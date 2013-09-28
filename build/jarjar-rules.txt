@@ -1,0 +1,4 @@
+rule net.sf.cglib.**.* org.testory.external.net.sf.cglib.@1.$@2
+rule net.sf.cglib.* org.testory.external.net.sf.cglib.$@1
+rule org.objenesis.**.* org.testory.external.org.objenesis.@1.$@2
+rule org.objenesis.* org.testory.external.org.objenesis.$@1
