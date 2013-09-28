@@ -76,8 +76,8 @@ import org.testory.TestoryAssertionError;
  * Few assertions can be used on their own. They are similar to junit's assertions
  * <ul>
  * <li><code>then(boolean)</code> is like <code>assertTrue(boolean)</code></li>
- * <li><code>then(Object, Object)</code> is like <code>assertEquals(Object, Object)</code> or like
- * <code>assertThat(T, Matcher&lt;T&gt;)</code></li>
+ * <li><code>then(Object, Object)</code> is like <code>assertThat(T, Matcher&lt;T&gt;)</code></li>
+ * <li><code>thenEqual(Object, Object)</code> is like <code>assertEquals(Object, Object)</code></li>
  * </ul>
  * </p>
  * 
