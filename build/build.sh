@@ -1,5 +1,8 @@
 #!/bin/bash
 
+BUILD_DIR=`dirname ${0}`
+cd "${BUILD_DIR}"
+
 #cleanup
 rm \
   --recursive \
