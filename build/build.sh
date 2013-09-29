@@ -19,6 +19,8 @@ mkdir \
 javac \
   -classpath "./../dep/cglib-nodep-2.2.3.jar:./../dep/objenesis-2.0.jar" \
   -sourcepath "./../src" \
+  -source 1.6 \
+  -target 1.6 \
   -d "./tmp/bin" \
   ./../src/org/testory/Testory.java
 
