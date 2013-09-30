@@ -19,7 +19,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class Describe_Mock {
   private Handler handler;
@@ -28,6 +27,7 @@ public class Describe_Mock {
   private Object object, mock;
   private Method method;
   private Throwable throwable;
+  private int counter;
 
   @Before
   public void before() throws NoSuchMethodException {
@@ -200,11 +200,15 @@ public class Describe_Mock {
 
   @Test
   public void should_not_intercept_finalize() {
-    handler = Mockito.mock(Handler.class);
+    handler = new Handler() {
+      public Object handle(Invocation invocation) {
+        return counter++;
+      }
+    };
     typing = typing($ConcreteClassWithFinalize.class, interfaces());
     mock = mock(typing, handler);
     (($ConcreteClassWithFinalize) mock).finalize();
-    Mockito.verifyZeroInteractions(handler);
+    assertEquals(0, counter);
   }
 
   @Test

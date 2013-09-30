@@ -2,9 +2,6 @@ package org.testory.mock;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.testory.mock.Invocation.invocation;
 import static org.testory.mock.Invocations.invoke;
 import static org.testory.test.TestUtils.newObject;
@@ -21,34 +18,48 @@ public class Describe_Invocations_invoke {
   private Host host;
   private Object object, argument;
   private Throwable throwable;
+  private int counter;
 
   @Before
   public void before() throws NoSuchMethodException {
     object = newObject("object");
     argument = newObject("argument");
-    host = mock(Host.class);
     method = Host.class.getDeclaredMethod("method", Object.class);
     throwable = new RuntimeException("throwable");
   }
 
   @Test
   public void should_invoke_invocation() throws Throwable {
+    host = new Host() {
+      Object method(Object arg) {
+        assertEquals(argument, arg);
+        return counter++;
+      }
+    };
     invocation = invocation(method, host, Arrays.asList(argument));
     invoke(invocation);
-    verify(host).method(argument);
+    assertEquals(1, counter);
   }
 
   @Test
   public void should_return_result_of_invocation() throws Throwable {
+    host = new Host() {
+      Object method(Object arg) {
+        return object;
+      }
+    };
     invocation = invocation(method, host, Arrays.asList(argument));
-    given(host.method(argument)).willReturn(object);
     assertEquals(object, invoke(invocation));
   }
 
   @Test
   public void should_throw_throwable_from_invocation() throws Throwable {
+    host = new Host() {
+      Object method(Object arg) throws Throwable {
+        throw throwable;
+      }
+    };
     invocation = invocation(method, host, Arrays.asList(argument));
-    given(host.method(argument)).willThrow(throwable);
     try {
       invoke(invocation);
       fail();
@@ -66,7 +77,8 @@ public class Describe_Invocations_invoke {
   }
 
   private static class Host {
-    Object method(Object arg) {
+    @SuppressWarnings("unused")
+    Object method(Object arg) throws Throwable {
       return null;
     }
   }

@@ -2,8 +2,6 @@ package org.testory.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.testory.common.Closures.invoked;
 import static org.testory.test.TestUtils.newObject;
 import static org.testory.test.TestUtils.newThrowable;
@@ -15,12 +13,12 @@ public class Describe_Closures_invoked {
   private Closure closure, invoked;
   private Object object;
   private Throwable throwable;
+  private int counter;
 
   @Before
   public void before() {
     object = newObject("object");
     throwable = newThrowable("throwable");
-    closure = mock(Closure.class);
   }
 
   @Test
@@ -52,14 +50,24 @@ public class Describe_Closures_invoked {
 
   @Test
   public void should_invoke_closure_once() throws Throwable {
+    closure = new Closure() {
+      public Object invoke() {
+        return counter++;
+      }
+    };
     invoked(closure);
-    verify(closure).invoke();
+    assertEquals(1, counter);
   }
 
   @Test
   public void should_not_invoke_closure_second_time() throws Throwable {
+    closure = new Closure() {
+      public Object invoke() throws Throwable {
+        return counter++;
+      }
+    };
     invoked = invoked(closure);
     invoked.invoke();
-    verify(closure).invoke();
+    assertEquals(1, counter);
   }
 }
