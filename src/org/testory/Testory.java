@@ -21,16 +21,10 @@ import java.util.HashSet;
 
 import org.testory.common.Closure;
 import org.testory.common.Nullable;
-import org.testory.doc.TestoryDemo;
-import org.testory.doc.TestoryTutorial;
 import org.testory.mock.Handler;
 import org.testory.mock.Invocation;
 import org.testory.mock.Invocations;
 
-/**
- * @see TestoryTutorial
- * @see TestoryDemo
- */
 public class Testory {
   public static void givenTest(Object test) {
     for (final Field field : test.getClass().getDeclaredFields()) {
