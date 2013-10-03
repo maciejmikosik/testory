@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.givenTest;
 
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -301,6 +302,16 @@ public class Describe_Testory_givenTest {
     TestClass test = new TestClass();
     givenTest(test);
     assertEquals(DummyClass.class.getDeclaredField("dummyField"), test.field);
+  }
+
+  @Test
+  public void should_inject_enum() {
+    class TestClass {
+      ElementType field;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertEquals(ElementType.class, test.field.getClass());
   }
 
   public static interface Interface {}

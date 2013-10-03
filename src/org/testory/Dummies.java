@@ -28,9 +28,11 @@ public class Dummies {
         ? reusableDummies.get(signature.type)
         : signature.type.isArray()
             ? dummyArray(signature)
-            : Modifier.isFinal(signature.type.getModifiers())
-                ? dummyFinal(signature)
-                : dummyMock(signature);
+            : signature.type.isEnum()
+                ? dummyEnum(signature)
+                : Modifier.isFinal(signature.type.getModifiers())
+                    ? dummyFinal(signature)
+                    : dummyMock(signature);
   }
 
   private static Map<Class<?>, Object> reusableDummies = reusableDummies();
@@ -73,6 +75,10 @@ public class Dummies {
     Object array = Array.newInstance(componentType, 1);
     Array.set(array, 0, dummy(signature(componentType, signature.name)));
     return array;
+  }
+
+  private static Object dummyEnum(Signature signature) {
+    return signature.type.getEnumConstants()[0];
   }
 
   private static Object dummyFinal(Signature signature) {

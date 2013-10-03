@@ -185,6 +185,7 @@ If field is of final class - injection fails unless class is one of
  - array - array with single dummy element (recursively)
  - String - string equal to field's name
  - primitive wrapper (for example Integer) - valueOf(0) (Integer.valueOf(0))
+ - enum - one of constants from enum declaration
  - Class - some concrete class
  - Method - some method declared in dummy class
  - Field - some field declared in dummy class
