@@ -252,8 +252,8 @@ public class Describe_Mock {
       }
     }
     mock = mock(typing(Foo.class, interfaces()), new Handler() {
-      public Object handle(Invocation interceptedInvocation) {
-        throw undeclared(throwable);
+      public Object handle(Invocation interceptedInvocation) throws Throwable {
+        throw throwable;
       }
     });
     try {
@@ -267,14 +267,12 @@ public class Describe_Mock {
   @Test
   public void should_stack_overflow_for_handler_invoking_invocation() {
     mock = mock(typing, new Handler() {
-      public Object handle(Invocation interceptedInvocation) {
+      public Object handle(Invocation interceptedInvocation) throws Throwable {
         try {
           return interceptedInvocation.method.invoke(interceptedInvocation.instance,
               interceptedInvocation.arguments.toArray());
         } catch (InvocationTargetException e) {
-          throw undeclared(e.getCause());
-        } catch (Exception e) {
-          throw undeclared(e);
+          throw e.getCause();
         }
       }
     });
@@ -338,15 +336,6 @@ public class Describe_Mock {
       throw new IllegalArgumentException();
     }
     return interfaces;
-  }
-
-  private static RuntimeException undeclared(Throwable throwable) {
-    Describe_Mock.<RuntimeException> doThrow(throwable);
-    throw new Error("unreachable");
-  }
-
-  private static <T extends Throwable> void doThrow(Throwable throwable) throws T {
-    throw (T) throwable;
   }
 }
 
