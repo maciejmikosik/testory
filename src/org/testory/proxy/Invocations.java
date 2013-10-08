@@ -1,6 +1,6 @@
-package org.testory.mock;
+package org.testory.proxy;
 
-import static org.testory.mock.Invocation.invocation;
+import static org.testory.proxy.Invocation.invocation;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

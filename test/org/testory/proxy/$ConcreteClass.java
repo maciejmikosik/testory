@@ -1,3 +1,3 @@
-package org.testory.mock;
+package org.testory.proxy;
 
 public class $ConcreteClass {}

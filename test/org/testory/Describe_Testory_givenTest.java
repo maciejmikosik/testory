@@ -17,7 +17,7 @@ import org.testory.Dummies.DummyClass;
 
 public class Describe_Testory_givenTest {
   @Test
-  public void should_mock_concrete_class() {
+  public void should_inject_concrete_class() {
     class ConcreteClass {}
     class TestClass {
       ConcreteClass field;
@@ -28,7 +28,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_mock_interface() {
+  public void should_inject_interface() {
     class TestClass {
       Interface field;
     }
@@ -38,7 +38,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_mock_abstract_class() {
+  public void should_inject_abstract_class() {
     abstract class AbstractClass {}
     class TestClass {
       AbstractClass field;
@@ -49,7 +49,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_mock_object_class() {
+  public void should_inject_object_class() {
     class TestClass {
       Object field;
     }
@@ -69,7 +69,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_stub_equals_to_match_same_mock() {
+  public void should_stub_equals_to_match_same_instance() {
     class TestClass {
       Object field;
     }
@@ -79,7 +79,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_stub_equals_to_not_match_not_same_mock() {
+  public void should_stub_equals_to_not_match_not_same_instance() {
     class TestClass {
       Object field;
       Object otherField;

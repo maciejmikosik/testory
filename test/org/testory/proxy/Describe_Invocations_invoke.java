@@ -1,9 +1,9 @@
-package org.testory.mock;
+package org.testory.proxy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.testory.mock.Invocation.invocation;
-import static org.testory.mock.Invocations.invoke;
+import static org.testory.proxy.Invocation.invocation;
+import static org.testory.proxy.Invocations.invoke;
 import static org.testory.test.TestUtils.newObject;
 
 import java.lang.reflect.Method;

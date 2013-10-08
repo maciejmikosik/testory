@@ -2,8 +2,8 @@ package org.testory;
 
 import static java.util.Collections.unmodifiableMap;
 import static org.testory.Dummies.Signature.signature;
-import static org.testory.mock.Mocks.mock;
-import static org.testory.mock.Typing.typing;
+import static org.testory.proxy.Proxies.proxy;
+import static org.testory.proxy.Typing.typing;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.testory.mock.Handler;
-import org.testory.mock.Invocation;
-import org.testory.mock.Typing;
+import org.testory.proxy.Handler;
+import org.testory.proxy.Invocation;
+import org.testory.proxy.Typing;
 
 public class Dummies {
   public static Object dummy(Class<?> type, String name) {
@@ -88,7 +88,7 @@ public class Dummies {
   }
 
   private static Object dummyMock(final Signature signature) {
-    return mock(typingCastableTo(signature.type), new Handler() {
+    return proxy(typingCastableTo(signature.type), new Handler() {
       public Object handle(Invocation invocation) {
         if (invocation.method.getName().equals("toString")) {
           return signature.name;

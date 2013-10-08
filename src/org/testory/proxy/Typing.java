@@ -1,4 +1,4 @@
-package org.testory.mock;
+package org.testory.proxy;
 
 import static org.testory.common.Checks.checkArgument;
 

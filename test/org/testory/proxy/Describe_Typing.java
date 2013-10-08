@@ -1,8 +1,8 @@
-package org.testory.mock;
+package org.testory.proxy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.testory.mock.Typing.typing;
+import static org.testory.proxy.Typing.typing;
 
 import java.util.Arrays;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package org.testory.mock;
+package org.testory.proxy;
 
 import org.testory.common.Nullable;
 

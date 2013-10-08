@@ -1,9 +1,9 @@
-package org.testory.mock;
+package org.testory.proxy;
 
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
-import static org.testory.mock.Invocation.invocation;
-import static org.testory.mock.Typing.typing;
+import static org.testory.proxy.Invocation.invocation;
+import static org.testory.proxy.Typing.typing;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -25,11 +25,9 @@ import net.sf.cglib.proxy.NoOp;
 
 import org.objenesis.ObjenesisStd;
 
-public class Mocks {
-  private Mocks() {}
-
+public class Proxies {
   /**
-   * Creates new mock instance that handles invocations with specified <b>handler</b> and extends
+   * Creates new proxy instance that handles invocations with specified <b>handler</b> and extends
    * superclass and implements interfaces of <b>typing</b>.
    * <p>
    * <ul>
@@ -43,13 +41,13 @@ public class Mocks {
    * <li>{@link Object#finalize()} is never intercepted</li>
    * </ul>
    */
-  public static Object mock(Typing typing, Handler handler) {
+  public static Object proxy(Typing typing, Handler handler) {
     checkNotNull(typing);
     checkNotNull(handler);
-    return newMockByCglib(tryAsMockable(typing), handler);
+    return newProxyByCglib(tryAsProxiable(typing), handler);
   }
 
-  private static Object newMockByCglib(Typing typing, final Handler handler) {
+  private static Object newProxyByCglib(Typing typing, final Handler handler) {
     Enhancer enhancer = new Enhancer() {
       /** includes all constructors */
       protected void filterConstructors(Class sc, List constructors) {}
@@ -79,7 +77,7 @@ public class Mocks {
     return proxy;
   }
 
-  private static Typing tryAsMockable(Typing typing) {
+  private static Typing tryAsProxiable(Typing typing) {
     return tryWithoutFactory(tryWithoutObjectBecauseOfCglibBug(typing));
   }
 
@@ -99,16 +97,16 @@ public class Mocks {
   }
 
   private static Typing tryWithoutObjectBecauseOfCglibBug(Typing typing) {
-    class MockableObject {}
+    class ProxiableObject {}
     return typing.superclass == Object.class
-        ? typing(MockableObject.class, typing.interfaces)
+        ? typing(ProxiableObject.class, typing.interfaces)
         : typing;
   }
 
   private static ClassLoader classLoadersFor(Typing typing) {
     LinkedHashSet<ClassLoader> loaders = new LinkedHashSet<ClassLoader>();
     loaders.add(typing.superclass.getClassLoader());
-    loaders.add(Mocks.class.getClassLoader());
+    loaders.add(Proxies.class.getClassLoader());
     loaders.add(Thread.currentThread().getContextClassLoader());
     loaders.remove(null);
     checkArgument(!loaders.isEmpty());

@@ -1,12 +1,12 @@
-package org.testory.mock;
+package org.testory.proxy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.testory.mock.Invocation.invocation;
-import static org.testory.mock.Mocks.mock;
-import static org.testory.mock.Typing.typing;
+import static org.testory.proxy.Invocation.invocation;
+import static org.testory.proxy.Proxies.proxy;
+import static org.testory.proxy.Typing.typing;
 import static org.testory.test.TestUtils.newObject;
 import static org.testory.test.TestUtils.newThrowable;
 
@@ -20,11 +20,11 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class Describe_Mock {
+public class Describe_Proxies_proxy {
   private Handler handler;
   private Typing typing;
   private Invocation savedInvocation;
-  private Object object, mock;
+  private Object object, proxy;
   private Method method;
   private Throwable throwable;
   private int counter;
@@ -43,120 +43,120 @@ public class Describe_Mock {
   }
 
   @Test
-  public void should_create_mock_extending_object() {
+  public void should_create_proxy_extending_object() {
     typing = typing(Object.class, interfaces());
-    mock = mock(typing, handler);
-    assertTrue(mock instanceof Object);
+    proxy = proxy(typing, handler);
+    assertTrue(proxy instanceof Object);
   }
 
   @Test
-  public void should_create_mock_extending_concrete_class() {
+  public void should_create_proxy_extending_concrete_class() {
     typing = typing($ConcreteClass.class, interfaces());
-    mock = mock(typing, handler);
-    assertTrue(mock instanceof $ConcreteClass);
+    proxy = proxy(typing, handler);
+    assertTrue(proxy instanceof $ConcreteClass);
   }
 
   @Test
-  public void should_create_mock_extending_package_private_concrete_class() {
+  public void should_create_proxy_extending_package_private_concrete_class() {
     typing = typing($PackagePrivateConcreteClass.class, interfaces());
-    mock = mock(typing, handler);
-    assertTrue(mock instanceof $PackagePrivateConcreteClass);
+    proxy = proxy(typing, handler);
+    assertTrue(proxy instanceof $PackagePrivateConcreteClass);
   }
 
   @Test
-  public void should_create_mock_extending_nested_in_method_concrete_class() {
+  public void should_create_proxy_extending_nested_in_method_concrete_class() {
     class NestedConcreteClass {}
     typing = typing(NestedConcreteClass.class, interfaces());
-    mock = mock(typing, handler);
-    assertTrue(mock instanceof NestedConcreteClass);
+    proxy = proxy(typing, handler);
+    assertTrue(proxy instanceof NestedConcreteClass);
   }
 
   @Test
-  public void should_create_mock_extending_abstract_class_with_abstract_method() {
+  public void should_create_proxy_extending_abstract_class_with_abstract_method() {
     typing = typing($AbstractClassWithAbstractMethod.class, interfaces());
-    mock = mock(typing, handler);
-    assertTrue(mock instanceof $AbstractClassWithAbstractMethod);
+    proxy = proxy(typing, handler);
+    assertTrue(proxy instanceof $AbstractClassWithAbstractMethod);
   }
 
   @Test
-  public void should_create_mock_extending_abstract_class_with_protected_abstract_method() {
+  public void should_create_proxy_extending_abstract_class_with_protected_abstract_method() {
     typing = typing($AbstractClassWithProtectedAbstractMethod.class, interfaces());
-    mock = mock(typing, handler);
-    assertTrue(mock instanceof $AbstractClassWithProtectedAbstractMethod);
+    proxy = proxy(typing, handler);
+    assertTrue(proxy instanceof $AbstractClassWithProtectedAbstractMethod);
   }
 
   @Test
-  public void should_create_mock_implementing_many_interfaces() {
+  public void should_create_proxy_implementing_many_interfaces() {
     typing = typing(Object.class,
         interfaces($InterfaceA.class, $InterfaceB.class, $InterfaceC.class));
-    mock = mock(typing, handler);
-    assertTrue(mock instanceof $InterfaceA);
-    assertTrue(mock instanceof $InterfaceB);
-    assertTrue(mock instanceof $InterfaceC);
+    proxy = proxy(typing, handler);
+    assertTrue(proxy instanceof $InterfaceA);
+    assertTrue(proxy instanceof $InterfaceB);
+    assertTrue(proxy instanceof $InterfaceC);
   }
 
-  // TODO fix: mock of package private interfaces
+  // TODO fix: proxy of package private interfaces
   @Ignore
   @Test
-  public void should_create_mock_implementing_many_package_private_interfaces() {
+  public void should_create_proxy_implementing_many_package_private_interfaces() {
     typing = typing(
         Object.class,
         interfaces($PackagePrivateInterfaceA.class, $PackagePrivateInterfaceB.class,
             $PackagePrivateInterfaceC.class));
-    mock = mock(typing, handler);
-    assertTrue(mock instanceof $PackagePrivateInterfaceA);
-    assertTrue(mock instanceof $PackagePrivateInterfaceB);
-    assertTrue(mock instanceof $PackagePrivateInterfaceC);
+    proxy = proxy(typing, handler);
+    assertTrue(proxy instanceof $PackagePrivateInterfaceA);
+    assertTrue(proxy instanceof $PackagePrivateInterfaceB);
+    assertTrue(proxy instanceof $PackagePrivateInterfaceC);
   }
 
   @Test
-  public void should_create_mock_extending_type_of_other_mock() {
+  public void should_create_proxy_extending_type_of_other_proxy() {
     typing = typing($ConcreteClass.class, interfaces($InterfaceA.class));
-    mock = mock(typing, handler);
-    mock = mock(typing(mock.getClass(), interfaces($InterfaceB.class)), handler);
-    assertTrue(mock instanceof $ConcreteClass);
-    assertTrue(mock instanceof $InterfaceA);
-    assertTrue(mock instanceof $InterfaceB);
+    proxy = proxy(typing, handler);
+    proxy = proxy(typing(proxy.getClass(), interfaces($InterfaceB.class)), handler);
+    assertTrue(proxy instanceof $ConcreteClass);
+    assertTrue(proxy instanceof $InterfaceA);
+    assertTrue(proxy instanceof $InterfaceB);
   }
 
   @Test
-  public void should_create_mock_extending_type_of_other_mock_extending_object() {
+  public void should_create_proxy_extending_type_of_other_proxy_extending_object() {
     typing = typing(Object.class, interfaces());
-    mock = mock(typing, handler);
-    mock = mock(typing(mock.getClass(), interfaces($InterfaceA.class)), handler);
-    assertTrue(mock instanceof $InterfaceA);
+    proxy = proxy(typing, handler);
+    proxy = proxy(typing(proxy.getClass(), interfaces($InterfaceA.class)), handler);
+    assertTrue(proxy instanceof $InterfaceA);
   }
 
   @Test
-  public void should_create_mock_extending_concrete_class_with_private_default_constructor() {
+  public void should_create_proxy_extending_concrete_class_with_private_default_constructor() {
     typing = typing($ConcreteClassWithPrivateDefaultConstructor.class, interfaces());
-    mock = mock(typing, handler);
-    assertTrue(mock instanceof $ConcreteClassWithPrivateDefaultConstructor);
+    proxy = proxy(typing, handler);
+    assertTrue(proxy instanceof $ConcreteClassWithPrivateDefaultConstructor);
   }
 
   @Test
-  public void should_create_mock_extending_concrete_class_with_private_constructor_with_arguments() {
+  public void should_create_proxy_extending_concrete_class_with_private_constructor_with_arguments() {
     typing = typing($ConcreteClassWithPrivateConstructorWithArguments.class, interfaces());
-    mock = mock(typing, handler);
-    assertTrue(mock instanceof $ConcreteClassWithPrivateConstructorWithArguments);
+    proxy = proxy(typing, handler);
+    assertTrue(proxy instanceof $ConcreteClassWithPrivateConstructorWithArguments);
   }
 
   @Test
-  public void should_create_mock_extending_type_of_other_mock_and_implementing_duplicated_interface() {
+  public void should_create_proxy_extending_type_of_other_proxy_and_implementing_duplicated_interface() {
     typing = typing($ConcreteClass.class, interfaces($InterfaceA.class));
-    mock = mock(typing, handler);
-    mock = mock(typing(mock.getClass(), interfaces($InterfaceA.class)), handler);
-    assertTrue(mock instanceof $ConcreteClass);
-    assertTrue(mock instanceof $InterfaceA);
+    proxy = proxy(typing, handler);
+    proxy = proxy(typing(proxy.getClass(), interfaces($InterfaceA.class)), handler);
+    assertTrue(proxy instanceof $ConcreteClass);
+    assertTrue(proxy instanceof $InterfaceA);
   }
 
   @Test
-  public void should_create_mock_with_duplicated_interfaces() {
+  public void should_create_proxy_with_duplicated_interfaces() {
     class Superclass implements $InterfaceA {}
     typing = typing(Superclass.class, interfaces($InterfaceA.class));
-    mock = mock(typing, handler);
-    assertTrue(mock instanceof Superclass);
-    assertTrue(mock instanceof $InterfaceA);
+    proxy = proxy(typing, handler);
+    assertTrue(proxy instanceof Superclass);
+    assertTrue(proxy instanceof $InterfaceA);
   }
 
   @Test
@@ -167,35 +167,35 @@ public class Describe_Mock {
       }
     }
     typing = typing(Foo.class, interfaces());
-    mock = mock(typing, handlerSavingInvocation());
+    proxy = proxy(typing, handlerSavingInvocation());
     method = Foo.class.getDeclaredMethod("foo", Object.class);
-    ((Foo) mock).foo(object);
-    assertEquals(invocation(method, mock, Arrays.asList(object)), savedInvocation);
+    ((Foo) proxy).foo(object);
+    assertEquals(invocation(method, proxy, Arrays.asList(object)), savedInvocation);
   }
 
   @Test
   public void should_intercept_equals() throws NoSuchMethodException {
-    mock = mock(typing, handlerSavingInvocation());
+    proxy = proxy(typing, handlerSavingInvocation());
     method = Object.class.getDeclaredMethod("equals", Object.class);
-    mock.equals(object);
-    assertEquals(invocation(method, mock, Arrays.asList(object)), savedInvocation);
+    proxy.equals(object);
+    assertEquals(invocation(method, proxy, Arrays.asList(object)), savedInvocation);
   }
 
   @Test
   public void should_intercept_to_string() throws NoSuchMethodException {
-    mock = mock(typing, handlerSavingInvocation());
+    proxy = proxy(typing, handlerSavingInvocation());
     method = Object.class.getDeclaredMethod("toString");
-    mock.toString();
-    assertEquals(invocation(method, mock, Arrays.asList()), savedInvocation);
+    proxy.toString();
+    assertEquals(invocation(method, proxy, Arrays.asList()), savedInvocation);
   }
 
   @Test
   public void should_intercept_clone() throws NoSuchMethodException {
     typing = typing($ConcreteClassWithClone.class, interfaces());
-    mock = mock(typing, handlerSavingInvocation());
+    proxy = proxy(typing, handlerSavingInvocation());
     method = $ConcreteClassWithClone.class.getDeclaredMethod("clone");
-    (($ConcreteClassWithClone) mock).clone();
-    assertEquals(invocation(method, mock, Arrays.asList()), savedInvocation);
+    (($ConcreteClassWithClone) proxy).clone();
+    assertEquals(invocation(method, proxy, Arrays.asList()), savedInvocation);
   }
 
   @Test
@@ -206,27 +206,27 @@ public class Describe_Mock {
       }
     };
     typing = typing($ConcreteClassWithFinalize.class, interfaces());
-    mock = mock(typing, handler);
-    (($ConcreteClassWithFinalize) mock).finalize();
+    proxy = proxy(typing, handler);
+    (($ConcreteClassWithFinalize) proxy).finalize();
     assertEquals(0, counter);
   }
 
   @Test
   public void should_intercept_package_private_method() throws NoSuchMethodException {
     typing = typing($ConcreteClassWithPackagePrivateMethod.class, interfaces());
-    mock = mock(typing, handlerSavingInvocation());
+    proxy = proxy(typing, handlerSavingInvocation());
     method = $ConcreteClassWithPackagePrivateMethod.class.getDeclaredMethod("packagePrivateMethod");
-    (($ConcreteClassWithPackagePrivateMethod) mock).packagePrivateMethod();
-    assertEquals(invocation(method, mock, Arrays.asList()), savedInvocation);
+    (($ConcreteClassWithPackagePrivateMethod) proxy).packagePrivateMethod();
+    assertEquals(invocation(method, proxy, Arrays.asList()), savedInvocation);
   }
 
   @Test
   public void should_intercept_protected_abstract_method() throws NoSuchMethodException {
     typing = typing($AbstractClassWithProtectedAbstractMethod.class, interfaces());
-    mock = mock(typing, handlerSavingInvocation());
+    proxy = proxy(typing, handlerSavingInvocation());
     method = $AbstractClassWithProtectedAbstractMethod.class.getDeclaredMethod("abstractMethod");
-    (($AbstractClassWithProtectedAbstractMethod) mock).abstractMethod();
-    assertEquals(invocation(method, mock, Arrays.asList()), savedInvocation);
+    (($AbstractClassWithProtectedAbstractMethod) proxy).abstractMethod();
+    assertEquals(invocation(method, proxy, Arrays.asList()), savedInvocation);
   }
 
   @Test
@@ -236,12 +236,12 @@ public class Describe_Mock {
         return null;
       }
     }
-    mock = mock(typing(Foo.class, interfaces()), new Handler() {
+    proxy = proxy(typing(Foo.class, interfaces()), new Handler() {
       public Object handle(Invocation interceptedInvocation) {
         return object;
       }
     });
-    assertSame(object, ((Foo) mock).foo());
+    assertSame(object, ((Foo) proxy).foo());
   }
 
   @Test
@@ -251,13 +251,13 @@ public class Describe_Mock {
         return null;
       }
     }
-    mock = mock(typing(Foo.class, interfaces()), new Handler() {
+    proxy = proxy(typing(Foo.class, interfaces()), new Handler() {
       public Object handle(Invocation interceptedInvocation) throws Throwable {
         throw throwable;
       }
     });
     try {
-      ((Foo) mock).foo();
+      ((Foo) proxy).foo();
       fail();
     } catch (Throwable t) {
       assertSame(throwable, t);
@@ -266,7 +266,7 @@ public class Describe_Mock {
 
   @Test
   public void should_stack_overflow_for_handler_invoking_invocation() {
-    mock = mock(typing, new Handler() {
+    proxy = proxy(typing, new Handler() {
       public Object handle(Invocation interceptedInvocation) throws Throwable {
         try {
           return interceptedInvocation.method.invoke(interceptedInvocation.instance,
@@ -277,7 +277,7 @@ public class Describe_Mock {
       }
     });
     try {
-      mock.toString();
+      proxy.toString();
       fail();
     } catch (StackOverflowError e) {}
   }
@@ -289,18 +289,18 @@ public class Describe_Mock {
         return 0;
       }
     }
-    mock = mock(typing(Foo.class, interfaces()), new Handler() {
+    proxy = proxy(typing(Foo.class, interfaces()), new Handler() {
       public Object handle(Invocation interceptedInvocation) {
         return null;
       }
     });
-    assertEquals(0, ((Foo) mock).foo());
+    assertEquals(0, ((Foo) proxy).foo());
   }
 
   @Test
-  public void should_not_create_mock_extending_final_type() {
+  public void should_not_create_proxy_extending_final_type() {
     try {
-      mock(typing($FinalClass.class, interfaces()), handler);
+      proxy(typing($FinalClass.class, interfaces()), handler);
       fail();
     } catch (IllegalArgumentException e) {}
   }
@@ -308,7 +308,7 @@ public class Describe_Mock {
   @Test
   public final void should_fail_for_null_typing() {
     try {
-      mock(null, handler);
+      proxy(null, handler);
       fail();
     } catch (NullPointerException e) {}
   }
@@ -316,7 +316,7 @@ public class Describe_Mock {
   @Test
   public final void should_fail_for_null_handler() {
     try {
-      mock(typing, null);
+      proxy(typing, null);
       fail();
     } catch (NullPointerException e) {}
   }

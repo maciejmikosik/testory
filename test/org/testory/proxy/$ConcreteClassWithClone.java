@@ -1,4 +1,4 @@
-package org.testory.mock;
+package org.testory.proxy;
 
 public class $ConcreteClassWithClone {
   public $ConcreteClassWithClone clone() {

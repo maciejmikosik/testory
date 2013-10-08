@@ -1,4 +1,4 @@
-package org.testory.mock;
+package org.testory.proxy;
 
 public abstract class $AbstractClassWithProtectedAbstractMethod {
   protected abstract void abstractMethod();

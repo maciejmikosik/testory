@@ -8,10 +8,10 @@ import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Matchers.match;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Throwables.gently;
-import static org.testory.mock.Invocations.invoke;
-import static org.testory.mock.Invocations.on;
-import static org.testory.mock.Mocks.mock;
-import static org.testory.mock.Typing.typing;
+import static org.testory.proxy.Invocations.invoke;
+import static org.testory.proxy.Invocations.on;
+import static org.testory.proxy.Proxies.proxy;
+import static org.testory.proxy.Typing.typing;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -21,9 +21,9 @@ import java.util.HashSet;
 
 import org.testory.common.Closure;
 import org.testory.common.Nullable;
-import org.testory.mock.Handler;
-import org.testory.mock.Invocation;
-import org.testory.mock.Invocations;
+import org.testory.proxy.Handler;
+import org.testory.proxy.Invocation;
+import org.testory.proxy.Invocations;
 
 public class Testory {
   public static void givenTest(Object test) {
@@ -66,7 +66,7 @@ public class Testory {
 
   public static <T> T givenTry(final T object) {
     checkUsage(object != null);
-    return (T) mock(typing(object.getClass(), new HashSet<Class<?>>()), new Handler() {
+    return (T) proxy(typing(object.getClass(), new HashSet<Class<?>>()), new Handler() {
       public Object handle(Invocation invocation) {
         Invocation onObjectInvocation = on(object, invocation);
         try {
@@ -93,7 +93,7 @@ public class Testory {
   public static <T> T givenTimes(final int number, final T object) {
     checkUsage(number >= 0);
     checkUsage(object != null);
-    return (T) mock(typing(object.getClass(), new HashSet<Class<?>>()), new Handler() {
+    return (T) proxy(typing(object.getClass(), new HashSet<Class<?>>()), new Handler() {
       public Object handle(final Invocation invocation) throws Throwable {
         final Invocation onObjectInvocation = on(object, invocation);
         for (int i = 0; i < number; i++) {
@@ -111,7 +111,7 @@ public class Testory {
       }
     });
     try {
-      return (T) mock(typing(object.getClass(), new HashSet<Class<?>>()), new Handler() {
+      return (T) proxy(typing(object.getClass(), new HashSet<Class<?>>()), new Handler() {
         public Object handle(final Invocation invocation) {
           final Invocation onObjectInvocation = on(object, invocation);
           Closure effect = invoked(new Closure() {
