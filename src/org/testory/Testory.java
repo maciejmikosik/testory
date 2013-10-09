@@ -74,7 +74,7 @@ public class Testory {
     } else if (type.isArray()) {
       Class<?> componentType = type.getComponentType();
       Object array = Array.newInstance(componentType, 1);
-      Array.set(array, 0, dummyOrMock(componentType, name));
+      Array.set(array, 0, dummyOrMock(componentType, name + "[0]"));
       return array;
     } else {
       return dummy(type, name);

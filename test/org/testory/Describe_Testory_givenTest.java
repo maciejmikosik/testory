@@ -293,21 +293,33 @@ public class Describe_Testory_givenTest {
   public void should_inject_array_of_strings() {
     class TestClass {
       String[] strings;
+      String[][] deepStrings;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertArrayEquals(new String[] { "strings" }, test.strings);
+    assertArrayEquals(new String[] { "strings[0]" }, test.strings);
+    assertArrayEquals(new String[][] { new String[] { "deepStrings[0][0]" } }, test.deepStrings);
   }
 
   @Test
   public void should_inject_array_of_mocks() {
     class TestClass {
       Object[] objects;
+      Object[][] deepObjects;
     }
     TestClass test = new TestClass();
     givenTest(test);
+
     assertEquals(1, test.objects.length);
     assertNotNull(test.objects[0]);
+    assertTrue(test.objects[0].equals(test.objects[0]));
+    assertEquals("objects[0]", test.objects[0].toString());
+
+    assertEquals(1, test.deepObjects.length);
+    assertEquals(1, test.deepObjects[0].length);
+    assertNotNull(test.deepObjects[0][0]);
+    assertTrue(test.deepObjects[0][0].equals(test.deepObjects[0][0]));
+    assertEquals("deepObjects[0][0]", test.deepObjects[0][0].toString());
   }
 
   @Test
