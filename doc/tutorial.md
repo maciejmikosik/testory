@@ -188,4 +188,5 @@ If field is of final class - injection fails unless class is one of
  - enum - one of constants from enum declaration
  - Class - some concrete class
  - Method - some method declared in dummy class
+ - Constructor - some constructor declared in dummy class
  - Field - some field declared in dummy class

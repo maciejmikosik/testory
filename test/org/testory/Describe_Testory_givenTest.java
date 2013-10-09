@@ -10,6 +10,7 @@ import static org.junit.Assert.fail;
 import static org.testory.Testory.givenTest;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -280,14 +281,17 @@ public class Describe_Testory_givenTest {
       Class<?> clazz;
       Field field;
       Method method;
+      Constructor<?> constructor;
     }
     TestClass test = new TestClass();
     givenTest(test);
     assertNotNull(test.clazz);
     assertNotNull(test.field);
     assertNotNull(test.method);
+    assertNotNull(test.constructor);
     assertEquals(test.clazz, test.field.getDeclaringClass());
     assertEquals(test.clazz, test.method.getDeclaringClass());
+    assertEquals(test.clazz, test.constructor.getDeclaringClass());
   }
 
   @Test

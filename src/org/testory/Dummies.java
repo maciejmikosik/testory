@@ -1,6 +1,7 @@
 package org.testory;
 
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -62,9 +63,11 @@ public class Dummies {
           ? DummyClass.class
           : type == Method.class
               ? DummyClass.class.getDeclaredMethod("dummyMethod")
-              : type == Field.class
-                  ? DummyClass.class.getDeclaredField("dummyField")
-                  : failCreatingDummy(type, name);
+              : type == Constructor.class
+                  ? DummyClass.class.getDeclaredConstructor()
+                  : type == Field.class
+                      ? DummyClass.class.getDeclaredField("dummyField")
+                      : failCreatingDummy(type, name);
     } catch (NoSuchMethodException e) {
       throw new Error(e);
     } catch (NoSuchFieldException e) {
