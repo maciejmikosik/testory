@@ -241,11 +241,8 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_arrays() {
+  public void should_inject_array_of_primitives() {
     class TestClass {
-      Object[] objects;
-      String[] strings;
-      Integer[] wrapperIntegers;
       boolean[] booleans;
       char[] characters;
       byte[] bytes;
@@ -257,22 +254,60 @@ public class Describe_Testory_givenTest {
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertEquals(1, test.objects.length);
-    assertTrue(test.objects[0] instanceof Object);
-    assertArrayEquals(new Integer[] { Integer.valueOf(0) }, test.wrapperIntegers);
-    assertArrayEquals(new String[] { "strings" }, test.strings);
     assertEquals(1, test.booleans.length);
     assertEquals((new boolean[1])[0], test.booleans[0]);
     assertArrayEquals(new char[1], test.characters);
     assertArrayEquals(new byte[1], test.bytes);
     assertArrayEquals(new short[1], test.shorts);
     assertArrayEquals(new int[1], test.integers);
-    assertEquals(1, test.longs.length);
-    assertEquals((new long[1])[0], test.longs[0]);
-    assertEquals(1, test.floats.length);
-    assertEquals((new float[1])[0], test.floats[0], 0.0f);
-    assertEquals(1, test.doubles.length);
-    assertEquals((new double[1])[0], test.doubles[0], 0.0);
+    assertArrayEquals(new long[1], test.longs);
+    assertArrayEquals(new float[1], test.floats, 0);
+    assertArrayEquals(new double[1], test.doubles, 0);
+  }
+
+  @Test
+  public void should_inject_array_of_wrappers() {
+    class TestClass {
+      Boolean[] booleans;
+      Character[] characters;
+      Byte[] bytes;
+      Short[] shorts;
+      Integer[] integers;
+      Long[] longs;
+      Float[] floats;
+      Double[] doubles;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertArrayEquals(new Boolean[] { false }, test.booleans);
+    assertArrayEquals(new Character[] { 0 }, test.characters);
+    assertArrayEquals(new Byte[] { 0 }, test.bytes);
+    assertArrayEquals(new Short[] { 0 }, test.shorts);
+    assertArrayEquals(new Integer[] { 0 }, test.integers);
+    assertArrayEquals(new Long[] { 0L }, test.longs);
+    assertArrayEquals(new Float[] { 0f }, test.floats);
+    assertArrayEquals(new Double[] { 0.0 }, test.doubles);
+  }
+
+  @Test
+  public void should_inject_array_of_strings() {
+    class TestClass {
+      String[] strings;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertArrayEquals(new String[] { "strings" }, test.strings);
+  }
+
+  @Test
+  public void should_inject_array_of_mocks() {
+    class TestClass {
+      Object[] objects;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertEquals(1, test.objects.length);
+    assertNotNull(test.objects[0]);
   }
 
   @Test
