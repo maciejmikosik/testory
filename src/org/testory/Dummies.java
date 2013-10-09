@@ -51,6 +51,12 @@ public class Dummies {
   }
 
   private static Object dummyReflected(Class<?> type, String name) {
+    @SuppressWarnings("unused")
+    class DummyClass {
+      public Object dummyField;
+
+      public void dummyMethod() {}
+    }
     try {
       return type == Class.class
           ? DummyClass.class
@@ -69,11 +75,5 @@ public class Dummies {
   private static Object failCreatingDummy(Class<?> type, String name) {
     throw new IllegalArgumentException("failed creating dummy for field: " + type.getSimpleName()
         + " " + name);
-  }
-
-  class DummyClass {
-    public Object dummyField;
-
-    public void dummyMethod() {}
   }
 }

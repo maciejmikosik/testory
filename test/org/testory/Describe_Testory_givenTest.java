@@ -3,6 +3,7 @@ package org.testory;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -13,7 +14,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
-import org.testory.Dummies.DummyClass;
 
 public class Describe_Testory_givenTest {
   @Test
@@ -275,33 +275,19 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_class() {
+  public void should_inject_reflection_classes() {
     class TestClass {
-      Class<?> field;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    assertEquals(DummyClass.class, test.field);
-  }
-
-  @Test
-  public void should_inject_method() throws NoSuchMethodException {
-    class TestClass {
-      Method field;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    assertEquals(DummyClass.class.getDeclaredMethod("dummyMethod"), test.field);
-  }
-
-  @Test
-  public void should_inject_field() throws NoSuchFieldException {
-    class TestClass {
+      Class<?> clazz;
       Field field;
+      Method method;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertEquals(DummyClass.class.getDeclaredField("dummyField"), test.field);
+    assertNotNull(test.clazz);
+    assertNotNull(test.field);
+    assertNotNull(test.method);
+    assertEquals(test.clazz, test.field.getDeclaringClass());
+    assertEquals(test.clazz, test.method.getDeclaringClass());
   }
 
   @Test
