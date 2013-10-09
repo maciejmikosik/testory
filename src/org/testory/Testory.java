@@ -13,10 +13,12 @@ import static org.testory.proxy.Invocations.on;
 import static org.testory.proxy.Proxies.proxy;
 import static org.testory.proxy.Typing.typing;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import org.testory.common.Closure;
@@ -24,6 +26,7 @@ import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.Invocations;
+import org.testory.proxy.Typing;
 
 public class Testory {
   public static void givenTest(Object test) {
@@ -37,7 +40,7 @@ public class Testory {
         });
         try {
           if (field.get(test) == null) {
-            field.set(test, dummy(field.getType(), field.getName()));
+            field.set(test, dummyOrMock(field.getType(), field.getName()));
           }
         } catch (RuntimeException e) {
           throw new TestoryException(e);
@@ -45,6 +48,36 @@ public class Testory {
           throw new Error(e);
         }
       }
+    }
+  }
+
+  private static Object dummyOrMock(Class<?> type, final String name) {
+    if (!Modifier.isFinal(type.getModifiers())) {
+      Typing typing = type.isInterface()
+          ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
+          : typing(type, new HashSet<Class<?>>());
+      Handler handler = new Handler() {
+        public Object handle(Invocation invocation) {
+          if (invocation.method.getName().equals("toString")) {
+            return name;
+          }
+          if (invocation.method.getName().equals("equals") && invocation.arguments.size() == 1) {
+            return invocation.instance == invocation.arguments.get(0);
+          }
+          if (invocation.method.getName().equals("hashCode") && invocation.arguments.size() == 0) {
+            return name.hashCode();
+          }
+          return null;
+        }
+      };
+      return proxy(typing, handler);
+    } else if (type.isArray()) {
+      Class<?> componentType = type.getComponentType();
+      Object array = Array.newInstance(componentType, 1);
+      Array.set(array, 0, dummyOrMock(componentType, name));
+      return array;
+    } else {
+      return dummy(type, name);
     }
   }
 

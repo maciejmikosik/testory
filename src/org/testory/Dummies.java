@@ -1,43 +1,31 @@
 package org.testory;
 
-import static java.util.Collections.unmodifiableMap;
-import static org.testory.Dummies.Signature.signature;
-import static org.testory.proxy.Proxies.proxy;
-import static org.testory.proxy.Typing.typing;
-
-import java.lang.reflect.Array;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.testory.proxy.Handler;
-import org.testory.proxy.Invocation;
-import org.testory.proxy.Typing;
-
 public class Dummies {
   public static Object dummy(Class<?> type, String name) {
-    return dummy(signature(type, name));
+    return type.isPrimitive() || wrappers.contains(type)
+        ? dummyPrimitive(type, name)
+        : type.isEnum()
+            ? type.getEnumConstants()[0]
+            : type == String.class
+                ? name
+                : type == Class.class || AccessibleObject.class.isAssignableFrom(type)
+                    ? dummyReflected(type, name)
+                    : failCreatingDummy(type, name);
   }
 
-  private static Object dummy(Signature signature) {
-    return reusableDummies.containsKey(signature.type)
-        ? reusableDummies.get(signature.type)
-        : signature.type.isArray()
-            ? dummyArray(signature)
-            : signature.type.isEnum()
-                ? dummyEnum(signature)
-                : Modifier.isFinal(signature.type.getModifiers())
-                    ? dummyFinal(signature)
-                    : dummyMock(signature);
-  }
+  private static final HashSet<Class<?>> wrappers = new HashSet<Class<?>>(Arrays.asList(Void.class,
+      Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class,
+      Float.class, Double.class));
 
-  private static Map<Class<?>, Object> reusableDummies = reusableDummies();
-
-  private static Map<Class<?>, Object> reusableDummies() {
+  private static Object dummyPrimitive(Class<?> type, String name) {
     Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
 
     map.put(boolean.class, Boolean.FALSE);
@@ -59,79 +47,33 @@ public class Dummies {
     map.put(Float.class, Float.valueOf(0));
     map.put(Double.class, Double.valueOf(0));
 
+    return map.get(type);
+  }
+
+  private static Object dummyReflected(Class<?> type, String name) {
     try {
-      map.put(Class.class, DummyClass.class);
-      map.put(Method.class, DummyClass.class.getDeclaredMethod("dummyMethod"));
-      map.put(Field.class, DummyClass.class.getDeclaredField("dummyField"));
-    } catch (Exception e) {
+      return type == Class.class
+          ? DummyClass.class
+          : type == Method.class
+              ? DummyClass.class.getDeclaredMethod("dummyMethod")
+              : type == Field.class
+                  ? DummyClass.class.getDeclaredField("dummyField")
+                  : failCreatingDummy(type, name);
+    } catch (NoSuchMethodException e) {
+      throw new Error(e);
+    } catch (NoSuchFieldException e) {
       throw new Error(e);
     }
-
-    return unmodifiableMap(map);
   }
 
-  private static Object dummyArray(Signature signature) {
-    Class<?> componentType = signature.type.getComponentType();
-    Object array = Array.newInstance(componentType, 1);
-    Array.set(array, 0, dummy(signature(componentType, signature.name)));
-    return array;
-  }
-
-  private static Object dummyEnum(Signature signature) {
-    return signature.type.getEnumConstants()[0];
-  }
-
-  private static Object dummyFinal(Signature signature) {
-    return signature.type == String.class
-        ? signature.name
-        : failCreatingDummy(signature);
-  }
-
-  private static Object dummyMock(final Signature signature) {
-    return proxy(typingCastableTo(signature.type), new Handler() {
-      public Object handle(Invocation invocation) {
-        if (invocation.method.getName().equals("toString")) {
-          return signature.name;
-        }
-        if (invocation.method.getName().equals("equals") && invocation.arguments.size() == 1) {
-          return invocation.instance == invocation.arguments.get(0);
-        }
-        if (invocation.method.getName().equals("hashCode") && invocation.arguments.size() == 0) {
-          return signature.name.hashCode();
-        }
-        return null;
-      }
-    });
-  }
-
-  private static Typing typingCastableTo(Class<?> type) {
-    return type.isInterface()
-        ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
-        : typing(type, new HashSet<Class<?>>());
-  }
-
-  private static Object failCreatingDummy(Signature signature) {
-    throw new IllegalArgumentException("failed creating dummy for field: "
-        + signature.type.getSimpleName() + " " + signature.name);
+  private static Object failCreatingDummy(Class<?> type, String name) {
+    throw new IllegalArgumentException("failed creating dummy for field: " + type.getSimpleName()
+        + " " + name);
   }
 
   class DummyClass {
     public Object dummyField;
 
     public void dummyMethod() {}
-  }
-
-  static class Signature {
-    public final Class<?> type;
-    public final String name;
-
-    private Signature(Class<?> type, String name) {
-      this.type = type;
-      this.name = name;
-    }
-
-    public static Signature signature(Class<?> type, String name) {
-      return new Signature(type, name);
-    }
   }
 }
