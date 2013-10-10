@@ -31,7 +31,7 @@ import org.testory.proxy.Typing;
 public class Testory {
   public static void givenTest(Object test) {
     for (final Field field : test.getClass().getDeclaredFields()) {
-      if (!Modifier.isStatic(field.getModifiers())) {
+      if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
           public Void run() {
             field.setAccessible(true);

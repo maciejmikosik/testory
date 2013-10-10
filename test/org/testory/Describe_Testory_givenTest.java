@@ -4,6 +4,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -188,6 +189,27 @@ public class Describe_Testory_givenTest {
     assertTrue(test.longField == 1);
     assertTrue(test.floatField == 1);
     assertTrue(test.doubleField == 1);
+  }
+
+  static class TestClassWithStaticField {
+    static Object field = null;
+  }
+
+  @Test
+  public void should_skip_static_field() {
+    TestClassWithStaticField test = new TestClassWithStaticField();
+    givenTest(test);
+    assertNull(TestClassWithStaticField.field);
+  }
+
+  @Test
+  public void should_skip_final_field() {
+    class TestClass {
+      final Object field = null;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertNull(test.field);
   }
 
   @Test

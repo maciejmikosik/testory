@@ -170,6 +170,8 @@ Field is ignored if
 
  - field is primitive already assigned to something other than binary zero
  - field is reference already assigned to something other than null
+ - field is final
+ - field is static
  - field is not declared in **test**'s class but in it's superclass
 
 Initialization depends on type of field.
