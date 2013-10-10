@@ -1,7 +1,7 @@
 package org.testory;
 
-import static org.testory.Dummies.dummy;
 import static org.testory.Formats.formatSection;
+import static org.testory.Samples.sample;
 import static org.testory.WhenEffect.whenEffect;
 import static org.testory.common.Closures.invoked;
 import static org.testory.common.Matchers.isMatcher;
@@ -40,7 +40,7 @@ public class Testory {
         });
         try {
           if (field.get(test) == null) {
-            field.set(test, dummyOrMock(field.getType(), field.getName()));
+            field.set(test, mockOrSample(field.getType(), field.getName()));
           }
         } catch (RuntimeException e) {
           throw new TestoryException(e);
@@ -51,7 +51,7 @@ public class Testory {
     }
   }
 
-  private static Object dummyOrMock(Class<?> type, final String name) {
+  private static Object mockOrSample(Class<?> type, final String name) {
     if (!Modifier.isFinal(type.getModifiers())) {
       Typing typing = type.isInterface()
           ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
@@ -74,10 +74,10 @@ public class Testory {
     } else if (type.isArray()) {
       Class<?> componentType = type.getComponentType();
       Object array = Array.newInstance(componentType, 1);
-      Array.set(array, 0, dummyOrMock(componentType, name + "[0]"));
+      Array.set(array, 0, mockOrSample(componentType, name + "[0]"));
       return array;
     } else {
-      return dummy(type, name);
+      return sample(type, name);
     }
   }
 

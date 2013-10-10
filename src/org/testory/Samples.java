@@ -9,24 +9,24 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public class Dummies {
-  public static Object dummy(Class<?> type, String name) {
+public class Samples {
+  public static Object sample(Class<?> type, String name) {
     return type.isPrimitive() || wrappers.contains(type)
-        ? dummyPrimitive(type, name)
+        ? samplePrimitive(type, name)
         : type.isEnum()
             ? type.getEnumConstants()[0]
             : type == String.class
                 ? name
                 : type == Class.class || AccessibleObject.class.isAssignableFrom(type)
-                    ? dummyReflected(type, name)
-                    : failCreatingDummy(type, name);
+                    ? sampleReflected(type, name)
+                    : fail(type, name);
   }
 
   private static final HashSet<Class<?>> wrappers = new HashSet<Class<?>>(Arrays.asList(Void.class,
       Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class,
       Float.class, Double.class));
 
-  private static Object dummyPrimitive(Class<?> type, String name) {
+  private static Object samplePrimitive(Class<?> type, String name) {
     Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
 
     map.put(boolean.class, Boolean.FALSE);
@@ -51,23 +51,23 @@ public class Dummies {
     return map.get(type);
   }
 
-  private static Object dummyReflected(Class<?> type, String name) {
+  private static Object sampleReflected(Class<?> type, String name) {
     @SuppressWarnings("unused")
-    class DummyClass {
-      public Object dummyField;
+    class SampleClass {
+      public Object sampleField;
 
-      public void dummyMethod() {}
+      public void sampleMethod() {}
     }
     try {
       return type == Class.class
-          ? DummyClass.class
+          ? SampleClass.class
           : type == Method.class
-              ? DummyClass.class.getDeclaredMethod("dummyMethod")
+              ? SampleClass.class.getDeclaredMethod("sampleMethod")
               : type == Constructor.class
-                  ? DummyClass.class.getDeclaredConstructor()
+                  ? SampleClass.class.getDeclaredConstructor()
                   : type == Field.class
-                      ? DummyClass.class.getDeclaredField("dummyField")
-                      : failCreatingDummy(type, name);
+                      ? SampleClass.class.getDeclaredField("sampleField")
+                      : fail(type, name);
     } catch (NoSuchMethodException e) {
       throw new Error(e);
     } catch (NoSuchFieldException e) {
@@ -75,8 +75,8 @@ public class Dummies {
     }
   }
 
-  private static Object failCreatingDummy(Class<?> type, String name) {
-    throw new IllegalArgumentException("failed creating dummy for field: " + type.getSimpleName()
-        + " " + name);
+  private static Object fail(Class<?> type, String name) {
+    throw new IllegalArgumentException("failed creating sample: " + type.getSimpleName() + " "
+        + name);
   }
 }

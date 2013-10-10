@@ -156,37 +156,46 @@ Catches possible throwable thrown by chained method allowing test to run forward
         when(list.size());
         thenReturned(0);
 
-givenTest
----------
+Initialization of test fields
+=============================
 
-Initializes all test's fields at once.
+`givenTest` initializes each field of **this** test and fails if initialization of any field fails.
 
         @Before
         public void before() {
           givenTest(this);
         }
 
-This injects dummy (unstubbable mock) into each field of **test**.
+Field is ignored if
 
-Injected dummy has following properties
-
- - Object.toString() is stubbed to return name of declared field
- - Object.equals(Object) is stubbed so dummy is equal only to itself
- - Object.hashCode() is stubbed to obey contract
-
-Field is skipped (nothing is injected) if
-
- - field is not null
- - field is of primitive type
+ - field is primitive already assigned to something other than binary zero
+ - field is reference already assigned to something other than null
  - field is not declared in **test**'s class but in it's superclass
 
-If field is of final class - injection fails unless class is one of
+Initialization depends on type of field.
 
- - array - array with single dummy element (recursively)
- - String - string equal to field's name
- - primitive wrapper (for example Integer) - valueOf(0) (Integer.valueOf(0))
- - enum - one of constants from enum declaration
- - Class - some concrete class
- - Method - some method declared in dummy class
- - Constructor - some constructor declared in dummy class
- - Field - some field declared in dummy class
+Array
+-----
+
+Field of array type is initialized to array of size 1. Array's cell is initialized recursively.
+
+Final type
+----------
+
+Field of final type is assigned to sample data
+
+ - Primitive stays assigned to binary zero. Wrapper is assigned to value of zero.
+ - String is initialized to name of field.
+ - Enum is initialized to one of enum constants.
+ - Class is initialized to some sample class.
+ - Field, Method and Constructor is assigned to member of sample class.
+
+Non-final type
+--------------
+
+Field of non-final type is assigned to dummy (unstubbable mock).
+Dummy has following properties
+
+ - Object.toString() is stubbed to return name of field
+ - Object.equals(Object) is stubbed so dummy is equal only to itself
+ - Object.hashCode() is stubbed to obey contract

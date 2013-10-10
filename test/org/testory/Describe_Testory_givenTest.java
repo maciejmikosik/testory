@@ -215,6 +215,30 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
+  public void should_inject_primitives() {
+    class TestClass {
+      boolean booleanField;
+      char characterField;
+      byte byteField;
+      short shortField;
+      int integerField;
+      long longField;
+      float floatField;
+      double doubleField;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertEquals(false, test.booleanField);
+    assertEquals(0, test.characterField);
+    assertEquals(0, test.byteField);
+    assertEquals(0, test.shortField);
+    assertEquals(0, test.integerField);
+    assertEquals(0, test.longField);
+    assertEquals(0, test.floatField, 0);
+    assertEquals(0, test.doubleField, 0);
+  }
+
+  @Test
   public void should_inject_wrappers() {
     class TestClass {
       Void voidField;
