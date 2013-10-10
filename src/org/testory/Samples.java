@@ -5,9 +5,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Samples {
   public static Object sample(Class<?> type, String name) {
@@ -22,9 +24,9 @@ public class Samples {
                     : fail(type, name);
   }
 
-  private static final HashSet<Class<?>> wrappers = new HashSet<Class<?>>(Arrays.asList(Void.class,
-      Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class,
-      Float.class, Double.class));
+  private static final Set<Class<?>> wrappers = Collections.unmodifiableSet(new HashSet<Class<?>>(
+      Arrays.asList(Void.class, Boolean.class, Character.class, Byte.class, Short.class,
+          Integer.class, Long.class, Float.class, Double.class)));
 
   private static Object samplePrimitive(Class<?> type, String name) {
     Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
