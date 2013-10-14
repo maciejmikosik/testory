@@ -15,7 +15,7 @@ public class Samples {
     return type.isPrimitive() || wrappers.contains(type)
         ? samplePrimitive(type, name)
         : type.isEnum()
-            ? type.getEnumConstants()[0]
+            ? dummyEnum(type, name)
             : type == String.class
                 ? name
                 : type == Class.class || AccessibleObject.class.isAssignableFrom(type)
@@ -67,6 +67,12 @@ public class Samples {
     return sign
         ? value
         : -value;
+  }
+
+  private static Object dummyEnum(Class<?> type, String name) {
+    Random random = new Random(new Random(name.hashCode()).nextLong());
+    Object[] constants = type.getEnumConstants();
+    return constants[random.nextInt(constants.length)];
   }
 
   private static Object sampleReflected(Class<?> type, String name) {

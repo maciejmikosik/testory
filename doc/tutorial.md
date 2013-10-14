@@ -195,7 +195,7 @@ Field of final type is assigned to sample data
    - `value * value * value` does not cause overflow or underflow
    - is not equal to +0.0 or -0.0
  - String is initialized to name of field.
- - Enum is initialized to one of enum constants.
+ - Enum is initialized to random constant.
  - Class is initialized to some sample class.
  - Field, Method and Constructor is assigned to member of sample class.
 

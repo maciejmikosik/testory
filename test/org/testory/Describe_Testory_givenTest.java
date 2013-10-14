@@ -16,6 +16,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
@@ -325,12 +326,15 @@ public class Describe_Testory_givenTest {
 
   @Test
   public void should_inject_enum() {
+    @SuppressWarnings("unused")
     class TestClass {
-      ElementType field;
+      ElementType a, b, c, d, e, f, g, h, i, j;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertEquals(ElementType.class, test.field.getClass());
+
+    List<Object> fields = readDeclaredFields(test);
+    assertTrue("" + fields, new HashSet<Object>(fields).size() > ElementType.values().length / 2);
   }
 
   @Test
