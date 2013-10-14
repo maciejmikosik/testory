@@ -7,6 +7,9 @@ import static org.testory.Testory.when;
 import static org.testory.test.TestUtils.newObject;
 import static org.testory.test.TestUtils.newThrowable;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.common.Closure;
@@ -60,6 +63,8 @@ public class Describe_Testory_thenThrown {
           + "    throwable\n" //
           + "  but thrown\n" //
           + "    otherThrowable\n" //
+          + "\n" //
+          + printStackTrace(otherThrowable) + "\n" //
       , e.getMessage());
     }
   }
@@ -111,9 +116,10 @@ public class Describe_Testory_thenThrown {
   public void should_fail_if_thrown_throwable_not_related_to_expected_type() {
     class ExpectedThrowable extends Throwable {}
     class OtherThrowable extends Throwable {}
+    otherThrowable = new OtherThrowable();
     when(new Closure() {
       public Object invoke() throws Throwable {
-        throw new OtherThrowable();
+        throw otherThrowable;
       }
     });
     try {
@@ -125,6 +131,8 @@ public class Describe_Testory_thenThrown {
           + "    " + ExpectedThrowable.class.getName() + "\n" //
           + "  but thrown instance of\n" //
           + "    " + OtherThrowable.class.getName() + "\n" //
+          + "\n" //
+          + printStackTrace(otherThrowable) + "\n" //
       , e.getMessage());
     }
   }
@@ -133,9 +141,10 @@ public class Describe_Testory_thenThrown {
   public void should_fail_if_thrown_throwable_supertyping_expected_type() {
     class SuperThrowable extends Throwable {}
     class ExpectedThrowable extends SuperThrowable {}
+    otherThrowable = new SuperThrowable();
     when(new Closure() {
       public Object invoke() throws Throwable {
-        throw new SuperThrowable();
+        throw otherThrowable;
       }
     });
     try {
@@ -147,6 +156,8 @@ public class Describe_Testory_thenThrown {
           + "    " + ExpectedThrowable.class.getName() + "\n" //
           + "  but thrown instance of\n" //
           + "    " + SuperThrowable.class.getName() + "\n" //
+          + "\n" //
+          + printStackTrace(otherThrowable) + "\n" //
       , e.getMessage());
     }
   }
@@ -198,6 +209,8 @@ public class Describe_Testory_thenThrown {
           + "    matcher\n" //
           + "  but thrown\n" //
           + "    otherThrowable\n" //
+          + "\n" //
+          + printStackTrace(otherThrowable) + "\n" //
       , e.getMessage());
     }
   }
@@ -282,5 +295,11 @@ public class Describe_Testory_thenThrown {
       thenThrown((Object) null);
       fail();
     } catch (TestoryException e) {}
+  }
+
+  private static String printStackTrace(Throwable throwable) {
+    StringWriter writer = new StringWriter();
+    throwable.printStackTrace(new PrintWriter(writer));
+    return writer.toString();
   }
 }

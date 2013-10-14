@@ -1,6 +1,7 @@
 package org.testory;
 
 import static org.testory.Formats.formatSection;
+import static org.testory.Formats.formatThrowable;
 import static org.testory.Samples.sample;
 import static org.testory.WhenEffect.whenEffect;
 import static org.testory.common.Closures.invoked;
@@ -212,7 +213,9 @@ public class Testory {
     } catch (Throwable throwable) {
       throw assertionError("\n" //
           + formatSection("expected returned", objectOrMatcher) //
-          + formatSection("but thrown", throwable));
+          + formatSection("but thrown", throwable) //
+          + "\n" //
+          + formatThrowable(throwable));
     }
     if (!areEqualDeep(objectOrMatcher, object)
         && !(objectOrMatcher != null && isMatcher(objectOrMatcher) && match(objectOrMatcher, object))) {
@@ -261,7 +264,9 @@ public class Testory {
     } catch (Throwable throwable) {
       throw assertionError("\n" //
           + formatSection("expected returned", "") //
-          + formatSection("but thrown", throwable));
+          + formatSection("but thrown", throwable) //
+          + "\n" //
+          + formatThrowable(throwable));
     }
   }
 
@@ -276,7 +281,9 @@ public class Testory {
       if (!match(matcher, throwable)) {
         throw assertionError("\n" //
             + formatSection("expected thrown throwable matching", matcher) //
-            + formatSection("but thrown", throwable));
+            + formatSection("but thrown", throwable) //
+            + "\n" //
+            + formatThrowable(throwable));
       }
       return;
     }
@@ -295,7 +302,9 @@ public class Testory {
       if (!areEqualDeep(expectedThrowable, throwable)) {
         throw assertionError("\n" //
             + formatSection("expected thrown", expectedThrowable) //
-            + formatSection("but thrown", throwable));
+            + formatSection("but thrown", throwable) //
+            + "\n" //
+            + formatThrowable(throwable));
       }
       return;
     }
@@ -314,7 +323,9 @@ public class Testory {
       if (!type.isInstance(throwable)) {
         throw assertionError("\n" //
             + formatSection("expected thrown instance of", type.getName()) //
-            + formatSection("but thrown instance of", throwable.getClass().getName()));
+            + formatSection("but thrown instance of", throwable.getClass().getName()) //
+            + "\n" //
+            + formatThrowable(throwable));
       }
       return;
     }

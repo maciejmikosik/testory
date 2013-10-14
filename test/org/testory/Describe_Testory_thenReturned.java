@@ -7,6 +7,9 @@ import static org.testory.Testory.when;
 import static org.testory.test.TestUtils.newObject;
 import static org.testory.test.TestUtils.newThrowable;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.common.Closure;
@@ -77,6 +80,8 @@ public class Describe_Testory_thenReturned {
           + "    object\n" //
           + "  but thrown\n" //
           + "    throwable\n" //
+          + "\n" //
+          + printStackTrace(throwable) + "\n" //
       , e.getMessage());
     }
   }
@@ -173,6 +178,8 @@ public class Describe_Testory_thenReturned {
           + "    matcher\n" //
           + "  but thrown\n" //
           + "    throwable\n" //
+          + "\n" //
+          + printStackTrace(throwable) + "\n" //
       , e.getMessage());
     }
   }
@@ -243,6 +250,8 @@ public class Describe_Testory_thenReturned {
           + "    4\n" //
           + "  but thrown\n" //
           + "    throwable\n" //
+          + "\n" //
+          + printStackTrace(throwable) + "\n" //
       , e.getMessage());
     }
   }
@@ -293,6 +302,8 @@ public class Describe_Testory_thenReturned {
           + "    null\n" //
           + "  but thrown\n" //
           + "    throwable\n" //
+          + "\n" //
+          + printStackTrace(throwable) + "\n" //
       , e.getMessage());
     }
   }
@@ -333,7 +344,15 @@ public class Describe_Testory_thenReturned {
           + "    \n" //
           + "  but thrown\n" //
           + "    throwable\n" //
+          + "\n" //
+          + printStackTrace(throwable) + "\n" //
       , e.getMessage());
     }
+  }
+
+  private static String printStackTrace(Throwable throwable) {
+    StringWriter writer = new StringWriter();
+    throwable.printStackTrace(new PrintWriter(writer));
+    return writer.toString();
   }
 }

@@ -1,5 +1,7 @@
 package org.testory;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Array;
 
 import org.testory.common.Nullable;
@@ -32,5 +34,14 @@ public class Formats {
     }
     builder.append(']');
     return builder.toString();
+  }
+
+  public static String formatThrowable(Throwable throwable) {
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter printWriter = new PrintWriter(stringWriter);
+    throwable.printStackTrace(printWriter);
+    printWriter.write("\n");
+    printWriter.close();
+    return stringWriter.toString();
   }
 }
