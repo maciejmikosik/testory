@@ -355,7 +355,7 @@ public class Testory {
         + formatSection("but returned", object));
   }
 
-  public static <T> void then(@Nullable T object, Object matcher) {
+  public static void then(@Nullable Object object, Object matcher) {
     checkUsage(matcher != null);
     checkUsage(isMatcher(matcher));
     if (!match(matcher, object)) {
@@ -365,7 +365,7 @@ public class Testory {
     }
   }
 
-  public static <T> void thenEqual(@Nullable Object object, @Nullable Object expected) {
+  public static void thenEqual(@Nullable Object object, @Nullable Object expected) {
     if (!areEqualDeep(object, expected)) {
       throw assertionError("\n" //
           + formatSection("expected", expected) //
