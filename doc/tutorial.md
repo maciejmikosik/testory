@@ -186,11 +186,20 @@ Final type
 
 Field of final type is assigned to sample data
 
- - Primitive stays assigned to binary zero. Wrapper is assigned to value of zero.
+ - `boolean`, `Boolean` is assigned to random value.
+ - `char`, `Character` is assigned to random lowercase letter.
+ - `byte`, `Byte`, `short`, `Short`, `int`, `Integer`, `long`, `Long` is assigned to random value such as
+   - `value * value * value` does not cause overflow
+   - is not equal to any of: -1, 0, 1
+ - `float`, `Float`, `double`, `Double` is assigned to random value such as
+   - `value * value * value` does not cause overflow or underflow
+   - is not equal to +0.0 or -0.0
  - String is initialized to name of field.
  - Enum is initialized to one of enum constants.
  - Class is initialized to some sample class.
  - Field, Method and Constructor is assigned to member of sample class.
+
+Random sample data is deterministically generated using field type and field name as a seed.
 
 Non-final type
 --------------

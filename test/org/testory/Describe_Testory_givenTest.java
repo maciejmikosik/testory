@@ -3,17 +3,20 @@ package org.testory;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.givenTest;
+import static org.testory.test.TestUtils.readDeclaredFields;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -114,116 +117,132 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_skip_not_null() {
+  public void should_inject_boolean() {
+    @SuppressWarnings("unused")
     class TestClass {
-      Object field;
-      String stringField = "value";
-      Boolean booleanField = Boolean.TRUE;
-      Character characterField = Character.valueOf((char) 1);
-      Byte byteField = Byte.valueOf((byte) 1);
-      Short shortField = Short.valueOf((short) 1);
-      Integer integerField = Integer.valueOf(1);
-      Long longField = Long.valueOf(1);
-      Float floatField = Float.valueOf(1);
-      Double doubleField = Double.valueOf(1);
-    }
-    TestClass test = new TestClass();
-    Object object = new Object();
-    test.field = object;
-    givenTest(test);
-    assertSame(object, test.field);
-    assertEquals("value", test.stringField);
-    assertEquals(Boolean.TRUE, test.booleanField);
-    assertEquals(Character.valueOf((char) 1), test.characterField);
-    assertEquals(Byte.valueOf((byte) 1), test.byteField);
-    assertEquals(Short.valueOf((short) 1), test.shortField);
-    assertEquals(Integer.valueOf(1), test.integerField);
-    assertEquals(Long.valueOf(1), test.longField);
-    assertEquals(Float.valueOf(1), test.floatField);
-    assertEquals(Double.valueOf(1), test.doubleField);
-  }
-
-  @Test
-  public void should_skip_primitive_equal_to_binary_zero() {
-    class TestClass {
-      boolean booleanField;
-      char charField;
-      byte byteField;
-      short shortField;
-      int intField;
-      long longField;
-      float floatField;
-      double doubleField;
+      boolean p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
+      Boolean w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertTrue(test.booleanField == false);
-    assertTrue(test.charField == (char) 0);
-    assertTrue(test.byteField == 0);
-    assertTrue(test.shortField == 0);
-    assertTrue(test.intField == 0);
-    assertTrue(test.longField == 0);
-    assertTrue(test.floatField == 0);
-    assertTrue(test.doubleField == 0);
+
+    List<Object> fields = readDeclaredFields(test);
+    assertTrue(fields.contains(false));
+    assertTrue(fields.contains(true));
   }
 
   @Test
-  public void should_skip_primitive_not_equal_to_binary_zero() {
+  public void should_inject_character() {
+    @SuppressWarnings("unused")
     class TestClass {
-      boolean booleanField = true;
-      char charField = 'a';
-      byte byteField = 1;
-      short shortField = 1;
-      int intField = 1;
-      long longField = 1;
-      float floatField = 1;
-      double doubleField = 1;
+      char p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
+      Character w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertTrue(test.booleanField == true);
-    assertTrue(test.charField == 'a');
-    assertTrue(test.byteField == 1);
-    assertTrue(test.shortField == 1);
-    assertTrue(test.intField == 1);
-    assertTrue(test.longField == 1);
-    assertTrue(test.floatField == 1);
-    assertTrue(test.doubleField == 1);
-  }
 
-  static class TestClassWithStaticField {
-    static Object field = null;
+    for (Object object : readDeclaredFields(test)) {
+      Character character = (Character) object;
+      assertTrue('a' <= character && character <= 'z');
+    }
   }
 
   @Test
-  public void should_skip_static_field() {
-    TestClassWithStaticField test = new TestClassWithStaticField();
-    givenTest(test);
-    assertNull(TestClassWithStaticField.field);
-  }
-
-  @Test
-  public void should_skip_final_field() {
+  public void should_inject_byte() {
+    @SuppressWarnings("unused")
     class TestClass {
-      final Object field = null;
+      byte p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
+      Byte w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertNull(test.field);
+
+    for (Object object : readDeclaredFields(test)) {
+      Byte number = (Byte) object;
+      assertTrue("" + number, 2 <= Math.abs(number) && Math.abs(number) <= 5);
+    }
   }
 
   @Test
-  public void should_fail_for_final_class() {
-    final class FinalClass {}
+  public void should_inject_short() {
+    @SuppressWarnings("unused")
     class TestClass {
-      @SuppressWarnings("unused")
-      FinalClass field;
+      short p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
+      Short w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
     }
     TestClass test = new TestClass();
-    try {
-      givenTest(test);
-      fail();
-    } catch (TestoryException e) {}
+    givenTest(test);
+
+    for (Object object : readDeclaredFields(test)) {
+      Short number = (Short) object;
+      assertTrue("" + number, 2 <= Math.abs(number) && Math.abs(number) <= 31);
+    }
+  }
+
+  @Test
+  public void should_inject_integer() {
+    @SuppressWarnings("unused")
+    class TestClass {
+      int p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
+      Integer w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+
+    for (Object object : readDeclaredFields(test)) {
+      Integer number = (Integer) object;
+      assertTrue("" + number, 2 <= Math.abs(number) && Math.abs(number) <= 1290);
+    }
+  }
+
+  @Test
+  public void should_inject_long() {
+    @SuppressWarnings("unused")
+    class TestClass {
+      long p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
+      Long w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+
+    for (Object object : readDeclaredFields(test)) {
+      Long number = (Long) object;
+      assertTrue("" + number, 2 <= Math.abs(number) && Math.abs(number) <= 2097152);
+    }
+  }
+
+  @Test
+  public void should_inject_float() {
+    @SuppressWarnings("unused")
+    class TestClass {
+      float p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
+      Float w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+
+    for (Object object : readDeclaredFields(test)) {
+      Float number = (Float) object;
+      assertTrue("" + number,
+          Math.pow(2, -30) <= Math.abs(number) && Math.abs(number) <= Math.pow(2, 30));
+    }
+  }
+
+  @Test
+  public void should_inject_double() {
+    @SuppressWarnings("unused")
+    class TestClass {
+      double p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
+      Double w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+
+    for (Object object : readDeclaredFields(test)) {
+      Double number = (Double) object;
+      assertTrue("" + number,
+          Math.pow(2, -300) <= Math.abs(number) && Math.abs(number) <= Math.pow(2, 300));
+    }
   }
 
   @Test
@@ -237,102 +256,19 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_primitives() {
-    class TestClass {
-      boolean booleanField;
-      char characterField;
-      byte byteField;
-      short shortField;
-      int integerField;
-      long longField;
-      float floatField;
-      double doubleField;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    assertEquals(false, test.booleanField);
-    assertEquals(0, test.characterField);
-    assertEquals(0, test.byteField);
-    assertEquals(0, test.shortField);
-    assertEquals(0, test.integerField);
-    assertEquals(0, test.longField);
-    assertEquals(0, test.floatField, 0);
-    assertEquals(0, test.doubleField, 0);
-  }
-
-  @Test
-  public void should_inject_wrappers() {
-    class TestClass {
-      Void voidField;
-      Boolean booleanField;
-      Character characterField;
-      Byte byteField;
-      Short shortField;
-      Integer integerField;
-      Long longField;
-      Float floatField;
-      Double doubleField;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    assertEquals(null, test.voidField);
-    assertEquals(Boolean.FALSE, test.booleanField);
-    assertEquals(Character.valueOf((char) 0), test.characterField);
-    assertEquals(Byte.valueOf((byte) 0), test.byteField);
-    assertEquals(Short.valueOf((short) 0), test.shortField);
-    assertEquals(Integer.valueOf(0), test.integerField);
-    assertEquals(Long.valueOf(0), test.longField);
-    assertEquals(Float.valueOf(0), test.floatField);
-    assertEquals(Double.valueOf(0), test.doubleField);
-  }
-
-  @Test
   public void should_inject_array_of_primitives() {
     class TestClass {
-      boolean[] booleans;
-      char[] characters;
-      byte[] bytes;
-      short[] shorts;
-      int[] integers;
-      long[] longs;
+      int[] ints;
+      Integer[] intWrappers;
       float[] floats;
-      double[] doubles;
+      Float[] floatWrappers;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertEquals(1, test.booleans.length);
-    assertEquals((new boolean[1])[0], test.booleans[0]);
-    assertArrayEquals(new char[1], test.characters);
-    assertArrayEquals(new byte[1], test.bytes);
-    assertArrayEquals(new short[1], test.shorts);
-    assertArrayEquals(new int[1], test.integers);
-    assertArrayEquals(new long[1], test.longs);
-    assertArrayEquals(new float[1], test.floats, 0);
-    assertArrayEquals(new double[1], test.doubles, 0);
-  }
-
-  @Test
-  public void should_inject_array_of_wrappers() {
-    class TestClass {
-      Boolean[] booleans;
-      Character[] characters;
-      Byte[] bytes;
-      Short[] shorts;
-      Integer[] integers;
-      Long[] longs;
-      Float[] floats;
-      Double[] doubles;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    assertArrayEquals(new Boolean[] { false }, test.booleans);
-    assertArrayEquals(new Character[] { 0 }, test.characters);
-    assertArrayEquals(new Byte[] { 0 }, test.bytes);
-    assertArrayEquals(new Short[] { 0 }, test.shorts);
-    assertArrayEquals(new Integer[] { 0 }, test.integers);
-    assertArrayEquals(new Long[] { 0L }, test.longs);
-    assertArrayEquals(new Float[] { 0f }, test.floats);
-    assertArrayEquals(new Double[] { 0.0 }, test.doubles);
+    assertNotEquals(0, test.ints[0]);
+    assertNotNull(test.intWrappers[0]);
+    assertNotEquals(0, test.floats[0]);
+    assertNotNull(test.floatWrappers[0]);
   }
 
   @Test
@@ -395,6 +331,107 @@ public class Describe_Testory_givenTest {
     TestClass test = new TestClass();
     givenTest(test);
     assertEquals(ElementType.class, test.field.getClass());
+  }
+
+  @Test
+  public void should_skip_not_null() {
+    class TestClass {
+      Object field;
+      String stringField = "value";
+      Boolean booleanField = Boolean.TRUE;
+      Character characterField = Character.valueOf((char) 1);
+      Byte byteField = Byte.valueOf((byte) 1);
+      Short shortField = Short.valueOf((short) 1);
+      Integer integerField = Integer.valueOf(1);
+      Long longField = Long.valueOf(1);
+      Float floatField = Float.valueOf(1);
+      Double doubleField = Double.valueOf(1);
+    }
+    TestClass test = new TestClass();
+    Object object = new Object();
+    test.field = object;
+    givenTest(test);
+    assertSame(object, test.field);
+    assertEquals("value", test.stringField);
+    assertEquals(Boolean.TRUE, test.booleanField);
+    assertEquals(Character.valueOf((char) 1), test.characterField);
+    assertEquals(Byte.valueOf((byte) 1), test.byteField);
+    assertEquals(Short.valueOf((short) 1), test.shortField);
+    assertEquals(Integer.valueOf(1), test.integerField);
+    assertEquals(Long.valueOf(1), test.longField);
+    assertEquals(Float.valueOf(1), test.floatField);
+    assertEquals(Double.valueOf(1), test.doubleField);
+  }
+
+  @Test
+  public void should_skip_void() {
+    class TestClass {
+      Void voidField;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertEquals(null, test.voidField);
+  }
+
+  @Test
+  public void should_skip_primitive_not_equal_to_binary_zero() {
+    class TestClass {
+      boolean booleanPrimitive = true;
+      boolean booleanWrapper = true;
+      char charField = 'a';
+      byte byteField = 1;
+      short shortField = 1;
+      int intField = 1;
+      long longField = 1;
+      float floatField = 1;
+      double doubleField = 1;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertEquals(true, test.booleanPrimitive);
+    assertEquals(true, test.booleanWrapper);
+    assertEquals('a', test.charField);
+    assertEquals(1, test.byteField);
+    assertEquals(1, test.shortField);
+    assertEquals(1, test.intField);
+    assertEquals(1, test.longField);
+    assertEquals(1, test.floatField, 0);
+    assertEquals(1, test.doubleField, 0);
+  }
+
+  static class TestClassWithStaticField {
+    static Object field = null;
+  }
+
+  @Test
+  public void should_skip_static_field() {
+    TestClassWithStaticField test = new TestClassWithStaticField();
+    givenTest(test);
+    assertNull(TestClassWithStaticField.field);
+  }
+
+  @Test
+  public void should_skip_final_field() {
+    class TestClass {
+      final Object field = null;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertNull(test.field);
+  }
+
+  @Test
+  public void should_fail_for_final_class() {
+    final class FinalClass {}
+    class TestClass {
+      @SuppressWarnings("unused")
+      FinalClass field;
+    }
+    TestClass test = new TestClass();
+    try {
+      givenTest(test);
+      fail();
+    } catch (TestoryException e) {}
   }
 
   public static interface Interface {}

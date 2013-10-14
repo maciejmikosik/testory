@@ -39,7 +39,13 @@ public class Testory {
           }
         });
         try {
-          if (field.get(test) == null) {
+          Object value = field.get(test);
+          boolean isInitialized = field.getType().isPrimitive()
+              ? !value.equals(false) && !value.equals((char) 0) && !value.equals((byte) 0)
+                  && !value.equals((short) 0) && !value.equals(0) && !value.equals((long) 0)
+                  && !value.equals((float) 0) && !value.equals((double) 0)
+              : value != null;
+          if (!isInitialized) {
             field.set(test, mockOrSample(field.getType(), field.getName()));
           }
         } catch (RuntimeException e) {

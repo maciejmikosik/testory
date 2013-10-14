@@ -6,9 +6,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 public class Samples {
@@ -21,36 +20,53 @@ public class Samples {
                 ? name
                 : type == Class.class || AccessibleObject.class.isAssignableFrom(type)
                     ? sampleReflected(type, name)
-                    : fail(type, name);
+                    : type == Void.class
+                        ? null
+                        : fail(type, name);
   }
 
   private static final Set<Class<?>> wrappers = Collections.unmodifiableSet(new HashSet<Class<?>>(
-      Arrays.asList(Void.class, Boolean.class, Character.class, Byte.class, Short.class,
-          Integer.class, Long.class, Float.class, Double.class)));
+      Arrays.asList(Boolean.class, Character.class, Byte.class, Short.class, Integer.class,
+          Long.class, Float.class, Double.class)));
 
   private static Object samplePrimitive(Class<?> type, String name) {
-    Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+    Random random = new Random(new Random(name.hashCode()).nextLong());
+    if (type == boolean.class || type == Boolean.class) {
+      return random.nextBoolean();
+    } else if (type == char.class || type == Character.class) {
+      return (char) ('a' + random.nextInt(26));
+    } else if (type == byte.class || type == Byte.class) {
+      return (byte) randomInteger(Byte.MAX_VALUE, random);
+    } else if (type == short.class || type == Short.class) {
+      return (short) randomInteger(Short.MAX_VALUE, random);
+    } else if (type == int.class || type == Integer.class) {
+      return (int) randomInteger(Integer.MAX_VALUE, random);
+    } else if (type == long.class || type == Long.class) {
+      return (long) randomInteger(Long.MAX_VALUE, random);
+    } else if (type == float.class || type == Float.class) {
+      return (float) randomReal(30, random);
+    } else if (type == double.class || type == Double.class) {
+      return (double) randomReal(300, random);
+    }
+    return null;
+  }
 
-    map.put(boolean.class, Boolean.FALSE);
-    map.put(char.class, Character.valueOf((char) 0));
-    map.put(byte.class, Byte.valueOf((byte) 0));
-    map.put(short.class, Short.valueOf((short) 0));
-    map.put(int.class, Integer.valueOf(0));
-    map.put(long.class, Long.valueOf(0));
-    map.put(float.class, Float.valueOf(0));
-    map.put(double.class, Double.valueOf(0));
+  private static int randomInteger(long maxValue, Random random) {
+    int max = (int) Math.floor(Math.pow(maxValue, 1f / 3));
+    boolean sign = random.nextBoolean();
+    int value = random.nextInt(max - 1) + 2;
+    return sign
+        ? value
+        : -value;
+  }
 
-    map.put(Void.class, null);
-    map.put(Boolean.class, Boolean.FALSE);
-    map.put(Character.class, Character.valueOf((char) 0));
-    map.put(Byte.class, Byte.valueOf((byte) 0));
-    map.put(Short.class, Short.valueOf((short) 0));
-    map.put(Integer.class, Integer.valueOf(0));
-    map.put(Long.class, Long.valueOf(0));
-    map.put(Float.class, Float.valueOf(0));
-    map.put(Double.class, Double.valueOf(0));
-
-    return map.get(type);
+  private static double randomReal(int maxExponent, Random random) {
+    boolean sign = random.nextBoolean();
+    float exponent = maxExponent * (2 * random.nextFloat() - 1f);
+    double value = Math.pow(2, exponent);
+    return sign
+        ? value
+        : -value;
   }
 
   private static Object sampleReflected(Class<?> type, String name) {
