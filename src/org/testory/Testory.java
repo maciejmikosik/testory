@@ -105,7 +105,7 @@ public class Testory {
   public static void given(double primitive) {}
 
   public static <T> T givenTry(final T object) {
-    checkUsage(object != null);
+    check(object != null);
     return (T) proxy(typing(object.getClass(), new HashSet<Class<?>>()), new Handler() {
       public Object handle(Invocation invocation) {
         Invocation onObjectInvocation = on(object, invocation);
@@ -119,8 +119,8 @@ public class Testory {
   }
 
   public static void givenTimes(int number, Closure closure) {
-    checkUsage(number >= 0);
-    checkUsage(closure != null);
+    check(number >= 0);
+    check(closure != null);
     for (int i = 0; i < number; i++) {
       try {
         closure.invoke();
@@ -131,8 +131,8 @@ public class Testory {
   }
 
   public static <T> T givenTimes(final int number, final T object) {
-    checkUsage(number >= 0);
-    checkUsage(object != null);
+    check(number >= 0);
+    check(object != null);
     return (T) proxy(typing(object.getClass(), new HashSet<Class<?>>()), new Handler() {
       public Object handle(final Invocation invocation) throws Throwable {
         final Invocation onObjectInvocation = on(object, invocation);
@@ -169,7 +169,7 @@ public class Testory {
   }
 
   public static void when(Closure closure) {
-    checkUsage(closure != null);
+    check(closure != null);
     whenEffect.set(invoked(closure));
   }
 
@@ -271,8 +271,8 @@ public class Testory {
   }
 
   public static void thenThrown(Object matcher) {
-    checkUsage(matcher != null);
-    checkUsage(isMatcher(matcher));
+    check(matcher != null);
+    check(isMatcher(matcher));
     Closure effect = getWhenEffect();
     Object object;
     try {
@@ -293,7 +293,7 @@ public class Testory {
   }
 
   public static void thenThrown(Throwable expectedThrowable) {
-    checkUsage(expectedThrowable != null);
+    check(expectedThrowable != null);
     Closure effect = getWhenEffect();
     Object object;
     try {
@@ -314,7 +314,7 @@ public class Testory {
   }
 
   public static void thenThrown(Class<? extends Throwable> type) {
-    checkUsage(type != null);
+    check(type != null);
     Closure effect = getWhenEffect();
     Object object;
     try {
@@ -356,8 +356,8 @@ public class Testory {
   }
 
   public static void then(@Nullable Object object, Object matcher) {
-    checkUsage(matcher != null);
-    checkUsage(isMatcher(matcher));
+    check(matcher != null);
+    check(isMatcher(matcher));
     if (!match(matcher, object)) {
       throw assertionError("\n" //
           + formatSection("expected object matching", matcher) //
@@ -373,7 +373,7 @@ public class Testory {
     }
   }
 
-  private static void checkUsage(boolean condition) {
+  private static void check(boolean condition) {
     if (!condition) {
       throw new TestoryException();
     }
@@ -403,7 +403,7 @@ public class Testory {
 
   private static Closure getWhenEffect() {
     Closure effect = whenEffect.get();
-    checkUsage(effect != null);
+    check(effect != null);
     return effect;
   }
 }
