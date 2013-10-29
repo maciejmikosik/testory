@@ -1,5 +1,7 @@
 package org.testory.test;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -49,6 +51,12 @@ public class Testilities {
         throw throwable;
       }
     };
+  }
+
+  public static String printStackTrace(Throwable throwable) {
+    StringWriter writer = new StringWriter();
+    throwable.printStackTrace(new PrintWriter(writer));
+    return writer.toString();
   }
 
   public static List<Object> readDeclaredFields(Object instance) {

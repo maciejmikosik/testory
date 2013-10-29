@@ -6,11 +6,9 @@ import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.when;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
+import static org.testory.test.Testilities.printStackTrace;
 import static org.testory.test.Testilities.returning;
 import static org.testory.test.Testilities.throwing;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -291,11 +289,5 @@ public class Describe_Testory_thenReturned {
           + printStackTrace(throwable) + "\n" //
       , e.getMessage());
     }
-  }
-
-  private static String printStackTrace(Throwable throwable) {
-    StringWriter writer = new StringWriter();
-    throwable.printStackTrace(new PrintWriter(writer));
-    return writer.toString();
   }
 }
