@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.when;
-import static org.testory.test.TestUtils.newObject;
-import static org.testory.test.TestUtils.newThrowable;
+import static org.testory.test.Testilities.newObject;
+import static org.testory.test.Testilities.newThrowable;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

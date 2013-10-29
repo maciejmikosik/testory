@@ -3,7 +3,7 @@ package org.testory;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
-import static org.testory.test.TestUtils.newObject;
+import static org.testory.test.Testilities.newObject;
 
 import org.junit.Before;
 import org.junit.Test;

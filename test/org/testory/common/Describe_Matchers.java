@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Matchers.match;
-import static org.testory.test.TestUtils.newObject;
+import static org.testory.test.Testilities.newObject;
 
 import org.fest.assertions.Condition;
 import org.hamcrest.Description;

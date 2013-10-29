@@ -7,8 +7,8 @@ import static org.junit.Assert.fail;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Proxies.proxy;
 import static org.testory.proxy.Typing.typing;
-import static org.testory.test.TestUtils.newObject;
-import static org.testory.test.TestUtils.newThrowable;
+import static org.testory.test.Testilities.newObject;
+import static org.testory.test.Testilities.newThrowable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

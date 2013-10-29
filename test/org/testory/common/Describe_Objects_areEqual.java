@@ -3,7 +3,7 @@ package org.testory.common;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.testory.common.Objects.areEqual;
-import static org.testory.test.TestUtils.newObject;
+import static org.testory.test.Testilities.newObject;
 
 import org.junit.Before;
 import org.junit.Test;

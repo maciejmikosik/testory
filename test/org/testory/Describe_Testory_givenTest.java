@@ -10,7 +10,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.givenTest;
-import static org.testory.test.TestUtils.readDeclaredFields;
+import static org.testory.test.Testilities.readDeclaredFields;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
