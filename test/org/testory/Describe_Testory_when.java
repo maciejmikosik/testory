@@ -10,6 +10,8 @@ import static org.testory.Testory.when;
 import static org.testory.WhenEffect.whenEffect;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
+import static org.testory.test.Testilities.returning;
+import static org.testory.test.Testilities.throwing;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -74,20 +76,12 @@ public class Describe_Testory_when {
 
   @Test
   public void should_accept_closure_returning() {
-    when(new Closure() {
-      public Object invoke() {
-        return object;
-      }
-    });
+    when(returning(object));
   }
 
   @Test
   public void should_accept_closure_throwing() {
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw throwable;
-      }
-    });
+    when(throwing(throwable));
   }
 
   @Test

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.givenTimes;
+import static org.testory.test.Testilities.returning;
 
 import java.util.concurrent.Callable;
 
@@ -112,11 +113,7 @@ public class Describe_Testory_givenTimes {
   @Test
   public void should_fail_calling_closure_negative_number_of_times() {
     try {
-      givenTimes(-1, new Closure() {
-        public Object invoke() {
-          return null;
-        }
-      });
+      givenTimes(-1, returning(null));
       fail();
     } catch (TestoryException e) {}
   }

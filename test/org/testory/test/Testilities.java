@@ -6,6 +6,8 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.testory.common.Closure;
+
 public class Testilities {
   public static Object newObject(final String name) {
     if (name == null) {
@@ -26,6 +28,25 @@ public class Testilities {
     return new Throwable() {
       public String toString() {
         return name;
+      }
+    };
+  }
+
+  public static Closure returning(final Object object) {
+    return new Closure() {
+      public Object invoke() {
+        return object;
+      }
+    };
+  }
+
+  public static Closure throwing(final Throwable throwable) {
+    if (throwable == null) {
+      throw new NullPointerException();
+    }
+    return new Closure() {
+      public Object invoke() throws Throwable {
+        throw throwable;
       }
     };
   }

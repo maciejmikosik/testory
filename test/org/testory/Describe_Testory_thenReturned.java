@@ -6,13 +6,14 @@ import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.when;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
+import static org.testory.test.Testilities.returning;
+import static org.testory.test.Testilities.throwing;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.common.Closure;
 
 public class Describe_Testory_thenReturned {
   private Object object, otherObject;
@@ -66,11 +67,7 @@ public class Describe_Testory_thenReturned {
 
   @Test
   public void should_fail_if_thrown_instead_of_returned_expected_object() {
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw throwable;
-      }
-    });
+    when(throwing(throwable));
     try {
       thenReturned(object);
       fail();
@@ -132,21 +129,13 @@ public class Describe_Testory_thenReturned {
 
   @Test
   public void should_succeed_if_returned_object_matched_by_matcher() {
-    when(new Closure() {
-      public Object invoke() {
-        return object;
-      }
-    });
+    when(returning(object));
     thenReturned(matcher);
   }
 
   @Test
   public void should_fail_if_returned_object_not_matched_by_matcher() {
-    when(new Closure() {
-      public Object invoke() {
-        return otherObject;
-      }
-    });
+    when(returning(otherObject));
     try {
       thenReturned(matcher);
       fail();
@@ -162,13 +151,7 @@ public class Describe_Testory_thenReturned {
 
   @Test
   public void should_fail_if_thrown_instead_of_returned_object_matched_by_matcher() {
-    try {
-      when(new Closure() {
-        public Object invoke() throws Throwable {
-          throw throwable;
-        }
-      });
-    } catch (Throwable e) {}
+    when(throwing(throwable));
     try {
       thenReturned(matcher);
       fail();
@@ -186,21 +169,13 @@ public class Describe_Testory_thenReturned {
 
   @Test
   public void should_succeed_if_returned_expected_primitive() {
-    when(new Closure() {
-      public Integer invoke() {
-        return 4;
-      }
-    });
+    when(returning(4));
     thenReturned(4);
   }
 
   @Test
   public void should_fail_if_returned_not_expected_primitive() {
-    when(new Closure() {
-      public Integer invoke() {
-        return 5;
-      }
-    });
+    when(returning(5));
     try {
       thenReturned(4);
       fail();
@@ -216,11 +191,7 @@ public class Describe_Testory_thenReturned {
 
   @Test
   public void should_fail_if_returned_null_instead_of_expected_primitive() {
-    when(new Closure() {
-      public Integer invoke() {
-        return null;
-      }
-    });
+    when(returning(null));
     try {
       thenReturned(4);
       fail();
@@ -236,11 +207,7 @@ public class Describe_Testory_thenReturned {
 
   @Test
   public void should_fail_if_thrown_instead_of_returned_expected_primitive() {
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw throwable;
-      }
-    });
+    when(throwing(throwable));
     try {
       thenReturned(4);
       fail();
@@ -258,21 +225,13 @@ public class Describe_Testory_thenReturned {
 
   @Test
   public void should_succeed_if_returned_expected_null() {
-    when(new Closure() {
-      public Object invoke() {
-        return null;
-      }
-    });
+    when(returning(null));
     thenReturned(null);
   }
 
   @Test
   public void should_fail_if_returned_not_expected_null() {
-    when(new Closure() {
-      public Object invoke() {
-        return object;
-      }
-    });
+    when(returning(object));
     try {
       thenReturned(null);
       fail();
@@ -288,11 +247,7 @@ public class Describe_Testory_thenReturned {
 
   @Test
   public void should_fail_if_thrown_instead_of_returned_expected_null() {
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw throwable;
-      }
-    });
+    when(throwing(throwable));
     try {
       thenReturned(null);
       fail();
@@ -310,31 +265,19 @@ public class Describe_Testory_thenReturned {
 
   @Test
   public void should_succeed_if_returned_when_expected_returned_anything() {
-    when(new Closure() {
-      public Object invoke() {
-        return object;
-      }
-    });
+    when(returning(object));
     thenReturned();
   }
 
   @Test
   public void should_succeed_if_returned_null_when_expected_returned_anything() {
-    when(new Closure() {
-      public Object invoke() {
-        return null;
-      }
-    });
+    when(returning(null));
     thenReturned();
   }
 
   @Test
   public void should_fail_if_thrown_when_expected_returned_anything() {
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw throwable;
-      }
-    });
+    when(throwing(throwable));
     try {
       thenReturned();
       fail();

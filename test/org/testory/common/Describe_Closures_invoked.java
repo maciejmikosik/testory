@@ -5,6 +5,8 @@ import static org.junit.Assert.fail;
 import static org.testory.common.Closures.invoked;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
+import static org.testory.test.Testilities.returning;
+import static org.testory.test.Testilities.throwing;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,22 +25,14 @@ public class Describe_Closures_invoked {
 
   @Test
   public void should_handle_closure_returning() throws Throwable {
-    closure = new Closure() {
-      public Object invoke() {
-        return object;
-      }
-    };
+    closure = returning(object);
     invoked = invoked(closure);
     assertEquals(object, invoked.invoke());
   }
 
   @Test
   public void should_handle_closure_throwing() {
-    closure = new Closure() {
-      public Object invoke() throws Throwable {
-        throw throwable;
-      }
-    };
+    closure = throwing(throwable);
     invoked = invoked(closure);
     try {
       invoked.invoke();

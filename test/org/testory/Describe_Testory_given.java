@@ -4,10 +4,10 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.test.Testilities.newObject;
+import static org.testory.test.Testilities.returning;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.common.Closure;
 
 public class Describe_Testory_given {
   private Object object;
@@ -33,11 +33,7 @@ public class Describe_Testory_given {
   @Test
   public void should_fail_for_any_closure() {
     try {
-      given(new Closure() {
-        public Object invoke() {
-          return null;
-        }
-      });
+      given(returning(null));
       fail();
     } catch (TestoryException e) {}
   }

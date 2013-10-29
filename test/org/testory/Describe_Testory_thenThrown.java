@@ -6,13 +6,14 @@ import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
+import static org.testory.test.Testilities.returning;
+import static org.testory.test.Testilities.throwing;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.common.Closure;
 
 @SuppressWarnings("serial")
 public class Describe_Testory_thenThrown {
@@ -39,21 +40,13 @@ public class Describe_Testory_thenThrown {
 
   @Test
   public void should_succeed_if_thrown_expected_throwable() {
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw throwable;
-      }
-    });
+    when(throwing(throwable));
     thenThrown(throwable);
   }
 
   @Test
   public void should_fail_if_throw_throwable_not_equal_to_expected() {
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw otherThrowable;
-      }
-    });
+    when(throwing(otherThrowable));
     try {
       thenThrown(throwable);
       fail();
@@ -71,11 +64,7 @@ public class Describe_Testory_thenThrown {
 
   @Test
   public void should_fail_if_returned_instead_of_thrown_expected_throwable() {
-    when(new Closure() {
-      public Object invoke() {
-        return object;
-      }
-    });
+    when(returning(object));
     try {
       thenThrown(throwable);
       fail();
@@ -92,11 +81,7 @@ public class Describe_Testory_thenThrown {
   @Test
   public void should_succeed_if_thrown_throwable_of_expected_type() {
     class ExpectedThrowable extends Throwable {}
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw new ExpectedThrowable();
-      }
-    });
+    when(throwing(new ExpectedThrowable()));
     thenThrown(ExpectedThrowable.class);
   }
 
@@ -104,11 +89,7 @@ public class Describe_Testory_thenThrown {
   public void should_succeed_if_throw_throwable_subtyping_expected_type() {
     class ExpectedThrowable extends Throwable {}
     class SubThrowable extends ExpectedThrowable {}
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw new SubThrowable();
-      }
-    });
+    when(throwing(new SubThrowable()));
     thenThrown(ExpectedThrowable.class);
   }
 
@@ -117,11 +98,7 @@ public class Describe_Testory_thenThrown {
     class ExpectedThrowable extends Throwable {}
     class OtherThrowable extends Throwable {}
     otherThrowable = new OtherThrowable();
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw otherThrowable;
-      }
-    });
+    when(throwing(otherThrowable));
     try {
       thenThrown(ExpectedThrowable.class);
       fail();
@@ -142,11 +119,7 @@ public class Describe_Testory_thenThrown {
     class SuperThrowable extends Throwable {}
     class ExpectedThrowable extends SuperThrowable {}
     otherThrowable = new SuperThrowable();
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw otherThrowable;
-      }
-    });
+    when(throwing(otherThrowable));
     try {
       thenThrown(ExpectedThrowable.class);
       fail();
@@ -165,11 +138,7 @@ public class Describe_Testory_thenThrown {
   @Test
   public void should_fail_if_returned_instead_of_thrown_throwable_of_expected_type() {
     class ExpectedThrowable extends Throwable {}
-    when(new Closure() {
-      public Object invoke() {
-        return object;
-      }
-    });
+    when(returning(object));
     try {
       thenThrown(ExpectedThrowable.class);
       fail();
@@ -185,21 +154,13 @@ public class Describe_Testory_thenThrown {
 
   @Test
   public void should_succeed_if_thrown_throwable_matched_by_matcher() {
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw throwable;
-      }
-    });
+    when(throwing(throwable));
     thenThrown(matcher);
   }
 
   @Test
   public void should_fail_if_thrown_throwable_not_matched_by_matcher() {
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw otherThrowable;
-      }
-    });
+    when(throwing(otherThrowable));
     try {
       thenThrown(matcher);
       fail();
@@ -217,11 +178,7 @@ public class Describe_Testory_thenThrown {
 
   @Test
   public void should_fail_if_returned_instead_of_thrown_throwable_matching_matcher() {
-    when(new Closure() {
-      public Object invoke() {
-        return object;
-      }
-    });
+    when(returning(object));
     try {
       thenThrown(matcher);
       fail();
@@ -237,21 +194,13 @@ public class Describe_Testory_thenThrown {
 
   @Test
   public void should_succeed_if_throw_when_expected_thrown_anything() {
-    when(new Closure() {
-      public Object invoke() throws Throwable {
-        throw throwable;
-      }
-    });
+    when(throwing(throwable));
     thenThrown();
   }
 
   @Test
   public void should_fail_if_returned_when_expected_thrown_anything() {
-    when(new Closure() {
-      public Object invoke() {
-        return object;
-      }
-    });
+    when(returning(object));
     try {
       thenThrown();
       fail();
