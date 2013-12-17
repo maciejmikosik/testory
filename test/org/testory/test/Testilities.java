@@ -15,7 +15,16 @@ public class Testilities {
     if (name == null) {
       throw new NullPointerException();
     }
+
     return new Object() {
+      public boolean equals(Object obj) {
+        return getClass().isInstance(obj) && toString().equals(obj.toString());
+      }
+
+      public int hashCode() {
+        return name.hashCode();
+      }
+
       public String toString() {
         return name;
       }
