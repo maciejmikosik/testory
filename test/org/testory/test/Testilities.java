@@ -62,6 +62,13 @@ public class Testilities {
     };
   }
 
+  // TODO test Testilities.Invoker
+  public static class Invoker {
+    public Object invoke(Closure closure) throws Throwable {
+      return closure.invoke();
+    }
+  }
+
   public static String printStackTrace(Throwable throwable) {
     StringWriter writer = new StringWriter();
     throwable.printStackTrace(new PrintWriter(writer));
