@@ -1,7 +1,6 @@
 package org.testory;
 
 import static org.testory.Formats.formatSection;
-import static org.testory.Formats.formatThrowable;
 import static org.testory.Samples.sample;
 import static org.testory.WhenEffect.whenEffect;
 import static org.testory.common.Closures.invoked;
@@ -9,6 +8,7 @@ import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Matchers.match;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Throwables.gently;
+import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Invocations.on;
 import static org.testory.proxy.Proxies.proxy;
@@ -221,7 +221,7 @@ public class Testory {
           + formatSection("expected returned", objectOrMatcher) //
           + formatSection("but thrown", throwable) //
           + "\n" //
-          + formatThrowable(throwable));
+          + printStackTrace(throwable));
     }
     if (!areEqualDeep(objectOrMatcher, object)
         && !(objectOrMatcher != null && isMatcher(objectOrMatcher) && match(objectOrMatcher, object))) {
@@ -272,7 +272,7 @@ public class Testory {
           + formatSection("expected returned", "") //
           + formatSection("but thrown", throwable) //
           + "\n" //
-          + formatThrowable(throwable));
+          + printStackTrace(throwable));
     }
   }
 
@@ -289,7 +289,7 @@ public class Testory {
             + formatSection("expected thrown throwable matching", matcher) //
             + formatSection("but thrown", throwable) //
             + "\n" //
-            + formatThrowable(throwable));
+            + printStackTrace(throwable));
       }
       return;
     }
@@ -310,7 +310,7 @@ public class Testory {
             + formatSection("expected thrown", expectedThrowable) //
             + formatSection("but thrown", throwable) //
             + "\n" //
-            + formatThrowable(throwable));
+            + printStackTrace(throwable));
       }
       return;
     }
@@ -331,7 +331,7 @@ public class Testory {
             + formatSection("expected thrown instance of", type.getName()) //
             + formatSection("but thrown instance of", throwable.getClass().getName()) //
             + "\n" //
-            + formatThrowable(throwable));
+            + printStackTrace(throwable));
       }
       return;
     }

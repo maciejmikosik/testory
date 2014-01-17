@@ -2,6 +2,9 @@ package org.testory.common;
 
 import static org.testory.common.Checks.checkNotNull;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 public class Throwables {
   /**
    * usage
@@ -19,5 +22,12 @@ public class Throwables {
     } else {
       throw new RuntimeException("gently", throwable);
     }
+  }
+
+  public static String printStackTrace(Throwable throwable) {
+    StringWriter stringWriter = new StringWriter();
+    throwable.printStackTrace(new PrintWriter(stringWriter));
+    stringWriter.append('\n');
+    return stringWriter.toString();
   }
 }
