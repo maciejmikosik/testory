@@ -106,7 +106,8 @@ public class Testory {
 
   public static <T> T givenTry(final T object) {
     check(object != null);
-    return (T) proxy(typing(object.getClass(), new HashSet<Class<?>>()), new Handler() {
+    Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
+    Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         Invocation onObjectInvocation = on(object, invocation);
         try {
@@ -115,7 +116,8 @@ public class Testory {
           return null;
         }
       }
-    });
+    };
+    return (T) proxy(typing, handler);
   }
 
   public static void givenTimes(int number, Closure closure) {
@@ -133,7 +135,8 @@ public class Testory {
   public static <T> T givenTimes(final int number, final T object) {
     check(number >= 0);
     check(object != null);
-    return (T) proxy(typing(object.getClass(), new HashSet<Class<?>>()), new Handler() {
+    Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
+    Handler handler = new Handler() {
       public Object handle(final Invocation invocation) throws Throwable {
         final Invocation onObjectInvocation = on(object, invocation);
         for (int i = 0; i < number; i++) {
@@ -141,7 +144,8 @@ public class Testory {
         }
         return null;
       }
-    });
+    };
+    return (T) proxy(typing, handler);
   }
 
   public static <T> T when(final T object) {
@@ -151,7 +155,8 @@ public class Testory {
       }
     });
     try {
-      return (T) proxy(typing(object.getClass(), new HashSet<Class<?>>()), new Handler() {
+      Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
+      Handler handler = new Handler() {
         public Object handle(final Invocation invocation) {
           final Invocation onObjectInvocation = on(object, invocation);
           Closure effect = invoked(new Closure() {
@@ -162,7 +167,8 @@ public class Testory {
           whenEffect.set(effect);
           return null;
         }
-      });
+      };
+      return (T) proxy(typing, handler);
     } catch (RuntimeException e) {
       return null;
     }
