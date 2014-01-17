@@ -340,14 +340,6 @@ public class Testory {
         + formatSection("but returned", object));
   }
 
-  public static void then(boolean condition) {
-    if (!condition) {
-      throw assertionError("\n" //
-          + formatSection("expected", "true") //
-          + formatSection("but was", "false"));
-    }
-  }
-
   public static void thenThrown() {
     Closure effect = getWhenEffect();
     Object object;
@@ -359,6 +351,14 @@ public class Testory {
     throw assertionError("\n" //
         + formatSection("expected thrown", "") //
         + formatSection("but returned", object));
+  }
+
+  public static void then(boolean condition) {
+    if (!condition) {
+      throw assertionError("\n" //
+          + formatSection("expected", "true") //
+          + formatSection("but was", "false"));
+    }
   }
 
   public static void then(@Nullable Object object, Object matcher) {
