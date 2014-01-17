@@ -1,12 +1,12 @@
 package org.testory;
 
-import static org.testory.Formats.formatSection;
 import static org.testory.Samples.sample;
 import static org.testory.WhenEffect.whenEffect;
 import static org.testory.common.Closures.invoked;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Matchers.match;
 import static org.testory.common.Objects.areEqualDeep;
+import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.proxy.Invocations.invoke;
@@ -377,6 +377,12 @@ public class Testory {
           + formatSection("expected", expected) //
           + formatSection("but was", object));
     }
+  }
+
+  private static String formatSection(String caption, @Nullable Object content) {
+    return "" //
+        + "  " + caption + "\n" //
+        + "    " + print(content) + "\n";
   }
 
   private static void check(boolean condition) {
