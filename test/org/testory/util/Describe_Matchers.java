@@ -233,6 +233,17 @@ public class Describe_Matchers {
   }
 
   @Test
+  public void should_allow_null_item() {
+    matcher = new Object() {
+      @SuppressWarnings("unused")
+      public boolean apply(Object input) {
+        return input == null;
+      }
+    };
+    assertTrue(match(matcher, null));
+  }
+
+  @Test
   public void should_object_with_method_with_wrong_name_not_be_matcher() {
     matcher = new Object() {
       @SuppressWarnings("unused")

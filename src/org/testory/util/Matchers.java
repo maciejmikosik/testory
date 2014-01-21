@@ -13,7 +13,7 @@ public class Matchers {
     return tryGetMatcherMethod(matcher.getClass()) != null;
   }
 
-  public static boolean match(Object matcher, Object object) {
+  public static boolean match(Object matcher, @Nullable Object object) {
     Method method = tryGetMatcherMethod(matcher.getClass());
     checkArgument(method != null);
     method.setAccessible(true);
