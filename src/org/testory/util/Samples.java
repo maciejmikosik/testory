@@ -1,4 +1,4 @@
-package org.testory;
+package org.testory.util;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+// TODO test Samples
 public class Samples {
   public static Object sample(Class<?> type, String name) {
     return type.isPrimitive() || wrappers.contains(type)

@@ -1,10 +1,7 @@
 package org.testory;
 
-import static org.testory.Samples.sample;
 import static org.testory.WhenEffect.whenEffect;
 import static org.testory.common.Closures.invoked;
-import static org.testory.common.Matchers.isMatcher;
-import static org.testory.common.Matchers.match;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
@@ -13,6 +10,9 @@ import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Invocations.on;
 import static org.testory.proxy.Proxies.proxy;
 import static org.testory.proxy.Typing.typing;
+import static org.testory.util.Matchers.isMatcher;
+import static org.testory.util.Matchers.match;
+import static org.testory.util.Samples.sample;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

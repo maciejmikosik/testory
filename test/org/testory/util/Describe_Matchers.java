@@ -1,11 +1,11 @@
-package org.testory.common;
+package org.testory.util;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.testory.common.Matchers.isMatcher;
-import static org.testory.common.Matchers.match;
 import static org.testory.test.Testilities.newObject;
+import static org.testory.util.Matchers.isMatcher;
+import static org.testory.util.Matchers.match;
 
 import org.fest.assertions.Condition;
 import org.hamcrest.Description;

@@ -1,10 +1,12 @@
-package org.testory.common;
+package org.testory.util;
 
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Throwables.gently;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import org.testory.common.Nullable;
 
 public class Matchers {
   public static boolean isMatcher(Object matcher) {
