@@ -1,7 +1,6 @@
 package org.testory;
 
 import static org.testory.WhenEffect.whenEffect;
-import static org.testory.common.Closures.invoked;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
@@ -10,6 +9,12 @@ import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Invocations.on;
 import static org.testory.proxy.Proxies.proxy;
 import static org.testory.proxy.Typing.typing;
+import static org.testory.util.Effect.getReturned;
+import static org.testory.util.Effect.getThrown;
+import static org.testory.util.Effect.hasReturned;
+import static org.testory.util.Effect.hasThrown;
+import static org.testory.util.Effect.returned;
+import static org.testory.util.Effect.thrown;
 import static org.testory.util.Matchers.isMatcher;
 import static org.testory.util.Matchers.match;
 import static org.testory.util.Samples.sample;
@@ -26,8 +31,8 @@ import org.testory.common.Closure;
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
-import org.testory.proxy.Invocations;
 import org.testory.proxy.Typing;
+import org.testory.util.Effect;
 
 public class Testory {
   public static void givenTest(Object test) {
@@ -149,22 +154,12 @@ public class Testory {
   }
 
   public static <T> T when(final T object) {
-    whenEffect.set(new Closure() {
-      public Object invoke() {
-        return object;
-      }
-    });
+    whenEffect.set(returned(object));
     try {
       Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
       Handler handler = new Handler() {
         public Object handle(final Invocation invocation) {
-          final Invocation onObjectInvocation = on(object, invocation);
-          Closure effect = invoked(new Closure() {
-            public Object invoke() throws Throwable {
-              return Invocations.invoke(onObjectInvocation);
-            }
-          });
-          whenEffect.set(effect);
+          whenEffect.set(effectOfInvoke(on(object, invocation)));
           return null;
         }
       };
@@ -176,7 +171,27 @@ public class Testory {
 
   public static void when(Closure closure) {
     check(closure != null);
-    whenEffect.set(invoked(closure));
+    whenEffect.set(effectOfInvoke(closure));
+  }
+
+  private static Effect effectOfInvoke(Closure closure) {
+    Object object;
+    try {
+      object = closure.invoke();
+    } catch (Throwable throwable) {
+      return thrown(throwable);
+    }
+    return returned(object);
+  }
+
+  private static Effect effectOfInvoke(Invocation invocation) {
+    Object object;
+    try {
+      object = invoke(invocation);
+    } catch (Throwable throwable) {
+      return thrown(throwable);
+    }
+    return returned(object);
   }
 
   public static void when(boolean value) {
@@ -212,17 +227,11 @@ public class Testory {
   }
 
   public static void thenReturned(@Nullable Object objectOrMatcher) {
-    Closure effect = getWhenEffect();
-    Object object;
-    try {
-      object = effect.invoke();
-    } catch (Throwable throwable) {
-      throw assertionError("\n" //
-          + formatSection("expected returned", objectOrMatcher) //
-          + formatBut(effect));
-    }
-    if (!areEqualDeep(objectOrMatcher, object)
-        && !(objectOrMatcher != null && isMatcher(objectOrMatcher) && match(objectOrMatcher, object))) {
+    Effect effect = getWhenEffect();
+    boolean expected = hasReturned(effect)
+        && (areEqualDeep(objectOrMatcher, getReturned(effect)) || objectOrMatcher != null
+            && isMatcher(objectOrMatcher) && match(objectOrMatcher, getReturned(effect)));
+    if (!expected) {
       throw assertionError("\n" //
           + formatSection("expected returned", objectOrMatcher) //
           + formatBut(effect));
@@ -262,10 +271,9 @@ public class Testory {
   }
 
   public static void thenReturned() {
-    Closure effect = getWhenEffect();
-    try {
-      effect.invoke();
-    } catch (Throwable throwable) {
+    Effect effect = getWhenEffect();
+    boolean expected = hasReturned(effect);
+    if (!expected) {
       throw assertionError("\n" //
           + formatSection("expected returned", "") //
           + formatBut(effect));
@@ -275,81 +283,54 @@ public class Testory {
   public static void thenThrown(Object matcher) {
     check(matcher != null);
     check(isMatcher(matcher));
-    Closure effect = getWhenEffect();
-    try {
-      effect.invoke();
-    } catch (Throwable throwable) {
-      if (!match(matcher, throwable)) {
-        throw assertionError("\n" //
-            + formatSection("expected thrown", matcher) //
-            + formatBut(effect));
-      }
-      return;
+    Effect effect = getWhenEffect();
+    boolean expected = hasThrown(effect) && match(matcher, getThrown(effect));
+    if (!expected) {
+      throw assertionError("\n" //
+          + formatSection("expected thrown", matcher) //
+          + formatBut(effect));
     }
-    throw assertionError("\n" //
-        + formatSection("expected thrown", matcher) //
-        + formatBut(effect));
   }
 
-  public static void thenThrown(Throwable expectedThrowable) {
-    check(expectedThrowable != null);
-    Closure effect = getWhenEffect();
-    try {
-      effect.invoke();
-    } catch (Throwable throwable) {
-      if (!areEqualDeep(expectedThrowable, throwable)) {
-        throw assertionError("\n" //
-            + formatSection("expected thrown", expectedThrowable) //
-            + formatBut(effect));
-      }
-      return;
+  public static void thenThrown(Throwable throwable) {
+    check(throwable != null);
+    Effect effect = getWhenEffect();
+    boolean expected = hasThrown(effect) && areEqualDeep(throwable, getThrown(effect));
+    if (!expected) {
+      throw assertionError("\n" //
+          + formatSection("expected thrown", throwable) //
+          + formatBut(effect));
     }
-    throw assertionError("\n" //
-        + formatSection("expected thrown", expectedThrowable) //
-        + formatBut(effect));
   }
 
   public static void thenThrown(Class<? extends Throwable> type) {
     check(type != null);
-    Closure effect = getWhenEffect();
-    try {
-      effect.invoke();
-    } catch (Throwable throwable) {
-      if (!type.isInstance(throwable)) {
-        throw assertionError("\n" //
-            + formatSection("expected thrown", type.getName()) //
-            + formatBut(effect));
-      }
-      return;
+    Effect effect = getWhenEffect();
+    boolean expected = hasThrown(effect) && type.isInstance(getThrown(effect));
+    if (!expected) {
+      throw assertionError("\n" //
+          + formatSection("expected thrown", type.getName()) //
+          + formatBut(effect));
     }
-    throw assertionError("\n" //
-        + formatSection("expected thrown", type.getName()) //
-        + formatBut(effect));
   }
 
   public static void thenThrown() {
-    Closure effect = getWhenEffect();
-    try {
-      effect.invoke();
-    } catch (Throwable throwable) {
-      return;
+    Effect effect = getWhenEffect();
+    boolean expected = hasThrown(effect);
+    if (!expected) {
+      throw assertionError("\n" //
+          + formatSection("expected thrown", "") //
+          + formatBut(effect));
     }
-    throw assertionError("\n" //
-        + formatSection("expected thrown", "") //
-        + formatBut(effect));
   }
 
-  private static String formatBut(Closure effect) {
-    Object object;
-    try {
-      object = effect.invoke();
-    } catch (Throwable throwable) {
-      return "" //
-          + formatSection("but thrown", throwable) //
-          + "\n" //
-          + printStackTrace(throwable);
-    }
-    return formatSection("but returned", object);
+  private static String formatBut(Effect effect) {
+    return hasReturned(effect)
+        ? formatSection("but returned", getReturned(effect))
+        : "" //
+            + formatSection("but thrown", getThrown(effect)) //
+            + "\n" //
+            + printStackTrace(getThrown(effect));
   }
 
   public static void then(boolean condition) {
@@ -412,8 +393,8 @@ public class Testory {
     throwable.setStackTrace(new StackTraceElement[] { stackTrace[index + 1] });
   }
 
-  private static Closure getWhenEffect() {
-    Closure effect = whenEffect.get();
+  private static Effect getWhenEffect() {
+    Effect effect = whenEffect.get();
     check(effect != null);
     return effect;
   }

@@ -1,7 +1,7 @@
 package org.testory;
 
-import org.testory.common.Closure;
+import org.testory.util.Effect;
 
 public class WhenEffect {
-  public static final ThreadLocal<Closure> whenEffect = new ThreadLocal<Closure>();
+  public static final ThreadLocal<Effect> whenEffect = new ThreadLocal<Effect>();
 }

@@ -12,6 +12,7 @@ import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
 import static org.testory.test.Testilities.returning;
 import static org.testory.test.Testilities.throwing;
+import static org.testory.util.Effect.getReturned;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -63,15 +64,15 @@ public class Describe_Testory_when {
   }
 
   @Test
-  public void should_register_instance() throws Throwable {
+  public void should_register_instance() {
     when(object);
-    assertEquals(object, whenEffect.get().invoke());
+    assertEquals(object, getReturned(whenEffect.get()));
   }
 
   @Test
-  public void should_register_null_instance() throws Throwable {
+  public void should_register_null_instance() {
     when((Object) null);
-    assertEquals(null, whenEffect.get().invoke());
+    assertEquals(null, getReturned(whenEffect.get()));
   }
 
   @Test
