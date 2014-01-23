@@ -219,15 +219,13 @@ public class Testory {
     } catch (Throwable throwable) {
       throw assertionError("\n" //
           + formatSection("expected returned", objectOrMatcher) //
-          + formatSection("but thrown", throwable) //
-          + "\n" //
-          + printStackTrace(throwable));
+          + formatBut(effect));
     }
     if (!areEqualDeep(objectOrMatcher, object)
         && !(objectOrMatcher != null && isMatcher(objectOrMatcher) && match(objectOrMatcher, object))) {
       throw assertionError("\n" //
           + formatSection("expected returned", objectOrMatcher) //
-          + formatSection("but returned", object));
+          + formatBut(effect));
     }
   }
 
@@ -270,9 +268,7 @@ public class Testory {
     } catch (Throwable throwable) {
       throw assertionError("\n" //
           + formatSection("expected returned", "") //
-          + formatSection("but thrown", throwable) //
-          + "\n" //
-          + printStackTrace(throwable));
+          + formatBut(effect));
     }
   }
 
@@ -280,77 +276,80 @@ public class Testory {
     check(matcher != null);
     check(isMatcher(matcher));
     Closure effect = getWhenEffect();
-    Object object;
     try {
-      object = effect.invoke();
+      effect.invoke();
     } catch (Throwable throwable) {
       if (!match(matcher, throwable)) {
         throw assertionError("\n" //
             + formatSection("expected thrown", matcher) //
-            + formatSection("but thrown", throwable) //
-            + "\n" //
-            + printStackTrace(throwable));
+            + formatBut(effect));
       }
       return;
     }
     throw assertionError("\n" //
         + formatSection("expected thrown", matcher) //
-        + formatSection("but returned", object));
+        + formatBut(effect));
   }
 
   public static void thenThrown(Throwable expectedThrowable) {
     check(expectedThrowable != null);
     Closure effect = getWhenEffect();
-    Object object;
     try {
-      object = effect.invoke();
+      effect.invoke();
     } catch (Throwable throwable) {
       if (!areEqualDeep(expectedThrowable, throwable)) {
         throw assertionError("\n" //
             + formatSection("expected thrown", expectedThrowable) //
-            + formatSection("but thrown", throwable) //
-            + "\n" //
-            + printStackTrace(throwable));
+            + formatBut(effect));
       }
       return;
     }
     throw assertionError("\n" //
         + formatSection("expected thrown", expectedThrowable) //
-        + formatSection("but returned", object));
+        + formatBut(effect));
   }
 
   public static void thenThrown(Class<? extends Throwable> type) {
     check(type != null);
     Closure effect = getWhenEffect();
-    Object object;
     try {
-      object = effect.invoke();
+      effect.invoke();
     } catch (Throwable throwable) {
       if (!type.isInstance(throwable)) {
         throw assertionError("\n" //
             + formatSection("expected thrown", type.getName()) //
-            + formatSection("but thrown", throwable) //
-            + "\n" //
-            + printStackTrace(throwable));
+            + formatBut(effect));
       }
       return;
     }
     throw assertionError("\n" //
         + formatSection("expected thrown", type.getName()) //
-        + formatSection("but returned", object));
+        + formatBut(effect));
   }
 
   public static void thenThrown() {
     Closure effect = getWhenEffect();
-    Object object;
     try {
-      object = effect.invoke();
+      effect.invoke();
     } catch (Throwable throwable) {
       return;
     }
     throw assertionError("\n" //
         + formatSection("expected thrown", "") //
-        + formatSection("but returned", object));
+        + formatBut(effect));
+  }
+
+  private static String formatBut(Closure effect) {
+    Object object;
+    try {
+      object = effect.invoke();
+    } catch (Throwable throwable) {
+      return "" //
+          + formatSection("but thrown", throwable) //
+          + "\n" //
+          + printStackTrace(throwable);
+    }
+    return formatSection("but returned", object);
   }
 
   public static void then(boolean condition) {
