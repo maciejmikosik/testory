@@ -40,7 +40,7 @@ public class Describe_Testory_then {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected object matching\n" //
+          + "  expected\n" //
           + "    matcher\n" //
           + "  but was\n" //
           + "    otherObject\n" //

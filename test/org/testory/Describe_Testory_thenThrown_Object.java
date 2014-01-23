@@ -58,7 +58,7 @@ public class Describe_Testory_thenThrown_Object {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected thrown throwable matching\n" //
+          + "  expected thrown\n" //
           + "    matcher\n" //
           + "  but thrown\n" //
           + "    otherThrowable\n" //
@@ -76,7 +76,7 @@ public class Describe_Testory_thenThrown_Object {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected thrown throwable matching\n" //
+          + "  expected thrown\n" //
           + "    matcher\n" //
           + "  but thrown\n" //
           + "    otherThrowable\n" //
@@ -94,7 +94,7 @@ public class Describe_Testory_thenThrown_Object {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected thrown throwable matching\n" //
+          + "  expected thrown\n" //
           + "    matcher\n" //
           + "  but returned\n" //
           + "    object\n" //
@@ -110,7 +110,7 @@ public class Describe_Testory_thenThrown_Object {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected thrown throwable matching\n" //
+          + "  expected thrown\n" //
           + "    matcher\n" //
           + "  but returned\n" //
           + "    object\n" //

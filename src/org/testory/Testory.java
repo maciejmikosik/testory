@@ -286,7 +286,7 @@ public class Testory {
     } catch (Throwable throwable) {
       if (!match(matcher, throwable)) {
         throw assertionError("\n" //
-            + formatSection("expected thrown throwable matching", matcher) //
+            + formatSection("expected thrown", matcher) //
             + formatSection("but thrown", throwable) //
             + "\n" //
             + printStackTrace(throwable));
@@ -294,7 +294,7 @@ public class Testory {
       return;
     }
     throw assertionError("\n" //
-        + formatSection("expected thrown throwable matching", matcher) //
+        + formatSection("expected thrown", matcher) //
         + formatSection("but returned", object));
   }
 
@@ -328,15 +328,15 @@ public class Testory {
     } catch (Throwable throwable) {
       if (!type.isInstance(throwable)) {
         throw assertionError("\n" //
-            + formatSection("expected thrown instance of", type.getName()) //
-            + formatSection("but thrown instance of", throwable.getClass().getName()) //
+            + formatSection("expected thrown", type.getName()) //
+            + formatSection("but thrown", throwable) //
             + "\n" //
             + printStackTrace(throwable));
       }
       return;
     }
     throw assertionError("\n" //
-        + formatSection("expected thrown instance of", type.getName()) //
+        + formatSection("expected thrown", type.getName()) //
         + formatSection("but returned", object));
   }
 
@@ -366,7 +366,7 @@ public class Testory {
     check(isMatcher(matcher));
     if (!match(matcher, object)) {
       throw assertionError("\n" //
-          + formatSection("expected object matching", matcher) //
+          + formatSection("expected", matcher) //
           + formatSection("but was", object));
     }
   }

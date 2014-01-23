@@ -68,10 +68,10 @@ public class Describe_Testory_thenThrown_Class {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected thrown instance of\n" //
+          + "  expected thrown\n" //
           + "    " + ExpectedThrowable.class.getName() + "\n" //
-          + "  but thrown instance of\n" //
-          + "    " + SuperThrowable.class.getName() + "\n" //
+          + "  but thrown\n" //
+          + "    " + throwable + "\n" //
           + "\n" //
           + printStackTrace(throwable) + "\n" //
       , e.getMessage());
@@ -89,10 +89,10 @@ public class Describe_Testory_thenThrown_Class {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected thrown instance of\n" //
+          + "  expected thrown\n" //
           + "    " + ExpectedThrowable.class.getName() + "\n" //
-          + "  but thrown instance of\n" //
-          + "    " + SuperThrowable.class.getName() + "\n" //
+          + "  but thrown\n" //
+          + "    " + throwable + "\n" //
           + "\n" //
           + printStackTrace(throwable) + "\n" //
       , e.getMessage());
@@ -110,10 +110,10 @@ public class Describe_Testory_thenThrown_Class {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected thrown instance of\n" //
+          + "  expected thrown\n" //
           + "    " + ExpectedThrowable.class.getName() + "\n" //
-          + "  but thrown instance of\n" //
-          + "    " + OtherThrowable.class.getName() + "\n" //
+          + "  but thrown\n" //
+          + "    " + throwable + "\n" //
           + "\n" //
           + printStackTrace(throwable) + "\n" //
       , e.getMessage());
@@ -131,10 +131,10 @@ public class Describe_Testory_thenThrown_Class {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected thrown instance of\n" //
+          + "  expected thrown\n" //
           + "    " + ExpectedThrowable.class.getName() + "\n" //
-          + "  but thrown instance of\n" //
-          + "    " + OtherThrowable.class.getName() + "\n" //
+          + "  but thrown\n" //
+          + "    " + throwable + "\n" //
           + "\n" //
           + printStackTrace(throwable) + "\n" //
       , e.getMessage());
@@ -150,7 +150,7 @@ public class Describe_Testory_thenThrown_Class {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected thrown instance of\n" //
+          + "  expected thrown\n" //
           + "    " + ExpectedThrowable.class.getName() + "\n" //
           + "  but returned\n" //
           + "    object\n" //
@@ -167,7 +167,7 @@ public class Describe_Testory_thenThrown_Class {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected thrown instance of\n" //
+          + "  expected thrown\n" //
           + "    " + ExpectedThrowable.class.getName() + "\n" //
           + "  but returned\n" //
           + "    object\n" //
