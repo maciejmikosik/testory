@@ -1,18 +1,17 @@
 package org.testory;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.when;
-import static org.testory.WhenEffect.whenEffect;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
 import static org.testory.test.Testilities.returning;
 import static org.testory.test.Testilities.throwing;
-import static org.testory.util.Effect.getReturned;
+
+import java.lang.Thread.UncaughtExceptionHandler;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -63,15 +62,13 @@ public class Describe_Testory_when {
   }
 
   @Test
-  public void should_register_instance() {
+  public void should_accept_object() {
     when(object);
-    assertEquals(object, getReturned(whenEffect.get()));
   }
 
   @Test
-  public void should_register_null_instance() {
+  public void should_accept_null_object() {
     when((Object) null);
-    assertEquals(null, getReturned(whenEffect.get()));
   }
 
   @Test
@@ -85,12 +82,20 @@ public class Describe_Testory_when {
   }
 
   @Test
-  public void should_fail_if_missed_when() {
-    whenEffect.set(null);
-    try {
-      thenReturned(object);
-      fail();
-    } catch (TestoryException e) {}
+  public void should_fail_if_missed_when() throws Throwable {
+    Thread thread = new Thread() {
+      public void run() {
+        thenReturned(object);
+      }
+    };
+    thread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+      public void uncaughtException(Thread t, Throwable e) {
+        throwable = e;
+      }
+    });
+    thread.start();
+    thread.join();
+    assertTrue(throwable instanceof TestoryException);
   }
 
   @Test

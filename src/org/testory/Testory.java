@@ -1,6 +1,5 @@
 package org.testory;
 
-import static org.testory.WhenEffect.whenEffect;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
@@ -36,6 +35,8 @@ import org.testory.proxy.Typing;
 import org.testory.util.Effect;
 
 public class Testory {
+  private static History history = new History();
+
   public static void givenTest(Object test) {
     for (final Field field : test.getClass().getDeclaredFields()) {
       if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
@@ -155,12 +156,12 @@ public class Testory {
   }
 
   public static <T> T when(final T object) {
-    whenEffect.set(returned(object));
+    history.logWhen(returned(object));
     try {
       Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
       Handler handler = new Handler() {
         public Object handle(final Invocation invocation) {
-          whenEffect.set(effectOfInvoke(on(object, invocation)));
+          history.logWhen(effectOfInvoke(on(object, invocation)));
           return null;
         }
       };
@@ -172,7 +173,7 @@ public class Testory {
 
   public static void when(Closure closure) {
     check(closure != null);
-    whenEffect.set(effectOfInvoke(closure));
+    history.logWhen(effectOfInvoke(closure));
   }
 
   private static Effect effectOfInvoke(Closure closure) {
@@ -230,7 +231,7 @@ public class Testory {
   }
 
   public static void thenReturned(@Nullable Object objectOrMatcher) {
-    Effect effect = getWhenEffect();
+    Effect effect = history.getLastWhenEffect();
     boolean expected = hasReturnedObject(effect)
         && (areEqualDeep(objectOrMatcher, getReturned(effect)) || objectOrMatcher != null
             && isMatcher(objectOrMatcher) && match(objectOrMatcher, getReturned(effect)));
@@ -274,7 +275,7 @@ public class Testory {
   }
 
   public static void thenReturned() {
-    Effect effect = getWhenEffect();
+    Effect effect = history.getLastWhenEffect();
     boolean expected = hasReturned(effect);
     if (!expected) {
       throw assertionError("\n" //
@@ -286,7 +287,7 @@ public class Testory {
   public static void thenThrown(Object matcher) {
     check(matcher != null);
     check(isMatcher(matcher));
-    Effect effect = getWhenEffect();
+    Effect effect = history.getLastWhenEffect();
     boolean expected = hasThrown(effect) && match(matcher, getThrown(effect));
     if (!expected) {
       throw assertionError("\n" //
@@ -297,7 +298,7 @@ public class Testory {
 
   public static void thenThrown(Throwable throwable) {
     check(throwable != null);
-    Effect effect = getWhenEffect();
+    Effect effect = history.getLastWhenEffect();
     boolean expected = hasThrown(effect) && areEqualDeep(throwable, getThrown(effect));
     if (!expected) {
       throw assertionError("\n" //
@@ -308,7 +309,7 @@ public class Testory {
 
   public static void thenThrown(Class<? extends Throwable> type) {
     check(type != null);
-    Effect effect = getWhenEffect();
+    Effect effect = history.getLastWhenEffect();
     boolean expected = hasThrown(effect) && type.isInstance(getThrown(effect));
     if (!expected) {
       throw assertionError("\n" //
@@ -318,7 +319,7 @@ public class Testory {
   }
 
   public static void thenThrown() {
-    Effect effect = getWhenEffect();
+    Effect effect = history.getLastWhenEffect();
     boolean expected = hasThrown(effect);
     if (!expected) {
       throw assertionError("\n" //
@@ -396,11 +397,5 @@ public class Testory {
       throw new Error();
     }
     throwable.setStackTrace(new StackTraceElement[] { stackTrace[index + 1] });
-  }
-
-  private static Effect getWhenEffect() {
-    Effect effect = whenEffect.get();
-    check(effect != null);
-    return effect;
   }
 }
