@@ -176,6 +176,25 @@ public class Describe_Testory_thenThrown_Class {
   }
 
   @Test
+  public void should_fail_if_proxy_returned_void() {
+    class ExpectedThrowable extends Throwable {}
+    when(new Runnable() {
+      public void run() {}
+    }).run();
+    try {
+      thenThrown(ExpectedThrowable.class);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n" //
+          + "  expected thrown\n" //
+          + "    " + ExpectedThrowable.class.getName() + "\n" //
+          + "  but returned\n" //
+          + "    void\n" //
+      , e.getMessage());
+    }
+  }
+
+  @Test
   public void should_fail_if_expected_null_type() {
     try {
       thenThrown((Class<? extends Throwable>) null);

@@ -119,6 +119,24 @@ public class Describe_Testory_thenThrown_Object {
   }
 
   @Test
+  public void should_fail_if_proxy_returned_void() {
+    when(new Runnable() {
+      public void run() {}
+    }).run();
+    try {
+      thenThrown(matcher);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n" //
+          + "  expected thrown\n" //
+          + "    matcher\n" //
+          + "  but returned\n" //
+          + "    void\n" //
+      , e.getMessage());
+    }
+  }
+
+  @Test
   public void should_fail_if_expected_object() {
     try {
       thenThrown(object);

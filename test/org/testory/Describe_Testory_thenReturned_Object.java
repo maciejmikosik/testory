@@ -389,6 +389,42 @@ public class Describe_Testory_thenReturned_Object {
   }
 
   @Test
+  public void should_fail_if_proxy_returned_void() {
+    when(new Runnable() {
+      public void run() {}
+    }).run();
+    try {
+      thenReturned(object);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n" //
+          + "  expected returned\n" //
+          + "    object\n" //
+          + "  but returned\n" //
+          + "    void\n" //
+      , e.getMessage());
+    }
+  }
+
+  @Test
+  public void should_fail_if_proxy_returned_void_instead_of_null() {
+    when(new Runnable() {
+      public void run() {}
+    }).run();
+    try {
+      thenReturned(null);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n" //
+          + "  expected returned\n" //
+          + "    null\n" //
+          + "  but returned\n" //
+          + "    void\n" //
+      , e.getMessage());
+    }
+  }
+
+  @Test
   public void should_fail_if_closure_thrown() {
     when(throwing(throwable));
     try {

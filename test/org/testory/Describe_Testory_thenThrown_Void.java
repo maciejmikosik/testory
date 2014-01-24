@@ -68,4 +68,22 @@ public class Describe_Testory_thenThrown_Void {
       , e.getMessage());
     }
   }
+
+  @Test
+  public void should_fail_if_proxy_returned_void() {
+    when(new Runnable() {
+      public void run() {}
+    }).run();
+    try {
+      thenThrown();
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n" //
+          + "  expected thrown\n" //
+          + "    \n" //
+          + "  but returned\n" //
+          + "    void\n" //
+      , e.getMessage());
+    }
+  }
 }

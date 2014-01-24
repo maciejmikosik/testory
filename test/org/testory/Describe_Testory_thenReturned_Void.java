@@ -63,6 +63,14 @@ public class Describe_Testory_thenReturned_Void {
   }
 
   @Test
+  public void should_succeed_if_proxy_returned_void() {
+    when(new Runnable() {
+      public void run() {}
+    }).run();
+    thenReturned();
+  }
+
+  @Test
   public void should_fail_if_closure_thrown_anything() {
     when(throwing(throwable));
     try {

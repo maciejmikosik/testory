@@ -12,8 +12,10 @@ import static org.testory.proxy.Typing.typing;
 import static org.testory.util.Effect.getReturned;
 import static org.testory.util.Effect.getThrown;
 import static org.testory.util.Effect.hasReturned;
+import static org.testory.util.Effect.hasReturnedObject;
 import static org.testory.util.Effect.hasThrown;
 import static org.testory.util.Effect.returned;
+import static org.testory.util.Effect.returnedVoid;
 import static org.testory.util.Effect.thrown;
 import static org.testory.util.Matchers.isMatcher;
 import static org.testory.util.Matchers.match;
@@ -190,7 +192,9 @@ public class Testory {
     } catch (Throwable throwable) {
       return thrown(throwable);
     }
-    return returned(object);
+    return invocation.method.getReturnType() == void.class
+        ? returnedVoid()
+        : returned(object);
   }
 
   public static void when(boolean value) {
@@ -227,7 +231,7 @@ public class Testory {
 
   public static void thenReturned(@Nullable Object objectOrMatcher) {
     Effect effect = getWhenEffect();
-    boolean expected = hasReturned(effect)
+    boolean expected = hasReturnedObject(effect)
         && (areEqualDeep(objectOrMatcher, getReturned(effect)) || objectOrMatcher != null
             && isMatcher(objectOrMatcher) && match(objectOrMatcher, getReturned(effect)));
     if (!expected) {
@@ -325,7 +329,9 @@ public class Testory {
 
   private static String formatBut(Effect effect) {
     return hasReturned(effect)
-        ? formatSection("but returned", getReturned(effect))
+        ? hasReturnedObject(effect)
+            ? formatSection("but returned", getReturned(effect))
+            : formatSection("but returned", "void")
         : "" //
             + formatSection("but thrown", getThrown(effect)) //
             + "\n" //
