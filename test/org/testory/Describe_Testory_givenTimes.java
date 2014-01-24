@@ -11,7 +11,6 @@ import java.util.concurrent.Callable;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.common.Closure;
 
 public class Describe_Testory_givenTimes {
   private int times, counter, failTime;

@@ -27,7 +27,6 @@ import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.testory.common.Closure;
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;

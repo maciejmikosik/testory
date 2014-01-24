@@ -16,7 +16,6 @@ import static org.testory.util.Effect.getReturned;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.common.Closure;
 
 /** more tests in then* versions */
 public class Describe_Testory_when {

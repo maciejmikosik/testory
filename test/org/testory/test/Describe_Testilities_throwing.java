@@ -6,7 +6,7 @@ import static org.testory.test.Testilities.throwing;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.common.Closure;
+import org.testory.Closure;
 
 public class Describe_Testilities_throwing {
   private Throwable throwable;

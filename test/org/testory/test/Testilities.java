@@ -8,7 +8,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.testory.common.Closure;
+import org.testory.Closure;
 
 public class Testilities {
   public static Object newObject(final String name) {
