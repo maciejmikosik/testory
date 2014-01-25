@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.testory.util.Effect;
 
-public class History {
+class History {
   /** youngest at begin */
   private final ThreadLocal<List<Object>> threadLocalEvents = new ThreadLocal<List<Object>>() {
     protected List<Object> initialValue() {
