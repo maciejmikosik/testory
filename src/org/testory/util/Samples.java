@@ -1,5 +1,7 @@
 package org.testory.util;
 
+import static org.testory.common.Checks.checkNotNull;
+
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -12,7 +14,16 @@ import java.util.Set;
 
 // TODO test Samples
 public class Samples {
+  public static boolean isSampleable(Class<?> type) {
+    checkNotNull(type);
+    return type.isPrimitive() || wrappers.contains(type) || type.isEnum() || type == String.class
+        || type == Class.class || AccessibleObject.class.isAssignableFrom(type)
+        || type == Void.class;
+  }
+
   public static Object sample(Class<?> type, String name) {
+    checkNotNull(type);
+    checkNotNull(name);
     return type.isPrimitive() || wrappers.contains(type)
         ? samplePrimitive(type, name)
         : type.isEnum()
@@ -101,7 +112,6 @@ public class Samples {
   }
 
   private static Object fail(Class<?> type, String name) {
-    throw new IllegalArgumentException("failed creating sample: " + type.getSimpleName() + " "
-        + name);
+    throw new IllegalArgumentException("cannot sample " + type.getName() + " " + name);
   }
 }

@@ -18,6 +18,7 @@ import static org.testory.util.Effect.returnedVoid;
 import static org.testory.util.Effect.thrown;
 import static org.testory.util.Matchers.isMatcher;
 import static org.testory.util.Matchers.match;
+import static org.testory.util.Samples.isSampleable;
 import static org.testory.util.Samples.sample;
 
 import java.lang.reflect.Array;
@@ -56,8 +57,6 @@ public class Testory {
           if (!isInitialized) {
             field.set(test, mockOrSample(field.getType(), field.getName()));
           }
-        } catch (RuntimeException e) {
-          throw new TestoryException(e);
         } catch (IllegalAccessException e) {
           throw new Error(e);
         }
@@ -90,8 +89,10 @@ public class Testory {
       Object array = Array.newInstance(componentType, 1);
       Array.set(array, 0, mockOrSample(componentType, name + "[0]"));
       return array;
-    } else {
+    } else if (isSampleable(type)) {
       return sample(type, name);
+    } else {
+      throw new TestoryException("cannot mock or sample " + type.getName() + " " + name);
     }
   }
 
