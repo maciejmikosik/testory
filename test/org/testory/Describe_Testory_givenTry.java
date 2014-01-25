@@ -44,4 +44,13 @@ public class Describe_Testory_givenTry {
       fail();
     } catch (TestoryException e) {}
   }
+
+  @Test
+  public void should_fail_for_final_class() {
+    final class FinalClass {}
+    try {
+      givenTry(new FinalClass());
+      fail();
+    } catch (TestoryException e) {}
+  }
 }

@@ -124,7 +124,11 @@ public class Testory {
         }
       }
     };
-    return (T) proxy(typing, handler);
+    try {
+      return (T) proxy(typing, handler);
+    } catch (IllegalArgumentException e) {
+      throw new TestoryException(e);
+    }
   }
 
   public static void givenTimes(int number, Closure closure) {
@@ -152,7 +156,11 @@ public class Testory {
         return null;
       }
     };
-    return (T) proxy(typing, handler);
+    try {
+      return (T) proxy(typing, handler);
+    } catch (IllegalArgumentException e) {
+      throw new TestoryException(e);
+    }
   }
 
   public static <T> T when(final T object) {

@@ -128,6 +128,15 @@ public class Describe_Testory_givenTimes {
   }
 
   @Test
+  public void should_fail_for_final_class() {
+    final class FinalClass {}
+    try {
+      givenTimes(3, new FinalClass());
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
   public void should_fail_for_null_closure() {
     try {
       givenTimes(times, null);
