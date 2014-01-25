@@ -1,10 +1,12 @@
 package org.testory.proxy;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.proxy.Invocation.invocation;
+import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
 import static org.testory.proxy.Typing.typing;
 import static org.testory.test.Testilities.newObject;
@@ -28,11 +30,15 @@ public class Describe_Proxies_proxy {
   private Method method;
   private Throwable throwable;
   private int counter;
+  private Class<?> type;
+  private Set<Class<?>> interfaces;
 
   @Before
   public void before() throws NoSuchMethodException {
+    type = Object.class;
+    interfaces = new HashSet<Class<?>>();
+    typing = typing(type, interfaces);
     method = Object.class.getDeclaredMethod("toString");
-    typing = typing(Object.class, interfaces());
     handler = new Handler() {
       public Object handle(Invocation invocation) {
         return null;
@@ -44,76 +50,85 @@ public class Describe_Proxies_proxy {
 
   @Test
   public void should_create_proxy_extending_object() {
-    typing = typing(Object.class, interfaces());
-    proxy = proxy(typing, handler);
-    assertTrue(proxy instanceof Object);
+    type = Object.class;
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(type.isInstance(proxy));
   }
 
   @Test
   public void should_create_proxy_extending_concrete_class() {
-    typing = typing($ConcreteClass.class, interfaces());
-    proxy = proxy(typing, handler);
-    assertTrue(proxy instanceof $ConcreteClass);
+    type = $ConcreteClass.class;
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(type.isInstance(proxy));
   }
 
   @Test
   public void should_create_proxy_extending_package_private_concrete_class() {
-    typing = typing($PackagePrivateConcreteClass.class, interfaces());
-    proxy = proxy(typing, handler);
-    assertTrue(proxy instanceof $PackagePrivateConcreteClass);
+    type = $PackagePrivateConcreteClass.class;
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(type.isInstance(proxy));
   }
 
   @Test
   public void should_create_proxy_extending_nested_in_method_concrete_class() {
     class NestedConcreteClass {}
-    typing = typing(NestedConcreteClass.class, interfaces());
-    proxy = proxy(typing, handler);
-    assertTrue(proxy instanceof NestedConcreteClass);
+    type = NestedConcreteClass.class;
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(type.isInstance(proxy));
   }
 
   @Test
   public void should_create_proxy_extending_abstract_class_with_abstract_method() {
-    typing = typing($AbstractClassWithAbstractMethod.class, interfaces());
-    proxy = proxy(typing, handler);
-    assertTrue(proxy instanceof $AbstractClassWithAbstractMethod);
+    type = $AbstractClassWithAbstractMethod.class;
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(type.isInstance(proxy));
   }
 
   @Test
   public void should_create_proxy_extending_abstract_class_with_protected_abstract_method() {
-    typing = typing($AbstractClassWithProtectedAbstractMethod.class, interfaces());
-    proxy = proxy(typing, handler);
-    assertTrue(proxy instanceof $AbstractClassWithProtectedAbstractMethod);
+    type = $AbstractClassWithProtectedAbstractMethod.class;
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(type.isInstance(proxy));
   }
 
   @Test
   public void should_create_proxy_implementing_many_interfaces() {
-    typing = typing(Object.class,
-        interfaces($InterfaceA.class, $InterfaceB.class, $InterfaceC.class));
-    proxy = proxy(typing, handler);
-    assertTrue(proxy instanceof $InterfaceA);
-    assertTrue(proxy instanceof $InterfaceB);
-    assertTrue(proxy instanceof $InterfaceC);
+    interfaces = interfaces($InterfaceA.class, $InterfaceB.class, $InterfaceC.class);
+    for (Class<?> interfaceType : interfaces) {
+      assertTrue(isProxiable(interfaceType));
+    }
+    proxy = proxy(typing(type, interfaces), handler);
+    for (Class<?> interfaceType : interfaces) {
+      assertTrue(interfaceType.isInstance(proxy));
+    }
   }
 
   // TODO fix: proxy of package private interfaces
   @Ignore
   @Test
   public void should_create_proxy_implementing_many_package_private_interfaces() {
-    typing = typing(
-        Object.class,
-        interfaces($PackagePrivateInterfaceA.class, $PackagePrivateInterfaceB.class,
-            $PackagePrivateInterfaceC.class));
-    proxy = proxy(typing, handler);
-    assertTrue(proxy instanceof $PackagePrivateInterfaceA);
-    assertTrue(proxy instanceof $PackagePrivateInterfaceB);
-    assertTrue(proxy instanceof $PackagePrivateInterfaceC);
+    interfaces = interfaces($PackagePrivateInterfaceA.class, $PackagePrivateInterfaceB.class,
+        $PackagePrivateInterfaceC.class);
+    for (Class<?> interfaceType : interfaces) {
+      assertTrue(isProxiable(interfaceType));
+    }
+    proxy = proxy(typing(type, interfaces), handler);
+    for (Class<?> interfaceType : interfaces) {
+      assertTrue(interfaceType.isInstance(proxy));
+    }
   }
 
   @Test
   public void should_create_proxy_extending_type_of_other_proxy() {
-    typing = typing($ConcreteClass.class, interfaces($InterfaceA.class));
-    proxy = proxy(typing, handler);
-    proxy = proxy(typing(proxy.getClass(), interfaces($InterfaceB.class)), handler);
+    type = proxy(typing($ConcreteClass.class, interfaces($InterfaceA.class)), handler).getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces($InterfaceB.class)), handler);
     assertTrue(proxy instanceof $ConcreteClass);
     assertTrue(proxy instanceof $InterfaceA);
     assertTrue(proxy instanceof $InterfaceB);
@@ -121,31 +136,33 @@ public class Describe_Proxies_proxy {
 
   @Test
   public void should_create_proxy_extending_type_of_other_proxy_extending_object() {
-    typing = typing(Object.class, interfaces());
-    proxy = proxy(typing, handler);
-    proxy = proxy(typing(proxy.getClass(), interfaces($InterfaceA.class)), handler);
+    type = proxy(typing(Object.class, interfaces), handler).getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces($InterfaceA.class)), handler);
     assertTrue(proxy instanceof $InterfaceA);
   }
 
   @Test
   public void should_create_proxy_extending_concrete_class_with_private_default_constructor() {
-    typing = typing($ConcreteClassWithPrivateDefaultConstructor.class, interfaces());
-    proxy = proxy(typing, handler);
-    assertTrue(proxy instanceof $ConcreteClassWithPrivateDefaultConstructor);
+    type = $ConcreteClassWithPrivateDefaultConstructor.class;
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(type.isInstance(proxy));
   }
 
   @Test
   public void should_create_proxy_extending_concrete_class_with_private_constructor_with_arguments() {
-    typing = typing($ConcreteClassWithPrivateConstructorWithArguments.class, interfaces());
-    proxy = proxy(typing, handler);
-    assertTrue(proxy instanceof $ConcreteClassWithPrivateConstructorWithArguments);
+    type = $ConcreteClassWithPrivateConstructorWithArguments.class;
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(type.isInstance(proxy));
   }
 
   @Test
   public void should_create_proxy_extending_type_of_other_proxy_and_implementing_duplicated_interface() {
-    typing = typing($ConcreteClass.class, interfaces($InterfaceA.class));
-    proxy = proxy(typing, handler);
-    proxy = proxy(typing(proxy.getClass(), interfaces($InterfaceA.class)), handler);
+    type = proxy(typing($ConcreteClass.class, interfaces($InterfaceA.class)), handler).getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces($InterfaceA.class)), handler);
     assertTrue(proxy instanceof $ConcreteClass);
     assertTrue(proxy instanceof $InterfaceA);
   }
@@ -153,10 +170,21 @@ public class Describe_Proxies_proxy {
   @Test
   public void should_create_proxy_with_duplicated_interfaces() {
     class Superclass implements $InterfaceA {}
-    typing = typing(Superclass.class, interfaces($InterfaceA.class));
-    proxy = proxy(typing, handler);
+    type = Superclass.class;
+    interfaces = interfaces($InterfaceA.class);
+    proxy = proxy(typing(type, interfaces), handler);
     assertTrue(proxy instanceof Superclass);
     assertTrue(proxy instanceof $InterfaceA);
+  }
+
+  @Test
+  public void should_not_create_proxy_extending_final_type() {
+    type = $FinalClass.class;
+    assertFalse(isProxiable(type));
+    try {
+      proxy(typing(type, interfaces), handler);
+      fail();
+    } catch (IllegalArgumentException e) {}
   }
 
   @Test
@@ -166,7 +194,7 @@ public class Describe_Proxies_proxy {
         return null;
       }
     }
-    typing = typing(Foo.class, interfaces());
+    typing = typing(Foo.class, interfaces);
     proxy = proxy(typing, handlerSavingInvocation());
     method = Foo.class.getDeclaredMethod("foo", Object.class);
     ((Foo) proxy).foo(object);
@@ -191,7 +219,7 @@ public class Describe_Proxies_proxy {
 
   @Test
   public void should_intercept_clone() throws NoSuchMethodException {
-    typing = typing($ConcreteClassWithClone.class, interfaces());
+    typing = typing($ConcreteClassWithClone.class, interfaces);
     proxy = proxy(typing, handlerSavingInvocation());
     method = $ConcreteClassWithClone.class.getDeclaredMethod("clone");
     (($ConcreteClassWithClone) proxy).clone();
@@ -205,7 +233,7 @@ public class Describe_Proxies_proxy {
         return counter++;
       }
     };
-    typing = typing($ConcreteClassWithFinalize.class, interfaces());
+    typing = typing($ConcreteClassWithFinalize.class, interfaces);
     proxy = proxy(typing, handler);
     (($ConcreteClassWithFinalize) proxy).finalize();
     assertEquals(0, counter);
@@ -213,7 +241,7 @@ public class Describe_Proxies_proxy {
 
   @Test
   public void should_intercept_package_private_method() throws NoSuchMethodException {
-    typing = typing($ConcreteClassWithPackagePrivateMethod.class, interfaces());
+    typing = typing($ConcreteClassWithPackagePrivateMethod.class, interfaces);
     proxy = proxy(typing, handlerSavingInvocation());
     method = $ConcreteClassWithPackagePrivateMethod.class.getDeclaredMethod("packagePrivateMethod");
     (($ConcreteClassWithPackagePrivateMethod) proxy).packagePrivateMethod();
@@ -222,7 +250,7 @@ public class Describe_Proxies_proxy {
 
   @Test
   public void should_intercept_protected_abstract_method() throws NoSuchMethodException {
-    typing = typing($AbstractClassWithProtectedAbstractMethod.class, interfaces());
+    typing = typing($AbstractClassWithProtectedAbstractMethod.class, interfaces);
     proxy = proxy(typing, handlerSavingInvocation());
     method = $AbstractClassWithProtectedAbstractMethod.class.getDeclaredMethod("abstractMethod");
     (($AbstractClassWithProtectedAbstractMethod) proxy).abstractMethod();
@@ -236,7 +264,7 @@ public class Describe_Proxies_proxy {
         return null;
       }
     }
-    proxy = proxy(typing(Foo.class, interfaces()), new Handler() {
+    proxy = proxy(typing(Foo.class, interfaces), new Handler() {
       public Object handle(Invocation interceptedInvocation) {
         return object;
       }
@@ -251,7 +279,7 @@ public class Describe_Proxies_proxy {
         return null;
       }
     }
-    proxy = proxy(typing(Foo.class, interfaces()), new Handler() {
+    proxy = proxy(typing(Foo.class, interfaces), new Handler() {
       public Object handle(Invocation interceptedInvocation) throws Throwable {
         throw throwable;
       }
@@ -289,20 +317,12 @@ public class Describe_Proxies_proxy {
         return 0;
       }
     }
-    proxy = proxy(typing(Foo.class, interfaces()), new Handler() {
+    proxy = proxy(typing(Foo.class, interfaces), new Handler() {
       public Object handle(Invocation interceptedInvocation) {
         return null;
       }
     });
     assertEquals(0, ((Foo) proxy).foo());
-  }
-
-  @Test
-  public void should_not_create_proxy_extending_final_type() {
-    try {
-      proxy(typing($FinalClass.class, interfaces()), handler);
-      fail();
-    } catch (IllegalArgumentException e) {}
   }
 
   @Test

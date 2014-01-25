@@ -7,6 +7,7 @@ import static org.testory.proxy.Typing.typing;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,6 +27,11 @@ import net.sf.cglib.proxy.NoOp;
 import org.objenesis.ObjenesisStd;
 
 public class Proxies {
+  public static boolean isProxiable(Class<?> type) {
+    checkNotNull(type);
+    return !Modifier.isFinal(type.getModifiers());
+  }
+
   /**
    * Creates new proxy instance that handles invocations with specified <b>handler</b> and extends
    * superclass and implements interfaces of <b>typing</b>.

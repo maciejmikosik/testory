@@ -6,6 +6,7 @@ import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Invocations.on;
+import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
 import static org.testory.proxy.Typing.typing;
 import static org.testory.util.Effect.getReturned;
@@ -65,7 +66,7 @@ public class Testory {
   }
 
   private static Object mockOrSample(Class<?> type, final String name) {
-    if (!Modifier.isFinal(type.getModifiers())) {
+    if (isProxiable(type)) {
       Typing typing = type.isInterface()
           ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
           : typing(type, new HashSet<Class<?>>());
@@ -114,6 +115,7 @@ public class Testory {
 
   public static <T> T givenTry(final T object) {
     check(object != null);
+    check(isProxiable(object.getClass()));
     Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
@@ -125,11 +127,7 @@ public class Testory {
         }
       }
     };
-    try {
-      return (T) proxy(typing, handler);
-    } catch (IllegalArgumentException e) {
-      throw new TestoryException(e);
-    }
+    return (T) proxy(typing, handler);
   }
 
   public static void givenTimes(int number, Closure closure) {
@@ -147,6 +145,7 @@ public class Testory {
   public static <T> T givenTimes(final int number, final T object) {
     check(number >= 0);
     check(object != null);
+    check(isProxiable(object.getClass()));
     Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       public Object handle(final Invocation invocation) throws Throwable {
@@ -157,16 +156,13 @@ public class Testory {
         return null;
       }
     };
-    try {
-      return (T) proxy(typing, handler);
-    } catch (IllegalArgumentException e) {
-      throw new TestoryException(e);
-    }
+    return (T) proxy(typing, handler);
   }
 
   public static <T> T when(final T object) {
     history.logWhen(returned(object));
-    try {
+    boolean isProxiable = object != null && isProxiable(object.getClass());
+    if (isProxiable) {
       Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
       Handler handler = new Handler() {
         public Object handle(final Invocation invocation) {
@@ -175,7 +171,7 @@ public class Testory {
         }
       };
       return (T) proxy(typing, handler);
-    } catch (RuntimeException e) {
+    } else {
       return null;
     }
   }
