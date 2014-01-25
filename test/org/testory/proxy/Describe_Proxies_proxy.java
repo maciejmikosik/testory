@@ -273,7 +273,45 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
+  public void should_not_return_incompatible_type_from_handler() {
+    class Foo {
+      public String foo() {
+        return null;
+      }
+    }
+    proxy = proxy(typing(Foo.class, interfaces), new Handler() {
+      public Object handle(Invocation interceptedInvocation) {
+        return object;
+      }
+    });
+    try {
+      ((Foo) proxy).foo();
+      fail();
+    } catch (ClassCastException e) {}
+  }
+
+  @Test
   public void should_throw_throwable_from_handler() {
+    class Foo {
+      public Object foo() throws Throwable {
+        return null;
+      }
+    }
+    proxy = proxy(typing(Foo.class, interfaces), new Handler() {
+      public Object handle(Invocation interceptedInvocation) throws Throwable {
+        throw throwable;
+      }
+    });
+    try {
+      ((Foo) proxy).foo();
+      fail();
+    } catch (Throwable t) {
+      assertSame(throwable, t);
+    }
+  }
+
+  @Test
+  public void should_throw_incompatible_throwable_from_handler() {
     class Foo {
       public Object foo() {
         return null;
