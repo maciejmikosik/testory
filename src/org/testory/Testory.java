@@ -159,6 +159,37 @@ public class Testory {
     return (T) proxy(typing, handler);
   }
 
+  public static <T> T mock(Class<T> type) {
+    Typing typing = type.isInterface()
+        ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
+        : typing(type, new HashSet<Class<?>>());
+    Handler handler = new Handler() {
+      @Nullable
+      public Object handle(Invocation invocation) throws Throwable {
+        Handler stubbingHandler = history.getStubbedHandlerFor(invocation);
+        return stubbingHandler != null
+            ? stubbingHandler.handle(invocation)
+            : null;
+      }
+    };
+    return (T) proxy(typing, handler);
+  }
+
+  public static <T> T given(final Will will, final T mock) {
+    Class<?> type = mock.getClass();
+    Typing typing = type.isInterface()
+        ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
+        : typing(type, new HashSet<Class<?>>());
+    Handler handler = new Handler() {
+      @Nullable
+      public Object handle(Invocation invocation) throws Throwable {
+        history.logStubbing(will, on(mock, invocation));
+        return null;
+      }
+    };
+    return (T) proxy(typing, handler);
+  }
+
   public static Will willReturn(@Nullable final Object object) {
     return new Will() {
       @Nullable
