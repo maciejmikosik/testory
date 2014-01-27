@@ -159,6 +159,25 @@ public class Testory {
     return (T) proxy(typing, handler);
   }
 
+  public static Will willReturn(@Nullable final Object object) {
+    return new Will() {
+      @Nullable
+      public Object handle(Invocation invocation) throws Throwable {
+        return object;
+      }
+    };
+  }
+
+  public static Will willThrow(final Throwable throwable) {
+    check(throwable != null);
+    return new Will() {
+      @Nullable
+      public Object handle(Invocation invocation) throws Throwable {
+        throw throwable;
+      }
+    };
+  }
+
   public static <T> T when(final T object) {
     history.logWhen(returned(object));
     boolean isProxiable = object != null && isProxiable(object.getClass());
