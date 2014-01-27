@@ -19,6 +19,16 @@ or assert that exception was thrown.
         when(list).get(0);
         thenThrown(IndexOutOfBoundsException.class);
 
+You can stub a mock to return Object
+
+        given(list = mock(List.class));
+        given(willReturn(object), list).get(2);
+
+or throw Throwable.
+
+        given(list = mock(List.class));
+        given(willThrow(new IndexOutOfBoundsException()), list).get(2);
+
 Tests can be even more compact using matchers ...
 
         given(list = new ArrayList<String>());

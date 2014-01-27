@@ -91,6 +91,21 @@ java syntax **when** must be in chained form.
 Notice that **when** in chained form catches any throwable. This prevents throwable from failing a test if result of **when** is not asserted by non-standalone assertion.
 **thenThrown** is overloaded to accept throwable instance, class or matcher.
 
+Mocks
+=====
+
+You can mock any non-final class or interface.
+
+        given(list = mock(List.class));
+
+You can stub a mock to return Object or throw Throwable.
+
+        given(willReturn(object), list).get(1);
+        given(willThrow(new IndexOutOfBoundsException()), list).get(2);
+
+Stubbing will be only effective for specified instance of mock, method and equal arguments.
+Mocks are nice, which means they do not throw exception for unstubbed methods.
+
 Utilities
 =========
 
