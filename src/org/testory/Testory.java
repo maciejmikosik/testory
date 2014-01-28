@@ -166,10 +166,7 @@ public class Testory {
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        Handler stubbingHandler = history.getStubbedHandlerFor(invocation);
-        return stubbingHandler != null
-            ? stubbingHandler.handle(invocation)
-            : null;
+        return history.getStubbedHandlerFor(invocation).handle(invocation);
       }
     };
     return (T) proxy(typing, handler);
