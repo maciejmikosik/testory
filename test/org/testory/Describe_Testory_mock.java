@@ -6,10 +6,41 @@ import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.when;
 
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 
 public class Describe_Testory_mock {
   private Object mock;
+
+  @Test
+  public void should_mock_concrete_class() {
+    mock = mock(ArrayList.class);
+    assertTrue(mock instanceof ArrayList);
+  }
+
+  @Test
+  public void should_mock_abstract_class() {
+    mock = mock(AbstractList.class);
+    assertTrue(mock instanceof AbstractList);
+  }
+
+  @Test
+  public void should_mock_interface() {
+    mock = mock(List.class);
+    assertTrue(mock instanceof List);
+  }
+
+  @Test
+  public void should_not_mock_final_class() {
+    final class FinalClass {}
+    try {
+      mock(FinalClass.class);
+      fail();
+    } catch (TestoryException e) {}
+  }
 
   @Test
   public void should_mock_implement_to_string() {
@@ -50,15 +81,6 @@ public class Describe_Testory_mock {
     mock = mock(Object.class);
     triggerPurge();
     assertEquals(mock.hashCode(), mock.hashCode());
-  }
-
-  @Test
-  public void should_not_mock_final_class() {
-    final class FinalClass {}
-    try {
-      mock(FinalClass.class);
-      fail();
-    } catch (TestoryException e) {}
   }
 
   private void triggerPurge() {
