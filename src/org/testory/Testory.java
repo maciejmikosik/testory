@@ -146,6 +146,7 @@ public class Testory {
   }
 
   public static <T> T mock(Class<T> type) {
+    check(isProxiable(type));
     Typing typing = type.isInterface()
         ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
         : typing(type, new HashSet<Class<?>>());

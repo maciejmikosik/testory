@@ -2,6 +2,7 @@ package org.testory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.when;
 
@@ -49,6 +50,15 @@ public class Describe_Testory_mock {
     mock = mock(Object.class);
     triggerPurge();
     assertEquals(mock.hashCode(), mock.hashCode());
+  }
+
+  @Test
+  public void should_not_mock_final_class() {
+    final class FinalClass {}
+    try {
+      mock(FinalClass.class);
+      fail();
+    } catch (TestoryException e) {}
   }
 
   private void triggerPurge() {
