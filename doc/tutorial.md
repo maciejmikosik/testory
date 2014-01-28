@@ -234,9 +234,8 @@ Random sample data is deterministically generated using field type and field nam
 Non-final type
 --------------
 
-Field of non-final type is assigned to dummy (unstubbable mock).
-Dummy has following properties
-
- - Object.toString() is stubbed to return name of field
- - Object.equals(Object) is stubbed so dummy is equal only to itself
- - Object.hashCode() is stubbed to obey contract
+Field of non-final type is assigned to mock.
+Mock is conveniently prestubbed
+   - toString is stubbed to return name of field
+   - equals is stubbed so mock is equal only to itself
+   - hashCode is stubbed to obey contract

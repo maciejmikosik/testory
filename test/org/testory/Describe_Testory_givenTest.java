@@ -9,7 +9,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
+import static org.testory.Testory.willReturn;
 import static org.testory.test.Testilities.readDeclaredFields;
 
 import java.lang.annotation.ElementType;
@@ -22,6 +24,8 @@ import java.util.List;
 import org.junit.Test;
 
 public class Describe_Testory_givenTest {
+  private final String string = "string";
+
   @Test
   public void should_inject_concrete_class() {
     class ConcreteClass {}
@@ -65,7 +69,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_stub_to_string_to_return_field_name() {
+  public void should_prestub_to_string_to_return_field_name() {
     class TestClass {
       Object field;
     }
@@ -75,7 +79,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_stub_equals_to_match_same_instance() {
+  public void should_prestub_equals_to_match_same_instance() {
     class TestClass {
       Object field;
     }
@@ -85,7 +89,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_stub_equals_to_not_match_not_same_instance() {
+  public void should_prestub_equals_to_not_match_not_same_instance() {
     class TestClass {
       Object field;
       Object otherField;
@@ -97,7 +101,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_stub_equals_to_not_match_null() {
+  public void should_prestub_equals_to_not_match_null() {
     class TestClass {
       Object field;
     }
@@ -107,7 +111,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_stub_hashcode_to_obey_contract() {
+  public void should_prestub_hashcode_to_obey_contract() {
     class TestClass {
       Object field, otherField;
     }
@@ -115,6 +119,28 @@ public class Describe_Testory_givenTest {
     givenTest(test);
     assertEquals(test.field.hashCode(), test.field.hashCode());
     assertTrue(test.field.hashCode() != test.otherField.hashCode());
+  }
+
+  @Test
+  public void should_injected_mock_be_stubbable() {
+    class TestClass {
+      List<Object> field;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    given(willReturn(string), test.field).get(0);
+    assertEquals(string, test.field.get(0));
+  }
+
+  @Test
+  public void should_injected_mock_be_restubbable() {
+    class TestClass {
+      Object field;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    given(willReturn(string), test.field).toString();
+    assertEquals(string, test.field.toString());
   }
 
   @Test

@@ -67,24 +67,10 @@ public class Testory {
 
   private static Object mockOrSample(Class<?> type, final String name) {
     if (isProxiable(type)) {
-      Typing typing = type.isInterface()
-          ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
-          : typing(type, new HashSet<Class<?>>());
-      Handler handler = new Handler() {
-        public Object handle(Invocation invocation) {
-          if (invocation.method.getName().equals("toString")) {
-            return name;
-          }
-          if (invocation.method.getName().equals("equals") && invocation.arguments.size() == 1) {
-            return invocation.instance == invocation.arguments.get(0);
-          }
-          if (invocation.method.getName().equals("hashCode") && invocation.arguments.size() == 0) {
-            return name.hashCode();
-          }
-          return null;
-        }
-      };
-      return proxy(typing, handler);
+      Object mock = mock(type);
+      given(willReturn(name), mock).toString();
+      given(willReturn(name.hashCode()), mock).hashCode();
+      return mock;
     } else if (type.isArray()) {
       Class<?> componentType = type.getComponentType();
       Object array = Array.newInstance(componentType, 1);
