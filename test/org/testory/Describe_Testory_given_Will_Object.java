@@ -77,4 +77,16 @@ public class Describe_Testory_given_Will_Object {
     when(object).toString();
     assertSame(object, mock.method());
   }
+
+  @Test
+  public void should_stub_method_with_array_argument() {
+    class Foo {
+      Object method(Object[] array) {
+        return null;
+      }
+    }
+    Foo mock = mock(Foo.class);
+    given(willReturn(object), mock).method(new Object[0]);
+    assertSame(object, mock.method(new Object[0]));
+  }
 }

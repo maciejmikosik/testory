@@ -3,6 +3,7 @@ package org.testory.proxy;
 import static java.util.Collections.unmodifiableList;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Objects.areEqualDeep;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -83,7 +84,16 @@ public class Invocation {
 
   private boolean equals(Invocation invocation) {
     return method.equals(invocation.method) && instance == invocation.instance
-        && arguments.equals(invocation.arguments);
+        && equalsArgumentsOf(invocation);
+  }
+
+  private boolean equalsArgumentsOf(Invocation invocation) {
+    for (int i = 0; i < arguments.size(); i++) {
+      if (!areEqualDeep(arguments.get(i), invocation.arguments.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public int hashCode() {

@@ -269,6 +269,13 @@ public class Describe_Invocation {
   }
 
   @Test
+  public void should_be_equal_to_equal_invocation_with_equal_array_argument() {
+    invocation = invocation(method, instance, Arrays.asList((Object) new Object[0]));
+    otherInvocation = invocation(method, instance, Arrays.asList((Object) new Object[0]));
+    assertEquals(invocation, otherInvocation);
+  }
+
+  @Test
   public void should_not_be_equal_to_invocation_of_not_equal_method() throws NoSuchMethodException {
     class Foo {
       @SuppressWarnings("unused")
