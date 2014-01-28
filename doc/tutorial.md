@@ -94,14 +94,22 @@ Notice that **when** in chained form catches any throwable. This prevents throwa
 Mocks
 =====
 
-You can mock any non-final class or interface.
+Any non-final class or interface can be mocked.
 
         given(list = mock(List.class));
 
-You can stub a mock to return Object or throw Throwable.
+Mock can be stubbed to return Object or throw Throwable
 
         given(willReturn(object), list).get(1);
         given(willThrow(new IndexOutOfBoundsException()), list).get(2);
+
+or stubbed with custom logic.
+
+        given(new Will() {
+          public Object handle(Invocation invocation) throws Throwable {
+            // custom logic
+          }
+        }, mock).toString();
 
 Stubbing will be only effective for specified instance of mock, method and equal arguments.
 Mocks are nice, which means they do not throw exception for unstubbed methods.
