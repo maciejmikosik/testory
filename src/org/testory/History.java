@@ -79,15 +79,29 @@ class History {
     addEvent(stubbing);
   }
 
-  public Handler getStubbedHandlerFor(Invocation invocation) {
+  public Handler getStubbedHandlerFor(Invocation stubbedInvocation) {
     for (Object event : getEvents()) {
       if (event instanceof Stubbing) {
         Stubbing stubbing = (Stubbing) event;
-        if (stubbing.invocation.equals(invocation)) {
+        if (stubbing.invocation.equals(stubbedInvocation)) {
           return stubbing.handler;
         }
       }
     }
-    return null;
+    return new Handler() {
+      public Object handle(Invocation invocation) {
+        if (invocation.method.getName().equals("toString")) {
+          return "mock " + invocation.instance.getClass().getName() + " "
+              + System.identityHashCode(invocation.instance);
+        }
+        if (invocation.method.getName().equals("equals") && invocation.arguments.size() == 1) {
+          return invocation.instance == invocation.arguments.get(0);
+        }
+        if (invocation.method.getName().equals("hashCode") && invocation.arguments.size() == 0) {
+          return System.identityHashCode(invocation.instance);
+        }
+        return null;
+      }
+    };
   }
 }
