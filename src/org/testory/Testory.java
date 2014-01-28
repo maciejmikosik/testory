@@ -210,6 +210,7 @@ public class Testory {
   }
 
   public static <T> T when(final T object) {
+    history.purge();
     history.logWhen(returned(object));
     boolean isProxiable = object != null && isProxiable(object.getClass());
     if (isProxiable) {
@@ -228,6 +229,7 @@ public class Testory {
 
   public static void when(Closure closure) {
     check(closure != null);
+    history.purge();
     history.logWhen(effectOfInvoke(closure));
   }
 

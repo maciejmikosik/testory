@@ -6,6 +6,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
+import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
 import static org.testory.Testory.willThrow;
 import static org.testory.test.Testilities.newObject;
@@ -62,5 +63,18 @@ public class Describe_Testory_given_Will_Object {
     }
     Foo foo = mock(Foo.class);
     assertNull(foo.method());
+  }
+
+  @Test
+  public void should_stubbing_survive_chained_when() {
+    class Foo {
+      Object method() {
+        return null;
+      }
+    }
+    Foo mock = mock(Foo.class);
+    given(willReturn(object), mock).method();
+    when(object).toString();
+    assertSame(object, mock.method());
   }
 }

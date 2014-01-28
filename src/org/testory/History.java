@@ -31,15 +31,21 @@ class History {
     threadLocalEvents.get().add(0, event);
   }
 
-  public void logWhen(Effect effect) {
-    checkNotNull(effect);
+  public void purge() {
+    class Purge {}
 
     List<Object> events = getEvents();
     for (int i = 0; i < events.size(); i++) {
-      if (events.get(i) instanceof Effect) {
+      if (events.get(i) instanceof Purge) {
         setEvents(events.subList(0, i));
+        break;
       }
     }
+    addEvent(new Purge());
+  }
+
+  public void logWhen(Effect effect) {
+    checkNotNull(effect);
     addEvent(effect);
   }
 
@@ -48,6 +54,7 @@ class History {
     for (Object event : getEvents()) {
       if (event instanceof Effect) {
         effect = (Effect) event;
+        break;
       }
     }
     check(effect != null);
