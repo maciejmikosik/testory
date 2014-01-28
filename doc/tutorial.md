@@ -112,7 +112,14 @@ or stubbed with custom logic.
         }, mock).toString();
 
 Stubbing will be only effective for specified instance of mock, method and equal arguments.
-Mocks are nice, which means they do not throw exception for unstubbed methods.
+
+Newly created mock has following properties
+ - all methods are stubbable, except finalize and final methods
+ - mock is nice, returning null or binary zero for unstubbed methods
+ - mock is conveniently prestubbed
+   - toString is stubbed to contain class name and identity hash code
+   - equals is stubbed so mock is equal only to itself
+   - hashCode is stubbed to identity hash code
 
 Utilities
 =========
