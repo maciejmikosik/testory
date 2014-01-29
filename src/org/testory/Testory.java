@@ -160,10 +160,7 @@ public class Testory {
   }
 
   public static <T> T given(final Will will, final T mock) {
-    Class<?> type = mock.getClass();
-    Typing typing = type.isInterface()
-        ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
-        : typing(type, new HashSet<Class<?>>());
+    Typing typing = typing(mock.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
