@@ -1,5 +1,21 @@
-Overview
-========
+
+ - [overview](#overview)
+ - [asserting invocation result](#asserting_invocation_result)
+   - [thenReturned](#then_returned)
+   - [thenThrown](#then_thrown)
+ - [mocks](#mocks)
+   - [stubbing](#stubbing)
+   - [verifying](#verifying)
+ - [utilities](#utilities)
+   - [matchers](#matchers)
+   - [closures](#closures)
+ - [macros](#macros)
+   - [givenTimes](#given_times)
+   - [givenTry](#given_try)
+   - [givenTest](#given_test)
+
+<a name="overview"/>
+# Overview
 
 To make **given**, **when**, **then** family of methods available, add following import to your test class.
 
@@ -17,7 +33,13 @@ you wrap lines inside methods
         given(list = new ArrayList<String>());
         when(list.add("element"));
 
-The purpose of **then** is to make an assertion. The most basic assertion asserts that condition is true. This works just like junit's **assertTrue**.
+The purpose of **then** is to make assertions similar to junit's assertions.
+
+ - `then(boolean)` is like `assertTrue(boolean)`
+ - `then(Object, Object)` is like `assertThat(T, Matcher<T>)`
+ - `thenEqual(Object, Object)` is like `assertEquals(Object, Object)`
+
+Example test using **given**-**when**-**then** looks like this
 
         given(list = new ArrayList<String>());
         when(list.add("element"));
@@ -34,37 +56,34 @@ you should use chained forms.
         given(list).clear();
         when(list).clear();
 
+<a name="asserting_invocation_result"/>
+# Asserting invocation result
 
-Assertions
-==========
+Assertions can be used to verify result of invocation happened at line with **when**.
 
-Standalone
-----------
+Result that is going to be asserted is
 
-Some assertions can be used on their own. They are similar to junit's assertions
-
- - `then(boolean)` is like `assertTrue(boolean)`
- - `then(Object, Object)` is like `assertThat(T, Matcher<T>)`
- - `thenEqual(Object, Object)` is like `assertEquals(Object, Object)`
-
-Non-standalone
---------------
-
-Non-standalone assertions are used to verify result of invocation happened at line with **when**.
-Result is object passed to **when** as an argument.
+ - object passed as an argument
 
         when(object);
-        
-If **when** is in chained form, result is object returned, or throwable thrown, by chained method.
 
-        when(instance).chainedMethod()  
+ - object returned, or throwable thrown, by chained method
 
-Non-standalone assertions are **thenReturned** and **thenThrown**.
+        when(instance).chainedMethod()
 
-thenReturned
-------------
+ - result of invoking closure
 
-**thenReturned** is used to make assertions about result of **when**. Assertion fails if result is not equal to expected.
+        when(new Closure() {
+          public Object invoke() throws Throwable {
+            // custom logic
+          }
+        });
+
+<a name="then_returned"/>
+### thenReturned
+
+
+**thenReturned** is used to make assertions about about object returned by **when**. Assertion fails if result is not equal to expected.
 
         given(list = new ArrayList<String>());
         given(list.add("element"));
@@ -78,8 +97,8 @@ Matchers can be used to make custom assertions
         when(list.clone());
         thenReturned(not(sameInstance(list)));
 
-thenThrown
-----------
+<a name="then_thrown"/>
+### thenThrown
 
 **thenThrown** is used to make assertions about throwable thrown by **when**. Because of
 java syntax **when** must be in chained form.
@@ -91,15 +110,15 @@ java syntax **when** must be in chained form.
 Notice that **when** in chained form catches any throwable. This prevents throwable from failing a test if result of **when** is not asserted by non-standalone assertion.
 **thenThrown** is overloaded to accept throwable instance, class or matcher.
 
-Mocks
-=====
+<a name="mocks"/>
+# Mocks
 
 Any non-final class or interface can be mocked.
 
         given(list = mock(List.class));
 
-Stubbing
---------
+<a name="stubbing"/>
+### Stubbing
 
 Mock can be stubbed to return Object or throw Throwable
 
@@ -124,8 +143,8 @@ Newly created mock has following properties
    - equals is stubbed so mock is equal only to itself
    - hashCode is stubbed to identity hash code
 
-Verifying
----------
+<a name="verifying"/>
+### Verifying
 
 It is possible to assert expected invocation on mock.
 
@@ -136,11 +155,11 @@ It is possible to assert expected invocation on mock.
 
 Verification ignores invocations that happened before **when**.
 
-Utilities
-=========
+<a name="utilities"/>
+# Utilities
 
-Matchers
---------
+<a name="matchers"/>
+### Matchers
 
 Wherever api method accepts Object, but states that it accepts matcher, you are free to pass any of compatible matchers
 
@@ -156,8 +175,8 @@ Wherever api method accepts Object, but states that it accepts matcher, you are 
           }
         };
 
-Closures
---------
+<a name="closures"/>
+### Closures
 
 In some cases **when** can be difficult to write. For example you want to assert that
 throwable was thrown, but cannot use chained form of **when**, because method is static. You may then
@@ -177,22 +196,23 @@ wrap call inside Closure.
           };
         }
 
-
-Macros
-======
+<a name="macros"/>
+# Macros
 
 Macros help you remove boilerplate code from your tests.
 
-givenTimes
-----------
+<a name="given_times"/>
+### givenTimes
+
+Repeats invocation many times.
 
         given(list = new ArrayList<String>());
         givenTimes(5, list).add("element");
         when(list.size());
         thenReturned(5);
 
-givenTry
---------
+<a name="given_try"/>
+### givenTry
 
 Catches possible throwable thrown by chained method allowing test to run forward. 
 
@@ -201,10 +221,10 @@ Catches possible throwable thrown by chained method allowing test to run forward
         when(list.size());
         thenReturned(0);
 
-Initialization of test fields
-=============================
+<a name="given_test"/>
+### givenTest
 
-`givenTest` initializes each field of **this** test and fails if initialization of any field fails.
+Initializes each field of **this** test and fails if initialization of any field fails.
 
         @Before
         public void before() {
@@ -221,13 +241,12 @@ Field is ignored if
 
 Initialization depends on type of field.
 
-Array
------
-
 Field of array type is initialized to array of size 1. Array's cell is initialized recursively.
 
-Final type
-----------
+Field of non-final type is assigned to mock. Mock is conveniently prestubbed
+ - toString is stubbed to return name of field
+ - equals is stubbed so mock is equal only to itself
+ - hashCode is stubbed to obey contract
 
 Field of final type is assigned to sample data
 
@@ -245,12 +264,3 @@ Field of final type is assigned to sample data
  - Field, Method and Constructor is assigned to member of sample class.
 
 Random sample data is deterministically generated using field type and field name as a seed.
-
-Non-final type
---------------
-
-Field of non-final type is assigned to mock.
-Mock is conveniently prestubbed
-   - toString is stubbed to return name of field
-   - equals is stubbed so mock is equal only to itself
-   - hashCode is stubbed to obey contract
