@@ -19,15 +19,18 @@ or assert that exception was thrown.
         when(list).get(0);
         thenThrown(IndexOutOfBoundsException.class);
 
-You can stub a mock to return Object
+You can stub a mock to return Object or throw Throwable ...
 
         given(list = mock(List.class));
-        given(willReturn(object), list).get(2);
-
-or throw Throwable.
-
-        given(list = mock(List.class));
+        given(willReturn(object), list).get(1);
         given(willThrow(new IndexOutOfBoundsException()), list).get(2);
+
+and verify call.
+
+        given(output = mock(OutputStream.class));
+        given(filterOutput = new FilterOutputStream(output));
+        when(filterOutput).close();
+        thenCalled(output).close();
 
 Tests can be even more compact using matchers ...
 

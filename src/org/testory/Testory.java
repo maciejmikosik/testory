@@ -153,6 +153,7 @@ public class Testory {
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
+        history.logInvocation(invocation);
         return history.getStubbedHandlerFor(invocation).handle(invocation);
       }
     };
@@ -401,6 +402,44 @@ public class Testory {
           + formatSection("expected", expected) //
           + formatSection("but was", object));
     }
+  }
+
+  public static <T> T thenCalled(final T mock) {
+    Typing typing = typing(mock.getClass(), new HashSet<Class<?>>());
+    Handler handler = new Handler() {
+      @Nullable
+      public Object handle(Invocation invocation) throws Throwable {
+        int counter = 0;
+        Invocation expected = on(mock, invocation);
+        for (Invocation occured : history.getInvocations()) {
+          if (expected.equals(occured)) {
+            counter++;
+          }
+        }
+        if (counter != 1) {
+          throw assertionError("\n" //
+              + formatSection("expected called", format(expected)));
+        }
+        return null;
+      }
+    };
+    return (T) proxy(typing, handler);
+  }
+
+  private static String format(Invocation invocation) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(invocation.instance);
+    builder.append(".");
+    builder.append(invocation.method.getName());
+    builder.append("(");
+    for (Object argument : invocation.arguments) {
+      builder.append(print(argument)).append(", ");
+    }
+    if (invocation.arguments.size() > 0) {
+      builder.delete(builder.length() - 2, builder.length());
+    }
+    builder.append(")");
+    return builder.toString();
   }
 
   private static String formatSection(String caption, @Nullable Object content) {

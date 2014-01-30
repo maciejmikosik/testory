@@ -3,6 +3,7 @@ package org.testory;
 import static org.testory.common.Checks.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.testory.proxy.Handler;
@@ -31,9 +32,9 @@ class History {
     threadLocalEvents.get().add(0, event);
   }
 
-  public void purge() {
-    class Purge {}
+  private static class Purge {}
 
+  public void purge() {
     List<Object> events = getEvents();
     for (int i = 0; i < events.size(); i++) {
       if (events.get(i) instanceof Purge) {
@@ -103,5 +104,21 @@ class History {
         return null;
       }
     };
+  }
+
+  public void logInvocation(Invocation invocation) {
+    addEvent(invocation);
+  }
+
+  public List<Invocation> getInvocations() {
+    List<Invocation> invocations = new ArrayList<Invocation>();
+    for (Object event : getEvents()) {
+      if (event instanceof Invocation) {
+        invocations.add((Invocation) event);
+      } else if (event instanceof Purge) {
+        break;
+      }
+    }
+    return Collections.unmodifiableList(invocations);
   }
 }

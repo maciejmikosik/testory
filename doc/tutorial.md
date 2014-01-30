@@ -98,6 +98,9 @@ Any non-final class or interface can be mocked.
 
         given(list = mock(List.class));
 
+Stubbing
+--------
+
 Mock can be stubbed to return Object or throw Throwable
 
         given(willReturn(object), list).get(1);
@@ -120,6 +123,18 @@ Newly created mock has following properties
    - toString is stubbed to contain class name and identity hash code
    - equals is stubbed so mock is equal only to itself
    - hashCode is stubbed to identity hash code
+
+Verifying
+---------
+
+It is possible to assert expected invocation on mock.
+
+        given(output = mock(OutputStream.class));
+        given(filterOutput = new FilterOutputStream(output));
+        when(filterOutput).close();
+        thenCalled(output).close();
+
+Verification ignores invocations that happened before **when**.
 
 Utilities
 =========
