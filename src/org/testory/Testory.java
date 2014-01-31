@@ -67,10 +67,7 @@ public class Testory {
 
   private static Object mockOrSample(Class<?> type, final String name) {
     if (isProxiable(type)) {
-      Object mock = mock(type);
-      given(willReturn(name), mock).toString();
-      given(willReturn(name.hashCode()), mock).hashCode();
-      return mock;
+      return mock(type, namedMockHandler(name));
     } else if (type.isArray()) {
       Class<?> componentType = type.getComponentType();
       Object array = Array.newInstance(componentType, 1);
@@ -147,6 +144,11 @@ public class Testory {
 
   public static <T> T mock(Class<T> type) {
     check(isProxiable(type));
+    return mock(type, unnamedMockHandler());
+  }
+
+  private static <T> T mock(Class<T> type, final Handler defaultHandler) {
+    check(isProxiable(type));
     Typing typing = type.isInterface()
         ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
         : typing(type, new HashSet<Class<?>>());
@@ -154,10 +156,44 @@ public class Testory {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         history.logInvocation(invocation);
-        return history.getStubbedHandlerFor(invocation).handle(invocation);
+        Handler stubbedHandler = history.getStubbedHandlerFor(invocation);
+        return stubbedHandler != null
+            ? stubbedHandler.handle(invocation)
+            : defaultHandler.handle(invocation);
       }
     };
     return (T) proxy(typing, handler);
+  }
+
+  private static Handler unnamedMockHandler() {
+    return new Handler() {
+      public Object handle(Invocation invocation) {
+        return invocation.method.getName().equals("toString")
+            ? "mock_" + invocation.instance.getClass().getName() + "_"
+                + System.identityHashCode(invocation.instance)
+            : invocation.method.getName().equals("equals") && invocation.arguments.size() == 1
+                ? invocation.instance == invocation.arguments.get(0)
+                : invocation.method.getName().equals("hashCode")
+                    && invocation.arguments.size() == 0
+                    ? System.identityHashCode(invocation.instance)
+                    : null;
+      }
+    };
+  }
+
+  private static Handler namedMockHandler(final String name) {
+    return new Handler() {
+      public Object handle(Invocation invocation) {
+        return invocation.method.getName().equals("toString")
+            ? name
+            : invocation.method.getName().equals("equals") && invocation.arguments.size() == 1
+                ? invocation.instance == invocation.arguments.get(0)
+                : invocation.method.getName().equals("hashCode")
+                    && invocation.arguments.size() == 0
+                    ? name.hashCode()
+                    : null;
+      }
+    };
   }
 
   public static <T> T given(final Will will, final T mock) {
