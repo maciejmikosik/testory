@@ -12,11 +12,25 @@ import static org.testory.proxy.Typing.typing;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.RandomAccess;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -175,6 +189,80 @@ public class Describe_Proxies_proxy {
     proxy = proxy(typing(type, interfaces), handler);
     assertTrue(proxy instanceof Superclass);
     assertTrue(proxy instanceof $InterfaceA);
+  }
+
+  @Test
+  public void should_create_proxy_of_arrays_as_list() {
+    type = Arrays.asList().getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof AbstractList);
+    assertTrue(proxy instanceof RandomAccess);
+    assertTrue(proxy instanceof Serializable);
+  }
+
+  @Test
+  public void should_create_proxy_of_unmodifiable_collection() {
+    type = Collections.unmodifiableCollection(new ArrayList<Object>()).getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Collection);
+    assertTrue(proxy instanceof Serializable);
+  }
+
+  @Test
+  public void should_create_proxy_of_unmodifiable_list() {
+    type = Collections.unmodifiableList(new LinkedList<Object>()).getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof List);
+    assertTrue(proxy instanceof Serializable);
+  }
+
+  @Test
+  public void should_create_proxy_of_unmodifiable_random_access_list() {
+    type = Collections.unmodifiableList(new ArrayList<Object>()).getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof List);
+    assertTrue(proxy instanceof Serializable);
+    assertTrue(proxy instanceof RandomAccess);
+  }
+
+  @Test
+  public void should_create_proxy_of_unmodifiable_set() {
+    type = Collections.unmodifiableSet(new HashSet<Object>()).getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Set);
+    assertTrue(proxy instanceof Serializable);
+  }
+
+  @Test
+  public void should_create_proxy_of_unmodifiable_sorted_set() {
+    type = Collections.unmodifiableSortedSet(new TreeSet<Object>()).getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof SortedSet);
+    assertTrue(proxy instanceof Serializable);
+  }
+
+  @Test
+  public void should_create_proxy_of_unmodifiable_map() {
+    type = Collections.unmodifiableMap(new HashMap<Object, Object>()).getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Map);
+    assertTrue(proxy instanceof Serializable);
+  }
+
+  @Test
+  public void should_create_proxy_of_unmodifiable_sorted_map() {
+    type = Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof SortedMap);
+    assertTrue(proxy instanceof Serializable);
   }
 
   @Test
