@@ -109,6 +109,12 @@ public class Describe_verification {
   }
 
   @Test
+  public void invocations_inside_when_are_included() {
+    when(mock.size());
+    thenCalled(mock).size();
+  }
+
+  @Test
   public void invocations_before_when_are_included() {
     mock.size();
     when("do something");
