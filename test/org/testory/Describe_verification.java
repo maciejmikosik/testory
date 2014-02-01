@@ -109,26 +109,20 @@ public class Describe_verification {
   }
 
   @Test
-  public void invocations_before_when_are_ignored() {
+  public void invocations_before_when_are_included() {
     mock.size();
     when("do something");
-    try {
-      thenCalled(mock).size();
-      fail();
-    } catch (TestoryAssertionError e) {}
+    thenCalled(mock).size();
   }
 
   @Test
-  public void invocations_before_when_closure_are_ignored() {
+  public void invocations_before_when_closure_are_included() {
     mock.size();
     when(new Closure() {
       public Object invoke() throws Throwable {
         return null;
       }
     });
-    try {
-      thenCalled(mock).size();
-      fail();
-    } catch (TestoryAssertionError e) {}
+    thenCalled(mock).size();
   }
 }

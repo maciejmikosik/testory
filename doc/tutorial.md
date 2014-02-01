@@ -153,8 +153,6 @@ It is possible to assert expected invocation on mock.
         when(filterOutput).close();
         thenCalled(output).close();
 
-Verification ignores invocations that happened before **when**.
-
 <a name="utilities"/>
 # Utilities
 

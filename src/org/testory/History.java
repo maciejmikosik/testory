@@ -103,8 +103,6 @@ class History {
     for (Object event : getEvents()) {
       if (event instanceof Invocation) {
         invocations.add((Invocation) event);
-      } else if (event instanceof Purge) {
-        break;
       }
     }
     return Collections.unmodifiableList(invocations);
