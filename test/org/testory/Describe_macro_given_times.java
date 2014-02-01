@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 import org.junit.Before;
 import org.junit.Test;
 
-public class Describe_Testory_givenTimes {
+public class Describe_macro_given_times {
   private int times, counter, failTime;
   private Exception exception;
 
@@ -24,7 +24,7 @@ public class Describe_Testory_givenTimes {
   }
 
   @Test
-  public void should_call_closure_many_times() {
+  public void calls_closure_many_times() {
     givenTimes(times, new Closure() {
       public Void invoke() {
         counter++;
@@ -35,7 +35,7 @@ public class Describe_Testory_givenTimes {
   }
 
   @Test
-  public void should_call_closure_zero_times() {
+  public void calls_closure_zero_times() {
     givenTimes(0, new Closure() {
       public Void invoke() {
         counter++;
@@ -46,7 +46,7 @@ public class Describe_Testory_givenTimes {
   }
 
   @Test
-  public void should_fail_gently_if_closure_throws() {
+  public void gently_propagates_throwable_thrown_by_closure() {
     times = 5;
     failTime = 3;
     try {
@@ -59,16 +59,33 @@ public class Describe_Testory_givenTimes {
           return null;
         }
       });
-      fail();
     } catch (Throwable throwable) {
       assertTrue(throwable instanceof RuntimeException);
       assertSame(exception, throwable.getCause());
       assertEquals(failTime, counter);
+      return;
     }
+    fail();
   }
 
   @Test
-  public void should_call_method_many_times() {
+  public void cannot_call_closure_negative_number_of_times() {
+    try {
+      givenTimes(-1, returning(null));
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void closure_cannot_be_null() {
+    try {
+      givenTimes(times, (Closure) null);
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void calls_invocation_many_times() {
     givenTimes(times, new Runnable() {
       public void run() {
         counter++;
@@ -78,7 +95,7 @@ public class Describe_Testory_givenTimes {
   }
 
   @Test
-  public void should_call_method_zero_times() {
+  public void calls_invocation_zero_times() {
     times = 0;
     givenTimes(0, new Runnable() {
       public void run() {
@@ -89,7 +106,7 @@ public class Describe_Testory_givenTimes {
   }
 
   @Test
-  public void should_fail_if_method_throws() {
+  public void gently_propagates_throwable_thrown_by_invocation() {
     times = 5;
     failTime = 3;
     try {
@@ -102,23 +119,16 @@ public class Describe_Testory_givenTimes {
           return null;
         }
       }).call();
-      fail();
     } catch (Throwable throwable) {
       assertSame(exception, throwable);
       assertEquals(failTime, counter);
+      return;
     }
+    fail();
   }
 
   @Test
-  public void should_fail_calling_closure_negative_number_of_times() {
-    try {
-      givenTimes(-1, returning(null));
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void should_fail_calling_method_negative_number_of_times() {
+  public void cannot_call_invocation_negative_number_of_times() {
     try {
       givenTimes(-1, new Runnable() {
         public void run() {}
@@ -128,24 +138,7 @@ public class Describe_Testory_givenTimes {
   }
 
   @Test
-  public void should_fail_for_final_class() {
-    final class FinalClass {}
-    try {
-      givenTimes(3, new FinalClass());
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void should_fail_for_null_closure() {
-    try {
-      givenTimes(times, null);
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void should_fail_for_null_object() {
+  public void invocation_instance_cannot_be_null() {
     try {
       givenTimes(times, (Object) null);
       fail();

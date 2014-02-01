@@ -6,7 +6,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
-import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
 import static org.testory.Testory.willThrow;
 import static org.testory.test.Testilities.newObject;
@@ -15,7 +14,7 @@ import static org.testory.test.Testilities.newThrowable;
 import org.junit.Before;
 import org.junit.Test;
 
-public class Describe_Testory_given_Will_Object {
+public class Describe_stubbing {
   private Object object;
   private Throwable throwable;
 
@@ -26,7 +25,7 @@ public class Describe_Testory_given_Will_Object {
   }
 
   @Test
-  public void should_stub_return() {
+  public void handler_can_return_object() {
     class Foo {
       Object method() {
         return null;
@@ -38,7 +37,7 @@ public class Describe_Testory_given_Will_Object {
   }
 
   @Test
-  public void should_stub_throw() throws Throwable {
+  public void handler_can_throw_throwable() throws Throwable {
     class Foo {
       Object method() throws Throwable {
         return null;
@@ -55,7 +54,7 @@ public class Describe_Testory_given_Will_Object {
   }
 
   @Test
-  public void should_return_null_if_not_stubbed() {
+  public void unstubbed_invocation_returns_null_as_object() {
     class Foo {
       Object method() {
         return object;
@@ -66,27 +65,13 @@ public class Describe_Testory_given_Will_Object {
   }
 
   @Test
-  public void should_stubbing_survive_chained_when() {
+  public void unstubbed_invocation_returns_zero_as_integer() {
     class Foo {
-      Object method() {
-        return null;
+      int method() {
+        return -1;
       }
     }
-    Foo mock = mock(Foo.class);
-    given(willReturn(object), mock).method();
-    when(object).toString();
-    assertSame(object, mock.method());
-  }
-
-  @Test
-  public void should_stub_method_with_array_argument() {
-    class Foo {
-      Object method(Object[] array) {
-        return null;
-      }
-    }
-    Foo mock = mock(Foo.class);
-    given(willReturn(object), mock).method(new Object[0]);
-    assertSame(object, mock.method(new Object[0]));
+    Foo foo = mock(Foo.class);
+    assertEquals(0, foo.method());
   }
 }

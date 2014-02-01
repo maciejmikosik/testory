@@ -4,10 +4,11 @@ import static org.testory.Testory.givenTest;
 
 import org.junit.Test;
 
-public class Describe_final_methods {
+public class Describe_handling_final_methods {
+  // TODO test stubbing and verification with final methods
   @SuppressWarnings("unused")
   @Test
-  public void should_inject_mock_with_final_hashcode() {
+  public void given_test_injects_mock_with_final_hashcode() {
     class Foo {
       private boolean initialized = false;
 

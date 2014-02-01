@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
 import org.junit.Before;
 import org.junit.Test;
 
-public class Describe_Testory_givenTry {
+public class Describe_macro_given_try {
   private int counter;
   private Exception exception;
 
@@ -19,7 +19,7 @@ public class Describe_Testory_givenTry {
   }
 
   @Test
-  public void should_call_method_once() {
+  public void calls_method_once() {
     givenTry(new Runnable() {
       public void run() {
         counter++;
@@ -29,7 +29,7 @@ public class Describe_Testory_givenTry {
   }
 
   @Test
-  public void should_catch_throwable() throws Exception {
+  public void catches_throwable() throws Exception {
     givenTry(new Callable<Object>() {
       public Object call() throws Exception {
         throw exception;
@@ -38,18 +38,9 @@ public class Describe_Testory_givenTry {
   }
 
   @Test
-  public void should_fail_for_null() {
+  public void invocation_instance_cannot_be_null() {
     try {
       givenTry(null);
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void should_fail_for_final_class() {
-    final class FinalClass {}
-    try {
-      givenTry(new FinalClass());
       fail();
     } catch (TestoryException e) {}
   }

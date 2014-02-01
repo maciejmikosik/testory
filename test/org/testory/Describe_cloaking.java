@@ -9,9 +9,9 @@ import static org.testory.Testory.thenThrown;
 
 import org.junit.Test;
 
-public class Describe_Testory_cloaking {
+public class Describe_cloaking {
   @Test
-  public void should_error_contain_one_element() {
+  public void stack_trace_contains_one_element() {
     try {
       then(false);
       fail();
@@ -21,17 +21,17 @@ public class Describe_Testory_cloaking {
   }
 
   @Test
-  public void should_error_be_from_test_class() {
+  public void stack_trace_contains_caller_class_name() {
     try {
       then(false);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals(Describe_Testory_cloaking.class.getName(), e.getStackTrace()[0].getClassName());
+      assertEquals(Describe_cloaking.class.getName(), e.getStackTrace()[0].getClassName());
     }
   }
 
   @Test
-  public void should_error_be_from_correct_line() {
+  public void stack_trace_contains_line_number_in_caller_class() {
     int previousLine = -1;
     try {
       previousLine = new Exception().getStackTrace()[0].getLineNumber();
@@ -43,7 +43,7 @@ public class Describe_Testory_cloaking {
   }
 
   @Test
-  public void should_exception_contain_original_stacktrace() {
+  public void exceptions_are_not_cloaked() {
     try {
       thenThrown((Throwable) null);
       fail();

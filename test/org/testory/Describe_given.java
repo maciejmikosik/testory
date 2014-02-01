@@ -9,7 +9,7 @@ import static org.testory.test.Testilities.returning;
 import org.junit.Before;
 import org.junit.Test;
 
-public class Describe_Testory_given {
+public class Describe_given {
   private Object object;
 
   @Before
@@ -18,20 +18,28 @@ public class Describe_Testory_given {
   }
 
   @Test
-  public void should_return_same_object() {
+  public void returns_same_object() {
     Object given = given(object);
-    assertSame(given, object);
+    assertSame(object, given);
   }
 
   @Test
-  public void should_return_null_object() {
+  public void returns_null_object() {
     Object given = given((Object) null);
-    assertSame(given, null);
+    assertSame(null, given);
+  }
+
+  @Test
+  public void returns_same_object_of_final_class() {
+    final class FinalClass {}
+    object = new FinalClass();
+    Object given = given(object);
+    assertSame(object, given);
   }
 
   @SuppressWarnings("deprecation")
   @Test
-  public void should_fail_for_any_closure() {
+  public void closure_is_forbidden() {
     try {
       given(returning(null));
       fail();
@@ -40,7 +48,7 @@ public class Describe_Testory_given {
 
   @SuppressWarnings("deprecation")
   @Test
-  public void should_fail_for_null_closure() {
+  public void null_closure_is_forbidden() {
     try {
       given(null);
       fail();

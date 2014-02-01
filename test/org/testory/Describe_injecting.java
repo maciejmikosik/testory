@@ -11,7 +11,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
-import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
 import static org.testory.test.Testilities.readDeclaredFields;
 
@@ -24,11 +23,11 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class Describe_Testory_givenTest {
+public class Describe_injecting {
   private final String string = "string";
 
   @Test
-  public void should_inject_concrete_class() {
+  public void injects_concrete_class() {
     class ConcreteClass {}
     class TestClass {
       ConcreteClass field;
@@ -39,7 +38,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_interface() {
+  public void injects_interface() {
     class TestClass {
       Interface field;
     }
@@ -49,7 +48,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_abstract_class() {
+  public void injects_abstract_class() {
     abstract class AbstractClass {}
     class TestClass {
       AbstractClass field;
@@ -60,7 +59,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_object_class() {
+  public void injects_object_class() {
     class TestClass {
       Object field;
     }
@@ -70,7 +69,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_prestub_to_string_to_return_field_name() {
+  public void to_string_is_prestubbed() {
     class TestClass {
       Object field;
     }
@@ -80,39 +79,20 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_prestub_equals_to_match_same_instance() {
+  public void equals_is_prestubbed() {
     class TestClass {
-      Object field;
+      Object field, otherField;
     }
     TestClass test = new TestClass();
     givenTest(test);
     assertTrue(test.field.equals(test.field));
-  }
-
-  @Test
-  public void should_prestub_equals_to_not_match_not_same_instance() {
-    class TestClass {
-      Object field;
-      Object otherField;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
     assertFalse(test.field.equals(test.otherField));
     assertFalse(test.otherField.equals(test.field));
-  }
-
-  @Test
-  public void should_prestub_equals_to_not_match_null() {
-    class TestClass {
-      Object field;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
     assertFalse(test.field.equals(null));
   }
 
   @Test
-  public void should_prestub_hashcode_to_obey_contract() {
+  public void hashcode_is_prestubbed() {
     class TestClass {
       Object field, otherField;
     }
@@ -123,22 +103,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_prestubbings_survive_purge() {
-    class TestClass {
-      Object field;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    String toString = test.field.toString();
-    int hashcode = test.field.hashCode();
-    when("");
-    when("");
-    assertEquals(toString, test.field.toString());
-    assertEquals(hashcode, test.field.hashCode());
-  }
-
-  @Test
-  public void should_injected_mock_be_stubbable() {
+  public void injected_mock_is_stubbable() {
     class TestClass {
       List<Object> field;
     }
@@ -149,7 +114,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_injected_mock_be_restubbable() {
+  public void injected_mock_is_restubbable() {
     class TestClass {
       Object field;
     }
@@ -160,7 +125,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_boolean() {
+  public void injects_boolean() {
     @SuppressWarnings("unused")
     class TestClass {
       boolean p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
@@ -175,7 +140,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_character() {
+  public void injects_character() {
     @SuppressWarnings("unused")
     class TestClass {
       char p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
@@ -191,7 +156,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_byte() {
+  public void injects_byte() {
     @SuppressWarnings("unused")
     class TestClass {
       byte p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
@@ -207,7 +172,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_short() {
+  public void injects_short() {
     @SuppressWarnings("unused")
     class TestClass {
       short p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
@@ -223,7 +188,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_integer() {
+  public void injects_integer() {
     @SuppressWarnings("unused")
     class TestClass {
       int p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
@@ -239,7 +204,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_long() {
+  public void injects_long() {
     @SuppressWarnings("unused")
     class TestClass {
       long p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
@@ -255,7 +220,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_float() {
+  public void injects_float() {
     @SuppressWarnings("unused")
     class TestClass {
       float p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
@@ -272,7 +237,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_double() {
+  public void injects_double() {
     @SuppressWarnings("unused")
     class TestClass {
       double p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
@@ -289,7 +254,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_string() {
+  public void injects_string() {
     class TestClass {
       String field;
     }
@@ -299,7 +264,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_array_of_primitives() {
+  public void injects_array_of_primitives() {
     class TestClass {
       int[] ints;
       Integer[] intWrappers;
@@ -315,7 +280,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_array_of_strings() {
+  public void injects_array_of_strings() {
     class TestClass {
       String[] strings;
       String[][] deepStrings;
@@ -327,7 +292,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_array_of_mocks() {
+  public void injects_array_of_mocks() {
     class TestClass {
       Object[] objects;
       Object[][] deepObjects;
@@ -348,7 +313,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_reflection_classes() {
+  public void injects_reflection_classes() {
     class TestClass {
       Class<?> clazz;
       Field field;
@@ -367,7 +332,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_inject_enum() {
+  public void injects_enum() {
     @SuppressWarnings("unused")
     class TestClass {
       ElementType a, b, c, d, e, f, g, h, i, j;
@@ -380,7 +345,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_skip_not_null() {
+  public void skips_not_null() {
     class TestClass {
       Object field;
       String stringField = "value";
@@ -410,7 +375,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_skip_void() {
+  public void skips_void() {
     class TestClass {
       Void voidField;
     }
@@ -420,7 +385,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_skip_primitive_not_equal_to_binary_zero() {
+  public void skips_primitive_not_equal_to_binary_zero() {
     class TestClass {
       boolean booleanPrimitive = true;
       boolean booleanWrapper = true;
@@ -450,14 +415,14 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_skip_static_field() {
+  public void skips_static_field() {
     TestClassWithStaticField test = new TestClassWithStaticField();
     givenTest(test);
     assertNull(TestClassWithStaticField.field);
   }
 
   @Test
-  public void should_skip_final_field() {
+  public void skips_final_field() {
     class TestClass {
       final Object field = null;
     }
@@ -467,7 +432,7 @@ public class Describe_Testory_givenTest {
   }
 
   @Test
-  public void should_fail_for_final_class() {
+  public void cannot_inject_final_class() {
     final class FinalClass {}
     class TestClass {
       @SuppressWarnings("unused")

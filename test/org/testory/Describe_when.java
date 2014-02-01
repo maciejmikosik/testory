@@ -17,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /** more tests in then* versions */
-public class Describe_Testory_when {
+public class Describe_when {
   private Throwable throwable;
   private Runnable runnable;
   private Object object;
@@ -29,7 +29,7 @@ public class Describe_Testory_when {
   }
 
   @Test
-  public void should_proxy_instance() {
+  public void proxies_instance_of_non_final_class() {
     class Foo {}
     object = new Foo();
     Object when = when(object);
@@ -38,7 +38,7 @@ public class Describe_Testory_when {
   }
 
   @Test
-  public void should_proxy_catch_thrown_throwable() {
+  public void proxy_does_not_propagate_throwables() {
     runnable = new Runnable() {
       public void run() {
         throw new RuntimeException();
@@ -48,7 +48,7 @@ public class Describe_Testory_when {
   }
 
   @Test
-  public void should_not_proxy_instance_of_final_class() {
+  public void does_not_proxy_final_classes() {
     final class FinalClass {}
     FinalClass finalInstance = new FinalClass();
     FinalClass when = when(finalInstance);
@@ -56,33 +56,33 @@ public class Describe_Testory_when {
   }
 
   @Test
-  public void should_not_proxy_null_instance() {
+  public void does_not_proxy_null_instance() {
     Object when = when((Object) null);
     assertNull(when);
   }
 
   @Test
-  public void should_accept_object() {
+  public void accepts_object() {
     when(object);
   }
 
   @Test
-  public void should_accept_null_object() {
+  public void accepts_null_object() {
     when((Object) null);
   }
 
   @Test
-  public void should_accept_closure_returning() {
+  public void accepts_closure_returning() {
     when(returning(object));
   }
 
   @Test
-  public void should_accept_closure_throwing() {
+  public void accepts_closure_throwing() {
     when(throwing(throwable));
   }
 
   @Test
-  public void should_fail_if_missed_when() throws Throwable {
+  public void when_is_required_for_result_assertion() throws Throwable {
     Thread thread = new Thread() {
       public void run() {
         thenReturned(object);
@@ -99,7 +99,7 @@ public class Describe_Testory_when {
   }
 
   @Test
-  public void should_fail_for_null_closure() {
+  public void fails_for_null_closure() {
     try {
       when((Closure) null);
       fail();

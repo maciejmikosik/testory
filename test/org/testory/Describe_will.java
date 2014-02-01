@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Invocation;
 
-public class Describe_Testory_will {
+public class Describe_will {
   private Will will;
   private Invocation invocation;
   private Object object;
@@ -24,26 +24,26 @@ public class Describe_Testory_will {
   }
 
   @Test
-  public void should_return_object() throws Throwable {
+  public void returns_object() throws Throwable {
     will = willReturn(object);
     assertSame(object, will.handle(invocation));
   }
 
   @Test
-  public void should_return_null() throws Throwable {
+  public void returns_null() throws Throwable {
     will = willReturn(null);
     assertSame(null, will.handle(invocation));
   }
 
   @Test
-  public void should_return_object_again() throws Throwable {
+  public void returns_same_object_again() throws Throwable {
     will = willReturn(object);
     will.handle(invocation);
     assertSame(object, will.handle(invocation));
   }
 
   @Test
-  public void should_throw_throwable() {
+  public void throws_throwable() {
     will = willThrow(throwable);
     try {
       will.handle(invocation);
@@ -54,7 +54,7 @@ public class Describe_Testory_will {
   }
 
   @Test
-  public void should_throw_throwable_again() {
+  public void throws_same_throwable_again() {
     will = willThrow(throwable);
     try {
       will.handle(invocation);
@@ -68,7 +68,7 @@ public class Describe_Testory_will {
   }
 
   @Test
-  public void should_not_throw_null() {
+  public void cannot_throw_null() {
     try {
       willThrow(null);
       fail();
