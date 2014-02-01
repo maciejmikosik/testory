@@ -94,12 +94,19 @@ public class Proxies {
   }
 
   private static Typing withoutFactory(Typing typing) {
-    Class<?> superclass = typing.superclass.getSuperclass();
-    Set<Class<?>> interfaces = new HashSet<Class<?>>();
-    interfaces.addAll(Arrays.asList(typing.superclass.getInterfaces()));
-    interfaces.addAll(typing.interfaces);
+    Typing peeled = peel(typing);
+    Class<?> superclass = peeled.superclass;
+    Set<Class<?>> interfaces = new HashSet<Class<?>>(peeled.interfaces);
     interfaces.remove(Factory.class);
     return typing(superclass, interfaces);
+  }
+
+  private static Typing peel(Typing typing) {
+    Class<?> superclass = typing.superclass.getSuperclass();
+    Set<Class<?>> interfaces = new HashSet<Class<?>>(typing.interfaces);
+    interfaces.addAll(Arrays.asList(typing.superclass.getInterfaces()));
+    return typing(superclass, interfaces);
+
   }
 
   private static Typing tryWithoutObjectBecauseOfCglibBug(Typing typing) {
