@@ -8,12 +8,18 @@ import static org.testory.proxy.Typing.typing;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import net.sf.cglib.core.CodeGenerationException;
 import net.sf.cglib.proxy.Callback;
@@ -84,7 +90,28 @@ public class Proxies {
   }
 
   private static Typing tryAsProxiable(Typing typing) {
-    return tryWithoutFactory(tryWithoutObjectBecauseOfCglibBug(typing));
+    return tryWithoutInaccessible(tryWithoutFactory(tryWithoutObjectBecauseOfCglibBug(typing)));
+  }
+
+  private static Typing tryWithoutInaccessible(Typing typing) {
+    return inaccessibleClasses.contains(typing.superclass)
+        ? tryWithoutInaccessible(peel(typing))
+        : typing;
+  }
+
+  private static final Set<Class<?>> inaccessibleClasses = inaccessibleClasses();
+
+  private static Set<Class<?>> inaccessibleClasses() {
+    HashSet<Class<?>> classes = new HashSet<Class<?>>();
+    classes.add(Arrays.asList().getClass());
+    classes.add(Collections.unmodifiableCollection(new ArrayList<Object>()).getClass());
+    classes.add(Collections.unmodifiableList(new LinkedList<Object>()).getClass());
+    classes.add(Collections.unmodifiableList(new ArrayList<Object>()).getClass());
+    classes.add(Collections.unmodifiableSet(new HashSet<Object>()).getClass());
+    classes.add(Collections.unmodifiableSortedSet(new TreeSet<Object>()).getClass());
+    classes.add(Collections.unmodifiableMap(new HashMap<Object, Object>()).getClass());
+    classes.add(Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).getClass());
+    return Collections.unmodifiableSet(classes);
   }
 
   private static Typing tryWithoutFactory(Typing typing) {
@@ -94,12 +121,19 @@ public class Proxies {
   }
 
   private static Typing withoutFactory(Typing typing) {
-    Class<?> superclass = typing.superclass.getSuperclass();
-    Set<Class<?>> interfaces = new HashSet<Class<?>>();
-    interfaces.addAll(Arrays.asList(typing.superclass.getInterfaces()));
-    interfaces.addAll(typing.interfaces);
+    Typing peeled = peel(typing);
+    Class<?> superclass = peeled.superclass;
+    Set<Class<?>> interfaces = new HashSet<Class<?>>(peeled.interfaces);
     interfaces.remove(Factory.class);
     return typing(superclass, interfaces);
+  }
+
+  private static Typing peel(Typing typing) {
+    Class<?> superclass = typing.superclass.getSuperclass();
+    Set<Class<?>> interfaces = new HashSet<Class<?>>(typing.interfaces);
+    interfaces.addAll(Arrays.asList(typing.superclass.getInterfaces()));
+    return typing(superclass, interfaces);
+
   }
 
   private static Typing tryWithoutObjectBecauseOfCglibBug(Typing typing) {

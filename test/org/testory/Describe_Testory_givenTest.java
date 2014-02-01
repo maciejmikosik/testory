@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
+import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
 import static org.testory.test.Testilities.readDeclaredFields;
 
@@ -119,6 +120,21 @@ public class Describe_Testory_givenTest {
     givenTest(test);
     assertEquals(test.field.hashCode(), test.field.hashCode());
     assertTrue(test.field.hashCode() != test.otherField.hashCode());
+  }
+
+  @Test
+  public void should_prestubbings_survive_purge() {
+    class TestClass {
+      Object field;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    String toString = test.field.toString();
+    int hashcode = test.field.hashCode();
+    when("");
+    when("");
+    assertEquals(toString, test.field.toString());
+    assertEquals(hashcode, test.field.hashCode());
   }
 
   @Test

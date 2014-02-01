@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.util.Effect;
@@ -80,6 +81,7 @@ class History {
     addEvent(stubbing);
   }
 
+  @Nullable
   public Handler getStubbedHandlerFor(Invocation stubbedInvocation) {
     for (Object event : getEvents()) {
       if (event instanceof Stubbing) {
@@ -89,21 +91,7 @@ class History {
         }
       }
     }
-    return new Handler() {
-      public Object handle(Invocation invocation) {
-        if (invocation.method.getName().equals("toString")) {
-          return "mock " + invocation.instance.getClass().getName() + " "
-              + System.identityHashCode(invocation.instance);
-        }
-        if (invocation.method.getName().equals("equals") && invocation.arguments.size() == 1) {
-          return invocation.instance == invocation.arguments.get(0);
-        }
-        if (invocation.method.getName().equals("hashCode") && invocation.arguments.size() == 0) {
-          return System.identityHashCode(invocation.instance);
-        }
-        return null;
-      }
-    };
+    return null;
   }
 
   public void logInvocation(Invocation invocation) {
