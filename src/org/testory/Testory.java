@@ -195,15 +195,27 @@ public class Testory {
   }
 
   public static <T> T given(final Handler will, T mock) {
+    check(will != null);
+    check(mock != null);
     Typing typing = typing(mock.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       @Nullable
-      public Object handle(Invocation invocation) throws Throwable {
-        history.logStubbing(will, invocation);
+      public Object handle(final Invocation invocation) throws Throwable {
+        history.logStubbing(will, new On() {
+          public boolean matches(Invocation item) {
+            return invocation.equals(item);
+          }
+        });
         return null;
       }
     };
     return proxyWrapping(mock, typing, handler);
+  }
+
+  public static void given(Handler will, On on) {
+    check(will != null);
+    check(on != null);
+    history.logStubbing(will, on);
   }
 
   public static Handler willReturn(@Nullable final Object object) {

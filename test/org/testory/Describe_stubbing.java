@@ -7,6 +7,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
+import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
 import static org.testory.Testory.willThrow;
 import static org.testory.test.Testilities.newObject;
@@ -14,13 +15,18 @@ import static org.testory.test.Testilities.newThrowable;
 
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.proxy.Handler;
+import org.testory.proxy.Invocation;
 
 public class Describe_stubbing {
   private Object object;
   private Throwable throwable;
   private List<Object> mock, otherMock;
+  private Handler handler;
+  private On on;
 
   @Before
   public void before() {
@@ -28,6 +34,14 @@ public class Describe_stubbing {
     throwable = newThrowable("throwable");
     mock = mock(List.class);
     otherMock = mock(List.class);
+    handler = mock(Handler.class);
+    on = mock(On.class);
+  }
+
+  @After
+  public void purge_stubbings_so_they_do_not_affect_other_tests() {
+    when("");
+    when("");
   }
 
   @Test
@@ -52,6 +66,46 @@ public class Describe_stubbing {
   public void ignores_different_argument() {
     given(willReturn(object), mock).get(0);
     assertNotSame(object, mock.get(1));
+  }
+
+  @Test
+  public void matches_invocation_with_custom_logic() {
+    given(willReturn(object), new On() {
+      public boolean matches(Invocation invocation) {
+        assume(invocation.method.getReturnType() == Object.class);
+        return invocation.instance == mock;
+      }
+    });
+    assertSame(object, mock.get(0));
+    assertNotSame(object, otherMock.get(0));
+  }
+
+  @Test
+  public void handler_cannot_be_null() {
+    try {
+      given(null, mock);
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      given(null, on);
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void mock_cannot_be_null() {
+    try {
+      given(handler, (Object) null);
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void on_cannot_be_null() {
+    try {
+      given(handler, (On) null);
+      fail();
+    } catch (TestoryException e) {}
   }
 
   @Test
@@ -103,5 +157,11 @@ public class Describe_stubbing {
     }
     Foo foo = mock(Foo.class);
     assertEquals(0, foo.method());
+  }
+
+  private static void assume(boolean assumption) {
+    if (!assumption) {
+      throw new RuntimeException("wrong assumption");
+    }
   }
 }

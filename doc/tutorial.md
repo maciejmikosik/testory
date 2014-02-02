@@ -120,20 +120,25 @@ Any non-final class or interface can be mocked.
 <a name="stubbing"/>
 ### Stubbing
 
-Mock can be stubbed to return Object or throw Throwable
+Mock can be stubbed to return Object or throw Throwable.
+Stubbing will be only effective for specified instance of mock, method and equal arguments.
 
         given(willReturn(object), list).get(1);
         given(willThrow(new IndexOutOfBoundsException()), list).get(2);
 
-or stubbed with custom logic.
+Or you can stub using custom handling and matching logic.
 
-        given(new Handler() {
+        Handler handler = new Handler() {
           public Object handle(Invocation invocation) throws Throwable {
             // custom logic
           }
-        }, mock).toString();
-
-Stubbing will be only effective for specified instance of mock, method and equal arguments.
+        };
+        On on = new On() {
+          public boolean matches(Invocation invocation) {
+            // custom logic
+          }
+        };
+        given(handler, on);
 
 Newly created mock has following properties
  - all methods are stubbable, except finalize and final methods
