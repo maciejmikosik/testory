@@ -159,6 +159,12 @@ Also using custom logic.
 
 Invocation is expected to be called exactly once.
 
+You can verify exact number of invocations (may be 0) or use matcher.
+
+        thenCalledTimes(3, mock).size();
+        thenCalledTimes(0, mock).clear();
+        thenCalledTimes(greaterThan(0), mock).toString();
+
 ### Capturing
 
 Use captor if you do not care about argument value.
