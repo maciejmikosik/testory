@@ -65,7 +65,7 @@ public class Testory {
     }
   }
 
-  private static Object mockOrSample(Class<?> type, final String name) {
+  private static Object mockOrSample(Class<?> type, String name) {
     if (isProxiable(type)) {
       return mock(type, namedMockHandler(name));
     } else if (type.isArray()) {
@@ -131,8 +131,8 @@ public class Testory {
     check(isProxiable(object.getClass()));
     Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
-      public Object handle(final Invocation invocation) throws Throwable {
-        final Invocation onObjectInvocation = on(object, invocation);
+      public Object handle(Invocation invocation) throws Throwable {
+        Invocation onObjectInvocation = on(object, invocation);
         for (int i = 0; i < number; i++) {
           invoke(onObjectInvocation);
         }
@@ -234,7 +234,7 @@ public class Testory {
     if (isProxiable) {
       Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
       Handler handler = new Handler() {
-        public Object handle(final Invocation invocation) {
+        public Object handle(Invocation invocation) {
           history.logWhen(effectOfInvoke(on(object, invocation)));
           return null;
         }
