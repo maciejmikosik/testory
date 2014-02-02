@@ -1,18 +1,8 @@
 
- - [overview](#overview)
- - [asserting invocation result](#asserting_invocation_result)
-   - [thenReturned](#then_returned)
-   - [thenThrown](#then_thrown)
- - [mocks](#mocks)
-   - [stubbing](#stubbing)
-   - [verifying](#verifying)
- - [utilities](#utilities)
-   - [matchers](#matchers)
-   - [closures](#closures)
- - [macros](#macros)
-   - [givenTimes](#given_times)
-   - [givenTry](#given_try)
-   - [givenTest](#given_test)
+### [overview](#overview) | [when](#when) | [thenReturned](#then_returned) | [thenThrown](#then_thrown)
+### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying)
+### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
+### [macros](#macros) | [givenTimes](#given_times) | [givenTry](#given_try) | [givenTest](#given_test)
 
 <a name="overview"/>
 # Overview
@@ -56,8 +46,8 @@ you should use chained forms.
         given(list).clear();
         when(list).clear();
 
-<a name="asserting_invocation_result"/>
-# Asserting invocation result
+<a name="when"/>
+### when
 
 Assertions can be used to verify result of invocation happened at line with **when**.
 
