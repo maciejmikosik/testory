@@ -1,7 +1,5 @@
 package org.testory.proxy;
 
-import static org.testory.proxy.Invocation.invocation;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -25,9 +23,5 @@ public class Invocations {
     } catch (InvocationTargetException e) {
       throw e.getCause();
     }
-  }
-
-  public static Invocation on(Object instance, Invocation invocation) {
-    return invocation(invocation.method, instance, invocation.arguments);
   }
 }

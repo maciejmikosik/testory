@@ -4,8 +4,8 @@ import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
+import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
-import static org.testory.proxy.Invocations.on;
 import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
 import static org.testory.proxy.Typing.typing;
@@ -96,21 +96,20 @@ public class Testory {
 
   public static void given(double primitive) {}
 
-  public static <T> T givenTry(final T object) {
+  public static <T> T givenTry(T object) {
     check(object != null);
     check(isProxiable(object.getClass()));
     Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
-        Invocation onObjectInvocation = on(object, invocation);
         try {
-          return invoke(onObjectInvocation);
+          return invoke(invocation);
         } catch (Throwable e) {
           return null;
         }
       }
     };
-    return (T) proxy(typing, handler);
+    return proxyWrapping(object, typing, handler);
   }
 
   public static void givenTimes(int number, Closure closure) {
@@ -125,21 +124,20 @@ public class Testory {
     }
   }
 
-  public static <T> T givenTimes(final int number, final T object) {
+  public static <T> T givenTimes(final int number, T object) {
     check(number >= 0);
     check(object != null);
     check(isProxiable(object.getClass()));
     Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        Invocation onObjectInvocation = on(object, invocation);
         for (int i = 0; i < number; i++) {
-          invoke(onObjectInvocation);
+          invoke(invocation);
         }
         return null;
       }
     };
-    return (T) proxy(typing, handler);
+    return proxyWrapping(object, typing, handler);
   }
 
   public static <T> T mock(Class<T> type) {
@@ -196,16 +194,16 @@ public class Testory {
     };
   }
 
-  public static <T> T given(final Handler will, final T mock) {
+  public static <T> T given(final Handler will, T mock) {
     Typing typing = typing(mock.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        history.logStubbing(will, on(mock, invocation));
+        history.logStubbing(will, invocation);
         return null;
       }
     };
-    return (T) proxy(typing, handler);
+    return proxyWrapping(mock, typing, handler);
   }
 
   public static Handler willReturn(@Nullable final Object object) {
@@ -227,7 +225,7 @@ public class Testory {
     };
   }
 
-  public static <T> T when(final T object) {
+  public static <T> T when(T object) {
     history.purge();
     history.logWhen(returned(object));
     boolean isProxiable = object != null && isProxiable(object.getClass());
@@ -235,11 +233,11 @@ public class Testory {
       Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
       Handler handler = new Handler() {
         public Object handle(Invocation invocation) {
-          history.logWhen(effectOfInvoke(on(object, invocation)));
+          history.logWhen(effectOfInvoke(invocation));
           return null;
         }
       };
-      return (T) proxy(typing, handler);
+      return proxyWrapping(object, typing, handler);
     } else {
       return null;
     }
@@ -440,26 +438,25 @@ public class Testory {
     }
   }
 
-  public static <T> T thenCalled(final T mock) {
+  public static <T> T thenCalled(T mock) {
     Typing typing = typing(mock.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         int counter = 0;
-        Invocation expected = on(mock, invocation);
         for (Invocation occured : history.getInvocations()) {
-          if (expected.equals(occured)) {
+          if (invocation.equals(occured)) {
             counter++;
           }
         }
         if (counter != 1) {
           throw assertionError("\n" //
-              + formatSection("expected called", format(expected)));
+              + formatSection("expected called", format(invocation)));
         }
         return null;
       }
     };
-    return (T) proxy(typing, handler);
+    return proxyWrapping(mock, typing, handler);
   }
 
   private static String format(Invocation invocation) {
@@ -488,6 +485,15 @@ public class Testory {
     if (!condition) {
       throw new TestoryException();
     }
+  }
+
+  private static <T> T proxyWrapping(final T wrapped, Typing typing, final Handler handler) {
+    return (T) proxy(typing, new Handler() {
+      @Nullable
+      public Object handle(Invocation invocation) throws Throwable {
+        return handler.handle(invocation(invocation.method, wrapped, invocation.arguments));
+      }
+    });
   }
 
   private static TestoryAssertionError assertionError(String message) {
