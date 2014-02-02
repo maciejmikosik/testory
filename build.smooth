@@ -1,0 +1,25 @@
+
+cglibJar     : file("dep/cglib-nodep-2.2.3.jar");
+objenesisJar : file("dep/objenesis-2.0.jar");
+
+dependencies : [
+                 cglibJar,
+                 objenesisJar,
+               ];
+
+licenseFiles : files("build/license");
+
+sourceFiles : files("src");
+classFiles : sourceFiles | javac(libs=dependencies, source="6", target="6");
+
+cglibClassFiles : cglibJar | unjar | filter("net/sf/cglib/**");
+objenesisClassFiles : objenesisJar | unjar | filter("org/objenesis/**");
+testoryJar : sourceFiles
+              | merge(with=classFiles)
+              | merge(with=cglibClassFiles) 
+              | merge(with=objenesisClassFiles) 
+              | merge(with=licenseFiles)
+              | jar(output="testory.jar");
+
+testory : testoryJar | save("build/tmp");
+
