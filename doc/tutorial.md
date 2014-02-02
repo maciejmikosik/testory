@@ -3,6 +3,7 @@
 ### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing)
 ### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
 ### [macros](#macros) | [givenTimes](#given_times) | [givenTry](#given_try) | [givenTest](#given_test)
+### [fine points](#fine_points) | [arrays](#arrays)
 
 <a name="overview"/>
 # Overview
@@ -289,3 +290,21 @@ Field of final type is assigned to sample data
  - Field, Method and Constructor is assigned to member of sample class.
 
 Random sample data is deterministically generated using field type and field name as a seed.
+
+
+<a name="fine_points"/>
+# Fine Points
+
+<a name="arrays"/>
+### Arrays
+
+In java, arrays are objects and invoking `equals` performs identity comparison.
+For sake of convenience, testory treats arrays as values and performs deep equals.
+This happens in
+
+ - `thenReturned`
+ - `thenEqual`
+ - stubbing (comparing arguments)
+ - verifying (comparing arguments)
+
+Error messages also print contents of array where possible.
