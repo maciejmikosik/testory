@@ -29,6 +29,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
@@ -200,12 +201,8 @@ public class Testory {
     Typing typing = typing(mock.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       @Nullable
-      public Object handle(final Invocation invocation) throws Throwable {
-        history.logStubbing(will, new On() {
-          public boolean matches(Invocation item) {
-            return invocation.equals(item);
-          }
-        });
+      public Object handle(Invocation invocation) throws Throwable {
+        history.logStubbing(will, on(invocation));
         return null;
       }
     };
@@ -233,6 +230,14 @@ public class Testory {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         throw throwable;
+      }
+    };
+  }
+
+  private static On on(final Invocation invocation) {
+    return new On() {
+      public boolean matches(Invocation item) {
+        return invocation.equals(item);
       }
     };
   }
@@ -451,17 +456,14 @@ public class Testory {
   }
 
   public static <T> T thenCalled(T mock) {
+    check(mock != null);
     Typing typing = typing(mock.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       @Nullable
-      public Object handle(Invocation invocation) throws Throwable {
-        int counter = 0;
-        for (Invocation occured : history.getInvocations()) {
-          if (invocation.equals(occured)) {
-            counter++;
-          }
-        }
-        if (counter != 1) {
+      public Object handle(final Invocation invocation) throws Throwable {
+        int number = numberOfCalls(on(invocation), history.getInvocations());
+        boolean expected = (number == 1);
+        if (!expected) {
           throw assertionError("\n" //
               + formatSection("expected called", format(invocation)));
         }
@@ -469,6 +471,26 @@ public class Testory {
       }
     };
     return proxyWrapping(mock, typing, handler);
+  }
+
+  public static void thenCalled(On on) {
+    check(on != null);
+    int number = numberOfCalls(on, history.getInvocations());
+    boolean expected = (number == 1);
+    if (!expected) {
+      throw assertionError("\n" //
+          + formatSection("expected called", on));
+    }
+  }
+
+  private static int numberOfCalls(On on, List<Invocation> invocations) {
+    int counter = 0;
+    for (Invocation invocation : invocations) {
+      if (on.matches(invocation)) {
+        counter++;
+      }
+    }
+    return counter;
   }
 
   private static String format(Invocation invocation) {

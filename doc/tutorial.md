@@ -158,6 +158,17 @@ It is possible to assert expected invocation on mock.
         when(filterOutput).close();
         thenCalled(output).close();
 
+Also using custom logic.
+
+        On on = new On() {
+          public boolean matches(Invocation invocation) {
+            // custom logic
+          }
+        };
+        thenCalled(on);
+
+Invocation is expected to be called exactly once.
+
 <a name="utilities"/>
 # Utilities
 
