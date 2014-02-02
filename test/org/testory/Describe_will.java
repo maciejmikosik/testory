@@ -9,10 +9,11 @@ import static org.testory.test.Testilities.newThrowable;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 
 public class Describe_will {
-  private Will will;
+  private Handler will;
   private Invocation invocation;
   private Object object;
   private Throwable throwable;

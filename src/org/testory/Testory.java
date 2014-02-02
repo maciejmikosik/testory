@@ -196,7 +196,7 @@ public class Testory {
     };
   }
 
-  public static <T> T given(final Will will, final T mock) {
+  public static <T> T given(final Handler will, final T mock) {
     Typing typing = typing(mock.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       @Nullable
@@ -208,8 +208,8 @@ public class Testory {
     return (T) proxy(typing, handler);
   }
 
-  public static Will willReturn(@Nullable final Object object) {
-    return new Will() {
+  public static Handler willReturn(@Nullable final Object object) {
+    return new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         return object;
@@ -217,9 +217,9 @@ public class Testory {
     };
   }
 
-  public static Will willThrow(final Throwable throwable) {
+  public static Handler willThrow(final Throwable throwable) {
     check(throwable != null);
-    return new Will() {
+    return new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         throw throwable;

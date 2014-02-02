@@ -127,7 +127,7 @@ Mock can be stubbed to return Object or throw Throwable
 
 or stubbed with custom logic.
 
-        given(new Will() {
+        given(new Handler() {
           public Object handle(Invocation invocation) throws Throwable {
             // custom logic
           }
