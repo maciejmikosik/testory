@@ -1,6 +1,6 @@
 
 ### [overview](#overview) | [when](#when) | [thenReturned](#then_returned) | [thenThrown](#then_thrown)
-### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying)
+### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing)
 ### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
 ### [macros](#macros) | [givenTimes](#given_times) | [givenTry](#given_try) | [givenTest](#given_test)
 
@@ -158,6 +158,21 @@ Also using custom logic.
         thenCalled(on);
 
 Invocation is expected to be called exactly once.
+
+### Capturing
+
+Use captor if you do not care about argument value.
+`Class` is just for inferring purpose, which means argument can be instance of any type.
+
+        given(willReturn(false), list).contains(any(Object.class));
+        thenCalled(list).add(any(Object.class));
+
+You cannot mix matchers with actual values.
+
+        // throws TestoryException
+        given(willReturn(true), mock).set(5, any(Object.class));
+
+**NOTE: more options are going to be implemented soon!**
 
 <a name="utilities"/>
 # Utilities

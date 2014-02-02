@@ -1,6 +1,8 @@
 package org.testory;
 
 import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Objects.print;
+import static org.testory.util.Primitives.zeroOrNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,5 +108,66 @@ class History {
       }
     }
     return Collections.unmodifiableList(invocations);
+  }
+
+  private static class Captor {
+    Class<?> type;
+  }
+
+  public <T> T logCaptor(Class<?> type) {
+    Captor captor = new Captor();
+    captor.type = type;
+    addEvent(captor);
+    return (T) zeroOrNull(type);
+  }
+
+  public On buildOnUsingCaptors(final Invocation invocation) {
+    final List<Captor> captors = getCaptorsAndConsume();
+    if (captors.size() > 0) {
+      check(captors.size() == invocation.arguments.size());
+    }
+    return new On() {
+      public boolean matches(Invocation item) {
+        return invocation.instance == item.instance && invocation.method.equals(item.method)
+            && captors.size() > 0 || invocation.equals(item);
+      }
+
+      public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(invocation.instance);
+        builder.append(".");
+        builder.append(invocation.method.getName());
+        builder.append("(");
+        if (captors.size() > 0) {
+          for (Captor captor : captors) {
+            builder.append("any(").append(captor.type.getName()).append("), ");
+            builder.delete(builder.length() - 2, builder.length());
+          }
+        } else {
+          for (Object argument : invocation.arguments) {
+            builder.append(print(argument)).append(", ");
+          }
+          if (invocation.arguments.size() > 0) {
+            builder.delete(builder.length() - 2, builder.length());
+          }
+        }
+        builder.append(")");
+        return builder.toString();
+      }
+    };
+  }
+
+  private List<Captor> getCaptorsAndConsume() {
+    class Consumer {}
+    List<Captor> captors = new ArrayList<Captor>();
+    for (Object event : getEvents()) {
+      if (event instanceof Captor) {
+        captors.add(0, (Captor) event);
+      } else if (event instanceof Consumer) {
+        break;
+      }
+    }
+    addEvent(new Consumer());
+    return captors;
   }
 }

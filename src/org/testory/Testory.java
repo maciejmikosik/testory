@@ -202,7 +202,7 @@ public class Testory {
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        history.logStubbing(will, on(invocation));
+        history.logStubbing(will, history.buildOnUsingCaptors(invocation));
         return null;
       }
     };
@@ -234,12 +234,10 @@ public class Testory {
     };
   }
 
-  private static On on(final Invocation invocation) {
-    return new On() {
-      public boolean matches(Invocation item) {
-        return invocation.equals(item);
-      }
-    };
+  public static <T> T any(Class<T> type) {
+    check(type != null);
+    check(!type.isPrimitive());
+    return history.logCaptor(type);
   }
 
   public static <T> T when(T object) {
@@ -461,11 +459,12 @@ public class Testory {
     Handler handler = new Handler() {
       @Nullable
       public Object handle(final Invocation invocation) throws Throwable {
-        int number = numberOfCalls(on(invocation), history.getInvocations());
+        On on = history.buildOnUsingCaptors(invocation);
+        int number = numberOfCalls(on, history.getInvocations());
         boolean expected = (number == 1);
         if (!expected) {
           throw assertionError("\n" //
-              + formatSection("expected called", format(invocation)));
+              + formatSection("expected called", on));
         }
         return null;
       }
@@ -491,22 +490,6 @@ public class Testory {
       }
     }
     return counter;
-  }
-
-  private static String format(Invocation invocation) {
-    StringBuilder builder = new StringBuilder();
-    builder.append(invocation.instance);
-    builder.append(".");
-    builder.append(invocation.method.getName());
-    builder.append("(");
-    for (Object argument : invocation.arguments) {
-      builder.append(print(argument)).append(", ");
-    }
-    if (invocation.arguments.size() > 0) {
-      builder.delete(builder.length() - 2, builder.length());
-    }
-    builder.append(")");
-    return builder.toString();
   }
 
   private static String formatSection(String caption, @Nullable Object content) {
