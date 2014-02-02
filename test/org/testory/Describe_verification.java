@@ -86,7 +86,12 @@ public class Describe_verification {
     try {
       thenCalled(mock).size();
       fail();
-    } catch (TestoryAssertionError e) {}
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n" //
+          + "  expected called\n" //
+          + "    " + mock + ".size()\n" //
+      , e.getMessage());
+    }
   }
 
   @Test
