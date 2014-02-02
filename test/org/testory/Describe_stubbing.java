@@ -1,6 +1,7 @@
 package org.testory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
@@ -11,17 +12,46 @@ import static org.testory.Testory.willThrow;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
 public class Describe_stubbing {
   private Object object;
   private Throwable throwable;
+  private List<Object> mock, otherMock;
 
   @Before
   public void before() {
     object = newObject("object");
     throwable = newThrowable("throwable");
+    mock = mock(List.class);
+    otherMock = mock(List.class);
+  }
+
+  @Test
+  public void stubs_equal_invocation() {
+    given(willReturn(object), mock).get(0);
+    assertSame(object, mock.get(0));
+  }
+
+  @Test
+  public void ignores_different_mock() {
+    given(willReturn(object), mock).get(0);
+    assertNotSame(object, otherMock.get(0));
+  }
+
+  @Test
+  public void ignores_different_method() {
+    given(willReturn(object), mock).get(0);
+    assertNotSame(object, mock.remove(0));
+  }
+
+  @Test
+  public void ignores_different_argument() {
+    given(willReturn(object), mock).get(0);
+    assertNotSame(object, mock.get(1));
   }
 
   @Test
