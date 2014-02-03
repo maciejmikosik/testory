@@ -1,6 +1,6 @@
 
 ### [overview](#overview) | [when](#when) | [thenReturned](#then_returned) | [thenThrown](#then_thrown)
-### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing)
+### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing) | [on](#on)
 ### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
 ### [macros](#macros) | [givenTimes](#given_times) | [givenTry](#given_try) | [givenTest](#given_test)
 ### [fine points](#fine_points) | [arrays](#arrays)
@@ -108,29 +108,6 @@ Any non-final class or interface can be mocked.
 
         given(list = mock(List.class));
 
-<a name="stubbing"/>
-### Stubbing
-
-Mock can be stubbed to return Object or throw Throwable.
-Stubbing will be only effective for specified instance of mock, method and equal arguments.
-
-        given(willReturn(object), list).get(1);
-        given(willThrow(new IndexOutOfBoundsException()), list).get(2);
-
-Or you can stub using custom handling and matching logic.
-
-        Handler handler = new Handler() {
-          public Object handle(Invocation invocation) throws Throwable {
-            // custom logic
-          }
-        };
-        On on = new On() {
-          public boolean matches(Invocation invocation) {
-            // custom logic
-          }
-        };
-        given(handler, on);
-
 Newly created mock has following properties
  - all methods are stubbable, except finalize and final methods
  - mock is nice, returning null or binary zero for unstubbed methods
@@ -138,6 +115,21 @@ Newly created mock has following properties
    - toString is stubbed to contain class name and identity hash code
    - equals is stubbed so mock is equal only to itself
    - hashCode is stubbed to identity hash code
+
+<a name="stubbing"/>
+### Stubbing
+
+Mock can be stubbed to return Object or throw Throwable or with custom logic.
+
+        given(willReturn(object), list).get(1);
+        given(willThrow(new IndexOutOfBoundsException()), list).get(2);
+        given(new Handler() {
+          public Object handle(Invocation invocation) throws Throwable {
+            // custom logic
+          }
+        }, mock).toString();
+
+Stubbing will be only effective for specified instance of mock, method and equal arguments.
 
 <a name="verifying"/>
 ### Verifying
@@ -149,18 +141,9 @@ It is possible to assert expected invocation on mock.
         when(filterOutput).close();
         thenCalled(output).close();
 
-Also using custom logic.
-
-        On on = new On() {
-          public boolean matches(Invocation invocation) {
-            // custom logic
-          }
-        };
-        thenCalled(on);
-
 Invocation is expected to be called exactly once.
 
-You can verify exact number of invocations (may be 0) or use matcher.
+You can verify number of invocations by passing exact value (may be 0) or using matcher.
 
         thenCalledTimes(3, mock).size();
         thenCalledTimes(0, mock).clear();
@@ -169,10 +152,11 @@ You can verify exact number of invocations (may be 0) or use matcher.
 ### Capturing
 
 Use captor if you do not care about argument value.
-`Class` is just for inferring purpose, which means argument can be instance of any type.
 
         given(willReturn(false), list).contains(any(Object.class));
         thenCalled(list).add(any(Object.class));
+
+`Class` is just for inferring purpose, which means argument can be instance of any type.
 
 You cannot mix matchers with actual values.
 
@@ -180,6 +164,19 @@ You cannot mix matchers with actual values.
         given(willReturn(true), mock).set(5, any(Object.class));
 
 **NOTE: more options are going to be implemented soon!**
+
+<a name="on"/>
+### On
+
+You can take full control of matching invocations by implementing you own **On**.
+
+        On on = new On() {
+          public boolean matches(Invocation invocation) {
+            // custom logic
+          }
+        };
+        given(willReturn(object), on);
+        thenCalled(on);
 
 <a name="utilities"/>
 # Utilities
