@@ -71,7 +71,7 @@ public class Testory {
 
   private static Object mockOrSample(Class<?> type, String name) {
     if (isProxiable(type)) {
-      return mock(type, namedMockHandler(name));
+      return mock(type, defaultMockHandler(name));
     } else if (type.isArray()) {
       Class<?> componentType = type.getComponentType();
       Object array = Array.newInstance(componentType, 1);
@@ -146,7 +146,7 @@ public class Testory {
 
   public static <T> T mock(Class<T> type) {
     check(isProxiable(type));
-    return mock(type, unnamedMockHandler());
+    return mock(type, defaultMockHandler(null));
   }
 
   private static <T> T mock(Class<T> type, final Handler defaultHandler) {
@@ -167,17 +167,21 @@ public class Testory {
     return (T) proxy(typing, handler);
   }
 
-  private static Handler unnamedMockHandler() {
+  private static Handler defaultMockHandler(@Nullable final String name) {
     return new Handler() {
       public Object handle(Invocation invocation) {
         return invocation.method.getName().equals("toString")
-            ? "mock_" + System.identityHashCode(invocation.instance) + "_"
-                + discoverMockedType(invocation.instance.getClass()).getName()
+            ? name != null
+                ? name
+                : "mock_" + System.identityHashCode(invocation.instance) + "_"
+                    + discoverMockedType(invocation.instance.getClass()).getName()
             : invocation.method.getName().equals("equals") && invocation.arguments.size() == 1
                 ? invocation.instance == invocation.arguments.get(0)
                 : invocation.method.getName().equals("hashCode")
                     && invocation.arguments.size() == 0
-                    ? System.identityHashCode(invocation.instance)
+                    ? name != null
+                        ? name.hashCode()
+                        : System.identityHashCode(invocation.instance)
                     : null;
       }
 
@@ -188,21 +192,6 @@ public class Testory {
         return interfaces.size() == 1
             ? interfaces.get(0)
             : proxyType.getSuperclass();
-      }
-    };
-  }
-
-  private static Handler namedMockHandler(final String name) {
-    return new Handler() {
-      public Object handle(Invocation invocation) {
-        return invocation.method.getName().equals("toString")
-            ? name
-            : invocation.method.getName().equals("equals") && invocation.arguments.size() == 1
-                ? invocation.instance == invocation.arguments.get(0)
-                : invocation.method.getName().equals("hashCode")
-                    && invocation.arguments.size() == 0
-                    ? name.hashCode()
-                    : null;
       }
     };
   }
