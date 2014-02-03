@@ -103,7 +103,6 @@ public class Testory {
   public static <T> T givenTry(T object) {
     check(object != null);
     check(isProxiable(object.getClass()));
-    Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         try {
@@ -113,7 +112,7 @@ public class Testory {
         }
       }
     };
-    return proxyWrapping(object, typing, handler);
+    return proxyWrapping(object, handler);
   }
 
   public static void givenTimes(int number, Closure closure) {
@@ -132,7 +131,6 @@ public class Testory {
     check(number >= 0);
     check(object != null);
     check(isProxiable(object.getClass()));
-    Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         for (int i = 0; i < number; i++) {
@@ -141,7 +139,7 @@ public class Testory {
         return null;
       }
     };
-    return proxyWrapping(object, typing, handler);
+    return proxyWrapping(object, handler);
   }
 
   public static <T> T mock(Class<T> type) {
@@ -199,7 +197,6 @@ public class Testory {
   public static <T> T given(final Handler will, T mock) {
     check(will != null);
     check(mock != null);
-    Typing typing = typing(mock.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
@@ -207,7 +204,7 @@ public class Testory {
         return null;
       }
     };
-    return proxyWrapping(mock, typing, handler);
+    return proxyWrapping(mock, handler);
   }
 
   public static void given(Handler will, On on) {
@@ -246,14 +243,13 @@ public class Testory {
     history.logWhen(returned(object));
     boolean isProxiable = object != null && isProxiable(object.getClass());
     if (isProxiable) {
-      Typing typing = typing(object.getClass(), new HashSet<Class<?>>());
       Handler handler = new Handler() {
         public Object handle(Invocation invocation) {
           history.logWhen(effectOfInvoke(invocation));
           return null;
         }
       };
-      return proxyWrapping(object, typing, handler);
+      return proxyWrapping(object, handler);
     } else {
       return null;
     }
@@ -480,7 +476,6 @@ public class Testory {
     check(numberMatcher != null);
     check(isMatcher(numberMatcher));
     check(mock != null);
-    Typing typing = typing(mock.getClass(), new HashSet<Class<?>>());
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
@@ -488,7 +483,7 @@ public class Testory {
         return null;
       }
     };
-    return proxyWrapping(mock, typing, handler);
+    return proxyWrapping(mock, handler);
   }
 
   public static void thenCalledTimes(Object numberMatcher, On on) {
@@ -533,7 +528,8 @@ public class Testory {
     }
   }
 
-  private static <T> T proxyWrapping(final T wrapped, Typing typing, final Handler handler) {
+  private static <T> T proxyWrapping(final T wrapped, final Handler handler) {
+    Typing typing = typing(wrapped.getClass(), new HashSet<Class<?>>());
     return (T) proxy(typing, new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
