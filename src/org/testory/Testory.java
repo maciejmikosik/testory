@@ -34,6 +34,7 @@ import java.util.List;
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
+import org.testory.proxy.Proxies;
 import org.testory.proxy.Typing;
 import org.testory.util.Effect;
 
@@ -588,7 +589,8 @@ public class Testory {
 
     int index = -1;
     for (int i = stackTrace.length - 1; i >= 0; i--) {
-      if (stackTrace[i].getClassName().equals(Testory.class.getName())) {
+      String name = stackTrace[i].getClassName();
+      if (name.equals(Testory.class.getName()) || name.startsWith(Proxies.class.getName())) {
         index = i;
         break;
       }
