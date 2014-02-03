@@ -118,7 +118,7 @@ public class Describe_capturing {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected called\n" //
+          + "  expected called times 1\n" //
           + "    " + mock + ".add(any(" + Object.class.getName() + "))" + "\n" //
       , e.getMessage());
     }
@@ -133,7 +133,7 @@ public class Describe_capturing {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected called\n" //
+          + "  expected called times 1\n" //
           + "    " + mock + ".add(any(" + Object.class.getName() + "))" + "\n" //
       , e.getMessage());
     }
