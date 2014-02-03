@@ -55,7 +55,7 @@ public class Describe_verification {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected called\n" //
+          + "  expected called times 1\n" //
           + "    " + mock + ".size()\n" //
       , e.getMessage());
     }
@@ -69,7 +69,7 @@ public class Describe_verification {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected called\n" //
+          + "  expected called times 1\n" //
           + "    " + mock + ".size()\n" //
       , e.getMessage());
     }
@@ -83,7 +83,7 @@ public class Describe_verification {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected called\n" //
+          + "  expected called times 1\n" //
           + "    " + mock + ".add(" + object + ")" + "\n" //
       , e.getMessage());
     }
@@ -96,7 +96,7 @@ public class Describe_verification {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected called\n" //
+          + "  expected called times 1\n" //
           + "    " + mock + ".size()\n" //
       , e.getMessage());
     }
@@ -111,7 +111,7 @@ public class Describe_verification {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected called\n" //
+          + "  expected called times 1\n" //
           + "    " + mock + ".size()" + "\n" //
       , e.getMessage());
     }
@@ -141,7 +141,7 @@ public class Describe_verification {
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected called\n" //
+          + "  expected called times 1\n" //
           + "    " + on + "\n" //
       , e.getMessage());
     }
