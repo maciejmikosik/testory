@@ -27,9 +27,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+
+import net.sf.cglib.proxy.Factory;
 
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
@@ -168,14 +171,23 @@ public class Testory {
     return new Handler() {
       public Object handle(Invocation invocation) {
         return invocation.method.getName().equals("toString")
-            ? "mock_" + invocation.instance.getClass().getName() + "_"
-                + System.identityHashCode(invocation.instance)
+            ? "mock_" + System.identityHashCode(invocation.instance) + "_"
+                + discoverMockedType(invocation.instance.getClass()).getName()
             : invocation.method.getName().equals("equals") && invocation.arguments.size() == 1
                 ? invocation.instance == invocation.arguments.get(0)
                 : invocation.method.getName().equals("hashCode")
                     && invocation.arguments.size() == 0
                     ? System.identityHashCode(invocation.instance)
                     : null;
+      }
+
+      private Class<?> discoverMockedType(Class<?> proxyType) {
+        List<Class<?>> interfaces = new ArrayList<Class<?>>(
+            Arrays.asList(proxyType.getInterfaces()));
+        interfaces.remove(Factory.class);
+        return interfaces.size() == 1
+            ? interfaces.get(0)
+            : proxyType.getSuperclass();
       }
     };
   }

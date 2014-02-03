@@ -16,6 +16,7 @@ import org.junit.Test;
 
 public class Describe_mocking {
   private Object mock, object;
+  private String expected;
 
   @Before
   public void before() {
@@ -51,10 +52,13 @@ public class Describe_mocking {
 
   @Test
   public void to_string_is_prestubbed_with_class_name_and_identity_hashcode() {
-    mock = mock(Object.class);
-    assertTrue(mock.toString().contains("mock"));
-    assertTrue(mock.toString().contains(mock.getClass().getName()));
-    assertTrue(mock.toString().contains("" + System.identityHashCode(mock)));
+    mock = mock(ArrayList.class);
+    expected = "mock_" + System.identityHashCode(mock) + "_" + ArrayList.class.getName();
+    assertEquals(expected, mock.toString());
+
+    mock = mock(List.class);
+    expected = "mock_" + System.identityHashCode(mock) + "_" + List.class.getName();
+    assertEquals(expected, mock.toString());
   }
 
   @Test
