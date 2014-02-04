@@ -8,17 +8,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Primitives {
-  public static Object zeroOrNull(Class<?> type) {
+  public static <T> T zeroOrNull(Class<T> type) {
     checkNotNull(type);
     checkArgument(!type.isPrimitive());
-    return zeroes.get(type);
+    return (T) zeroes.get(type);
   }
 
   private static final Map<Class<?>, Object> zeroes = zeroes();
 
   private static Map<Class<?>, Object> zeroes() {
     Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
-    map.put(Boolean.class, false);
+    map.put(Boolean.class, Boolean.valueOf(false));
     map.put(Character.class, Character.valueOf((char) 0));
     map.put(Byte.class, Byte.valueOf((byte) 0));
     map.put(Short.class, Short.valueOf((short) 0));

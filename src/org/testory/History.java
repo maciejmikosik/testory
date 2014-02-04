@@ -1,16 +1,24 @@
 package org.testory;
 
 import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
+import static org.testory.proxy.Proxies.isProxiable;
+import static org.testory.proxy.Proxies.proxy;
+import static org.testory.proxy.Typing.typing;
+import static org.testory.util.Matchers.match;
 import static org.testory.util.Primitives.zeroOrNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
+import org.testory.proxy.Typing;
 import org.testory.util.Effect;
 
 class History {
@@ -112,49 +120,152 @@ class History {
 
   private static class Captor {
     Class<?> type;
+    @Nullable
+    Object token;
   }
 
-  public <T> T logCaptor(Class<?> type) {
+  public <T> T logCaptor(Class<T> type) {
+    boolean isProxiable = isProxiable(type);
+    T token = isProxiable
+        ? proxyLight(type)
+        : null;
+
     Captor captor = new Captor();
     captor.type = type;
+    captor.token = token;
     addEvent(captor);
-    return (T) zeroOrNull(type);
+
+    return isProxiable
+        ? token
+        : zeroOrNull(type);
+  }
+
+  private static <T> T proxyLight(Class<T> type) {
+    Typing typing = type.isInterface()
+        ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
+        : typing(type, new HashSet<Class<?>>());
+    Handler handler = new Handler() {
+      @Nullable
+      public Object handle(Invocation invocation) throws Throwable {
+        return null;
+      }
+    };
+    return (T) proxy(typing, handler);
   }
 
   public On buildOnUsingCaptors(final Invocation invocation) {
     final List<Captor> captors = getCaptorsAndConsume();
-    if (captors.size() > 0) {
-      check(captors.size() == invocation.arguments.size());
-    }
+    final List<Object> argumentMatchers = solve(invocation.arguments, captors);
+    final Object argumentsMatcher = new Object() {
+      @SuppressWarnings("unused")
+      public boolean matches(Object item) {
+        List<Object> arguments = (List<Object>) item;
+        for (int i = 0; i < argumentMatchers.size(); i++) {
+          if (!match(argumentMatchers.get(i), arguments.get(i))) {
+            return false;
+          }
+        }
+        return true;
+      }
+    };
+
     return new On() {
       public boolean matches(Invocation item) {
         return invocation.instance == item.instance && invocation.method.equals(item.method)
-            && captors.size() > 0 || invocation.equals(item);
+            && match(argumentsMatcher, item.arguments);
       }
 
       public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(invocation.instance);
+        builder.append(dangerouslyInvokeToStringOnMock(invocation.instance));
         builder.append(".");
         builder.append(invocation.method.getName());
         builder.append("(");
-        if (captors.size() > 0) {
-          for (Captor captor : captors) {
-            builder.append("any(").append(captor.type.getName()).append("), ");
-            builder.delete(builder.length() - 2, builder.length());
-          }
-        } else {
-          for (Object argument : invocation.arguments) {
-            builder.append(print(argument)).append(", ");
-          }
-          if (invocation.arguments.size() > 0) {
-            builder.delete(builder.length() - 2, builder.length());
-          }
+        for (Object argumentMatcher : argumentMatchers) {
+          builder.append(argumentMatcher).append(", ");
+        }
+        if (argumentMatchers.size() > 0) {
+          builder.delete(builder.length() - 2, builder.length());
         }
         builder.append(")");
         return builder.toString();
       }
     };
+  }
+
+  private static List<Object> solve(List<Object> arguments, List<Captor> captors) {
+    for (int i = 0; i < captors.size(); i++) {
+      Captor captor = captors.get(i);
+      if (captor.token != null) {
+        for (int j = 0; j < arguments.size(); j++) {
+          Object argument = arguments.get(j);
+          if (argument == captor.token) {
+            ArrayList<Object> solved = new ArrayList<Object>();
+            List<Object> leftArguments = arguments.subList(0, j);
+            List<Object> rightArguments = arguments.subList(j + 1, arguments.size());
+            List<Captor> leftCaptors = captors.subList(0, i);
+            List<Captor> rightCaptors = captors.subList(i + 1, captors.size());
+            solved.addAll(solve(leftArguments, leftCaptors));
+            solved.add(trueMatcher(captor.type));
+            solved.addAll(solve(rightArguments, rightCaptors));
+            return solved;
+          }
+        }
+        throw new TestoryException("captor created but not passed to invocation");
+      }
+    }
+    if (arguments.isEmpty()) {
+      return new ArrayList<Object>();
+    }
+    if (captors.isEmpty()) {
+      ArrayList<Object> solved = new ArrayList<Object>();
+      for (final Object argument : arguments) {
+        solved.add(new Object() {
+          @SuppressWarnings("unused")
+          public boolean matches(Object item) {
+            return areEqualDeep(argument, item);
+          }
+
+          public String toString() {
+            return print(argument);
+          }
+        });
+      }
+      return solved;
+    } else if (captors.size() == arguments.size()) {
+      ArrayList<Object> solved = new ArrayList<Object>();
+      for (Captor captor : captors) {
+        solved.add(trueMatcher(captor.type));
+      }
+      return solved;
+    } else {
+      throw new TestoryException("cannot solve mixed arguments and captors");
+    }
+  }
+
+  private static Object trueMatcher(final Class<?> type) {
+    return new Object() {
+      @SuppressWarnings("unused")
+      public boolean matches(Object item) {
+        return true;
+      }
+
+      public String toString() {
+        return "any(" + type.getName() + ")";
+      }
+    };
+  }
+
+  /**
+   * Invoked only in specific situation if we know that test is failing.
+   * {@link Testory#thenCalledTimes(Object, On)} assertion fails, it builds error message, it
+   * invokes {@link On#toString()}, it invokes this method, it invokes mock.toString(). Invoking in
+   * other situations may cause not intended consequences like extra invocation to be registered and
+   * verification fails.
+   */
+
+  private static String dangerouslyInvokeToStringOnMock(Object mock) {
+    return mock.toString();
   }
 
   private List<Captor> getCaptorsAndConsume() {

@@ -151,17 +151,24 @@ You can verify number of invocations by passing exact value (may be 0) or using 
 
 ### Capturing
 
-Use captor if you do not care about argument value.
+Use captor if you do not care about argument value during stubbing or verification.
 
         given(willReturn(false), list).contains(any(Object.class));
         thenCalled(list).add(any(Object.class));
 
 `Class` is just for inferring purpose, which means argument can be instance of any type.
 
-You cannot mix matchers with actual values.
+You can mix captors with real arguments if you work with non-final types.
+
+        given(willReturn(true), mock).someMethod(object, any(Object.class));
+
+Mixing captors and real arguments of final types works only if they are separated by non-final captor.
 
         // throws TestoryException
-        given(willReturn(true), mock).set(5, any(Object.class));
+        given(willReturn(object), mock).someMethod(any(Integer.class), object, 0);
+        // works
+        given(willReturn(object), mock).someMethod(any(Integer.class), any(Object.class), 0);
+
 
 **NOTE: more options are going to be implemented soon!**
 
