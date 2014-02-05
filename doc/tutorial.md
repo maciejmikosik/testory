@@ -185,6 +185,16 @@ You can take full control of matching invocations by implementing you own **On**
         given(willReturn(object), on);
         thenCalled(on);
 
+Use factories for most common cases.
+
+To assert that no invocations was called on mock.
+
+        thenCalledTimes(0, onInstance(mock));
+
+Or stub for returning particular type. See [komarro library](https://code.google.com/p/komarro/) for explanation why would you want to do that.
+
+        given(willReturn(person), onReturn(Person.class));
+
 <a name="utilities"/>
 # Utilities
 

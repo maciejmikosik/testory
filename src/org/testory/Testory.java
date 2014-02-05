@@ -239,6 +239,36 @@ public class Testory {
     return history.logCaptor(type);
   }
 
+  public static On onInstance(final Object mock) {
+    check(mock != null);
+    return new On() {
+      public boolean matches(Invocation invocation) {
+        return invocation.instance == mock;
+      }
+
+      public String toString() {
+        return "onInstance(" + dangerouslyInvokeToStringOnMock(mock) + ")";
+      }
+    };
+  }
+
+  public static On onReturn(final Class<?> type) {
+    check(type != null);
+    return new On() {
+      public boolean matches(Invocation invocation) {
+        return type == invocation.method.getReturnType();
+      }
+
+      public String toString() {
+        return "onReturn(" + type.getName() + ")";
+      }
+    };
+  }
+
+  private static String dangerouslyInvokeToStringOnMock(Object mock) {
+    return mock.toString();
+  }
+
   public static <T> T when(T object) {
     history.purge();
     history.logWhen(returned(object));
