@@ -122,9 +122,11 @@ class History {
     Class<?> type;
     @Nullable
     Object token;
+    @Nullable
+    Object matcher;
   }
 
-  public <T> T logCaptor(Class<T> type) {
+  public <T> T logCaptor(Class<T> type, @Nullable Object matcher) {
     boolean isProxiable = isProxiable(type);
     T token = isProxiable
         ? proxyLight(type)
@@ -133,6 +135,7 @@ class History {
     Captor captor = new Captor();
     captor.type = type;
     captor.token = token;
+    captor.matcher = matcher;
     addEvent(captor);
 
     return isProxiable
@@ -206,7 +209,7 @@ class History {
             List<Captor> leftCaptors = captors.subList(0, i);
             List<Captor> rightCaptors = captors.subList(i + 1, captors.size());
             solved.addAll(solve(leftArguments, leftCaptors));
-            solved.add(trueMatcher(captor.type));
+            solved.add(asMatcher(captor));
             solved.addAll(solve(rightArguments, rightCaptors));
             return solved;
           }
@@ -235,7 +238,7 @@ class History {
     } else if (captors.size() == arguments.size()) {
       ArrayList<Object> solved = new ArrayList<Object>();
       for (Captor captor : captors) {
-        solved.add(trueMatcher(captor.type));
+        solved.add(asMatcher(captor));
       }
       return solved;
     } else {
@@ -243,15 +246,19 @@ class History {
     }
   }
 
-  private static Object trueMatcher(final Class<?> type) {
+  private static Object asMatcher(final Captor captor) {
     return new Object() {
       @SuppressWarnings("unused")
       public boolean matches(Object item) {
-        return true;
+        return captor.matcher != null
+            ? match(captor.matcher, item)
+            : true;
       }
 
       public String toString() {
-        return "any(" + type.getName() + ")";
+        return captor.matcher != null
+            ? "any(" + captor.type.getName() + ", " + captor.matcher + ")"
+            : "any(" + captor.type.getName() + ")";
       }
     };
   }

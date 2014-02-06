@@ -9,6 +9,7 @@ import static org.testory.Testory.any;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
+import static org.testory.Testory.thenEqual;
 import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
 import static org.testory.test.Testilities.newObject;
@@ -278,6 +279,43 @@ public class Describe_capturing {
   }
 
   @Test
+  public void matches_matching_argument() {
+    given(willReturn(true), mock).foo_Object(any(Object.class, same(object)));
+    assertTrue(mock.foo_Object(object));
+    thenCalled(mock).foo_Object(any(Object.class, same(object)));
+  }
+
+  @Test
+  public void not_matches_mismatching_argument() {
+    given(willReturn(true), mock).foo_Object(any(Object.class, same(object)));
+    assertFalse(mock.foo_Object(otherObject));
+
+    try {
+      thenCalled(mock).foo_Object(any(Object.class, same(object)));
+      fail();
+    } catch (TestoryAssertionError e) {
+      thenEqual(format("\n" //
+          + "  expected called times 1\n" //
+          + "    %s.foo_Object(any(%s, %s))\n", //
+          mock, Object.class.getName(), same(object)), //
+          e.getMessage());
+    }
+  }
+
+  private static Object same(final Object object) {
+    return new Object() {
+      @SuppressWarnings("unused")
+      public boolean matches(Object item) {
+        return object == item;
+      }
+
+      public String toString() {
+        return "same(" + object + ")";
+      }
+    };
+  }
+
+  @Test
   public void type_cannot_be_null() {
     try {
       any(null);
@@ -289,6 +327,14 @@ public class Describe_capturing {
   public void type_cannot_be_primitive() {
     try {
       any(int.class);
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void matcher_cannot_be_null() {
+    try {
+      any(Object.class, null);
       fail();
     } catch (TestoryException e) {}
   }

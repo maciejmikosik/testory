@@ -156,6 +156,9 @@ Use captor if you do not care about argument value during stubbing or verificati
         given(willReturn(false), list).contains(any(Object.class));
         thenCalled(list).add(any(Object.class));
 
+        given(willThrow(new IndexOutOfBoundsException()), list).get(any(Integer.class, greaterThan(2)));
+        thenCalled(list).add(any(Integer.class), any(Object.class, startsWith("prefix")));
+
 `Class` is just for inferring purpose, which means argument can be instance of any type.
 
 You can mix captors with real arguments if you work with non-final types.

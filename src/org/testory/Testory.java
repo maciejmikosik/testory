@@ -236,7 +236,14 @@ public class Testory {
   public static <T> T any(Class<T> type) {
     check(type != null);
     check(!type.isPrimitive());
-    return history.logCaptor(type);
+    return history.logCaptor(type, null);
+  }
+
+  public static <T> T any(Class<T> type, Object matcher) {
+    check(type != null);
+    check(matcher != null);
+    check(!type.isPrimitive());
+    return history.logCaptor(type, matcher);
   }
 
   public static On onInstance(final Object mock) {
