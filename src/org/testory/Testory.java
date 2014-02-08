@@ -223,6 +223,16 @@ public class Testory {
     };
   }
 
+  public static Handler willThrow(final Class<? extends Throwable> throwableClass) {
+    check(throwableClass != null);
+    return new Handler() {
+      @Nullable
+      public Object handle(Invocation invocation) throws Throwable {
+        throw throwableClass.newInstance();
+      }
+    };
+  }
+
   public static Handler willThrow(final Throwable throwable) {
     check(throwable != null);
     return new Handler() {
