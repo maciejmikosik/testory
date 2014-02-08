@@ -7,6 +7,8 @@ import static org.testory.Testory.willThrow;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
 
+import java.io.IOException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Handler;
@@ -71,8 +73,47 @@ public class Describe_will {
   @Test
   public void cannot_throw_null() {
     try {
-      willThrow(null);
+      willThrow((Throwable) null);
       fail();
     } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void throws_throwable_of_given_type() {
+    will = willThrow(IOException.class);
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (IOException e) {
+      // expected
+    } catch (Throwable e) {
+      fail();
+    }
+  }
+
+  @Test
+  public void throws_same_throwable_of_given_type_again() {
+    will = willThrow(IOException.class);
+    try {
+      will.handle(invocation);
+    } catch (Throwable e) {}
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (IOException e) {
+      // expected
+    } catch (Throwable e) {
+      fail();
+    }
+  }
+
+  @Test
+  public void cannot_throw_exception_of_null_type() {
+    try {
+      willThrow((Class<? extends Throwable>) null);
+      fail();
+    } catch (TestoryException e) {
+      // expected
+    }
   }
 }
