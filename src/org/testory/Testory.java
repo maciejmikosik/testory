@@ -162,7 +162,9 @@ public class Testory {
             : defaultHandler.handle(invocation);
       }
     };
-    return (T) proxy(typing, handler);
+    T mock = (T) proxy(typing, handler);
+    history.logMocking(mock);
+    return mock;
   }
 
   private static Handler defaultMockHandler(@Nullable final String name) {
@@ -197,6 +199,7 @@ public class Testory {
   public static <T> T given(final Handler will, T mock) {
     check(will != null);
     check(mock != null);
+    check(history.isMock(mock));
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
@@ -490,6 +493,7 @@ public class Testory {
 
   public static <T> T thenCalled(T mock) {
     check(mock != null);
+    check(history.isMock(mock));
     return thenCalledTimes(exactly(1), mock);
   }
 
@@ -501,6 +505,7 @@ public class Testory {
   public static <T> T thenCalledTimes(int number, T mock) {
     check(number >= 0);
     check(mock != null);
+    check(history.isMock(mock));
     return thenCalledTimes(exactly(number), mock);
   }
 
@@ -514,6 +519,7 @@ public class Testory {
     check(numberMatcher != null);
     check(isMatcher(numberMatcher));
     check(mock != null);
+    check(history.isMock(mock));
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {

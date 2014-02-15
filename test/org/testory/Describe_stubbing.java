@@ -107,6 +107,14 @@ public class Describe_stubbing {
   }
 
   @Test
+  public void mock_cannot_be_any_object() {
+    try {
+      given(handler, new Object());
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
   public void captor_cannot_be_null() {
     try {
       given(handler, (Captor) null);

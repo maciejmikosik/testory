@@ -399,6 +399,24 @@ public class Describe_verification {
   }
 
   @Test
+  public void mock_cannot_be_any_object() {
+    try {
+      thenCalled(new Object());
+      fail();
+    } catch (TestoryException e) {}
+
+    try {
+      thenCalledTimes(1, new Object());
+      fail();
+    } catch (TestoryException e) {}
+
+    try {
+      thenCalledTimes(matcher, new Object());
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
   public void captor_cannot_be_null() {
     try {
       thenCalled((Captor) null);

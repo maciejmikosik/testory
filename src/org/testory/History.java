@@ -80,6 +80,30 @@ class History {
     }
   }
 
+  private static class Mocking {
+    Object mock;
+  }
+
+  public void logMocking(Object mock) {
+    checkNotNull(mock);
+    Mocking mocking = new Mocking();
+    mocking.mock = mock;
+    addEvent(mocking);
+  }
+
+  public boolean isMock(Object mock) {
+    checkNotNull(mock);
+    for (Object event : getEvents()) {
+      if (event instanceof Mocking) {
+        Mocking mocking = (Mocking) event;
+        if (mocking.mock == mock) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private static class Stubbing {
     Handler handler;
     Captor captor;
