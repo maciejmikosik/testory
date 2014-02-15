@@ -201,17 +201,17 @@ public class Testory {
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        history.logStubbing(will, history.buildOnUsingCaptors(invocation));
+        history.logStubbing(will, history.buildCaptorUsingAnys(invocation));
         return null;
       }
     };
     return proxyWrapping(mock, handler);
   }
 
-  public static void given(Handler will, On on) {
+  public static void given(Handler will, Captor captor) {
     check(will != null);
-    check(on != null);
-    history.logStubbing(will, on);
+    check(captor != null);
+    history.logStubbing(will, captor);
   }
 
   public static Handler willReturn(@Nullable final Object object) {
@@ -236,19 +236,19 @@ public class Testory {
   public static <T> T any(Class<T> type) {
     check(type != null);
     check(!type.isPrimitive());
-    return history.logCaptor(type, null);
+    return history.logAny(type, null);
   }
 
   public static <T> T any(Class<T> type, Object matcher) {
     check(type != null);
     check(matcher != null);
     check(!type.isPrimitive());
-    return history.logCaptor(type, matcher);
+    return history.logAny(type, matcher);
   }
 
-  public static On onInstance(final Object mock) {
+  public static Captor onInstance(final Object mock) {
     check(mock != null);
-    return new On() {
+    return new Captor() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock;
       }
@@ -259,9 +259,9 @@ public class Testory {
     };
   }
 
-  public static On onReturn(final Class<?> type) {
+  public static Captor onReturn(final Class<?> type) {
     check(type != null);
-    return new On() {
+    return new Captor() {
       public boolean matches(Invocation invocation) {
         return type == invocation.method.getReturnType();
       }
@@ -493,9 +493,9 @@ public class Testory {
     return thenCalledTimes(exactly(1), mock);
   }
 
-  public static void thenCalled(On on) {
-    check(on != null);
-    thenCalledTimes(exactly(1), on);
+  public static void thenCalled(Captor captor) {
+    check(captor != null);
+    thenCalledTimes(exactly(1), captor);
   }
 
   public static <T> T thenCalledTimes(int number, T mock) {
@@ -504,10 +504,10 @@ public class Testory {
     return thenCalledTimes(exactly(number), mock);
   }
 
-  public static void thenCalledTimes(int number, On on) {
+  public static void thenCalledTimes(int number, Captor captor) {
     check(number >= 0);
-    check(on != null);
-    thenCalledTimes(exactly(number), on);
+    check(captor != null);
+    thenCalledTimes(exactly(number), captor);
   }
 
   public static <T> T thenCalledTimes(final Object numberMatcher, T mock) {
@@ -517,27 +517,27 @@ public class Testory {
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        thenCalledTimes(numberMatcher, history.buildOnUsingCaptors(invocation));
+        thenCalledTimes(numberMatcher, history.buildCaptorUsingAnys(invocation));
         return null;
       }
     };
     return proxyWrapping(mock, handler);
   }
 
-  public static void thenCalledTimes(Object numberMatcher, On on) {
+  public static void thenCalledTimes(Object numberMatcher, Captor captor) {
     check(numberMatcher != null);
     check(isMatcher(numberMatcher));
-    check(on != null);
+    check(captor != null);
     int numberOfCalls = 0;
     for (Invocation invocation : history.getInvocations()) {
-      if (on.matches(invocation)) {
+      if (captor.matches(invocation)) {
         numberOfCalls++;
       }
     }
     boolean expected = match(numberMatcher, numberOfCalls);
     if (!expected) {
       throw assertionError("\n" //
-          + formatSection("expected called times " + numberMatcher, on));
+          + formatSection("expected called times " + numberMatcher, captor));
     }
   }
 

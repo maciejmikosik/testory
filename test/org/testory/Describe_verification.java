@@ -19,7 +19,7 @@ public class Describe_verification {
   private Object object, otherObject;
   private Object matcher;
   private List<Object> mock, otherMock;
-  private On on;
+  private Captor captor;
 
   @Before
   public void before() {
@@ -120,7 +120,7 @@ public class Describe_verification {
   @Test
   public void asserts_invocation_with_custom_logic() {
     mock.add(object);
-    thenCalled(new On() {
+    thenCalled(new Captor() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock && invocation.method.getName().equals("add")
             && invocation.arguments.equals(Arrays.asList(object));
@@ -131,18 +131,18 @@ public class Describe_verification {
   @Test
   public void fails_invocation_with_custom_logic() {
     try {
-      on = new On() {
+      captor = new Captor() {
         public boolean matches(Invocation invocation) {
           return invocation.instance == mock && invocation.method.getName().equals("add")
               && invocation.arguments.equals(Arrays.asList(object));
         }
       };
-      thenCalled(on);
+      thenCalled(captor);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
           + "  expected called times 1\n" //
-          + "    " + on + "\n" //
+          + "    " + captor + "\n" //
       , e.getMessage());
     }
   }
@@ -154,7 +154,7 @@ public class Describe_verification {
     mock.size();
 
     thenCalledTimes(3, mock).size();
-    thenCalledTimes(3, new On() {
+    thenCalledTimes(3, new Captor() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock && invocation.method.getName().equals("size");
       }
@@ -164,7 +164,7 @@ public class Describe_verification {
   @Test
   public void asserts_zero_number_of_invocations() {
     thenCalledTimes(0, mock).size();
-    thenCalledTimes(0, new On() {
+    thenCalledTimes(0, new Captor() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock && invocation.method.getName().equals("size");
       }
@@ -187,17 +187,17 @@ public class Describe_verification {
     }
 
     try {
-      on = new On() {
+      captor = new Captor() {
         public boolean matches(Invocation invocation) {
           return invocation.instance == mock && invocation.method.getName().equals("size");
         }
       };
-      thenCalledTimes(3, on);
+      thenCalledTimes(3, captor);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
           + "  expected called times " + 3 + "\n" //
-          + "    " + on + "\n" //
+          + "    " + captor + "\n" //
       , e.getMessage());
     }
   }
@@ -220,17 +220,17 @@ public class Describe_verification {
     }
 
     try {
-      on = new On() {
+      captor = new Captor() {
         public boolean matches(Invocation invocation) {
           return invocation.instance == mock && invocation.method.getName().equals("size");
         }
       };
-      thenCalledTimes(3, on);
+      thenCalledTimes(3, captor);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
           + "  expected called times " + 3 + "\n" //
-          + "    " + on + "\n" //
+          + "    " + captor + "\n" //
       , e.getMessage());
     }
   }
@@ -248,7 +248,7 @@ public class Describe_verification {
       }
     };
     thenCalledTimes(matcher, mock).size();
-    thenCalledTimes(matcher, new On() {
+    thenCalledTimes(matcher, new Captor() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock && invocation.method.getName().equals("size");
       }
@@ -282,17 +282,17 @@ public class Describe_verification {
     }
 
     try {
-      on = new On() {
+      captor = new Captor() {
         public boolean matches(Invocation invocation) {
           return invocation.instance == mock && invocation.method.getName().equals("size");
         }
       };
-      thenCalledTimes(matcher, on);
+      thenCalledTimes(matcher, captor);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
           + "  expected called times " + matcher + "\n" //
-          + "    " + on + "\n" //
+          + "    " + captor + "\n" //
       , e.getMessage());
     }
   }
@@ -336,7 +336,7 @@ public class Describe_verification {
     } catch (TestoryException e) {}
 
     try {
-      thenCalledTimes(-1, new On() {
+      thenCalledTimes(-1, new Captor() {
         public boolean matches(Invocation invocation) {
           return false;
         }
@@ -354,7 +354,7 @@ public class Describe_verification {
     } catch (TestoryException e) {}
 
     try {
-      thenCalledTimes(matcher, new On() {
+      thenCalledTimes(matcher, new Captor() {
         public boolean matches(Invocation invocation) {
           return false;
         }
@@ -371,7 +371,7 @@ public class Describe_verification {
     } catch (TestoryException e) {}
 
     try {
-      thenCalledTimes(null, new On() {
+      thenCalledTimes(null, new Captor() {
         public boolean matches(Invocation invocation) {
           return false;
         }
@@ -399,19 +399,19 @@ public class Describe_verification {
   }
 
   @Test
-  public void on_cannot_be_null() {
+  public void captor_cannot_be_null() {
     try {
-      thenCalled((On) null);
+      thenCalled((Captor) null);
       fail();
     } catch (TestoryException e) {}
 
     try {
-      thenCalledTimes(1, (On) null);
+      thenCalledTimes(1, (Captor) null);
       fail();
     } catch (TestoryException e) {}
 
     try {
-      thenCalledTimes(matcher, (On) null);
+      thenCalledTimes(matcher, (Captor) null);
       fail();
     } catch (TestoryException e) {}
   }

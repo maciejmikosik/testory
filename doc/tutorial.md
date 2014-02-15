@@ -1,6 +1,6 @@
 
 ### [overview](#overview) | [when](#when) | [thenReturned](#then_returned) | [thenThrown](#then_thrown)
-### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing) | [on](#on)
+### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing)
 ### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
 ### [macros](#macros) | [givenTimes](#given_times) | [givenTry](#given_try) | [givenTest](#given_test)
 ### [fine points](#fine_points) | [arrays](#arrays)
@@ -151,7 +151,7 @@ You can verify number of invocations by passing exact value (may be 0) or using 
 
 ### Capturing
 
-Use captor if you do not care about argument value during stubbing or verification.
+Use **any** if you do not care about argument value during stubbing or verification.
 
         given(willReturn(false), list).contains(any(Object.class));
         thenCalled(list).add(any(Object.class));
@@ -161,32 +161,26 @@ Use captor if you do not care about argument value during stubbing or verificati
 
 `Class` is just for inferring purpose, which means argument can be instance of any type.
 
-You can mix captors with real arguments if you work with non-final types.
+You can mix **any**s with real arguments if you work with non-final types.
 
         given(willReturn(true), mock).someMethod(object, any(Object.class));
 
-Mixing captors and real arguments of final types works only if they are separated by non-final captor.
+Mixing **any**s and real arguments of final types works only if they are separated by non-final **any**.
 
         // throws TestoryException
         given(willReturn(object), mock).someMethod(any(Integer.class), object, 0);
         // works
         given(willReturn(object), mock).someMethod(any(Integer.class), any(Object.class), 0);
 
+You can take full control of matching invocations by implementing you own **Captor**.
 
-**NOTE: more options are going to be implemented soon!**
-
-<a name="on"/>
-### On
-
-You can take full control of matching invocations by implementing you own **On**.
-
-        On on = new On() {
+        Captor captor = new Captor() {
           public boolean matches(Invocation invocation) {
             // custom logic
           }
         };
-        given(willReturn(object), on);
-        thenCalled(on);
+        given(willReturn(object), captor);
+        thenCalled(captor);
 
 Use factories for most common cases.
 

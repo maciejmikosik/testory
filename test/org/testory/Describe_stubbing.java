@@ -26,7 +26,7 @@ public class Describe_stubbing {
   private Throwable throwable;
   private List<Object> mock, otherMock;
   private Handler handler;
-  private On on;
+  private Captor captor;
 
   @Before
   public void before() {
@@ -35,7 +35,7 @@ public class Describe_stubbing {
     mock = mock(List.class);
     otherMock = mock(List.class);
     handler = mock(Handler.class);
-    on = mock(On.class);
+    captor = mock(Captor.class);
   }
 
   @After
@@ -70,7 +70,7 @@ public class Describe_stubbing {
 
   @Test
   public void matches_invocation_with_custom_logic() {
-    given(willReturn(object), new On() {
+    given(willReturn(object), new Captor() {
       public boolean matches(Invocation invocation) {
         assume(invocation.method.getReturnType() == Object.class);
         return invocation.instance == mock;
@@ -87,7 +87,7 @@ public class Describe_stubbing {
       fail();
     } catch (TestoryException e) {}
     try {
-      given(null, on);
+      given(null, captor);
       fail();
     } catch (TestoryException e) {}
   }
@@ -101,9 +101,9 @@ public class Describe_stubbing {
   }
 
   @Test
-  public void on_cannot_be_null() {
+  public void captor_cannot_be_null() {
     try {
-      given(handler, (On) null);
+      given(handler, (Captor) null);
       fail();
     } catch (TestoryException e) {}
   }

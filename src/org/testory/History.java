@@ -81,13 +81,13 @@ class History {
 
   private static class Stubbing {
     Handler handler;
-    On on;
+    Captor captor;
   }
 
-  public void logStubbing(Handler handler, On on) {
+  public void logStubbing(Handler handler, Captor captor) {
     Stubbing stubbing = new Stubbing();
     stubbing.handler = handler;
-    stubbing.on = on;
+    stubbing.captor = captor;
     addEvent(stubbing);
   }
 
@@ -96,7 +96,7 @@ class History {
     for (Object event : getEvents()) {
       if (event instanceof Stubbing) {
         Stubbing stubbing = (Stubbing) event;
-        if (stubbing.on.matches(invocation)) {
+        if (stubbing.captor.matches(invocation)) {
           return stubbing.handler;
         }
       }
@@ -118,7 +118,7 @@ class History {
     return Collections.unmodifiableList(invocations);
   }
 
-  private static class Captor {
+  private static class Any {
     Class<?> type;
     @Nullable
     Object token;
@@ -126,17 +126,17 @@ class History {
     Object matcher;
   }
 
-  public <T> T logCaptor(Class<T> type, @Nullable Object matcher) {
+  public <T> T logAny(Class<T> type, @Nullable Object matcher) {
     boolean isProxiable = isProxiable(type);
     T token = isProxiable
         ? proxyLight(type)
         : null;
 
-    Captor captor = new Captor();
-    captor.type = type;
-    captor.token = token;
-    captor.matcher = matcher;
-    addEvent(captor);
+    Any any = new Any();
+    any.type = type;
+    any.token = token;
+    any.matcher = matcher;
+    addEvent(any);
 
     return isProxiable
         ? token
@@ -156,9 +156,9 @@ class History {
     return (T) proxy(typing, handler);
   }
 
-  public On buildOnUsingCaptors(final Invocation invocation) {
-    final List<Captor> captors = getCaptorsAndConsume();
-    final List<Object> argumentMatchers = solve(invocation.arguments, captors);
+  public Captor buildCaptorUsingAnys(final Invocation invocation) {
+    final List<Any> anys = getAnysAndConsume();
+    final List<Object> argumentMatchers = solve(invocation.arguments, anys);
     final Object argumentsMatcher = new Object() {
       @SuppressWarnings("unused")
       public boolean matches(Object item) {
@@ -172,7 +172,7 @@ class History {
       }
     };
 
-    return new On() {
+    return new Captor() {
       public boolean matches(Invocation item) {
         return invocation.instance == item.instance && invocation.method.equals(item.method)
             && match(argumentsMatcher, item.arguments);
@@ -196,31 +196,31 @@ class History {
     };
   }
 
-  private static List<Object> solve(List<Object> arguments, List<Captor> captors) {
-    for (int i = 0; i < captors.size(); i++) {
-      Captor captor = captors.get(i);
-      if (captor.token != null) {
+  private static List<Object> solve(List<Object> arguments, List<Any> anys) {
+    for (int i = 0; i < anys.size(); i++) {
+      Any any = anys.get(i);
+      if (any.token != null) {
         for (int j = 0; j < arguments.size(); j++) {
           Object argument = arguments.get(j);
-          if (argument == captor.token) {
+          if (argument == any.token) {
             ArrayList<Object> solved = new ArrayList<Object>();
             List<Object> leftArguments = arguments.subList(0, j);
             List<Object> rightArguments = arguments.subList(j + 1, arguments.size());
-            List<Captor> leftCaptors = captors.subList(0, i);
-            List<Captor> rightCaptors = captors.subList(i + 1, captors.size());
-            solved.addAll(solve(leftArguments, leftCaptors));
-            solved.add(asMatcher(captor));
-            solved.addAll(solve(rightArguments, rightCaptors));
+            List<Any> leftAnys = anys.subList(0, i);
+            List<Any> rightAnys = anys.subList(i + 1, anys.size());
+            solved.addAll(solve(leftArguments, leftAnys));
+            solved.add(asMatcher(any));
+            solved.addAll(solve(rightArguments, rightAnys));
             return solved;
           }
         }
-        throw new TestoryException("captor created but not passed to invocation");
+        throw new TestoryException("any() created but not passed to invocation");
       }
     }
     if (arguments.isEmpty()) {
       return new ArrayList<Object>();
     }
-    if (captors.isEmpty()) {
+    if (anys.isEmpty()) {
       ArrayList<Object> solved = new ArrayList<Object>();
       for (final Object argument : arguments) {
         solved.add(new Object() {
@@ -235,57 +235,57 @@ class History {
         });
       }
       return solved;
-    } else if (captors.size() == arguments.size()) {
+    } else if (anys.size() == arguments.size()) {
       ArrayList<Object> solved = new ArrayList<Object>();
-      for (Captor captor : captors) {
-        solved.add(asMatcher(captor));
+      for (Any any : anys) {
+        solved.add(asMatcher(any));
       }
       return solved;
     } else {
-      throw new TestoryException("cannot solve mixed arguments and captors");
+      throw new TestoryException("cannot solve mixed arguments and anys");
     }
   }
 
-  private static Object asMatcher(final Captor captor) {
+  private static Object asMatcher(final Any any) {
     return new Object() {
       @SuppressWarnings("unused")
       public boolean matches(Object item) {
-        return captor.matcher != null
-            ? match(captor.matcher, item)
+        return any.matcher != null
+            ? match(any.matcher, item)
             : true;
       }
 
       public String toString() {
-        return captor.matcher != null
-            ? "any(" + captor.type.getName() + ", " + captor.matcher + ")"
-            : "any(" + captor.type.getName() + ")";
+        return any.matcher != null
+            ? "any(" + any.type.getName() + ", " + any.matcher + ")"
+            : "any(" + any.type.getName() + ")";
       }
     };
   }
 
   /**
    * Invoked only in specific situation if we know that test is failing.
-   * {@link Testory#thenCalledTimes(Object, On)} assertion fails, it builds error message, it
-   * invokes {@link On#toString()}, it invokes this method, it invokes mock.toString(). Invoking in
-   * other situations may cause not intended consequences like extra invocation to be registered and
-   * verification fails.
+   * {@link Testory#thenCalledTimes(Object, Captor)} assertion fails, it builds error message, it
+   * invokes {@link Captor#toString()}, it invokes this method, it invokes mock.toString(). Invoking
+   * in other situations may cause not intended consequences like extra invocation to be registered
+   * and verification fails.
    */
 
   private static String dangerouslyInvokeToStringOnMock(Object mock) {
     return mock.toString();
   }
 
-  private List<Captor> getCaptorsAndConsume() {
+  private List<Any> getAnysAndConsume() {
     class Consumer {}
-    List<Captor> captors = new ArrayList<Captor>();
+    List<Any> anys = new ArrayList<Any>();
     for (Object event : getEvents()) {
-      if (event instanceof Captor) {
-        captors.add(0, (Captor) event);
+      if (event instanceof Any) {
+        anys.add(0, (Any) event);
       } else if (event instanceof Consumer) {
         break;
       }
     }
     addEvent(new Consumer());
-    return captors;
+    return anys;
   }
 }
