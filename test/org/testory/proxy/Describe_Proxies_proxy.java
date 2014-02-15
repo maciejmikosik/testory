@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -199,6 +200,11 @@ public class Describe_Proxies_proxy {
     assertTrue(proxy instanceof AbstractList);
     assertTrue(proxy instanceof RandomAccess);
     assertTrue(proxy instanceof Serializable);
+
+    type = Arrays.asList().iterator().getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Iterator);
   }
 
   @Test
@@ -208,6 +214,11 @@ public class Describe_Proxies_proxy {
     proxy = proxy(typing(type, interfaces), handler);
     assertTrue(proxy instanceof Collection);
     assertTrue(proxy instanceof Serializable);
+
+    type = Collections.unmodifiableCollection(new ArrayList<Object>()).iterator().getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Iterator);
   }
 
   @Test
@@ -217,6 +228,11 @@ public class Describe_Proxies_proxy {
     proxy = proxy(typing(type, interfaces), handler);
     assertTrue(proxy instanceof List);
     assertTrue(proxy instanceof Serializable);
+
+    type = Collections.unmodifiableList(new LinkedList<Object>()).iterator().getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Iterator);
   }
 
   @Test
@@ -227,6 +243,11 @@ public class Describe_Proxies_proxy {
     assertTrue(proxy instanceof List);
     assertTrue(proxy instanceof Serializable);
     assertTrue(proxy instanceof RandomAccess);
+
+    type = Collections.unmodifiableList(new ArrayList<Object>()).iterator().getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Iterator);
   }
 
   @Test
@@ -236,6 +257,11 @@ public class Describe_Proxies_proxy {
     proxy = proxy(typing(type, interfaces), handler);
     assertTrue(proxy instanceof Set);
     assertTrue(proxy instanceof Serializable);
+
+    type = Collections.unmodifiableSet(new HashSet<Object>()).iterator().getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Iterator);
   }
 
   @Test
@@ -245,6 +271,11 @@ public class Describe_Proxies_proxy {
     proxy = proxy(typing(type, interfaces), handler);
     assertTrue(proxy instanceof SortedSet);
     assertTrue(proxy instanceof Serializable);
+
+    type = Collections.unmodifiableSortedSet(new TreeSet<Object>()).iterator().getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Iterator);
   }
 
   @Test
@@ -254,6 +285,30 @@ public class Describe_Proxies_proxy {
     proxy = proxy(typing(type, interfaces), handler);
     assertTrue(proxy instanceof Map);
     assertTrue(proxy instanceof Serializable);
+
+    type = Collections.unmodifiableMap(new HashMap<Object, Object>()).keySet().getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Set);
+    assertTrue(proxy instanceof Serializable);
+
+    type = Collections.unmodifiableMap(new HashMap<Object, Object>()).keySet().iterator()
+        .getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Iterator);
+
+    type = Collections.unmodifiableMap(new HashMap<Object, Object>()).values().getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Collection);
+    assertTrue(proxy instanceof Serializable);
+
+    type = Collections.unmodifiableMap(new HashMap<Object, Object>()).values().iterator()
+        .getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Iterator);
   }
 
   @Test
@@ -263,6 +318,30 @@ public class Describe_Proxies_proxy {
     proxy = proxy(typing(type, interfaces), handler);
     assertTrue(proxy instanceof SortedMap);
     assertTrue(proxy instanceof Serializable);
+
+    type = Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).keySet().getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Set);
+    assertTrue(proxy instanceof Serializable);
+
+    type = Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).keySet().iterator()
+        .getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Iterator);
+
+    type = Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).values().getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Collection);
+    assertTrue(proxy instanceof Serializable);
+
+    type = Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).values().iterator()
+        .getClass();
+    assertTrue(isProxiable(type));
+    proxy = proxy(typing(type, interfaces), handler);
+    assertTrue(proxy instanceof Iterator);
   }
 
   @Test

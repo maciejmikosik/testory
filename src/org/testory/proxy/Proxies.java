@@ -104,7 +104,9 @@ public class Proxies {
   private static Set<Class<?>> inaccessibleClasses() {
     HashSet<Class<?>> classes = new HashSet<Class<?>>();
     classes.add(Arrays.asList().getClass());
+    classes.add(Arrays.asList().iterator().getClass());
     classes.add(Collections.unmodifiableCollection(new ArrayList<Object>()).getClass());
+    classes.add(Collections.unmodifiableCollection(new ArrayList<Object>()).iterator().getClass());
     classes.add(Collections.unmodifiableList(new LinkedList<Object>()).getClass());
     classes.add(Collections.unmodifiableList(new ArrayList<Object>()).getClass());
     classes.add(Collections.unmodifiableSet(new HashSet<Object>()).getClass());
