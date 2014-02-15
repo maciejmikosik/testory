@@ -1,11 +1,10 @@
 
-### [overview](#overview) | [when](#when) | [thenReturned](#then_returned) | [thenThrown](#then_thrown)
+### [overview](#overview) | [when](#when) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown)
 ### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing)
 ### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
-### [macros](#macros) | [givenTimes](#given_times) | [givenTry](#given_try) | [givenTest](#given_test)
-### [fine points](#fine_points) | [arrays](#arrays)
+### [macros](#macros) | [givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
+### [fine points](#fine-points) | [arrays](#arrays)
 
-<a name="overview"/>
 # Overview
 
 To make **given**, **when**, **then** family of methods available, add following import to your test class.
@@ -47,7 +46,6 @@ you should use chained forms.
         given(list).clear();
         when(list).clear();
 
-<a name="when"/>
 ### when
 
 Assertions can be used to verify result of invocation happened at line with **when**.
@@ -70,7 +68,6 @@ Result that is going to be asserted is
           }
         });
 
-<a name="then_returned"/>
 ### thenReturned
 
 
@@ -88,7 +85,6 @@ Matchers can be used to make custom assertions
         when(list.clone());
         thenReturned(not(sameInstance(list)));
 
-<a name="then_thrown"/>
 ### thenThrown
 
 **thenThrown** is used to make assertions about throwable thrown by **when**. Because of
@@ -101,7 +97,6 @@ java syntax **when** must be in chained form.
 Notice that **when** in chained form catches any throwable. This prevents throwable from failing a test if result of **when** is not asserted by non-standalone assertion.
 **thenThrown** is overloaded to accept throwable instance, class or matcher.
 
-<a name="mocks"/>
 # Mocks
 
 Any non-final class or interface can be mocked.
@@ -116,7 +111,6 @@ Newly created mock has following properties
    - equals is stubbed so mock is equal only to itself
    - hashCode is stubbed to identity hash code
 
-<a name="stubbing"/>
 ### Stubbing
 
 Mock can be stubbed to return Object or throw Throwable or with custom logic.
@@ -131,7 +125,6 @@ Mock can be stubbed to return Object or throw Throwable or with custom logic.
 
 Stubbing will be only effective for specified instance of mock, method and equal arguments.
 
-<a name="verifying"/>
 ### Verifying
 
 It is possible to assert expected invocation on mock.
@@ -192,10 +185,8 @@ Or stub for returning particular type. See [komarro library](https://code.google
 
         given(willReturn(person), onReturn(Person.class));
 
-<a name="utilities"/>
 # Utilities
 
-<a name="matchers"/>
 ### Matchers
 
 Wherever api method accepts Object, but states that it accepts matcher, you are free to pass any of compatible matchers
@@ -212,7 +203,6 @@ Wherever api method accepts Object, but states that it accepts matcher, you are 
           }
         };
 
-<a name="closures"/>
 ### Closures
 
 In some cases **when** can be difficult to write. For example you want to assert that
@@ -233,12 +223,10 @@ wrap call inside Closure.
           };
         }
 
-<a name="macros"/>
 # Macros
 
 Macros help you remove boilerplate code from your tests.
 
-<a name="given_times"/>
 ### givenTimes
 
 Repeats invocation many times.
@@ -248,7 +236,6 @@ Repeats invocation many times.
         when(list.size());
         thenReturned(5);
 
-<a name="given_try"/>
 ### givenTry
 
 Catches possible throwable thrown by chained method allowing test to run forward. 
@@ -258,7 +245,6 @@ Catches possible throwable thrown by chained method allowing test to run forward
         when(list.size());
         thenReturned(0);
 
-<a name="given_test"/>
 ### givenTest
 
 Initializes each field of **this** test and fails if initialization of any field fails.
@@ -302,11 +288,8 @@ Field of final type is assigned to sample data
 
 Random sample data is deterministically generated using field type and field name as a seed.
 
-
-<a name="fine_points"/>
 # Fine Points
 
-<a name="arrays"/>
 ### Arrays
 
 In java, arrays are objects and invoking `equals` performs identity comparison.
