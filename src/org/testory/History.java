@@ -1,5 +1,6 @@
 package org.testory;
 
+import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
@@ -91,8 +92,18 @@ class History {
     addEvent(stubbing);
   }
 
-  @Nullable
+  public boolean hasStubbedHandlerFor(Invocation invocation) {
+    return tryGetStubbedHandlerFor(invocation) != null;
+  }
+
   public Handler getStubbedHandlerFor(Invocation invocation) {
+    Handler handler = tryGetStubbedHandlerFor(invocation);
+    checkArgument(handler != null);
+    return handler;
+  }
+
+  @Nullable
+  private Handler tryGetStubbedHandlerFor(Invocation invocation) {
     for (Object event : getEvents()) {
       if (event instanceof Stubbing) {
         Stubbing stubbing = (Stubbing) event;

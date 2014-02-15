@@ -157,9 +157,8 @@ public class Testory {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         history.logInvocation(invocation);
-        Handler stubbedHandler = history.getStubbedHandlerFor(invocation);
-        return stubbedHandler != null
-            ? stubbedHandler.handle(invocation)
+        return history.hasStubbedHandlerFor(invocation)
+            ? history.getStubbedHandlerFor(invocation).handle(invocation)
             : defaultHandler.handle(invocation);
       }
     };
