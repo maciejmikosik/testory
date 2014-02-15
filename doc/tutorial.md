@@ -1,6 +1,6 @@
 
 ### [overview](#overview) | [when](#when) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown)
-### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing)
+### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing) | [spying](#spying)
 ### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
 ### [macros](#macros) | [givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
 ### [fine points](#fine-points) | [arrays](#arrays)
@@ -184,6 +184,26 @@ To assert that no invocations was called on mock.
 Or stub for returning particular type. See [komarro library](https://code.google.com/p/komarro/) for explanation why would you want to do that.
 
         given(willReturn(person), onReturn(Person.class));
+
+### Spying
+
+Spy is a mock that is prestubbed to delegate all invocations to real object.
+
+You can create spy as a new mock
+
+        given(real = Arrays.asList("a", "b", "c"));
+        given(spy = spy(real));
+
+or stub an existing mock to act as a spy
+
+        given(real = Arrays.asList("a", "b", "c"));
+        given(mock = mock(List.class));
+        given(willSpy(real), onInstance(mock));
+
+Spies can be stubbed and verified like any other mock.
+
+ - real object does not have to be actually real, it can be other mock/spy
+ - there can be many spies for same real object
 
 # Utilities
 

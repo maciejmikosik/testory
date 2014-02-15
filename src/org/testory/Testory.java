@@ -148,6 +148,14 @@ public class Testory {
     return mock(type, defaultMockHandler(null));
   }
 
+  public static <T> T spy(T real) {
+    check(real != null);
+    Class<T> type = (Class<T>) real.getClass();
+    T mock = mock(type);
+    given(willSpy(real), onInstance(mock));
+    return mock;
+  }
+
   private static <T> T mock(Class<T> type, final Handler defaultHandler) {
     check(isProxiable(type));
     Typing typing = type.isInterface()
@@ -231,6 +239,16 @@ public class Testory {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         throw throwable;
+      }
+    };
+  }
+
+  public static Handler willSpy(final Object real) {
+    check(real != null);
+    return new Handler() {
+      @Nullable
+      public Object handle(Invocation invocation) throws Throwable {
+        return invoke(invocation(invocation.method, real, invocation.arguments));
       }
     };
   }
