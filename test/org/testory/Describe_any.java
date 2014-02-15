@@ -332,6 +332,14 @@ public class Describe_any {
   }
 
   @Test
+  public void matcher_cannot_be_any_object() {
+    try {
+      any(Object.class, new Object());
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
   public void matcher_cannot_be_null() {
     try {
       any(Object.class, null);

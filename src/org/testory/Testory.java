@@ -242,6 +242,7 @@ public class Testory {
   public static <T> T any(Class<T> type, Object matcher) {
     check(type != null);
     check(matcher != null);
+    check(isMatcher(matcher));
     check(!type.isPrimitive());
     return history.logAny(type, matcher);
   }
