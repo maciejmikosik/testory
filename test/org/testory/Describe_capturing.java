@@ -33,14 +33,19 @@ public class Describe_capturing {
 
   @Before
   public void before() {
+    purge();
+
     mock = mock(Service.class);
     otherMock = mock(Service.class);
     data = mock(Data.class);
   }
 
-  @Before
   @After
-  public void purge_to_isolate_tests() {
+  public void after() {
+    purge();
+  }
+
+  private void purge() {
     when("");
     when("");
   }

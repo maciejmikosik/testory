@@ -30,6 +30,8 @@ public class Describe_stubbing {
 
   @Before
   public void before() {
+    purge();
+
     object = newObject("object");
     throwable = newThrowable("throwable");
     mock = mock(List.class);
@@ -39,7 +41,11 @@ public class Describe_stubbing {
   }
 
   @After
-  public void purge_stubbings_so_they_do_not_affect_other_tests() {
+  public void after() {
+    purge();
+  }
+
+  private void purge() {
     when("");
     when("");
   }

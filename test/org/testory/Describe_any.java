@@ -38,15 +38,20 @@ public class Describe_any {
 
   @Before
   public void before() {
+    purge();
+
     mock = mock(Foo.class);
     otherMock = mock(Foo.class);
     object = newObject("object");
     otherObject = newObject("otherObject");
   }
 
-  @Before
   @After
-  public void purge_to_isolate_tests() {
+  public void after() {
+    purge();
+  }
+
+  private void purge() {
     when("");
     when("");
   }
