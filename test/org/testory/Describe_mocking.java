@@ -2,6 +2,7 @@ package org.testory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
@@ -62,6 +63,17 @@ public class Describe_mocking {
   }
 
   @Test
+  public void overloaded_to_string_is_not_prestubbed() {
+    class Foo {
+      String toString(Foo foo) {
+        return "notStubbed";
+      }
+    }
+    Foo foo = mock(Foo.class);
+    assertNull(foo.toString(new Foo()));
+  }
+
+  @Test
   public void equals_is_prestubbed_so_mock_is_equal_only_to_itself() {
     mock = mock(Object.class);
     assertEquals(mock, mock);
@@ -69,8 +81,35 @@ public class Describe_mocking {
   }
 
   @Test
+  public void overloaded_equals_is_not_prestubbed() {
+    class Foo {
+      Object equals(Foo foo) {
+        return new Object();
+      }
+
+      Object equals() {
+        return new Object();
+      }
+    }
+    Foo foo = mock(Foo.class);
+    assertNull(foo.equals(new Foo()));
+    assertNull(foo.equals());
+  }
+
+  @Test
   public void hashcode_is_prestubbed_to_identity_hashcode() {
     mock = mock(Object.class);
     assertEquals(mock.hashCode(), System.identityHashCode(mock));
+  }
+
+  @Test
+  public void overloaded_hashcode_is_not_prestubbed() {
+    class Foo {
+      Object hashCode(Foo foo) {
+        return new Object();
+      }
+    }
+    Foo foo = mock(Foo.class);
+    assertNull(foo.hashCode(new Foo()));
   }
 }

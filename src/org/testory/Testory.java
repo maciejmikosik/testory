@@ -179,14 +179,17 @@ public class Testory {
     return new Handler() {
       public Object handle(Invocation invocation) {
         return invocation.method.getName().equals("toString")
+            && invocation.method.getParameterTypes().length == 0
             ? name != null
                 ? name
                 : "mock_" + System.identityHashCode(invocation.instance) + "_"
                     + discoverMockedType(invocation.instance.getClass()).getName()
-            : invocation.method.getName().equals("equals") && invocation.arguments.size() == 1
+            : invocation.method.getName().equals("equals")
+                && invocation.method.getParameterTypes().length == 1
+                && invocation.method.getParameterTypes()[0] == Object.class
                 ? invocation.instance == invocation.arguments.get(0)
                 : invocation.method.getName().equals("hashCode")
-                    && invocation.arguments.size() == 0
+                    && invocation.method.getParameterTypes().length == 0
                     ? name != null
                         ? name.hashCode()
                         : System.identityHashCode(invocation.instance)

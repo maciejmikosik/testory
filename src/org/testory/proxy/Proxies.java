@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +18,10 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -35,7 +39,11 @@ import org.objenesis.ObjenesisStd;
 public class Proxies {
   public static boolean isProxiable(Class<?> type) {
     checkNotNull(type);
-    return !Modifier.isFinal(type.getModifiers());
+    return !isFinal(type) || isPeelable(type);
+  }
+
+  private static boolean isFinal(Class<?> type) {
+    return Modifier.isFinal(type.getModifiers());
   }
 
   /**
@@ -90,29 +98,80 @@ public class Proxies {
   }
 
   private static Typing tryAsProxiable(Typing typing) {
-    return tryWithoutInaccessible(tryWithoutFactory(tryWithoutObjectBecauseOfCglibBug(typing)));
+    return tryPeel(tryWithoutFactory(tryWithoutObjectBecauseOfCglibBug(typing)));
   }
 
-  private static Typing tryWithoutInaccessible(Typing typing) {
-    return inaccessibleClasses.contains(typing.superclass)
-        ? tryWithoutInaccessible(peel(typing))
+  private static Typing tryPeel(Typing typing) {
+    return isPeelable(typing.superclass)
+        ? tryPeel(peel(typing))
         : typing;
   }
 
-  private static final Set<Class<?>> inaccessibleClasses = inaccessibleClasses();
+  private static boolean isPeelable(Class<?> type) {
+    return peelables.contains(type);
+  }
 
-  private static Set<Class<?>> inaccessibleClasses() {
+  private static final Set<Class<?>> peelables = peelables();
+
+  private static Set<Class<?>> peelables() {
     HashSet<Class<?>> classes = new HashSet<Class<?>>();
+
+    ArrayList<Object> arrayList = new ArrayList<Object>();
+    classes.add(arrayList.iterator().getClass());
+    classes.add(arrayList.listIterator().getClass());
+    classes.add(arrayList.subList(0, 0).getClass());
+    classes.add(arrayList.subList(0, 0).iterator().getClass());
+
+    LinkedList<Object> linkedList = new LinkedList<Object>();
+    classes.add(linkedList.iterator().getClass());
+    classes.add(linkedList.subList(0, 0).getClass());
+    classes.add(linkedList.subList(0, 0).iterator().getClass());
+
+    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
+    classes.add(hashMap.keySet().getClass());
+    classes.add(hashMap.keySet().iterator().getClass());
+    classes.add(hashMap.values().getClass());
+    classes.add(hashMap.values().iterator().getClass());
+    classes.add(hashMap.entrySet().getClass());
+    classes.add(hashMap.entrySet().iterator().getClass());
+    classes.add(hashMap.keySet().iterator().getClass().getSuperclass());
+
+    TreeMap<Object, Object> treeMap = new TreeMap<Object, Object>();
+    classes.add(treeMap.keySet().getClass());
+    classes.add(treeMap.keySet().iterator().getClass());
+    classes.add(treeMap.values().getClass());
+    classes.add(treeMap.values().iterator().getClass());
+    classes.add(treeMap.entrySet().getClass());
+    classes.add(treeMap.entrySet().iterator().getClass());
+    classes.add(treeMap.keySet().iterator().getClass().getSuperclass());
+
     classes.add(Arrays.asList().getClass());
     classes.add(Arrays.asList().iterator().getClass());
-    classes.add(Collections.unmodifiableCollection(new ArrayList<Object>()).getClass());
-    classes.add(Collections.unmodifiableCollection(new ArrayList<Object>()).iterator().getClass());
-    classes.add(Collections.unmodifiableList(new LinkedList<Object>()).getClass());
-    classes.add(Collections.unmodifiableList(new ArrayList<Object>()).getClass());
-    classes.add(Collections.unmodifiableSet(new HashSet<Object>()).getClass());
-    classes.add(Collections.unmodifiableSortedSet(new TreeSet<Object>()).getClass());
-    classes.add(Collections.unmodifiableMap(new HashMap<Object, Object>()).getClass());
-    classes.add(Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).getClass());
+    classes.add(Arrays.asList().listIterator().getClass());
+    classes.add(Arrays.asList().subList(0, 0).getClass());
+
+    HashSet<Object> hashSet = new HashSet<Object>();
+    TreeSet<Object> treeSet = new TreeSet<Object>();
+
+    Collection<Object> uCollection = Collections.unmodifiableCollection(arrayList);
+    List<Object> uList = Collections.unmodifiableList(linkedList);
+    List<Object> uRandomAccessList = Collections.unmodifiableList(arrayList);
+    Set<Object> uSet = Collections.unmodifiableSet(hashSet);
+    SortedSet<Object> uSortedSet = Collections.unmodifiableSortedSet(treeSet);
+    Map<Object, Object> uMap = Collections.unmodifiableMap(hashMap);
+    SortedMap<Object, Object> uSortedMap = Collections.unmodifiableSortedMap(treeMap);
+    classes.add(uCollection.getClass());
+    classes.add(uCollection.iterator().getClass());
+    classes.add(uList.getClass());
+    classes.add(uList.listIterator().getClass());
+    classes.add(uRandomAccessList.getClass());
+    classes.add(uSet.getClass());
+    classes.add(uSortedSet.getClass());
+    classes.add(uMap.getClass());
+    classes.add(uMap.entrySet().getClass());
+    classes.add(uMap.entrySet().iterator().getClass());
+    classes.add(uSortedMap.getClass());
+
     return Collections.unmodifiableSet(classes);
   }
 

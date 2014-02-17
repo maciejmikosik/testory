@@ -1,5 +1,11 @@
 package org.testory.proxy;
 
+import static java.util.Collections.unmodifiableCollection;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.Collections.unmodifiableSortedMap;
+import static java.util.Collections.unmodifiableSortedSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
@@ -8,24 +14,26 @@ import static org.junit.Assert.fail;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
-import static org.testory.proxy.Typing.typing;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.AbstractCollection;
 import java.util.AbstractList;
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.RandomAccess;
 import java.util.Set;
 import java.util.SortedMap;
@@ -34,7 +42,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class Describe_Proxies_proxy {
@@ -46,13 +53,11 @@ public class Describe_Proxies_proxy {
   private Throwable throwable;
   private int counter;
   private Class<?> type;
-  private Set<Class<?>> interfaces;
 
   @Before
   public void before() throws NoSuchMethodException {
     type = Object.class;
-    interfaces = new HashSet<Class<?>>();
-    typing = typing(type, interfaces);
+    typing = typing();
     method = Object.class.getDeclaredMethod("toString");
     handler = new Handler() {
       public Object handle(Invocation invocation) {
@@ -64,284 +69,187 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
-  public void should_create_proxy_extending_object() {
-    type = Object.class;
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(type.isInstance(proxy));
-  }
-
-  @Test
-  public void should_create_proxy_extending_concrete_class() {
-    type = $ConcreteClass.class;
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(type.isInstance(proxy));
-  }
-
-  @Test
-  public void should_create_proxy_extending_package_private_concrete_class() {
-    type = $PackagePrivateConcreteClass.class;
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(type.isInstance(proxy));
-  }
-
-  @Test
-  public void should_create_proxy_extending_nested_in_method_concrete_class() {
+  public void concrete_classes_are_proxiable() {
+    assertProxiable(Object.class);
+    assertProxiable($ConcreteClass.class);
+    assertProxiable($PackagePrivateConcreteClass.class);
     class NestedConcreteClass {}
-    type = NestedConcreteClass.class;
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(type.isInstance(proxy));
+    assertProxiable(NestedConcreteClass.class);
+    assertProxiable($ConcreteClassWithPrivateDefaultConstructor.class);
+    assertProxiable($ConcreteClassWithPrivateConstructorWithArguments.class);
   }
 
   @Test
-  public void should_create_proxy_extending_abstract_class_with_abstract_method() {
-    type = $AbstractClassWithAbstractMethod.class;
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(type.isInstance(proxy));
+  public void abstract_classes_are_proxiable() {
+    assertProxiable($AbstractClassWithAbstractMethod.class);
+    assertProxiable($AbstractClassWithProtectedAbstractMethod.class);
   }
 
   @Test
-  public void should_create_proxy_extending_abstract_class_with_protected_abstract_method() {
-    type = $AbstractClassWithProtectedAbstractMethod.class;
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(type.isInstance(proxy));
+  public void interfaces_are_proxiable() {
+    assertProxiable(typing($InterfaceA.class, $InterfaceB.class, $InterfaceC.class));
+    assertProxiable(typing($PackagePrivateInterfaceA.class, $PackagePrivateInterfaceB.class,
+        $PackagePrivateInterfaceC.class));
   }
 
   @Test
-  public void should_create_proxy_implementing_many_interfaces() {
-    interfaces = interfaces($InterfaceA.class, $InterfaceB.class, $InterfaceC.class);
-    for (Class<?> interfaceType : interfaces) {
-      assertTrue(isProxiable(interfaceType));
-    }
-    proxy = proxy(typing(type, interfaces), handler);
-    for (Class<?> interfaceType : interfaces) {
-      assertTrue(interfaceType.isInstance(proxy));
-    }
-  }
-
-  // TODO fix: proxy of package private interfaces
-  @Ignore
-  @Test
-  public void should_create_proxy_implementing_many_package_private_interfaces() {
-    interfaces = interfaces($PackagePrivateInterfaceA.class, $PackagePrivateInterfaceB.class,
-        $PackagePrivateInterfaceC.class);
-    for (Class<?> interfaceType : interfaces) {
-      assertTrue(isProxiable(interfaceType));
-    }
-    proxy = proxy(typing(type, interfaces), handler);
-    for (Class<?> interfaceType : interfaces) {
-      assertTrue(interfaceType.isInstance(proxy));
-    }
-  }
-
-  @Test
-  public void should_create_proxy_extending_type_of_other_proxy() {
-    type = proxy(typing($ConcreteClass.class, interfaces($InterfaceA.class)), handler).getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces($InterfaceB.class)), handler);
-    assertTrue(proxy instanceof $ConcreteClass);
-    assertTrue(proxy instanceof $InterfaceA);
-    assertTrue(proxy instanceof $InterfaceB);
-  }
-
-  @Test
-  public void should_create_proxy_extending_type_of_other_proxy_extending_object() {
-    type = proxy(typing(Object.class, interfaces), handler).getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces($InterfaceA.class)), handler);
-    assertTrue(proxy instanceof $InterfaceA);
-  }
-
-  @Test
-  public void should_create_proxy_extending_concrete_class_with_private_default_constructor() {
-    type = $ConcreteClassWithPrivateDefaultConstructor.class;
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(type.isInstance(proxy));
-  }
-
-  @Test
-  public void should_create_proxy_extending_concrete_class_with_private_constructor_with_arguments() {
-    type = $ConcreteClassWithPrivateConstructorWithArguments.class;
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(type.isInstance(proxy));
-  }
-
-  @Test
-  public void should_create_proxy_extending_type_of_other_proxy_and_implementing_duplicated_interface() {
-    type = proxy(typing($ConcreteClass.class, interfaces($InterfaceA.class)), handler).getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces($InterfaceA.class)), handler);
-    assertTrue(proxy instanceof $ConcreteClass);
-    assertTrue(proxy instanceof $InterfaceA);
-  }
-
-  @Test
-  public void should_create_proxy_with_duplicated_interfaces() {
+  public void merges_duplicated_interfaces() {
     class Superclass implements $InterfaceA {}
-    type = Superclass.class;
-    interfaces = interfaces($InterfaceA.class);
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Superclass);
-    assertTrue(proxy instanceof $InterfaceA);
+    assertProxiable(typing(Superclass.class, $InterfaceA.class));
   }
 
   @Test
-  public void should_create_proxy_of_arrays_as_list() {
-    type = Arrays.asList().getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof AbstractList);
-    assertTrue(proxy instanceof RandomAccess);
-    assertTrue(proxy instanceof Serializable);
+  public void proxy_types_are_proxiable() {
+    type = proxy(typing($ConcreteClass.class, $InterfaceA.class), handler).getClass();
+    assertProxiable(typing(type, $InterfaceB.class),
+        typing($ConcreteClass.class, $InterfaceA.class, $InterfaceB.class));
 
-    type = Arrays.asList().iterator().getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Iterator);
+    type = proxy(typing(), handler).getClass();
+    assertProxiable(typing(type, $InterfaceA.class), typing($InterfaceA.class));
+
+    type = proxy(typing($ConcreteClass.class, $InterfaceA.class), handler).getClass();
+    assertProxiable(typing(type, $InterfaceA.class),
+        typing($ConcreteClass.class, $InterfaceA.class));
   }
 
   @Test
-  public void should_create_proxy_of_unmodifiable_collection() {
-    type = Collections.unmodifiableCollection(new ArrayList<Object>()).getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Collection);
-    assertTrue(proxy instanceof Serializable);
+  public void collections_are_proxiable() {
+    ArrayList<Object> arrayList = new ArrayList<Object>();
+    assertProxiable(arrayList);
+    assertProxiable(arrayList.iterator(), typing(Iterator.class));
+    assertProxiable(arrayList.listIterator(), typing(ListIterator.class));
+    assertProxiable(arrayList.subList(0, 0), typing(AbstractList.class, RandomAccess.class));
+    assertProxiable(arrayList.subList(0, 0).iterator(), typing(Iterator.class));
+    assertProxiable(arrayList.subList(0, 0).listIterator(), typing(ListIterator.class));
 
-    type = Collections.unmodifiableCollection(new ArrayList<Object>()).iterator().getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Iterator);
+    LinkedList<Object> linkedList = new LinkedList<Object>();
+    assertProxiable(linkedList);
+    assertProxiable(linkedList.iterator(), typing(Iterator.class));
+    assertProxiable(linkedList.listIterator(), typing(ListIterator.class));
+    assertProxiable(linkedList.subList(0, 0), typing(AbstractList.class));
+    assertProxiable(linkedList.subList(0, 0).iterator(), typing(Iterator.class));
+    assertProxiable(linkedList.subList(0, 0).listIterator(), typing(ListIterator.class));
+
+    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
+    assertProxiable(hashMap);
+    assertProxiable(hashMap.keySet(), typing(AbstractSet.class));
+    assertProxiable(hashMap.keySet().iterator(), typing(Iterator.class));
+    assertProxiable(hashMap.values(), typing(AbstractCollection.class));
+    assertProxiable(hashMap.values().iterator(), typing(Iterator.class));
+    assertProxiable(hashMap.entrySet(), typing(AbstractSet.class));
+    assertProxiable(hashMap.entrySet().iterator(), typing(Iterator.class));
+
+    TreeMap<Object, Object> treeMap = new TreeMap<Object, Object>();
+    assertProxiable(treeMap);
+    assertProxiable(treeMap.keySet(), typing(AbstractSet.class, NavigableSet.class));
+    assertProxiable(treeMap.keySet().iterator(), typing(Iterator.class));
+    assertProxiable(treeMap.values(), typing(AbstractCollection.class));
+    assertProxiable(treeMap.values().iterator(), typing(Iterator.class));
+    assertProxiable(treeMap.entrySet(), typing(AbstractSet.class));
+    assertProxiable(treeMap.entrySet().iterator(), typing(Iterator.class));
+
+    HashSet<Object> hashSet = new HashSet<Object>();
+    assertProxiable(hashSet);
+    assertProxiable(hashSet.iterator(), typing(Iterator.class));
+
+    TreeSet<Object> treeSet = new TreeSet<Object>();
+    assertProxiable(treeSet);
+    assertProxiable(treeSet.iterator(), typing(Iterator.class));
   }
 
   @Test
-  public void should_create_proxy_of_unmodifiable_list() {
-    type = Collections.unmodifiableList(new LinkedList<Object>()).getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof List);
-    assertTrue(proxy instanceof Serializable);
-
-    type = Collections.unmodifiableList(new LinkedList<Object>()).iterator().getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Iterator);
+  public void arrays_as_list_is_proxiable() {
+    List<Object> list = Arrays.asList();
+    assertProxiable(list, typing(AbstractList.class, RandomAccess.class, Serializable.class));
+    assertProxiable(list.iterator(), typing(Iterator.class));
+    assertProxiable(list.listIterator(), typing(ListIterator.class));
+    assertProxiable(list.subList(0, 0), typing(AbstractList.class, RandomAccess.class));
+    assertProxiable(list.subList(0, 0).iterator(), typing(Iterator.class));
+    assertProxiable(list.subList(0, 0).listIterator(), typing(ListIterator.class));
   }
 
   @Test
-  public void should_create_proxy_of_unmodifiable_random_access_list() {
-    type = Collections.unmodifiableList(new ArrayList<Object>()).getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof List);
-    assertTrue(proxy instanceof Serializable);
-    assertTrue(proxy instanceof RandomAccess);
+  public void unmodifiable_collections_are_proxiable() {
+    Collection<Object> collection = unmodifiableCollection(new ArrayList<Object>());
+    assertProxiable(collection, typing(Collection.class, Serializable.class));
+    assertProxiable(collection.iterator(), typing(Iterator.class));
 
-    type = Collections.unmodifiableList(new ArrayList<Object>()).iterator().getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Iterator);
+    List<Object> list = unmodifiableList(new LinkedList<Object>());
+    assertProxiable(list, typing(List.class, Serializable.class));
+    assertProxiable(list.iterator(), typing(Iterator.class));
+    assertProxiable(list.listIterator(), typing(ListIterator.class));
+    assertProxiable(list.subList(0, 0), typing(List.class));
+    assertProxiable(list.subList(0, 0).iterator(), typing(Iterator.class));
+    assertProxiable(list.subList(0, 0).listIterator(), typing(ListIterator.class));
+
+    List<Object> randomAccessList = unmodifiableList(new ArrayList<Object>());
+    assertProxiable(randomAccessList, typing(List.class, Serializable.class, RandomAccess.class));
+    assertProxiable(randomAccessList.iterator(), typing(Iterator.class));
+    assertProxiable(randomAccessList.listIterator(), typing(ListIterator.class));
+    assertProxiable(randomAccessList.subList(0, 0), typing(List.class, RandomAccess.class));
+    assertProxiable(randomAccessList.subList(0, 0).iterator(), typing(Iterator.class));
+    assertProxiable(randomAccessList.subList(0, 0).listIterator(), typing(ListIterator.class));
+
+    Set<Object> set = unmodifiableSet(new HashSet<Object>());
+    assertProxiable(set, typing(Set.class, Serializable.class));
+    assertProxiable(set.iterator(), typing(Iterator.class));
+
+    SortedSet<Object> sortedSet = unmodifiableSortedSet(new TreeSet<Object>());
+    assertProxiable(sortedSet, typing(SortedSet.class, Serializable.class));
+    assertProxiable(sortedSet.iterator(), typing(Iterator.class));
+
+    Map<Object, Object> map = unmodifiableMap(new HashMap<Object, Object>());
+    assertProxiable(map, typing(Map.class, Serializable.class));
+    assertProxiable(map.keySet(), typing(Set.class, Serializable.class));
+    assertProxiable(map.keySet().iterator(), typing(Iterator.class));
+    assertProxiable(map.values(), typing(Collection.class, Serializable.class));
+    assertProxiable(map.values().iterator(), typing(Iterator.class));
+    assertProxiable(map.entrySet(), typing(Set.class, Serializable.class));
+    assertProxiable(map.entrySet().iterator(), typing(Iterator.class));
+
+    SortedMap<Object, Object> sortedMap = unmodifiableSortedMap(new TreeMap<Object, Object>());
+    assertProxiable(sortedMap, typing(SortedMap.class, Serializable.class));
+    assertProxiable(sortedMap.keySet(), typing(Set.class, Serializable.class));
+    assertProxiable(sortedMap.keySet().iterator(), typing(Iterator.class));
+    assertProxiable(sortedMap.values(), typing(Collection.class, Serializable.class));
+    assertProxiable(sortedMap.values().iterator(), typing(Iterator.class));
+    assertProxiable(sortedMap.entrySet(), typing(Set.class, Serializable.class));
+    assertProxiable(sortedMap.entrySet().iterator(), typing(Iterator.class));
   }
 
-  @Test
-  public void should_create_proxy_of_unmodifiable_set() {
-    type = Collections.unmodifiableSet(new HashSet<Object>()).getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Set);
-    assertTrue(proxy instanceof Serializable);
-
-    type = Collections.unmodifiableSet(new HashSet<Object>()).iterator().getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Iterator);
+  private static void assertProxiable(Object object) {
+    Typing typing = typing(object.getClass());
+    assertProxiable(typing, typing);
   }
 
-  @Test
-  public void should_create_proxy_of_unmodifiable_sorted_set() {
-    type = Collections.unmodifiableSortedSet(new TreeSet<Object>()).getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof SortedSet);
-    assertTrue(proxy instanceof Serializable);
-
-    type = Collections.unmodifiableSortedSet(new TreeSet<Object>()).iterator().getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Iterator);
+  private static void assertProxiable(Class<?> type) {
+    Typing typing = typing(type);
+    assertProxiable(typing, typing);
   }
 
-  @Test
-  public void should_create_proxy_of_unmodifiable_map() {
-    type = Collections.unmodifiableMap(new HashMap<Object, Object>()).getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Map);
-    assertTrue(proxy instanceof Serializable);
-
-    type = Collections.unmodifiableMap(new HashMap<Object, Object>()).keySet().getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Set);
-    assertTrue(proxy instanceof Serializable);
-
-    type = Collections.unmodifiableMap(new HashMap<Object, Object>()).keySet().iterator()
-        .getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Iterator);
-
-    type = Collections.unmodifiableMap(new HashMap<Object, Object>()).values().getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Collection);
-    assertTrue(proxy instanceof Serializable);
-
-    type = Collections.unmodifiableMap(new HashMap<Object, Object>()).values().iterator()
-        .getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Iterator);
+  private static void assertProxiable(Typing typing) {
+    assertProxiable(typing, typing);
   }
 
-  @Test
-  public void should_create_proxy_of_unmodifiable_sorted_map() {
-    type = Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof SortedMap);
-    assertTrue(proxy instanceof Serializable);
+  private static void assertProxiable(Object object, Typing outgoing) {
+    assertProxiable(typing(object.getClass()), outgoing);
+  }
 
-    type = Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).keySet().getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Set);
-    assertTrue(proxy instanceof Serializable);
-
-    type = Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).keySet().iterator()
-        .getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Iterator);
-
-    type = Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).values().getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Collection);
-    assertTrue(proxy instanceof Serializable);
-
-    type = Collections.unmodifiableSortedMap(new TreeMap<Object, Object>()).values().iterator()
-        .getClass();
-    assertTrue(isProxiable(type));
-    proxy = proxy(typing(type, interfaces), handler);
-    assertTrue(proxy instanceof Iterator);
+  private static void assertProxiable(Typing incoming, Typing outgoing) {
+    String message = incoming + " " + outgoing;
+    assertTrue(message, isProxiable(incoming.superclass));
+    for (Class<?> type : incoming.interfaces) {
+      assertTrue(message, isProxiable(type));
+    }
+    Object proxy = proxy(incoming, new Handler() {
+      public Object handle(Invocation invocation) {
+        return null;
+      }
+    });
+    assertTrue(message, outgoing.superclass.isInstance(proxy));
+    for (Class<?> type : outgoing.interfaces) {
+      assertTrue(message, type.isInstance(proxy));
+    }
   }
 
   @Test
@@ -349,7 +257,7 @@ public class Describe_Proxies_proxy {
     type = $FinalClass.class;
     assertFalse(isProxiable(type));
     try {
-      proxy(typing(type, interfaces), handler);
+      proxy(typing(type), handler);
       fail();
     } catch (IllegalArgumentException e) {}
   }
@@ -361,7 +269,7 @@ public class Describe_Proxies_proxy {
         return null;
       }
     }
-    typing = typing(Foo.class, interfaces);
+    typing = typing(Foo.class);
     proxy = proxy(typing, handlerSavingInvocation());
     method = Foo.class.getDeclaredMethod("foo", Object.class);
     ((Foo) proxy).foo(object);
@@ -386,7 +294,7 @@ public class Describe_Proxies_proxy {
 
   @Test
   public void should_intercept_clone() throws NoSuchMethodException {
-    typing = typing($ConcreteClassWithClone.class, interfaces);
+    typing = typing($ConcreteClassWithClone.class);
     proxy = proxy(typing, handlerSavingInvocation());
     method = $ConcreteClassWithClone.class.getDeclaredMethod("clone");
     (($ConcreteClassWithClone) proxy).clone();
@@ -400,7 +308,7 @@ public class Describe_Proxies_proxy {
         return counter++;
       }
     };
-    typing = typing($ConcreteClassWithFinalize.class, interfaces);
+    typing = typing($ConcreteClassWithFinalize.class);
     proxy = proxy(typing, handler);
     (($ConcreteClassWithFinalize) proxy).finalize();
     assertEquals(0, counter);
@@ -408,7 +316,7 @@ public class Describe_Proxies_proxy {
 
   @Test
   public void should_intercept_package_private_method() throws NoSuchMethodException {
-    typing = typing($ConcreteClassWithPackagePrivateMethod.class, interfaces);
+    typing = typing($ConcreteClassWithPackagePrivateMethod.class);
     proxy = proxy(typing, handlerSavingInvocation());
     method = $ConcreteClassWithPackagePrivateMethod.class.getDeclaredMethod("packagePrivateMethod");
     (($ConcreteClassWithPackagePrivateMethod) proxy).packagePrivateMethod();
@@ -417,7 +325,7 @@ public class Describe_Proxies_proxy {
 
   @Test
   public void should_intercept_protected_abstract_method() throws NoSuchMethodException {
-    typing = typing($AbstractClassWithProtectedAbstractMethod.class, interfaces);
+    typing = typing($AbstractClassWithProtectedAbstractMethod.class);
     proxy = proxy(typing, handlerSavingInvocation());
     method = $AbstractClassWithProtectedAbstractMethod.class.getDeclaredMethod("abstractMethod");
     (($AbstractClassWithProtectedAbstractMethod) proxy).abstractMethod();
@@ -431,7 +339,7 @@ public class Describe_Proxies_proxy {
         return null;
       }
     }
-    proxy = proxy(typing(Foo.class, interfaces), new Handler() {
+    proxy = proxy(typing(Foo.class), new Handler() {
       public Object handle(Invocation interceptedInvocation) {
         return object;
       }
@@ -446,7 +354,7 @@ public class Describe_Proxies_proxy {
         return null;
       }
     }
-    proxy = proxy(typing(Foo.class, interfaces), new Handler() {
+    proxy = proxy(typing(Foo.class), new Handler() {
       public Object handle(Invocation interceptedInvocation) {
         return object;
       }
@@ -464,7 +372,7 @@ public class Describe_Proxies_proxy {
         return null;
       }
     }
-    proxy = proxy(typing(Foo.class, interfaces), new Handler() {
+    proxy = proxy(typing(Foo.class), new Handler() {
       public Object handle(Invocation interceptedInvocation) throws Throwable {
         throw throwable;
       }
@@ -484,7 +392,7 @@ public class Describe_Proxies_proxy {
         return null;
       }
     }
-    proxy = proxy(typing(Foo.class, interfaces), new Handler() {
+    proxy = proxy(typing(Foo.class), new Handler() {
       public Object handle(Invocation interceptedInvocation) throws Throwable {
         throw throwable;
       }
@@ -522,7 +430,7 @@ public class Describe_Proxies_proxy {
         return 0;
       }
     }
-    proxy = proxy(typing(Foo.class, interfaces), new Handler() {
+    proxy = proxy(typing(Foo.class), new Handler() {
       public Object handle(Invocation interceptedInvocation) {
         return null;
       }
@@ -555,12 +463,21 @@ public class Describe_Proxies_proxy {
     };
   }
 
-  private static Set<Class<?>> interfaces(Class<?>... elements) {
-    HashSet<Class<?>> interfaces = new HashSet<Class<?>>(Arrays.asList(elements));
-    if (interfaces.size() != elements.length) {
-      throw new IllegalArgumentException();
+  private static Typing typing(Class<?>... types) {
+    Set<Class<?>> superclasses = new HashSet<Class<?>>();
+    Set<Class<?>> interfaces = new HashSet<Class<?>>();
+    for (Class<?> type : types) {
+      Set<Class<?>> typeCollection = type.isInterface()
+          ? interfaces
+          : superclasses;
+      typeCollection.add(type);
     }
-    return interfaces;
+    if (superclasses.size() > 1) {
+      throw new IllegalArgumentException();
+    } else if (superclasses.size() == 0) {
+      superclasses.add(Object.class);
+    }
+    return Typing.typing(superclasses.iterator().next(), interfaces);
   }
 }
 
