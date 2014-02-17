@@ -20,7 +20,9 @@ import static org.testory.test.Testilities.newThrowable;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.AbstractCollection;
 import java.util.AbstractList;
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,7 +31,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.RandomAccess;
 import java.util.Set;
 import java.util.SortedMap;
@@ -109,10 +113,59 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
+  public void collections_are_proxiable() {
+    ArrayList<Object> arrayList = new ArrayList<Object>();
+    assertProxiable(arrayList);
+    assertProxiable(arrayList.iterator(), typing(Iterator.class));
+    assertProxiable(arrayList.listIterator(), typing(ListIterator.class));
+    assertProxiable(arrayList.subList(0, 0), typing(AbstractList.class, RandomAccess.class));
+    assertProxiable(arrayList.subList(0, 0).iterator(), typing(Iterator.class));
+    assertProxiable(arrayList.subList(0, 0).listIterator(), typing(ListIterator.class));
+
+    LinkedList<Object> linkedList = new LinkedList<Object>();
+    assertProxiable(linkedList);
+    assertProxiable(linkedList.iterator(), typing(Iterator.class));
+    assertProxiable(linkedList.listIterator(), typing(ListIterator.class));
+    assertProxiable(linkedList.subList(0, 0), typing(AbstractList.class));
+    assertProxiable(linkedList.subList(0, 0).iterator(), typing(Iterator.class));
+    assertProxiable(linkedList.subList(0, 0).listIterator(), typing(ListIterator.class));
+
+    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
+    assertProxiable(hashMap);
+    assertProxiable(hashMap.keySet(), typing(AbstractSet.class));
+    assertProxiable(hashMap.keySet().iterator(), typing(Iterator.class));
+    assertProxiable(hashMap.values(), typing(AbstractCollection.class));
+    assertProxiable(hashMap.values().iterator(), typing(Iterator.class));
+    assertProxiable(hashMap.entrySet(), typing(AbstractSet.class));
+    assertProxiable(hashMap.entrySet().iterator(), typing(Iterator.class));
+
+    TreeMap<Object, Object> treeMap = new TreeMap<Object, Object>();
+    assertProxiable(treeMap);
+    assertProxiable(treeMap.keySet(), typing(AbstractSet.class, NavigableSet.class));
+    assertProxiable(treeMap.keySet().iterator(), typing(Iterator.class));
+    assertProxiable(treeMap.values(), typing(AbstractCollection.class));
+    assertProxiable(treeMap.values().iterator(), typing(Iterator.class));
+    assertProxiable(treeMap.entrySet(), typing(AbstractSet.class));
+    assertProxiable(treeMap.entrySet().iterator(), typing(Iterator.class));
+
+    HashSet<Object> hashSet = new HashSet<Object>();
+    assertProxiable(hashSet);
+    assertProxiable(hashSet.iterator(), typing(Iterator.class));
+
+    TreeSet<Object> treeSet = new TreeSet<Object>();
+    assertProxiable(treeSet);
+    assertProxiable(treeSet.iterator(), typing(Iterator.class));
+  }
+
+  @Test
   public void arrays_as_list_is_proxiable() {
     List<Object> list = Arrays.asList();
     assertProxiable(list, typing(AbstractList.class, RandomAccess.class, Serializable.class));
     assertProxiable(list.iterator(), typing(Iterator.class));
+    assertProxiable(list.listIterator(), typing(ListIterator.class));
+    assertProxiable(list.subList(0, 0), typing(AbstractList.class, RandomAccess.class));
+    assertProxiable(list.subList(0, 0).iterator(), typing(Iterator.class));
+    assertProxiable(list.subList(0, 0).listIterator(), typing(ListIterator.class));
   }
 
   @Test
@@ -124,10 +177,18 @@ public class Describe_Proxies_proxy {
     List<Object> list = unmodifiableList(new LinkedList<Object>());
     assertProxiable(list, typing(List.class, Serializable.class));
     assertProxiable(list.iterator(), typing(Iterator.class));
+    assertProxiable(list.listIterator(), typing(ListIterator.class));
+    assertProxiable(list.subList(0, 0), typing(List.class));
+    assertProxiable(list.subList(0, 0).iterator(), typing(Iterator.class));
+    assertProxiable(list.subList(0, 0).listIterator(), typing(ListIterator.class));
 
     List<Object> randomAccessList = unmodifiableList(new ArrayList<Object>());
     assertProxiable(randomAccessList, typing(List.class, Serializable.class, RandomAccess.class));
     assertProxiable(randomAccessList.iterator(), typing(Iterator.class));
+    assertProxiable(randomAccessList.listIterator(), typing(ListIterator.class));
+    assertProxiable(randomAccessList.subList(0, 0), typing(List.class, RandomAccess.class));
+    assertProxiable(randomAccessList.subList(0, 0).iterator(), typing(Iterator.class));
+    assertProxiable(randomAccessList.subList(0, 0).listIterator(), typing(ListIterator.class));
 
     Set<Object> set = unmodifiableSet(new HashSet<Object>());
     assertProxiable(set, typing(Set.class, Serializable.class));
@@ -143,6 +204,8 @@ public class Describe_Proxies_proxy {
     assertProxiable(map.keySet().iterator(), typing(Iterator.class));
     assertProxiable(map.values(), typing(Collection.class, Serializable.class));
     assertProxiable(map.values().iterator(), typing(Iterator.class));
+    assertProxiable(map.entrySet(), typing(Set.class, Serializable.class));
+    assertProxiable(map.entrySet().iterator(), typing(Iterator.class));
 
     SortedMap<Object, Object> sortedMap = unmodifiableSortedMap(new TreeMap<Object, Object>());
     assertProxiable(sortedMap, typing(SortedMap.class, Serializable.class));
@@ -150,6 +213,13 @@ public class Describe_Proxies_proxy {
     assertProxiable(sortedMap.keySet().iterator(), typing(Iterator.class));
     assertProxiable(sortedMap.values(), typing(Collection.class, Serializable.class));
     assertProxiable(sortedMap.values().iterator(), typing(Iterator.class));
+    assertProxiable(sortedMap.entrySet(), typing(Set.class, Serializable.class));
+    assertProxiable(sortedMap.entrySet().iterator(), typing(Iterator.class));
+  }
+
+  private static void assertProxiable(Object object) {
+    Typing typing = typing(object.getClass());
+    assertProxiable(typing, typing);
   }
 
   private static void assertProxiable(Class<?> type) {
