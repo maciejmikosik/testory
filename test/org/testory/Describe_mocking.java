@@ -60,6 +60,10 @@ public class Describe_mocking {
     mock = mock(List.class);
     expected = "mock_" + System.identityHashCode(mock) + "_" + List.class.getName();
     assertEquals(expected, mock.toString());
+
+    mock = mock(Object.class);
+    expected = "mock_" + System.identityHashCode(mock) + "_" + Object.class.getName();
+    assertEquals(expected, mock.toString());
   }
 
   @Test
