@@ -3,7 +3,7 @@
 ### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing) | [spying](#spying)
 ### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
 ### [macros](#macros) | [givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
-### [fine points](#fine-points) | [arrays](#arrays)
+### [fine points](#fine-points) | [arrays](#arrays) | [purging](#purging)
 
 # Overview
 
@@ -322,3 +322,27 @@ This happens in
  - verifying (comparing arguments)
 
 Error messages also print contents of array where possible.
+
+### Purging
+
+Testory maintains global state that holds information about every mock, stubbing and invocation. This data needs to be periodically released to prevent running out of memory. Since testory has no foolproof way to tell whether one test ended and another started, it relies on simplistic assumption that only one **when** is used per one test. Thus calling **when**, makes testory to forget about all events that happened before previous **when**.
+
+    mock = mock(Object.class)
+    when(...)  // previous when
+
+    ...
+
+    when(...) // forgets about anything that happened before previous when
+    // any of the following throws TestoryException
+    mock.toString();
+    given(willReturn(""), mock).toString();
+    thenCalled(mock).toString();
+
+Purging has following consequences
+
+ - calling any method on purged mock throws TestoryException
+ - purged stubbing is no longer in effect
+ - purged invocation is not included during verification
+ - purged mock is no longer considered to be a mock, so
+  - stubbing it causes TestoryException
+  - verifying it causes TestoryException
