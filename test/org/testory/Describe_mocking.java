@@ -52,6 +52,27 @@ public class Describe_mocking {
   }
 
   @Test
+  public void mock_is_nice() {
+    class Foo {
+      Object getObject() {
+        throw new RuntimeException();
+      }
+
+      int getInt() {
+        throw new RuntimeException();
+      }
+
+      void getVoid() {
+        throw new RuntimeException();
+      }
+    }
+    Foo foo = mock(Foo.class);
+    assertNull(foo.getObject());
+    assertEquals(0, foo.getInt());
+    foo.getVoid();
+  }
+
+  @Test
   public void to_string_is_prestubbed_with_class_name_and_identity_hashcode() {
     mock = mock(ArrayList.class);
     expected = "mock_" + System.identityHashCode(mock) + "_" + ArrayList.class.getName();

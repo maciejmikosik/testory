@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
+import static org.testory.Testory.mock;
 import static org.testory.Testory.willReturn;
 import static org.testory.test.Testilities.readDeclaredFields;
 
@@ -66,6 +67,27 @@ public class Describe_injecting {
     TestClass test = new TestClass();
     givenTest(test);
     assertTrue(test.field instanceof Object);
+  }
+
+  @Test
+  public void mock_is_nice() {
+    class Foo {
+      Object getObject() {
+        throw new RuntimeException();
+      }
+
+      int getInt() {
+        throw new RuntimeException();
+      }
+
+      void getVoid() {
+        throw new RuntimeException();
+      }
+    }
+    Foo foo = mock(Foo.class);
+    assertNull(foo.getObject());
+    assertEquals(0, foo.getInt());
+    foo.getVoid();
   }
 
   @Test

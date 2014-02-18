@@ -2,7 +2,6 @@ package org.testory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
@@ -149,28 +148,6 @@ public class Describe_stubbing {
     } catch (Throwable t) {
       assertSame(throwable, t);
     }
-  }
-
-  @Test
-  public void unstubbed_invocation_returns_null_as_object() {
-    class Foo {
-      Object method() {
-        return object;
-      }
-    }
-    Foo foo = mock(Foo.class);
-    assertNull(foo.method());
-  }
-
-  @Test
-  public void unstubbed_invocation_returns_zero_as_integer() {
-    class Foo {
-      int method() {
-        return -1;
-      }
-    }
-    Foo foo = mock(Foo.class);
-    assertEquals(0, foo.method());
   }
 
   private static void assume(boolean assumption) {
