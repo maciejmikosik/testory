@@ -86,6 +86,42 @@ public class Describe_stubbing {
   }
 
   @Test
+  public void void_method_accepts_returning_null() {
+    class Foo {
+      void method() {
+        throw new RuntimeException();
+      }
+    }
+    Foo foo = mock(Foo.class);
+    given(willReturn(null), foo).method();
+    foo.method();
+  }
+
+  @Test
+  public void primitive_method_accepts_returning_wrapper() {
+    class Foo {
+      int method() {
+        throw new RuntimeException();
+      }
+    }
+    Foo foo = mock(Foo.class);
+    given(willReturn(Integer.valueOf(3)), foo).method();
+    assertEquals(3, foo.method());
+  }
+
+  @Test
+  public void primitive_method_accepts_returning_autoboxed_wrapper() {
+    class Foo {
+      int method() {
+        throw new RuntimeException();
+      }
+    }
+    Foo foo = mock(Foo.class);
+    given(willReturn(3), foo).method();
+    assertEquals(3, foo.method());
+  }
+
+  @Test
   public void handler_cannot_be_null() {
     try {
       given(null, mock);

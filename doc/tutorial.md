@@ -125,6 +125,8 @@ Mock can be stubbed to return Object or throw Throwable or with custom logic.
 
 Stubbing will be only effective for specified instance of mock, method and equal arguments.
 
+ - Void method can be stubbed to "just return" using `willReturn(null)`
+
 ### Verifying
 
 It is possible to assert expected invocation on mock.
