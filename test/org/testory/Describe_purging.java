@@ -1,7 +1,7 @@
 package org.testory;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.mock;
@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class Describe_purging {
-  private Object mock, value;
+  private Object mock;
   private String string;
 
   @Before
@@ -21,35 +21,48 @@ public class Describe_purging {
   }
 
   @Test
-  public void mock_prestubbings_survive_purge() {
+  public void mock_is_unusable_after_purging() {
     mock = mock(Object.class);
-    String toString = mock.toString();
-    boolean equals = mock.equals(mock);
-    int hashcode = mock.hashCode();
 
     triggerPurge();
-    assertEquals(toString, mock.toString());
-    assertEquals(equals, mock.equals(mock));
-    assertEquals(hashcode, mock.hashCode());
+
+    try {
+      mock.toString();
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      mock.equals(mock);
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      mock.hashCode();
+      fail();
+    } catch (TestoryException e) {}
   }
 
   @Test
-  public void injected_mock_prestubbings_survive_purge() {
+  public void injected_mock_is_unusable_after_purging() {
     class TestClass {
       Object field;
     }
     TestClass test = new TestClass();
     givenTest(test);
     mock = test.field;
-    String toString = mock.toString();
-    boolean equals = mock.equals(mock);
-    int hashcode = mock.hashCode();
 
     triggerPurge();
 
-    assertEquals(toString, test.field.toString());
-    assertEquals(equals, mock.equals(mock));
-    assertEquals(hashcode, test.field.hashCode());
+    try {
+      mock.toString();
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      mock.equals(mock);
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      mock.hashCode();
+      fail();
+    } catch (TestoryException e) {}
   }
 
   @Test
@@ -63,11 +76,13 @@ public class Describe_purging {
   @Test
   public void double_when_purges_stubbings() {
     mock = mock(Object.class);
-    value = mock.toString();
     given(willReturn(string), mock).toString();
     when("");
     when("");
-    assertEquals(value, mock.toString());
+    try {
+      mock.toString();
+      fail();
+    } catch (TestoryException e) {}
   }
 
   private void triggerPurge() {
