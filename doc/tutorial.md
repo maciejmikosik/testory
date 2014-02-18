@@ -3,7 +3,7 @@
 ### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing) | [spying](#spying)
 ### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
 ### [macros](#macros) | [givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
-### [fine points](#fine-points) | [arrays](#arrays) | [purging](#purging)
+### [fine points](#fine-points) | [arrays](#arrays) | [primitives](#primitives) | [purging](#purging)
 
 # Overview
 
@@ -324,6 +324,21 @@ This happens in
  - verifying (comparing arguments)
 
 Error messages also print contents of array where possible.
+
+### Primitives
+
+For convenience, testory does not differentiate between primitives and wrapper types.
+Necessary boxing/unboxing is performed behind the scenes.
+This applies to type of
+
+ - object passed to `when`
+ - object returned from chained `when`
+ - object returned from `Closure`
+ - object expected by `thenReturned`
+ - objects compared by `thenEqual`
+ - object matched by `then`
+ - object returned from `Handler` (including object passed to `willReturn`)
+ - object passed to matcher
 
 ### Purging
 
