@@ -27,12 +27,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
-
-import net.sf.cglib.proxy.Factory;
 
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
@@ -72,7 +68,10 @@ public class Testory {
 
   private static Object mockOrSample(Class<?> type, String name) {
     if (isProxiable(type)) {
-      return mock(type, defaultMockHandler(name));
+      Object mock = rawMock(type);
+      stubNice(mock);
+      stubObject(mock, name, name.hashCode());
+      return mock;
     } else if (type.isArray()) {
       Class<?> componentType = type.getComponentType();
       Object array = Array.newInstance(componentType, 1);
@@ -145,7 +144,11 @@ public class Testory {
 
   public static <T> T mock(Class<T> type) {
     check(isProxiable(type));
-    return mock(type, defaultMockHandler(null));
+    final T mock = rawMock(type);
+    int hash = System.identityHashCode(mock);
+    stubNice(mock);
+    stubObject(mock, "mock_" + hash + "_" + type.getName(), hash);
+    return mock;
   }
 
   public static <T> T spy(T real) {
@@ -156,7 +159,7 @@ public class Testory {
     return mock;
   }
 
-  private static <T> T mock(Class<T> type, final Handler defaultHandler) {
+  private static <T> T rawMock(Class<T> type) {
     check(isProxiable(type));
     Typing typing = type.isInterface()
         ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
@@ -165,9 +168,11 @@ public class Testory {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         history.logInvocation(invocation);
-        return history.hasStubbedHandlerFor(invocation)
-            ? history.getStubbedHandlerFor(invocation).handle(invocation)
-            : defaultHandler.handle(invocation);
+        if (history.hasStubbedHandlerFor(invocation)) {
+          return history.getStubbedHandlerFor(invocation).handle(invocation);
+        } else {
+          throw new TestoryException("purged mock");
+        }
       }
     };
     T mock = (T) proxy(typing, handler);
@@ -175,36 +180,34 @@ public class Testory {
     return mock;
   }
 
-  private static Handler defaultMockHandler(@Nullable final String name) {
-    return new Handler() {
-      public Object handle(Invocation invocation) {
-        return invocation.method.getName().equals("toString")
-            && invocation.method.getParameterTypes().length == 0
-            ? name != null
-                ? name
-                : "mock_" + System.identityHashCode(invocation.instance) + "_"
-                    + discoverMockedType(invocation.instance.getClass()).getName()
-            : invocation.method.getName().equals("equals")
-                && invocation.method.getParameterTypes().length == 1
-                && invocation.method.getParameterTypes()[0] == Object.class
-                ? invocation.instance == invocation.arguments.get(0)
-                : invocation.method.getName().equals("hashCode")
-                    && invocation.method.getParameterTypes().length == 0
-                    ? name != null
-                        ? name.hashCode()
-                        : System.identityHashCode(invocation.instance)
-                    : null;
-      }
+  private static void stubNice(Object mock) {
+    given(willReturn(null), onInstance(mock));
+  }
 
-      private Class<?> discoverMockedType(Class<?> proxyType) {
-        List<Class<?>> interfaces = new ArrayList<Class<?>>(
-            Arrays.asList(proxyType.getInterfaces()));
-        interfaces.remove(Factory.class);
-        return interfaces.size() == 1
-            ? interfaces.get(0)
-            : proxyType.getSuperclass();
+  private static void stubObject(final Object mock, String name, int hash) {
+    given(willReturn(name), new Captor() {
+      public boolean matches(Invocation invocation) {
+        return invocation.instance == mock && invocation.method.getName().equals("toString")
+            && invocation.method.getParameterTypes().length == 0;
       }
-    };
+    });
+    given(new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        return invocation.instance == mock && invocation.arguments.get(0) == mock;
+      }
+    }, new Captor() {
+      public boolean matches(Invocation invocation) {
+        return invocation.instance == mock
+            && invocation.method.getName().equals("equals")
+            && Arrays.equals(invocation.method.getParameterTypes(), new Class<?>[] { Object.class });
+      }
+    });
+    given(willReturn(hash), new Captor() {
+      public boolean matches(Invocation invocation) {
+        return invocation.instance == mock && invocation.method.getName().equals("hashCode")
+            && invocation.method.getParameterTypes().length == 0;
+      }
+    });
   }
 
   public static <T> T given(final Handler will, T mock) {
