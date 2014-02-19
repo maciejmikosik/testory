@@ -249,7 +249,20 @@ public class Proxies {
   private static Handler compatible(final Handler handler) {
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        Object returned = handler.handle(invocation);
+        Object returned;
+        try {
+          returned = handler.handle(invocation);
+        } catch (Throwable throwable) {
+          for (Class<?> type : invocation.method.getExceptionTypes()) {
+            if (type.isInstance(throwable)) {
+              throw throwable;
+            }
+          }
+          if (throwable instanceof RuntimeException || throwable instanceof Error) {
+            throw throwable;
+          }
+          throw new ProxyException();
+        }
         Class<?> type = invocation.method.getReturnType();
         check(returned == null || type != void.class && isAssignableTo(type, returned));
         return returned;

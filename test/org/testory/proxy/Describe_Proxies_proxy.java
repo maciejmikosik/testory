@@ -17,6 +17,8 @@ import static org.testory.proxy.Proxies.proxy;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -91,6 +93,10 @@ public class Describe_Proxies_proxy {
     }
 
     public void getVoid() {
+      throw new RuntimeException();
+    }
+
+    public void throwsIOException() throws IOException {
       throw new RuntimeException();
     }
 
@@ -423,7 +429,8 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
-  public void throws_throwable() {
+  public void throws_error() {
+    throwable = new Error();
     proxy = (Foo) proxy(typing, handlerThrowing(throwable));
     try {
       proxy.getObject();
@@ -434,7 +441,8 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
-  public void throws_incompatible_throwable() {
+  public void throws_runtime_exception() {
+    throwable = new RuntimeException();
     proxy = (Foo) proxy(typing, handlerThrowing(throwable));
     try {
       proxy.getObject();
@@ -442,6 +450,50 @@ public class Describe_Proxies_proxy {
     } catch (Throwable t) {
       assertSame(throwable, t);
     }
+  }
+
+  @Test
+  public void throws_declared_exception() {
+    throwable = new IOException();
+    proxy = (Foo) proxy(typing, handlerThrowing(throwable));
+    try {
+      proxy.throwsIOException();
+      fail();
+    } catch (Throwable t) {
+      assertSame(throwable, t);
+    }
+  }
+
+  @Test
+  public void throws_subclass_of_declared_exception() {
+    throwable = new FileNotFoundException();
+    proxy = (Foo) proxy(typing, handlerThrowing(throwable));
+    try {
+      proxy.throwsIOException();
+      fail();
+    } catch (Throwable t) {
+      assertSame(throwable, t);
+    }
+  }
+
+  @Test
+  public void does_not_throw_undeclared_exception() {
+    throwable = new IOException();
+    proxy = (Foo) proxy(typing, handlerThrowing(throwable));
+    try {
+      proxy.getObject();
+      fail();
+    } catch (ProxyException t) {}
+  }
+
+  @Test
+  public void does_not_throw_superclass_of_declared_exception() throws IOException {
+    throwable = new Exception();
+    proxy = (Foo) proxy(typing, handlerThrowing(throwable));
+    try {
+      proxy.throwsIOException();
+      fail();
+    } catch (ProxyException t) {}
   }
 
   @Test
