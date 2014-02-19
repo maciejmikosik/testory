@@ -1,5 +1,8 @@
 package org.testory;
 
+import static org.testory.common.Classes.canThrow;
+import static org.testory.common.Classes.couldReturn;
+import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
@@ -175,13 +178,36 @@ public class Testory {
         }
       }
     };
-    T mock = (T) proxy(typing, handler);
+    T mock = (T) proxy(typing, compatible(handler));
     history.logMocking(mock);
     return mock;
   }
 
+  private static Handler compatible(final Handler handler) {
+    return new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        Object returned;
+        try {
+          returned = handler.handle(invocation);
+        } catch (Throwable throwable) {
+          check(canThrow(throwable, invocation.method));
+          throw throwable;
+        }
+        check(couldReturn(returned, invocation.method));
+        return returned;
+      }
+    };
+  }
+
   private static void stubNice(Object mock) {
-    given(willReturn(null), onInstance(mock));
+    given(new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        Class<?> returnType = invocation.method.getReturnType();
+        return returnType.isPrimitive()
+            ? zeroOrNull(returnType)
+            : null;
+      }
+    }, onInstance(mock));
   }
 
   private static void stubObject(final Object mock, String name, int hash) {
@@ -601,7 +627,11 @@ public class Testory {
     return (T) proxy(typing, new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        return handler.handle(invocation(invocation.method, wrapped, invocation.arguments));
+        handler.handle(invocation(invocation.method, wrapped, invocation.arguments));
+        Class<?> returnType = invocation.method.getReturnType();
+        return returnType.isPrimitive()
+            ? zeroOrNull(returnType)
+            : null;
       }
     });
   }

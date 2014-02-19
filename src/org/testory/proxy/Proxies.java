@@ -1,7 +1,8 @@
 package org.testory.proxy;
 
 import static org.testory.common.Checks.checkArgument;
-import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Classes.canThrow;
+import static org.testory.common.Classes.couldReturn;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Typing.typing;
 
@@ -38,7 +39,7 @@ import org.objenesis.ObjenesisStd;
 
 public class Proxies {
   public static boolean isProxiable(Class<?> type) {
-    checkNotNull(type);
+    check(type != null);
     return !isFinal(type) || isPeelable(type);
   }
 
@@ -62,8 +63,8 @@ public class Proxies {
    * </ul>
    */
   public static Object proxy(Typing typing, Handler handler) {
-    checkNotNull(typing);
-    checkNotNull(handler);
+    check(typing != null);
+    check(handler != null);
     return newProxyByCglib(tryAsProxiable(typing), handler);
   }
 
@@ -89,11 +90,14 @@ public class Proxies {
     try {
       proxyClass = enhancer.createClass();
     } catch (CodeGenerationException e) {
-      throw new IllegalArgumentException(e);
+      throw new ProxyException(e);
+    } catch (IllegalArgumentException e) {
+      throw new ProxyException(e);
     }
 
     Factory proxy = (Factory) new ObjenesisStd().newInstance(proxyClass);
-    proxy.setCallbacks(new Callback[] { asMethodInterceptor(handler), new SerializableNoOp() });
+    proxy.setCallbacks(new Callback[] { asMethodInterceptor(compatible(handler)),
+        new SerializableNoOp() });
     return proxy;
   }
 
@@ -243,6 +247,22 @@ public class Proxies {
     };
   }
 
+  private static Handler compatible(final Handler handler) {
+    return new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        Object returned;
+        try {
+          returned = handler.handle(invocation);
+        } catch (Throwable throwable) {
+          check(canThrow(throwable, invocation.method));
+          throw throwable;
+        }
+        check(couldReturn(returned, invocation.method));
+        return returned;
+      }
+    };
+  }
+
   private static boolean isFinalize(Method method) {
     return method.getName().equals("finalize") && method.getParameterTypes().length == 0;
   }
@@ -251,5 +271,11 @@ public class Proxies {
     private static final long serialVersionUID = 4961170565306875478L;
 
     private SerializableNoOp() {}
+  }
+
+  private static void check(boolean condition) {
+    if (!condition) {
+      throw new ProxyException();
+    }
   }
 }
