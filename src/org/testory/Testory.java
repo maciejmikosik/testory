@@ -2,6 +2,7 @@ package org.testory;
 
 import static org.testory.common.Classes.canThrow;
 import static org.testory.common.Classes.couldReturn;
+import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
@@ -199,7 +200,14 @@ public class Testory {
   }
 
   private static void stubNice(Object mock) {
-    given(willReturn(null), onInstance(mock));
+    given(new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        Class<?> returnType = invocation.method.getReturnType();
+        return returnType.isPrimitive()
+            ? zeroOrNull(returnType)
+            : null;
+      }
+    }, onInstance(mock));
   }
 
   private static void stubObject(final Object mock, String name, int hash) {
@@ -619,7 +627,11 @@ public class Testory {
     return (T) proxy(typing, new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        return handler.handle(invocation(invocation.method, wrapped, invocation.arguments));
+        handler.handle(invocation(invocation.method, wrapped, invocation.arguments));
+        Class<?> returnType = invocation.method.getReturnType();
+        return returnType.isPrimitive()
+            ? zeroOrNull(returnType)
+            : null;
       }
     });
   }

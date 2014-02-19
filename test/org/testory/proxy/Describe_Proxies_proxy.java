@@ -11,6 +11,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
@@ -388,14 +389,6 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
-  public void returned_null_is_converted_to_primitive() {
-    proxy = (Foo) proxy(typing, handlerReturning(null));
-    assertEquals(false, proxy.getBoolean());
-    assertEquals(0, proxy.getInt());
-    assertEquals(0f, proxy.getFloat(), 0f);
-  }
-
-  @Test
   public void returned_null_is_converted_to_void() {
     proxy = (Foo) proxy(typing, handlerReturning(null));
     proxy.getVoid();
@@ -413,6 +406,15 @@ public class Describe_Proxies_proxy {
   @Test
   public void does_not_return_incompatible_primitive() {
     proxy = (Foo) proxy(typing, handlerReturning(3f));
+    try {
+      proxy.getInt();
+      fail();
+    } catch (ProxyException e) {}
+  }
+
+  @Test
+  public void does_not_return_incompatible_null() {
+    proxy = (Foo) proxy(typing, handlerReturning(null));
     try {
       proxy.getInt();
       fail();
@@ -557,7 +559,7 @@ public class Describe_Proxies_proxy {
     return new Handler() {
       public Object handle(Invocation invocation) {
         savedInvocation = invocation;
-        return null;
+        return zeroOrNull(invocation.method.getReturnType());
       }
     };
   }

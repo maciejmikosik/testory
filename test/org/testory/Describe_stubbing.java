@@ -137,12 +137,6 @@ public class Describe_stubbing {
   }
 
   @Test
-  public void returned_null_is_converted_to_primitive() {
-    given(willReturn(null), mock).getInt();
-    assertEquals(0, mock.getInt());
-  }
-
-  @Test
   public void returned_null_is_converted_to_void() {
     given(willReturn(null), mock).getVoid();
     mock.getVoid();
@@ -160,6 +154,15 @@ public class Describe_stubbing {
   @Test
   public void does_not_return_incompatible_primitive() {
     given(willReturn(3f), mock).getInt();
+    try {
+      mock.getInt();
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void does_not_return_incompatible_null() {
+    given(willReturn(null), mock).getInt();
     try {
       mock.getInt();
       fail();
