@@ -125,7 +125,9 @@ Mock can be stubbed to return Object, throw Throwable or execute custom logic.
 
 Stubbing will be only effective for specified instance of mock, method and equal arguments.
 
- - Void method can be stubbed to "just return" using `willReturn(null)`
+ - void method can be stubbed to "just return" using `willReturn(null)`
+ - returning object incompatible with method return type causes `TestoryException` upon invocation
+ - throwing throwable incompatible with method declaration causes `TestoryException` upon invocation
 
 ### Verifying
 
