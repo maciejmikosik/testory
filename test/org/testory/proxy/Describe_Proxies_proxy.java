@@ -48,7 +48,8 @@ public class Describe_Proxies_proxy {
   private Handler handler;
   private Typing typing;
   private Invocation savedInvocation;
-  private Object object, proxy;
+  private Object object;
+  private Foo proxy;
   private Method method;
   private Throwable throwable;
   private int counter;
@@ -56,16 +57,42 @@ public class Describe_Proxies_proxy {
 
   @Before
   public void before() throws NoSuchMethodException {
-    type = Object.class;
-    typing = typing();
-    method = Object.class.getDeclaredMethod("toString");
-    handler = new Handler() {
-      public Object handle(Invocation invocation) {
-        return null;
-      }
-    };
+    type = Foo.class;
+    typing = typing(Foo.class);
+    method = Foo.class.getDeclaredMethod("getObject");
+    handler = handlerReturning(null);
     object = newObject("object");
     throwable = newThrowable("throwable");
+  }
+
+  abstract class Foo {
+    public void setObject(Object foo) {
+      throw new RuntimeException();
+    }
+
+    public Object getObject() {
+      throw new RuntimeException();
+    }
+
+    public String getString() {
+      throw new RuntimeException();
+    }
+
+    public int getInt() {
+      throw new RuntimeException();
+    }
+
+    protected Object clone() {
+      throw new RuntimeException();
+    }
+
+    protected void finalize() {
+      throw new RuntimeException();
+    }
+
+    void packagePrivate() {}
+
+    protected abstract void protectedAbstract();
   }
 
   @Test
@@ -217,6 +244,16 @@ public class Describe_Proxies_proxy {
     assertProxiable(sortedMap.entrySet().iterator(), typing(Iterator.class));
   }
 
+  @Test
+  public void final_type_is_not_proxiable() {
+    final class FinalClass {}
+    assertFalse(isProxiable(FinalClass.class));
+    try {
+      proxy(typing(FinalClass.class), handler);
+      fail();
+    } catch (IllegalArgumentException e) {}
+  }
+
   private static void assertProxiable(Object object) {
     Typing typing = typing(object.getClass());
     assertProxiable(typing, typing);
@@ -241,11 +278,7 @@ public class Describe_Proxies_proxy {
     for (Class<?> type : incoming.interfaces) {
       assertTrue(message, isProxiable(type));
     }
-    Object proxy = proxy(incoming, new Handler() {
-      public Object handle(Invocation invocation) {
-        return null;
-      }
-    });
+    Object proxy = proxy(incoming, handlerReturning(null));
     assertTrue(message, outgoing.superclass.isInstance(proxy));
     for (Class<?> type : outgoing.interfaces) {
       assertTrue(message, type.isInstance(proxy));
@@ -253,132 +286,91 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
-  public void should_not_create_proxy_extending_final_type() {
-    type = $FinalClass.class;
-    assertFalse(isProxiable(type));
-    try {
-      proxy(typing(type), handler);
-      fail();
-    } catch (IllegalArgumentException e) {}
-  }
-
-  @Test
-  public final void should_intercept_invocation() throws NoSuchMethodException {
-    class Foo {
-      public Object foo(Object foo) {
-        return null;
-      }
-    }
-    typing = typing(Foo.class);
-    proxy = proxy(typing, handlerSavingInvocation());
-    method = Foo.class.getDeclaredMethod("foo", Object.class);
-    ((Foo) proxy).foo(object);
+  public final void intercepts_invocation() throws NoSuchMethodException {
+    proxy = (Foo) proxy(typing, handlerSavingInvocation());
+    method = Foo.class.getDeclaredMethod("setObject", Object.class);
+    proxy.setObject(object);
     assertEquals(invocation(method, proxy, Arrays.asList(object)), savedInvocation);
   }
 
   @Test
-  public void should_intercept_equals() throws NoSuchMethodException {
-    proxy = proxy(typing, handlerSavingInvocation());
+  public void intercepts_equals() throws NoSuchMethodException {
+    proxy = (Foo) proxy(typing, handlerSavingInvocation());
     method = Object.class.getDeclaredMethod("equals", Object.class);
     proxy.equals(object);
     assertEquals(invocation(method, proxy, Arrays.asList(object)), savedInvocation);
   }
 
   @Test
-  public void should_intercept_to_string() throws NoSuchMethodException {
-    proxy = proxy(typing, handlerSavingInvocation());
+  public void intercepts_to_string() throws NoSuchMethodException {
+    proxy = (Foo) proxy(typing, handlerSavingInvocation());
     method = Object.class.getDeclaredMethod("toString");
     proxy.toString();
     assertEquals(invocation(method, proxy, Arrays.asList()), savedInvocation);
   }
 
   @Test
-  public void should_intercept_clone() throws NoSuchMethodException {
-    typing = typing($ConcreteClassWithClone.class);
-    proxy = proxy(typing, handlerSavingInvocation());
-    method = $ConcreteClassWithClone.class.getDeclaredMethod("clone");
-    (($ConcreteClassWithClone) proxy).clone();
+  public void intercepts_clone() throws NoSuchMethodException {
+    proxy = (Foo) proxy(typing, handlerSavingInvocation());
+    method = Foo.class.getDeclaredMethod("clone");
+    proxy.clone();
     assertEquals(invocation(method, proxy, Arrays.asList()), savedInvocation);
   }
 
   @Test
-  public void should_not_intercept_finalize() {
+  public void does_not_intercept_finalize() {
     handler = new Handler() {
       public Object handle(Invocation invocation) {
         return counter++;
       }
     };
-    typing = typing($ConcreteClassWithFinalize.class);
-    proxy = proxy(typing, handler);
-    (($ConcreteClassWithFinalize) proxy).finalize();
+    proxy = (Foo) proxy(typing, handler);
+    proxy.finalize();
     assertEquals(0, counter);
   }
 
   @Test
-  public void should_intercept_package_private_method() throws NoSuchMethodException {
-    typing = typing($ConcreteClassWithPackagePrivateMethod.class);
-    proxy = proxy(typing, handlerSavingInvocation());
-    method = $ConcreteClassWithPackagePrivateMethod.class.getDeclaredMethod("packagePrivateMethod");
-    (($ConcreteClassWithPackagePrivateMethod) proxy).packagePrivateMethod();
+  public void intercepts_package_private_method() throws NoSuchMethodException {
+    proxy = (Foo) proxy(typing, handlerSavingInvocation());
+    method = Foo.class.getDeclaredMethod("packagePrivate");
+    proxy.packagePrivate();
     assertEquals(invocation(method, proxy, Arrays.asList()), savedInvocation);
   }
 
   @Test
-  public void should_intercept_protected_abstract_method() throws NoSuchMethodException {
-    typing = typing($AbstractClassWithProtectedAbstractMethod.class);
-    proxy = proxy(typing, handlerSavingInvocation());
-    method = $AbstractClassWithProtectedAbstractMethod.class.getDeclaredMethod("abstractMethod");
-    (($AbstractClassWithProtectedAbstractMethod) proxy).abstractMethod();
+  public void intercepts_protected_abstract_method() throws NoSuchMethodException {
+    proxy = (Foo) proxy(typing, handlerSavingInvocation());
+    method = Foo.class.getDeclaredMethod("protectedAbstract");
+    proxy.protectedAbstract();
     assertEquals(invocation(method, proxy, Arrays.asList()), savedInvocation);
   }
 
   @Test
-  public void should_return_result_from_handler() {
-    class Foo {
-      public Object foo() {
-        return null;
-      }
-    }
-    proxy = proxy(typing(Foo.class), new Handler() {
-      public Object handle(Invocation interceptedInvocation) {
-        return object;
-      }
-    });
-    assertSame(object, ((Foo) proxy).foo());
+  public void returns_object() {
+    proxy = (Foo) proxy(typing, handlerReturning(object));
+    assertSame(object, proxy.getObject());
   }
 
   @Test
-  public void should_not_return_incompatible_type_from_handler() {
-    class Foo {
-      public String foo() {
-        return null;
-      }
-    }
-    proxy = proxy(typing(Foo.class), new Handler() {
-      public Object handle(Invocation interceptedInvocation) {
-        return object;
-      }
-    });
+  public void returned_null_is_converted_to_primitive_zero() {
+    proxy = (Foo) proxy(typing, handlerReturning(null));
+    assertEquals(0, proxy.getInt());
+  }
+
+  @Test
+  public void does_not_return_incompatible_type() {
+    proxy = (Foo) proxy(typing, handlerReturning(object));
     try {
-      ((Foo) proxy).foo();
+      proxy.getString();
       fail();
     } catch (ClassCastException e) {}
   }
 
   @Test
-  public void should_throw_throwable_from_handler() {
-    class Foo {
-      public Object foo() throws Throwable {
-        return null;
-      }
-    }
-    proxy = proxy(typing(Foo.class), new Handler() {
-      public Object handle(Invocation interceptedInvocation) throws Throwable {
-        throw throwable;
-      }
-    });
+  public void throws_throwable() {
+    proxy = (Foo) proxy(typing, handlerThrowing(throwable));
     try {
-      ((Foo) proxy).foo();
+      proxy.getObject();
       fail();
     } catch (Throwable t) {
       assertSame(throwable, t);
@@ -386,19 +378,10 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
-  public void should_throw_incompatible_throwable_from_handler() {
-    class Foo {
-      public Object foo() {
-        return null;
-      }
-    }
-    proxy = proxy(typing(Foo.class), new Handler() {
-      public Object handle(Invocation interceptedInvocation) throws Throwable {
-        throw throwable;
-      }
-    });
+  public void throws_incompatible_throwable() {
+    proxy = (Foo) proxy(typing, handlerThrowing(throwable));
     try {
-      ((Foo) proxy).foo();
+      proxy.getObject();
       fail();
     } catch (Throwable t) {
       assertSame(throwable, t);
@@ -406,12 +389,11 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
-  public void should_stack_overflow_for_handler_invoking_invocation() {
-    proxy = proxy(typing, new Handler() {
-      public Object handle(Invocation interceptedInvocation) throws Throwable {
+  public void recursion_causes_stack_overflow() {
+    proxy = (Foo) proxy(typing, new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
         try {
-          return interceptedInvocation.method.invoke(interceptedInvocation.instance,
-              interceptedInvocation.arguments.toArray());
+          return invocation.method.invoke(invocation.instance, invocation.arguments.toArray());
         } catch (InvocationTargetException e) {
           throw e.getCause();
         }
@@ -424,22 +406,7 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
-  public void should_null_returned_by_handler_be_converted_to_zero() {
-    class Foo {
-      public int foo() {
-        return 0;
-      }
-    }
-    proxy = proxy(typing(Foo.class), new Handler() {
-      public Object handle(Invocation interceptedInvocation) {
-        return null;
-      }
-    });
-    assertEquals(0, ((Foo) proxy).foo());
-  }
-
-  @Test
-  public final void should_fail_for_null_typing() {
+  public final void typing_cannot_be_null() {
     try {
       proxy(null, handler);
       fail();
@@ -447,11 +414,27 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
-  public final void should_fail_for_null_handler() {
+  public final void handler_cannot_be_null() {
     try {
       proxy(typing, null);
       fail();
     } catch (NullPointerException e) {}
+  }
+
+  private static Handler handlerReturning(final Object object) {
+    return new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        return object;
+      }
+    };
+  }
+
+  private static Handler handlerThrowing(final Throwable throwable) {
+    return new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        throw throwable;
+      }
+    };
   }
 
   private Handler handlerSavingInvocation() {
