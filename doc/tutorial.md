@@ -146,27 +146,6 @@ You can verify number of invocations by passing exact value (may be 0) or using 
 
 ### Capturing
 
-Use **any** if you do not care about argument value during stubbing or verification.
-
-        given(willReturn(false), list).contains(any(Object.class));
-        thenCalled(list).add(any(Object.class));
-
-        given(willThrow(new IndexOutOfBoundsException()), list).get(any(Integer.class, greaterThan(2)));
-        thenCalled(list).add(any(Integer.class), any(Object.class, startsWith("prefix")));
-
-`Class` is just for inferring purpose, which means argument can be instance of any type.
-
-You can mix **any**s with real arguments if you work with non-final types.
-
-        given(willReturn(true), mock).someMethod(object, any(Object.class));
-
-Mixing **any**s and real arguments of final types works only if they are separated by non-final **any**.
-
-        // throws TestoryException
-        given(willReturn(object), mock).someMethod(any(Integer.class), object, 0);
-        // works
-        given(willReturn(object), mock).someMethod(any(Integer.class), any(Object.class), 0);
-
 You can take full control of matching invocations by implementing you own **Captor**.
 
         Captor captor = new Captor() {
@@ -179,13 +158,39 @@ You can take full control of matching invocations by implementing you own **Capt
 
 Use factories for most common cases.
 
-To assert that no invocations was called on mock.
+ - To assert that no invocations was called on mock.
 
         thenCalledTimes(0, onInstance(mock));
 
-Or stub for returning particular type. See [komarro library](https://code.google.com/p/komarro/) for explanation why would you want to do that.
+ - To stub all invocations returning specified type. See [komarro library](https://code.google.com/p/komarro/) for explanation why would you want to do that.
 
         given(willReturn(person), onReturn(Person.class));
+
+Use `any` if you do not care about argument value during stubbing or verification.
+
+        given(willReturn(false), list).contains(any(Object.class));
+        thenCalled(list).add(any(Object.class));
+
+or `any` with [matcher](#matchers) if you care
+
+        given(willThrow(new IndexOutOfBoundsException()), list).get(any(Integer.class, greaterThan(2)));
+        thenCalled(list).add(any(Object.class, startsWith("prefix")));
+
+`Class` passed to `any` is just for inferring purpose. Argument can be instance of any type and still can match.
+
+In most cases you can mix `any`s with real arguments.
+
+        given(willReturn(true), mock).someMethod(object, any(Object.class));
+
+In cases where you cannot (due to complicated technical limitations) `TestoryException` is thrown.
+
+        // throws TestoryException
+        given(willReturn(object), mock).someMethod(any(Integer.class), object, 0);
+
+In such cases replace more arguments with `any`s until it works
+
+        // works
+        given(willReturn(object), mock).someMethod(any(Integer.class), any(Object.class, equalTo(object)), 0);
 
 ### Spying
 
