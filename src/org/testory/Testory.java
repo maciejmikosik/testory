@@ -1,5 +1,6 @@
 package org.testory;
 
+import static org.testory.common.Classes.isAssignableTo;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
@@ -175,9 +176,33 @@ public class Testory {
         }
       }
     };
-    T mock = (T) proxy(typing, handler);
+    T mock = (T) proxy(typing, compatible(handler));
     history.logMocking(mock);
     return mock;
+  }
+
+  private static Handler compatible(final Handler handler) {
+    return new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        Object returned;
+        try {
+          returned = handler.handle(invocation);
+        } catch (Throwable throwable) {
+          for (Class<?> type : invocation.method.getExceptionTypes()) {
+            if (type.isInstance(throwable)) {
+              throw throwable;
+            }
+          }
+          if (throwable instanceof RuntimeException || throwable instanceof Error) {
+            throw throwable;
+          }
+          throw new TestoryException();
+        }
+        Class<?> type = invocation.method.getReturnType();
+        check(returned == null || isAssignableTo(type, returned));
+        return returned;
+      }
+    };
   }
 
   private static void stubNice(Object mock) {

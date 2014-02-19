@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
-import org.testory.proxy.ProxyException;
 
 public class Describe_stubbing {
   private Object object, argument, otherArgument;
@@ -155,7 +154,7 @@ public class Describe_stubbing {
     try {
       mock.getString();
       fail();
-    } catch (ProxyException e) {}
+    } catch (TestoryException e) {}
   }
 
   @Test
@@ -164,7 +163,7 @@ public class Describe_stubbing {
     try {
       mock.getInt();
       fail();
-    } catch (ProxyException e) {}
+    } catch (TestoryException e) {}
   }
 
   @Test
@@ -173,7 +172,7 @@ public class Describe_stubbing {
     try {
       mock.getVoid();
       fail();
-    } catch (ProxyException e) {}
+    } catch (TestoryException e) {}
   }
 
   @Test
@@ -231,7 +230,7 @@ public class Describe_stubbing {
     try {
       mock.getObject();
       fail();
-    } catch (ProxyException t) {}
+    } catch (TestoryException t) {}
   }
 
   @Test
@@ -241,7 +240,7 @@ public class Describe_stubbing {
     try {
       mock.throwsIOException();
       fail();
-    } catch (ProxyException t) {}
+    } catch (TestoryException t) {}
   }
 
   @Test
