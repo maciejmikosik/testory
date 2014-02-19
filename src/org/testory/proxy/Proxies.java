@@ -1,7 +1,6 @@
 package org.testory.proxy;
 
 import static org.testory.common.Checks.checkArgument;
-import static org.testory.common.Checks.checkNotNull;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Typing.typing;
 
@@ -38,7 +37,7 @@ import org.objenesis.ObjenesisStd;
 
 public class Proxies {
   public static boolean isProxiable(Class<?> type) {
-    checkNotNull(type);
+    check(type != null);
     return !isFinal(type) || isPeelable(type);
   }
 
@@ -62,8 +61,8 @@ public class Proxies {
    * </ul>
    */
   public static Object proxy(Typing typing, Handler handler) {
-    checkNotNull(typing);
-    checkNotNull(handler);
+    check(typing != null);
+    check(handler != null);
     return newProxyByCglib(tryAsProxiable(typing), handler);
   }
 
@@ -89,7 +88,9 @@ public class Proxies {
     try {
       proxyClass = enhancer.createClass();
     } catch (CodeGenerationException e) {
-      throw new IllegalArgumentException(e);
+      throw new ProxyException(e);
+    } catch (IllegalArgumentException e) {
+      throw new ProxyException(e);
     }
 
     Factory proxy = (Factory) new ObjenesisStd().newInstance(proxyClass);
@@ -251,5 +252,11 @@ public class Proxies {
     private static final long serialVersionUID = 4961170565306875478L;
 
     private SerializableNoOp() {}
+  }
+
+  private static void check(boolean condition) {
+    if (!condition) {
+      throw new ProxyException();
+    }
   }
 }

@@ -251,7 +251,7 @@ public class Describe_Proxies_proxy {
     try {
       proxy(typing(FinalClass.class), handler);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   private static void assertProxiable(Object object) {
@@ -406,11 +406,19 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
+  public final void type_cannot_be_null() {
+    try {
+      isProxiable(null);
+      fail();
+    } catch (ProxyException e) {}
+  }
+
+  @Test
   public final void typing_cannot_be_null() {
     try {
       proxy(null, handler);
       fail();
-    } catch (NullPointerException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -418,7 +426,7 @@ public class Describe_Proxies_proxy {
     try {
       proxy(typing, null);
       fail();
-    } catch (NullPointerException e) {}
+    } catch (ProxyException e) {}
   }
 
   private static Handler handlerReturning(final Object object) {
