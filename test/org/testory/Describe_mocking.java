@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.test.Testilities.newObject;
 
@@ -40,15 +39,6 @@ public class Describe_mocking {
   public void interface_is_mockable() {
     mock = mock(List.class);
     assertTrue(mock instanceof List);
-  }
-
-  @Test
-  public void final_class_is_not_mockable() {
-    final class FinalClass {}
-    try {
-      mock(FinalClass.class);
-      fail();
-    } catch (TestoryException e) {}
   }
 
   @Test

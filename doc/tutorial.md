@@ -3,7 +3,7 @@
 ### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing) | [spying](#spying)
 ### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
 ### [macros](#macros) | [givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
-### [fine points](#fine-points) | [arrays](#arrays) | [primitives](#primitives) | [purging](#purging)
+### [fine points](#fine-points) | [arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging)
 
 # Overview
 
@@ -339,6 +339,30 @@ This applies to type of
  - object matched by `then`
  - object returned from `Handler` (including object passed to `willReturn`)
  - object passed to matcher
+
+### Finals
+
+Due to technical limitations, testory does not play well with final classes and final methods.
+
+Final classes cannot be mocked or chained. Any of the following throws `TestoryException`.
+
+    mock(FinalClass.class);
+
+    when(instanceOfFinalClass).method();
+    givenTry(instanceOfFinalClass).method();
+    givenTimes(instanceOfFinalClass).method();
+
+Final methods on mock should not be invoked, stubbed or verified.
+Final methods on any object should not be proxied (used in chained form).
+Any of the following invokes real method on unreal (mocked/proxied) object causing undetermined effects!
+
+    mock.finalMethod();
+    given(willReturn(object), mock).finalMethod();
+    thenCalled(mock).finalMethod();
+
+    when(instance).finalMethod();
+    givenTry(instance).finalMethod();
+    givenTimes(n, instance).finalMethod();
 
 ### Purging
 
