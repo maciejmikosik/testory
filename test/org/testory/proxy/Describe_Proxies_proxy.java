@@ -78,7 +78,19 @@ public class Describe_Proxies_proxy {
       throw new RuntimeException();
     }
 
+    public boolean getBoolean() {
+      throw new RuntimeException();
+    }
+
     public int getInt() {
+      throw new RuntimeException();
+    }
+
+    public float getFloat() {
+      throw new RuntimeException();
+    }
+
+    public void getVoid() {
       throw new RuntimeException();
     }
 
@@ -352,9 +364,35 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
-  public void returned_null_is_converted_to_primitive_zero() {
+  public void returns_primitive() {
+    proxy = (Foo) proxy(typing, handlerReturning(3));
+    assertEquals(3, proxy.getInt());
+  }
+
+  @Test
+  public void returned_primitive_is_wide_converted() {
+    proxy = (Foo) proxy(typing, handlerReturning(3));
+    assertEquals(3f, proxy.getFloat(), 0f);
+  }
+
+  @Test
+  public void returns_null() {
     proxy = (Foo) proxy(typing, handlerReturning(null));
+    assertEquals(null, proxy.getObject());
+  }
+
+  @Test
+  public void returned_null_is_converted_to_primitive() {
+    proxy = (Foo) proxy(typing, handlerReturning(null));
+    assertEquals(false, proxy.getBoolean());
     assertEquals(0, proxy.getInt());
+    assertEquals(0f, proxy.getFloat(), 0f);
+  }
+
+  @Test
+  public void returned_null_is_converted_to_void() {
+    proxy = (Foo) proxy(typing, handlerReturning(null));
+    proxy.getVoid();
   }
 
   @Test
@@ -363,7 +401,25 @@ public class Describe_Proxies_proxy {
     try {
       proxy.getString();
       fail();
-    } catch (ClassCastException e) {}
+    } catch (ProxyException e) {}
+  }
+
+  @Test
+  public void does_not_return_incompatible_primitive() {
+    proxy = (Foo) proxy(typing, handlerReturning(3f));
+    try {
+      proxy.getInt();
+      fail();
+    } catch (ProxyException e) {}
+  }
+
+  @Test
+  public void does_not_return_incompatible_with_void() {
+    proxy = (Foo) proxy(typing, handlerReturning(object));
+    try {
+      proxy.getVoid();
+      fail();
+    } catch (ProxyException e) {}
   }
 
   @Test

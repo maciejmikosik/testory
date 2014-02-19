@@ -36,7 +36,9 @@ public class Invocation {
     return new Invocation(method, instance, args);
   }
 
-  private static boolean isAssignableTo(Class<?> type, Object instance) {
+  // TODO extract common isAssignableTo(Class, Object)
+  public static boolean isAssignableTo(Class<?> type, Object instance) {
+    // FIXME fails it type==void.class
     return type.isPrimitive()
         ? isConvertibleTo(type, instance)
         : instance == null || type.isAssignableFrom(instance.getClass());

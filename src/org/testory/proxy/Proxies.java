@@ -2,6 +2,7 @@ package org.testory.proxy;
 
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.proxy.Invocation.invocation;
+import static org.testory.proxy.Invocation.isAssignableTo;
 import static org.testory.proxy.Typing.typing;
 
 import java.io.Serializable;
@@ -94,7 +95,8 @@ public class Proxies {
     }
 
     Factory proxy = (Factory) new ObjenesisStd().newInstance(proxyClass);
-    proxy.setCallbacks(new Callback[] { asMethodInterceptor(handler), new SerializableNoOp() });
+    proxy.setCallbacks(new Callback[] { asMethodInterceptor(compatible(handler)),
+        new SerializableNoOp() });
     return proxy;
   }
 
@@ -240,6 +242,17 @@ public class Proxies {
         return isFinalize(method)
             ? null
             : handler.handle(invocation(method, obj, Arrays.asList(args)));
+      }
+    };
+  }
+
+  private static Handler compatible(final Handler handler) {
+    return new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        Object returned = handler.handle(invocation);
+        Class<?> type = invocation.method.getReturnType();
+        check(returned == null || type != void.class && isAssignableTo(type, returned));
+        return returned;
       }
     };
   }
