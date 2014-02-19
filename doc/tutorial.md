@@ -48,7 +48,7 @@ you should use chained forms.
 
 ### when
 
-Assertions can be used to verify result of invocation happened at line with **when**.
+Assertions can be used to verify result of invocation that happened at line containing **when**.
 
 Result that is going to be asserted is
 
@@ -71,14 +71,14 @@ Result that is going to be asserted is
 ### thenReturned
 
 
-**thenReturned** is used to make assertions about about object returned by **when**. Assertion fails if result is not equal to expected.
+**thenReturned** is used to make assertions about object returned by **when**. Assertion fails if result is not equal to expected.
 
         given(list = new ArrayList<String>());
         given(list.add("element"));
         when(list.get(0));
         thenReturned("element");
 
-Matchers can be used to make custom assertions
+[Matchers](#matchers) can be used to make custom assertions
 
         given(list = new ArrayList<String>());
         given(list.add("element"));
@@ -107,13 +107,13 @@ Newly created mock has following properties
  - all methods are stubbable, except finalize and final methods
  - mock is nice, returning null or binary zero for unstubbed methods
  - mock is conveniently prestubbed
-   - toString is stubbed to contain class name and identity hash code
+   - toString is stubbed to contain class name and [identity hash code](http://docs.oracle.com/javase/7/docs/api/java/lang/System.html#identityHashCode(java.lang.Object))
    - equals is stubbed so mock is equal only to itself
-   - hashCode is stubbed to identity hash code
+   - hashCode is stubbed to [identity hash code](http://docs.oracle.com/javase/7/docs/api/java/lang/System.html#identityHashCode(java.lang.Object))
 
 ### Stubbing
 
-Mock can be stubbed to return Object or throw Throwable or with custom logic.
+Mock can be stubbed to return Object, throw Throwable or execute custom logic.
 
         given(willReturn(object), list).get(1);
         given(willThrow(new IndexOutOfBoundsException()), list).get(2);
@@ -211,12 +211,12 @@ Spies can be stubbed and verified like any other mock.
 
 ### Matchers
 
-Wherever api method accepts Object, but states that it accepts matcher, you are free to pass any of compatible matchers
+Wherever api method accepts Object via parameter named matcher, you are free to pass any compatible matcher
 
- - org.hamcrest.Matcher
- - org.fest.assertions.Condition
- - com.google.common.base.Predicate
- - com.google.common.base.Function
+ - [org.hamcrest.Matcher](https://github.com/hamcrest/JavaHamcrest)
+ - [org.fest.assertions.Condition](https://github.com/alexruiz/fest-assert-1.x)
+ - [com.google.common.base.Predicate](https://code.google.com/p/guava-libraries/)
+ - [com.google.common.base.Function](https://code.google.com/p/guava-libraries/)
  - dynamic matcher
  
         Object matcher = new Object() {
