@@ -1,6 +1,7 @@
 package org.testory;
 
-import static org.testory.common.Classes.isAssignableTo;
+import static org.testory.common.Classes.canThrow;
+import static org.testory.common.Classes.couldReturn;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
@@ -188,18 +189,10 @@ public class Testory {
         try {
           returned = handler.handle(invocation);
         } catch (Throwable throwable) {
-          for (Class<?> type : invocation.method.getExceptionTypes()) {
-            if (type.isInstance(throwable)) {
-              throw throwable;
-            }
-          }
-          if (throwable instanceof RuntimeException || throwable instanceof Error) {
-            throw throwable;
-          }
-          throw new TestoryException();
+          check(canThrow(throwable, invocation.method));
+          throw throwable;
         }
-        Class<?> type = invocation.method.getReturnType();
-        check(returned == null || isAssignableTo(type, returned));
+        check(couldReturn(returned, invocation.method));
         return returned;
       }
     };

@@ -55,4 +55,27 @@ public class Classes {
     private static void method(char argument) {}
   }
 
+  // TODO write tests
+  public static boolean couldReturn(@Nullable Object object, Method method) {
+    checkNotNull(method);
+    return canReturn(object, method) || object == null;
+  }
+
+  // TODO write tests
+  public static boolean canReturn(@Nullable Object object, Method method) {
+    checkNotNull(method);
+    return isAssignableTo(method.getReturnType(), object);
+  }
+
+  // TODO write tests
+  public static boolean canThrow(Throwable throwable, Method method) {
+    checkNotNull(throwable);
+    checkNotNull(method);
+    for (Class<?> exceptionType : method.getExceptionTypes()) {
+      if (exceptionType.isInstance(throwable)) {
+        return true;
+      }
+    }
+    return throwable instanceof RuntimeException || throwable instanceof Error;
+  }
 }

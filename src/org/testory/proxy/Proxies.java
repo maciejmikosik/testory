@@ -1,7 +1,8 @@
 package org.testory.proxy;
 
 import static org.testory.common.Checks.checkArgument;
-import static org.testory.common.Classes.isAssignableTo;
+import static org.testory.common.Classes.canThrow;
+import static org.testory.common.Classes.couldReturn;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Typing.typing;
 
@@ -253,18 +254,10 @@ public class Proxies {
         try {
           returned = handler.handle(invocation);
         } catch (Throwable throwable) {
-          for (Class<?> type : invocation.method.getExceptionTypes()) {
-            if (type.isInstance(throwable)) {
-              throw throwable;
-            }
-          }
-          if (throwable instanceof RuntimeException || throwable instanceof Error) {
-            throw throwable;
-          }
-          throw new ProxyException();
+          check(canThrow(throwable, invocation.method));
+          throw throwable;
         }
-        Class<?> type = invocation.method.getReturnType();
-        check(returned == null || isAssignableTo(type, returned));
+        check(couldReturn(returned, invocation.method));
         return returned;
       }
     };
