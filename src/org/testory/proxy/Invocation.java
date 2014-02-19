@@ -3,9 +3,9 @@ package org.testory.proxy;
 import static java.util.Collections.unmodifiableList;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Classes.isAssignableTo;
 import static org.testory.common.Objects.areEqualDeep;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -34,50 +34,6 @@ public class Invocation {
       checkArgument(isAssignableTo(parameters[i], args.get(i)));
     }
     return new Invocation(method, instance, args);
-  }
-
-  // TODO extract common isAssignableTo(Class, Object)
-  public static boolean isAssignableTo(Class<?> type, Object instance) {
-    // FIXME fails it type==void.class
-    return type.isPrimitive()
-        ? isConvertibleTo(type, instance)
-        : instance == null || type.isAssignableFrom(instance.getClass());
-  }
-
-  private static boolean isConvertibleTo(Class<?> type, Object instance) {
-    try {
-      Method method = PrimitiveMethods.class.getDeclaredMethod("method", type);
-      method.setAccessible(true);
-      method.invoke(null, instance);
-      return true;
-    } catch (IllegalArgumentException e) {
-      return false;
-    } catch (NoSuchMethodException e) {
-      throw new Error(e);
-    } catch (IllegalAccessException e) {
-      throw new Error(e);
-    } catch (InvocationTargetException e) {
-      throw new Error(e);
-    }
-  }
-
-  @SuppressWarnings("unused")
-  private static class PrimitiveMethods {
-    private static void method(byte argument) {}
-
-    private static void method(short argument) {}
-
-    private static void method(int argument) {}
-
-    private static void method(long argument) {}
-
-    private static void method(float argument) {}
-
-    private static void method(double argument) {}
-
-    private static void method(boolean argument) {}
-
-    private static void method(char argument) {}
   }
 
   public boolean equals(Object object) {

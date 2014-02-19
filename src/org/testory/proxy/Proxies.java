@@ -1,8 +1,8 @@
 package org.testory.proxy;
 
 import static org.testory.common.Checks.checkArgument;
+import static org.testory.common.Classes.isAssignableTo;
 import static org.testory.proxy.Invocation.invocation;
-import static org.testory.proxy.Invocation.isAssignableTo;
 import static org.testory.proxy.Typing.typing;
 
 import java.io.Serializable;
@@ -264,7 +264,7 @@ public class Proxies {
           throw new ProxyException();
         }
         Class<?> type = invocation.method.getReturnType();
-        check(returned == null || type != void.class && isAssignableTo(type, returned));
+        check(returned == null || isAssignableTo(type, returned));
         return returned;
       }
     };
