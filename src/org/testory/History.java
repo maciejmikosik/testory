@@ -2,13 +2,13 @@ package org.testory;
 
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
 import static org.testory.proxy.Typing.typing;
 import static org.testory.util.Matchers.match;
-import static org.testory.util.Primitives.zeroOrNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
