@@ -298,7 +298,7 @@ public class Testory {
   public static <T> T any(Class<T> type) {
     check(type != null);
     check(!type.isPrimitive());
-    return history.logAny(type, null);
+    return history.logAny(type);
   }
 
   public static <T> T any(Class<T> type, Object matcher) {

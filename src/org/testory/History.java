@@ -5,6 +5,7 @@ import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
+import static org.testory.util.Matchers.isMatcher;
 import static org.testory.util.Matchers.match;
 import static org.testory.util.Uniques.hasUniques;
 import static org.testory.util.Uniques.unique;
@@ -157,7 +158,19 @@ class History {
     Object matcher;
   }
 
-  public <T> T logAny(Class<T> type, @Nullable Object matcher) {
+  public <T> T logAny(Class<T> type) {
+    checkNotNull(type);
+    return logAnyRaw(type, null);
+  }
+
+  public <T> T logAny(Class<T> type, Object matcher) {
+    checkNotNull(type);
+    checkNotNull(matcher);
+    checkArgument(isMatcher(matcher));
+    return logAnyRaw(type, matcher);
+  }
+
+  private <T> T logAnyRaw(Class<T> type, @Nullable Object matcher) {
     @Nullable
     T token = hasUniques(type)
         ? unique(type)
