@@ -1,8 +1,10 @@
 package org.testory;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static org.testory.Testory.willRethrow;
 import static org.testory.Testory.willReturn;
 import static org.testory.Testory.willThrow;
 import static org.testory.test.Testilities.newObject;
@@ -81,9 +83,50 @@ public class Describe_will {
   }
 
   @Test
+  public void rethrows_throwable() {
+    will = willRethrow(throwable);
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable e) {
+      assertSame(throwable, e);
+    }
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable e) {
+      assertSame(throwable, e);
+    }
+  }
+
+  @Test
+  public void rethrows_throwable_with_original_stack_trace() throws Throwable {
+    stackTraceA = throwable.getStackTrace();
+    will = willRethrow(throwable);
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable t) {
+      stackTraceB = t.getStackTrace();
+    }
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable t) {
+      stackTraceC = t.getStackTrace();
+    }
+    assertArrayEquals(stackTraceA, stackTraceB);
+    assertArrayEquals(stackTraceA, stackTraceC);
+  }
+
+  @Test
   public void cannot_throw_null() {
     try {
       willThrow(null);
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      willRethrow(null);
       fail();
     } catch (TestoryException e) {}
   }

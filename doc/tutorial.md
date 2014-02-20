@@ -126,7 +126,7 @@ Mock can be stubbed to return Object, throw Throwable or execute custom logic.
 Stubbing will be only effective for specified instance of mock, method and equal arguments.
 
  - void method can be stubbed to "just return" using `willReturn(null)`
- - `willThrow` [fills in stack trace](http://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#fillInStackTrace()) upon throwing
+ - `willThrow` [fills in stack trace](http://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#fillInStackTrace()) upon throwing, `willRethrow` does not
  - returning object incompatible with method return type causes `TestoryException` upon invocation
  - throwing throwable incompatible with method declaration causes `TestoryException` upon invocation
 

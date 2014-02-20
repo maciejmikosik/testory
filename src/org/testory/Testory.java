@@ -275,6 +275,16 @@ public class Testory {
     };
   }
 
+  public static Handler willRethrow(final Throwable throwable) {
+    check(throwable != null);
+    return new Handler() {
+      @Nullable
+      public Object handle(Invocation invocation) throws Throwable {
+        throw throwable;
+      }
+    };
+  }
+
   public static Handler willSpy(final Object real) {
     check(real != null);
     return new Handler() {
