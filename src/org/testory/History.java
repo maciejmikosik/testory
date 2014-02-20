@@ -5,21 +5,17 @@ import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
-import static org.testory.proxy.Proxies.isProxiable;
-import static org.testory.proxy.Proxies.proxy;
-import static org.testory.proxy.Typing.typing;
 import static org.testory.util.Matchers.match;
+import static org.testory.util.Uniques.hasUniques;
+import static org.testory.util.Uniques.unique;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
-import org.testory.proxy.Typing;
 import org.testory.util.Effect;
 
 class History {
@@ -162,9 +158,9 @@ class History {
   }
 
   public <T> T logAny(Class<T> type, @Nullable Object matcher) {
-    boolean isProxiable = isProxiable(type);
-    T token = isProxiable
-        ? proxyLight(type)
+    @Nullable
+    T token = hasUniques(type)
+        ? unique(type)
         : null;
 
     Any any = new Any();
@@ -173,22 +169,9 @@ class History {
     any.matcher = matcher;
     addEvent(any);
 
-    return isProxiable
+    return token != null
         ? token
         : zeroOrNull(type);
-  }
-
-  private static <T> T proxyLight(Class<T> type) {
-    Typing typing = type.isInterface()
-        ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
-        : typing(type, new HashSet<Class<?>>());
-    Handler handler = new Handler() {
-      @Nullable
-      public Object handle(Invocation invocation) throws Throwable {
-        return null;
-      }
-    };
-    return (T) proxy(typing, handler);
   }
 
   public Captor buildCaptorUsingAnys(final Invocation invocation) {
