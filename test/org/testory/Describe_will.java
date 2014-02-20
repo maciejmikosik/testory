@@ -1,11 +1,14 @@
 package org.testory;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.willReturn;
 import static org.testory.Testory.willThrow;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
+
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +20,7 @@ public class Describe_will {
   private Invocation invocation;
   private Object object;
   private Throwable throwable;
+  private StackTraceElement[] stackTraceA, stackTraceB, stackTraceC;
 
   @Before
   public void before() {
@@ -53,6 +57,27 @@ public class Describe_will {
     } catch (Throwable e) {
       assertSame(throwable, e);
     }
+  }
+
+  @Test
+  public void throws_throwable_with_filled_in_stack_trace() throws Throwable {
+    stackTraceA = throwable.getStackTrace();
+    will = willThrow(throwable);
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable t) {
+      stackTraceB = t.getStackTrace();
+    }
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable t) {
+      stackTraceC = t.getStackTrace();
+    }
+    assertFalse(Arrays.deepEquals(stackTraceA, stackTraceB));
+    assertFalse(Arrays.deepEquals(stackTraceA, stackTraceC));
+    assertFalse(Arrays.deepEquals(stackTraceB, stackTraceC));
   }
 
   @Test

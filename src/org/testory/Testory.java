@@ -270,7 +270,7 @@ public class Testory {
     return new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        throw throwable;
+        throw throwable.fillInStackTrace();
       }
     };
   }
