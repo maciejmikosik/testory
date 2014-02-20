@@ -1,11 +1,16 @@
 package org.testory;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static org.testory.Testory.willRethrow;
 import static org.testory.Testory.willReturn;
 import static org.testory.Testory.willThrow;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
+
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +22,7 @@ public class Describe_will {
   private Invocation invocation;
   private Object object;
   private Throwable throwable;
+  private StackTraceElement[] stackTraceA, stackTraceB, stackTraceC;
 
   @Before
   public void before() {
@@ -28,19 +34,14 @@ public class Describe_will {
   public void returns_object() throws Throwable {
     will = willReturn(object);
     assertSame(object, will.handle(invocation));
+    assertSame(object, will.handle(invocation));
   }
 
   @Test
   public void returns_null() throws Throwable {
     will = willReturn(null);
     assertSame(null, will.handle(invocation));
-  }
-
-  @Test
-  public void returns_same_object_again() throws Throwable {
-    will = willReturn(object);
-    will.handle(invocation);
-    assertSame(object, will.handle(invocation));
+    assertSame(null, will.handle(invocation));
   }
 
   @Test
@@ -52,14 +53,6 @@ public class Describe_will {
     } catch (Throwable e) {
       assertSame(throwable, e);
     }
-  }
-
-  @Test
-  public void throws_same_throwable_again() {
-    will = willThrow(throwable);
-    try {
-      will.handle(invocation);
-    } catch (Throwable e) {}
     try {
       will.handle(invocation);
       fail();
@@ -69,9 +62,71 @@ public class Describe_will {
   }
 
   @Test
+  public void throws_throwable_with_filled_in_stack_trace() throws Throwable {
+    stackTraceA = throwable.getStackTrace();
+    will = willThrow(throwable);
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable t) {
+      stackTraceB = t.getStackTrace();
+    }
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable t) {
+      stackTraceC = t.getStackTrace();
+    }
+    assertFalse(Arrays.deepEquals(stackTraceA, stackTraceB));
+    assertFalse(Arrays.deepEquals(stackTraceA, stackTraceC));
+    assertFalse(Arrays.deepEquals(stackTraceB, stackTraceC));
+  }
+
+  @Test
+  public void rethrows_throwable() {
+    will = willRethrow(throwable);
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable e) {
+      assertSame(throwable, e);
+    }
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable e) {
+      assertSame(throwable, e);
+    }
+  }
+
+  @Test
+  public void rethrows_throwable_with_original_stack_trace() throws Throwable {
+    stackTraceA = throwable.getStackTrace();
+    will = willRethrow(throwable);
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable t) {
+      stackTraceB = t.getStackTrace();
+    }
+    try {
+      will.handle(invocation);
+      fail();
+    } catch (Throwable t) {
+      stackTraceC = t.getStackTrace();
+    }
+    assertArrayEquals(stackTraceA, stackTraceB);
+    assertArrayEquals(stackTraceA, stackTraceC);
+  }
+
+  @Test
   public void cannot_throw_null() {
     try {
       willThrow(null);
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      willRethrow(null);
       fail();
     } catch (TestoryException e) {}
   }

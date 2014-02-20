@@ -270,6 +270,16 @@ public class Testory {
     return new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
+        throw throwable.fillInStackTrace();
+      }
+    };
+  }
+
+  public static Handler willRethrow(final Throwable throwable) {
+    check(throwable != null);
+    return new Handler() {
+      @Nullable
+      public Object handle(Invocation invocation) throws Throwable {
         throw throwable;
       }
     };
