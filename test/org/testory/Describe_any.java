@@ -25,15 +25,15 @@ public class Describe_any {
   private Object object, otherObject;
 
   public interface Foo {
-    boolean foo_Object(Object a);
+    boolean foo(Object a);
 
-    boolean bar_Object(Object a);
+    boolean bar(Object a);
 
-    boolean foo_Object_Object(Object a, Object b);
+    boolean foo(Object a, Object b);
 
-    boolean foo_int(int a);
+    boolean foo(int a);
 
-    boolean foo_int_Object_int(int a, Object b, int c);
+    boolean foo(int a, Object b, int c);
   }
 
   @Before
@@ -107,44 +107,75 @@ public class Describe_any {
   }
 
   @Test
-  public void matches_other_argument() {
-    given(willReturn(true), mock).foo_Object(any(Object.class));
-    assertTrue(mock.foo_Object(object));
-    thenCalled(mock).foo_Object(any(Object.class));
+  public void matches_any_object() {
+    given(willReturn(true), mock).foo(any(Object.class));
+    assertTrue(mock.foo(object));
+    thenCalled(mock).foo(any(Object.class));
   }
 
   @Test
-  public void matches_null_argument() {
-    given(willReturn(true), mock).foo_Object(any(Object.class));
-    assertTrue(mock.foo_Object(null));
-    thenCalled(mock).foo_Object(any(Object.class));
+  public void matches_any_object_accepts_null() {
+    given(willReturn(true), mock).foo(any(Object.class));
+    assertTrue(mock.foo(null));
+    thenCalled(mock).foo(any(Object.class));
   }
 
   @Test
-  public void matches_other_int() {
-    given(willReturn(true), mock).foo_int(any(Integer.class));
-    assertTrue(mock.foo_int(5));
-    thenCalled(mock).foo_int(any(Integer.class));
+  public void matches_any_int() {
+    given(willReturn(true), mock).foo((int) any(Integer.class));
+    assertTrue(mock.foo(5));
+    thenCalled(mock).foo((int) any(Integer.class));
   }
 
   @Test
-  public void matches_other_two_arguments() {
-    given(willReturn(true), mock).foo_Object_Object(any(Object.class), any(Object.class));
-    assertTrue(mock.foo_Object_Object(object, otherObject));
-    thenCalled(mock).foo_Object_Object(any(Object.class), any(Object.class));
+  public void matches_any_two_objects() {
+    given(willReturn(true), mock).foo(any(Object.class), any(Object.class));
+    assertTrue(mock.foo(object, otherObject));
+    thenCalled(mock).foo(any(Object.class), any(Object.class));
   }
 
   @Test
-  public void not_matches_other_instance() {
-    given(willReturn(true), mock).foo_Object(any(Object.class));
-    assertFalse(otherMock.foo_Object(object));
+  public void matches_any_type() {
+    given(willReturn(true), mock).foo(any(Foo.class));
+    assertTrue(mock.foo(object));
+    thenCalled(mock).foo(any(Foo.class));
+  }
+
+  @Test
+  public void matches_matching_argument() {
+    given(willReturn(true), mock).foo(any(Object.class, same(object)));
+    assertTrue(mock.foo(object));
+    thenCalled(mock).foo(any(Object.class, same(object)));
+  }
+
+  @Test
+  public void not_matches_mismatching_argument() {
+    given(willReturn(true), mock).foo(any(Object.class, same(object)));
+    assertFalse(mock.foo(otherObject));
+
     try {
-      thenCalled(mock).foo_Object(any(Object.class));
+      thenCalled(mock).foo(any(Object.class, same(object)));
+      fail();
+    } catch (TestoryAssertionError e) {
+      thenEqual(format("\n" //
+          + "  expected called times 1\n" //
+          + "    %s.foo(any(%s, %s))\n", //
+          mock, Object.class.getName(), same(object)), //
+          e.getMessage());
+    }
+  }
+
+  @Test
+  public void not_matches_other_mock() {
+    given(willReturn(true), mock).foo(any(Object.class));
+    assertFalse(otherMock.foo(object));
+    try {
+      thenCalled(mock).foo(any(Object.class));
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(format("\n" //
           + "  expected called times 1\n" //
-          + "    %s.foo_Object(any(%s))\n", //
+          + "    %s.foo(any(%s))\n", //
           mock, Object.class.getName()), //
           e.getMessage());
     }
@@ -152,172 +183,128 @@ public class Describe_any {
 
   @Test
   public void not_matches_other_method() {
-    given(willReturn(true), mock).foo_Object(any(Object.class));
-    assertFalse(mock.bar_Object(object));
+    given(willReturn(true), mock).foo(any(Object.class));
+    assertFalse(mock.bar(object));
     try {
-      thenCalled(mock).foo_Object(any(Object.class));
+      thenCalled(mock).foo(any(Object.class));
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(format("\n" //
           + "  expected called times 1\n" //
-          + "    %s.foo_Object(any(%s))\n", //
+          + "    %s.foo(any(%s))\n", //
           mock, Object.class.getName()), //
           e.getMessage());
     }
   }
 
   @Test
-  public void ignores_type() {
-    given(willReturn(true), mock).foo_Object(any(Foo.class));
-    assertTrue(mock.foo_Object(object));
-    thenCalled(mock).foo_Object(any(Foo.class));
-  }
-
-  @Test
-  public void cannot_use_more_anys_than_parameters() {
-    try {
-      any(Object.class);
-      given(willReturn(true), mock).foo_Object(any(Object.class));
-      fail();
-    } catch (TestoryException e) {}
-
-    try {
-      any(Object.class);
-      thenCalled(mock).foo_Object(any(Object.class));
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
   public void solves_mixing_proxiable_types() {
     mock = mock(Foo.class);
-    given(willReturn(true), mock).foo_Object_Object(object, any(Object.class));
-    assertTrue(mock.foo_Object_Object(object, object));
-    thenCalled(mock).foo_Object_Object(object, any(Object.class));
+    given(willReturn(true), mock).foo(object, any(Object.class));
+    assertTrue(mock.foo(object, object));
+    thenCalled(mock).foo(object, any(Object.class));
 
     mock = mock(Foo.class);
-    given(willReturn(true), mock).foo_Object_Object(object, any(Object.class));
-    assertTrue(mock.foo_Object_Object(object, otherObject));
-    thenCalled(mock).foo_Object_Object(object, any(Object.class));
+    given(willReturn(true), mock).foo(object, any(Object.class));
+    assertTrue(mock.foo(object, otherObject));
+    thenCalled(mock).foo(object, any(Object.class));
 
     mock = mock(Foo.class);
-    given(willReturn(true), mock).foo_Object_Object(object, any(Object.class));
-    assertTrue(mock.foo_Object_Object(object, null));
-    thenCalled(mock).foo_Object_Object(object, any(Object.class));
+    given(willReturn(true), mock).foo(object, any(Object.class));
+    assertTrue(mock.foo(object, null));
+    thenCalled(mock).foo(object, any(Object.class));
 
     mock = mock(Foo.class);
-    given(willReturn(true), mock).foo_Object_Object(object, any(Object.class));
-    assertFalse(mock.foo_Object_Object(otherObject, object));
+    given(willReturn(true), mock).foo(object, any(Object.class));
+    assertFalse(mock.foo(otherObject, object));
     try {
-      thenCalled(mock).foo_Object_Object(object, any(Object.class));
+      thenCalled(mock).foo(object, any(Object.class));
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(format("\n" //
           + "  expected called times 1\n" //
-          + "    %s.foo_Object_Object(%s, any(%s))\n", //
+          + "    %s.foo(%s, any(%s))\n", //
           mock, object, Object.class.getName()), //
           e.getMessage());
     }
 
     mock = mock(Foo.class);
-    given(willReturn(true), mock).foo_Object_Object(object, any(Object.class));
-    assertFalse(mock.foo_Object_Object(null, object));
+    given(willReturn(true), mock).foo(object, any(Object.class));
+    assertFalse(mock.foo(null, object));
     try {
-      thenCalled(mock).foo_Object_Object(object, any(Object.class));
+      thenCalled(mock).foo(object, any(Object.class));
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(format("\n" //
           + "  expected called times 1\n" //
-          + "    %s.foo_Object_Object(%s, any(%s))\n", //
+          + "    %s.foo(%s, any(%s))\n", //
           mock, object, Object.class.getName()), //
           e.getMessage());
     }
 
     mock = mock(Foo.class);
-    given(willReturn(true), mock).foo_Object_Object(object, any(Object.class));
-    assertFalse(mock.foo_Object_Object(null, null));
+    given(willReturn(true), mock).foo(object, any(Object.class));
+    assertFalse(mock.foo(null, null));
     try {
-      thenCalled(mock).foo_Object_Object(object, any(Object.class));
+      thenCalled(mock).foo(object, any(Object.class));
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(format("\n" //
           + "  expected called times 1\n" //
-          + "    %s.foo_Object_Object(%s, any(%s))\n", //
+          + "    %s.foo(%s, any(%s))\n", //
           mock, object, Object.class.getName()), //
           e.getMessage());
     }
   }
 
   @Test
-  public void solves_mixing_ints_separated_by_any() {
+  public void solves_mixing_with_separator() {
     mock = mock(Foo.class);
-    given(willReturn(true), mock).foo_int_Object_int(any(Integer.class), any(Object.class), 0);
-    assertTrue(mock.foo_int_Object_int(-1, object, 0));
-    thenCalled(mock).foo_int_Object_int(any(Integer.class), any(Object.class), 0);
+    given(willReturn(true), mock).foo(any(Integer.class), any(Object.class), 0);
+    assertTrue(mock.foo(-1, object, 0));
+    thenCalled(mock).foo(any(Integer.class), any(Object.class), 0);
 
     mock = mock(Foo.class);
-    given(willReturn(true), mock).foo_int_Object_int(any(Integer.class), any(Object.class), 0);
-    assertFalse(mock.foo_int_Object_int(0, object, -1));
+    given(willReturn(true), mock).foo(any(Integer.class), any(Object.class), 0);
+    assertFalse(mock.foo(0, object, -1));
     try {
-      thenCalled(mock).foo_int_Object_int(any(Integer.class), any(Object.class), 0);
+      thenCalled(mock).foo(any(Integer.class), any(Object.class), 0);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(format("\n" //
           + "  expected called times 1\n" //
-          + "    %s.foo_int_Object_int(any(%s), any(%s), %s)\n", //
+          + "    %s.foo(any(%s), any(%s), %s)\n", //
           mock, Integer.class.getName(), Object.class.getName(), 0), //
           e.getMessage());
     }
   }
 
   @Test
-  public void recovers_after_misuse() {
+  public void not_solves_more_anys_than_parameters() {
     try {
       any(Object.class);
-      given(willReturn(true), mock).foo_Object(any(Object.class));
+      given(willReturn(true), mock).foo(any(Object.class));
       fail();
     } catch (TestoryException e) {}
 
-    given(willReturn(true), mock).foo_Object(any(Object.class));
-    assertTrue(mock.foo_Object(object));
-    thenCalled(mock).foo_Object(any(Object.class));
-  }
-
-  @Test
-  public void matches_matching_argument() {
-    given(willReturn(true), mock).foo_Object(any(Object.class, same(object)));
-    assertTrue(mock.foo_Object(object));
-    thenCalled(mock).foo_Object(any(Object.class, same(object)));
-  }
-
-  @Test
-  public void not_matches_mismatching_argument() {
-    given(willReturn(true), mock).foo_Object(any(Object.class, same(object)));
-    assertFalse(mock.foo_Object(otherObject));
-
     try {
-      thenCalled(mock).foo_Object(any(Object.class, same(object)));
+      any(Object.class);
+      thenCalled(mock).foo(any(Object.class));
       fail();
-    } catch (TestoryAssertionError e) {
-      thenEqual(format("\n" //
-          + "  expected called times 1\n" //
-          + "    %s.foo_Object(any(%s, %s))\n", //
-          mock, Object.class.getName(), same(object)), //
-          e.getMessage());
-    }
+    } catch (TestoryException e) {}
   }
 
-  private static Object same(final Object object) {
-    return new Object() {
-      @SuppressWarnings("unused")
-      public boolean matches(Object item) {
-        return object == item;
-      }
+  @Test
+  public void recovers_after_misuse() {
+    try {
+      any(Object.class);
+      given(willReturn(true), mock).foo(any(Object.class));
+      fail();
+    } catch (TestoryException e) {}
 
-      public String toString() {
-        return "same(" + object + ")";
-      }
-    };
+    given(willReturn(true), mock).foo(any(Object.class));
+    assertTrue(mock.foo(object));
+    thenCalled(mock).foo(any(Object.class));
   }
 
   @Test
@@ -350,5 +337,18 @@ public class Describe_any {
       any(Object.class, null);
       fail();
     } catch (TestoryException e) {}
+  }
+
+  private static Object same(final Object object) {
+    return new Object() {
+      @SuppressWarnings("unused")
+      public boolean matches(Object item) {
+        return object == item;
+      }
+
+      public String toString() {
+        return "same(" + object + ")";
+      }
+    };
   }
 }
