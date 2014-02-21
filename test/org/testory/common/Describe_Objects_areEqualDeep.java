@@ -169,6 +169,13 @@ public class Describe_Objects_areEqualDeep {
   }
 
   @Test
+  public void should_match_equal_null_arrays() {
+    object = new Object[] { null, null, null, null };
+    otherObject = new Object[] { null, null, null, null };
+    assertTrue(areEqualDeep(object, otherObject));
+  }
+
+  @Test
   public void should_not_match_not_equal_object_arrays() {
     object = new Object[] { "a", 1111, true, "d" };
     otherObject = new Object[] { "a", 8888, true, "d" };
