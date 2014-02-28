@@ -7,6 +7,7 @@ import java.security.PrivilegedAction;
 
 public class Invocations {
   public static Object invoke(Invocation invocation) throws Throwable {
+    check(invocation != null);
     final Method method = invocation.method;
     Object instance = invocation.instance;
     Object[] arguments = invocation.arguments.toArray();
@@ -22,6 +23,12 @@ public class Invocations {
       throw new Error(e);
     } catch (InvocationTargetException e) {
       throw e.getCause();
+    }
+  }
+
+  private static void check(boolean condition) {
+    if (!condition) {
+      throw new ProxyException();
     }
   }
 }

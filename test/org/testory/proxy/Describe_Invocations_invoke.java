@@ -73,7 +73,7 @@ public class Describe_Invocations_invoke {
     try {
       invoke(null);
       fail();
-    } catch (NullPointerException e) {}
+    } catch (ProxyException e) {}
   }
 
   private static class Host {
