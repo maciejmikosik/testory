@@ -4,6 +4,7 @@ import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
 import static org.testory.proxy.Invocation.invocation;
+import static org.testory.proxy.ProxyException.check;
 import static org.testory.proxy.Typing.typing;
 
 import java.io.Serializable;
@@ -275,11 +276,5 @@ public class Proxies {
     private static final long serialVersionUID = 4961170565306875478L;
 
     private SerializableNoOp() {}
-  }
-
-  private static void check(boolean condition) {
-    if (!condition) {
-      throw new ProxyException();
-    }
   }
 }

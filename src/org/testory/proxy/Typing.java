@@ -1,6 +1,6 @@
 package org.testory.proxy;
 
-import static org.testory.common.Checks.checkArgument;
+import static org.testory.proxy.ProxyException.check;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -21,12 +21,14 @@ public class Typing {
   }
 
   public static Typing typing(Class<?> superclass, Set<? extends Class<?>> interfaces) {
-    checkArgument(!superclass.isInterface());
-    checkArgument(!superclass.isPrimitive());
-    checkArgument(!superclass.isArray());
+    check(superclass != null);
+    check(interfaces != null);
+    check(!superclass.isInterface());
+    check(!superclass.isPrimitive());
+    check(!superclass.isArray());
     Set<Class<?>> interfacesCopy = Collections.unmodifiableSet(new HashSet<Class<?>>(interfaces));
     for (Class<?> interfacee : interfacesCopy) {
-      checkArgument(interfacee.isInterface() && !interfacee.isAnnotation());
+      check(interfacee.isInterface() && !interfacee.isAnnotation());
     }
     return new Typing(superclass, interfacesCopy);
   }

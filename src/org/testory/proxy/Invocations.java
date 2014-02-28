@@ -1,5 +1,7 @@
 package org.testory.proxy;
 
+import static org.testory.proxy.ProxyException.check;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -7,6 +9,7 @@ import java.security.PrivilegedAction;
 
 public class Invocations {
   public static Object invoke(Invocation invocation) throws Throwable {
+    check(invocation != null);
     final Method method = invocation.method;
     Object instance = invocation.instance;
     Object[] arguments = invocation.arguments.toArray();

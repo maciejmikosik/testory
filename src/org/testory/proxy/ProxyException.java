@@ -16,4 +16,10 @@ public class ProxyException extends RuntimeException {
   public ProxyException(Throwable cause) {
     super(cause);
   }
+
+  public static void check(boolean condition) {
+    if (!condition) {
+      throw new ProxyException();
+    }
+  }
 }
