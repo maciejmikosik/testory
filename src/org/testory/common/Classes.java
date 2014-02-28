@@ -56,7 +56,6 @@ public class Classes {
     return canAssign(object, method.getReturnType());
   }
 
-  // TODO write tests
   public static boolean canThrow(Throwable throwable, Method method) {
     checkNotNull(throwable);
     checkNotNull(method);
