@@ -61,7 +61,6 @@ public class Classes {
     return throwable instanceof RuntimeException || throwable instanceof Error;
   }
 
-  // TODO write tests
   public static <T> T zeroOrNull(Class<T> type) {
     checkNotNull(type);
     return (T) zeroes.get(type);
