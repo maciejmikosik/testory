@@ -3,7 +3,7 @@ package org.testory.proxy;
 import static java.util.Collections.unmodifiableList;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
-import static org.testory.common.Classes.isAssignableTo;
+import static org.testory.common.Classes.canAssign;
 import static org.testory.common.Objects.areEqualDeep;
 
 import java.lang.reflect.Method;
@@ -31,7 +31,7 @@ public class Invocation {
     Class<?>[] parameters = method.getParameterTypes();
     checkArgument(parameters.length == args.size());
     for (int i = 0; i < parameters.length; i++) {
-      checkArgument(isAssignableTo(parameters[i], args.get(i)));
+      checkArgument(canAssign(args.get(i), parameters[i]));
     }
     return new Invocation(method, instance, args);
   }
