@@ -45,12 +45,6 @@ public class Classes {
     }
   }
 
-  // TODO write tests
-  public static boolean couldReturn(@Nullable Object object, Method method) {
-    checkNotNull(method);
-    return canReturn(object, method) || method.getReturnType() == void.class && object == null;
-  }
-
   public static boolean canReturn(@Nullable Object object, Method method) {
     checkNotNull(method);
     return canAssign(object, method.getReturnType());

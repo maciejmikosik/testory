@@ -1,7 +1,7 @@
 package org.testory;
 
+import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
-import static org.testory.common.Classes.couldReturn;
 import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
@@ -27,6 +27,7 @@ import static org.testory.util.Samples.sample;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -193,8 +194,12 @@ public class Testory {
           check(canThrow(throwable, invocation.method));
           throw throwable;
         }
-        check(couldReturn(returned, invocation.method));
+        check(canReturn(returned, invocation.method) || canReturnVoid(returned, invocation.method));
         return returned;
+      }
+
+      private boolean canReturnVoid(Object returned, Method method) {
+        return method.getReturnType() == void.class && returned == null;
       }
     };
   }
