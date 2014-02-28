@@ -3,7 +3,7 @@ package org.testory.proxy;
 import static java.util.Collections.unmodifiableList;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
-import static org.testory.common.Classes.isAssignableTo;
+import static org.testory.common.Classes.canInvoke;
 import static org.testory.common.Objects.areEqualDeep;
 
 import java.lang.reflect.Method;
@@ -25,15 +25,9 @@ public class Invocation {
   public static Invocation invocation(Method method, Object instance, List<?> arguments) {
     checkNotNull(instance);
     checkArgument(!Modifier.isStatic(method.getModifiers()));
+    checkArgument(canInvoke(method, instance, arguments.toArray()));
     checkArgument(method.getDeclaringClass().isInstance(instance));
-
-    List<Object> args = unmodifiableList(new ArrayList<Object>(arguments));
-    Class<?>[] parameters = method.getParameterTypes();
-    checkArgument(parameters.length == args.size());
-    for (int i = 0; i < parameters.length; i++) {
-      checkArgument(isAssignableTo(parameters[i], args.get(i)));
-    }
-    return new Invocation(method, instance, args);
+    return new Invocation(method, instance, unmodifiableList(new ArrayList<Object>(arguments)));
   }
 
   public boolean equals(Object object) {

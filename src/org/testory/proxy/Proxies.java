@@ -1,8 +1,8 @@
 package org.testory.proxy;
 
 import static org.testory.common.Checks.checkArgument;
+import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
-import static org.testory.common.Classes.couldReturn;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Typing.typing;
 
@@ -257,8 +257,12 @@ public class Proxies {
           check(canThrow(throwable, invocation.method));
           throw throwable;
         }
-        check(couldReturn(returned, invocation.method));
+        check(canReturn(returned, invocation.method) || canReturnVoid(returned, invocation.method));
         return returned;
+      }
+
+      private boolean canReturnVoid(Object returned, Method method) {
+        return method.getReturnType() == void.class && returned == null;
       }
     };
   }

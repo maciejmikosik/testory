@@ -3,74 +3,54 @@ package org.testory.common;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Classes {
-  // TODO move tests from Invocation to Classes
-  public static boolean isAssignableTo(Class<?> type, @Nullable Object instance) {
+  public static boolean canAssign(@Nullable Object instance, Class<?> type) {
     checkNotNull(type);
     return type.isPrimitive()
-        ? isConvertibleTo(type, instance)
+        ? canConvert(instance, type)
         : instance == null || type.isAssignableFrom(instance.getClass());
   }
 
-  private static boolean isConvertibleTo(Class<?> type, Object instance) {
+  private static boolean canConvert(Object instance, Class<?> type) {
     checkArgument(type.isPrimitive());
     if (type == void.class) {
       return false;
     }
     try {
-      Method method = PrimitiveMethods.class.getDeclaredMethod("method", type);
-      method.setAccessible(true);
-      method.invoke(null, instance);
+      @SuppressWarnings("unused")
+      class Methods {
+        // @formatter:off
+        void method(boolean a) {}
+        void method(char a) {}
+        void method(byte a) {}
+        void method(short a) {}
+        void method(int a) {}
+        void method(long a) {}
+        void method(float a) {}
+        void method(double a) {}
+        // @formatter:on
+      }
+
+      Methods.class.getDeclaredMethod("method", type).invoke(new Methods(), instance);
       return true;
     } catch (IllegalArgumentException e) {
       return false;
-    } catch (NoSuchMethodException e) {
-      throw new Error(e);
-    } catch (IllegalAccessException e) {
-      throw new Error(e);
-    } catch (InvocationTargetException e) {
+    } catch (Exception e) {
       throw new Error(e);
     }
   }
 
-  @SuppressWarnings("unused")
-  private static class PrimitiveMethods {
-    private static void method(byte argument) {}
-
-    private static void method(short argument) {}
-
-    private static void method(int argument) {}
-
-    private static void method(long argument) {}
-
-    private static void method(float argument) {}
-
-    private static void method(double argument) {}
-
-    private static void method(boolean argument) {}
-
-    private static void method(char argument) {}
-  }
-
-  // TODO write tests
-  public static boolean couldReturn(@Nullable Object object, Method method) {
-    checkNotNull(method);
-    return canReturn(object, method) || method.getReturnType() == void.class && object == null;
-  }
-
-  // TODO write tests
   public static boolean canReturn(@Nullable Object object, Method method) {
     checkNotNull(method);
-    return isAssignableTo(method.getReturnType(), object);
+    return canAssign(object, method.getReturnType());
   }
 
-  // TODO write tests
   public static boolean canThrow(Throwable throwable, Method method) {
     checkNotNull(throwable);
     checkNotNull(method);
@@ -82,7 +62,30 @@ public class Classes {
     return throwable instanceof RuntimeException || throwable instanceof Error;
   }
 
-  // TODO write tests
+  public static boolean canInvoke(Method method, @Nullable Object instance, Object... arguments) {
+    checkNotNull(method);
+    checkNotNull(arguments);
+    return correctInstance(instance, method) && correctArguments(arguments, method);
+  }
+
+  private static boolean correctInstance(@Nullable Object instance, Method method) {
+    return Modifier.isStatic(method.getModifiers())
+        || method.getDeclaringClass().isInstance(instance);
+  }
+
+  private static boolean correctArguments(Object[] arguments, Method method) {
+    Class<?>[] parameters = method.getParameterTypes();
+    if (parameters.length != arguments.length) {
+      return false;
+    }
+    for (int i = 0; i < parameters.length; i++) {
+      if (!canAssign(arguments[i], parameters[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public static <T> T zeroOrNull(Class<T> type) {
     checkNotNull(type);
     return (T) zeroes.get(type);
