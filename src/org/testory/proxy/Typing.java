@@ -1,5 +1,7 @@
 package org.testory.proxy;
 
+import static org.testory.proxy.ProxyException.check;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -45,11 +47,5 @@ public class Typing {
 
   public String toString() {
     return "typing(" + superclass + ", " + interfaces + ")";
-  }
-
-  private static void check(boolean condition) {
-    if (!condition) {
-      throw new ProxyException();
-    }
   }
 }

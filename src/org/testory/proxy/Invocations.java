@@ -1,5 +1,7 @@
 package org.testory.proxy;
 
+import static org.testory.proxy.ProxyException.check;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -23,12 +25,6 @@ public class Invocations {
       throw new Error(e);
     } catch (InvocationTargetException e) {
       throw e.getCause();
-    }
-  }
-
-  private static void check(boolean condition) {
-    if (!condition) {
-      throw new ProxyException();
     }
   }
 }

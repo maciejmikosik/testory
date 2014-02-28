@@ -3,6 +3,7 @@ package org.testory.proxy;
 import static java.util.Collections.unmodifiableList;
 import static org.testory.common.Classes.canInvoke;
 import static org.testory.common.Objects.areEqualDeep;
+import static org.testory.proxy.ProxyException.check;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -52,11 +53,5 @@ public class Invocation {
 
   public String toString() {
     return "invocation(" + method + ", " + instance + ", " + arguments + ")";
-  }
-
-  private static void check(boolean condition) {
-    if (!condition) {
-      throw new ProxyException();
-    }
   }
 }
