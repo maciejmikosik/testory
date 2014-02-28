@@ -58,7 +58,7 @@ public class Describe_Typing {
     try {
       typing(superclass, interfaces);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -67,7 +67,7 @@ public class Describe_Typing {
     try {
       typing(superclass, interfaces);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -76,7 +76,7 @@ public class Describe_Typing {
     try {
       typing(superclass, interfaces);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -85,7 +85,7 @@ public class Describe_Typing {
     try {
       typing(superclass, interfaces);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -95,7 +95,7 @@ public class Describe_Typing {
     try {
       typing(superclass, interfaces);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -105,7 +105,7 @@ public class Describe_Typing {
     try {
       typing(superclass, interfaces);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -114,7 +114,7 @@ public class Describe_Typing {
     try {
       typing(superclass, interfaces);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -123,7 +123,7 @@ public class Describe_Typing {
     try {
       typing(superclass, interfaces);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -132,7 +132,7 @@ public class Describe_Typing {
     try {
       typing(superclass, interfaces);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -140,7 +140,7 @@ public class Describe_Typing {
     try {
       typing(null, interfaces);
       fail();
-    } catch (NullPointerException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -148,7 +148,7 @@ public class Describe_Typing {
     try {
       typing(superclass, null);
       fail();
-    } catch (NullPointerException e) {}
+    } catch (ProxyException e) {}
   }
 
   private static Set<Class<?>> classes(Class<?>... classes) {
