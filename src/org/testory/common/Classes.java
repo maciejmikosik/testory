@@ -4,6 +4,7 @@ import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +60,30 @@ public class Classes {
       }
     }
     return throwable instanceof RuntimeException || throwable instanceof Error;
+  }
+
+  public static boolean canInvoke(Method method, @Nullable Object instance, Object... arguments) {
+    checkNotNull(method);
+    checkNotNull(arguments);
+    return correctInstance(instance, method) && correctArguments(arguments, method);
+  }
+
+  private static boolean correctInstance(@Nullable Object instance, Method method) {
+    return Modifier.isStatic(method.getModifiers())
+        || method.getDeclaringClass().isInstance(instance);
+  }
+
+  private static boolean correctArguments(Object[] arguments, Method method) {
+    Class<?>[] parameters = method.getParameterTypes();
+    if (parameters.length != arguments.length) {
+      return false;
+    }
+    for (int i = 0; i < parameters.length; i++) {
+      if (!canAssign(arguments[i], parameters[i])) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public static <T> T zeroOrNull(Class<T> type) {
