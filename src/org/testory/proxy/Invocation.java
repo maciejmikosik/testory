@@ -1,8 +1,6 @@
 package org.testory.proxy;
 
 import static java.util.Collections.unmodifiableList;
-import static org.testory.common.Checks.checkArgument;
-import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.canInvoke;
 import static org.testory.common.Objects.areEqualDeep;
 
@@ -23,10 +21,10 @@ public class Invocation {
   }
 
   public static Invocation invocation(Method method, Object instance, List<?> arguments) {
-    checkNotNull(instance);
-    checkArgument(!Modifier.isStatic(method.getModifiers()));
-    checkArgument(canInvoke(method, instance, arguments.toArray()));
-    checkArgument(method.getDeclaringClass().isInstance(instance));
+    check(method != null);
+    check(!Modifier.isStatic(method.getModifiers()));
+    check(arguments != null);
+    check(canInvoke(method, instance, arguments.toArray()));
     return new Invocation(method, instance, unmodifiableList(new ArrayList<Object>(arguments)));
   }
 
@@ -54,5 +52,11 @@ public class Invocation {
 
   public String toString() {
     return "invocation(" + method + ", " + instance + ", " + arguments + ")";
+  }
+
+  private static void check(boolean condition) {
+    if (!condition) {
+      throw new ProxyException();
+    }
   }
 }

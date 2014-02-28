@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+// TODO rewrite: do not duplicate what tests of canInvoke already do
 public class Describe_Invocation {
   private Object instance, otherInstance;
   private Object argument, argumentA, argumentB;
@@ -75,7 +76,7 @@ public class Describe_Invocation {
     try {
       invocation(method, instance, arguments);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -114,7 +115,7 @@ public class Describe_Invocation {
     try {
       invocation(method, instance, arguments);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -129,7 +130,7 @@ public class Describe_Invocation {
     try {
       invocation(method, instance, arguments);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -144,7 +145,7 @@ public class Describe_Invocation {
     try {
       invocation(method, instance, arguments);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -159,7 +160,7 @@ public class Describe_Invocation {
     try {
       invocation(method, instance, arguments);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -174,7 +175,7 @@ public class Describe_Invocation {
     try {
       invocation(method, instance, arguments);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -197,7 +198,7 @@ public class Describe_Invocation {
     try {
       invocation(method, instance, arguments);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -258,7 +259,7 @@ public class Describe_Invocation {
     try {
       invocation(method, instance, arguments);
       fail();
-    } catch (IllegalArgumentException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -343,7 +344,7 @@ public class Describe_Invocation {
     try {
       invocation(null, instance, arguments);
       fail();
-    } catch (NullPointerException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -351,7 +352,7 @@ public class Describe_Invocation {
     try {
       invocation(method, null, arguments);
       fail();
-    } catch (NullPointerException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -359,6 +360,6 @@ public class Describe_Invocation {
     try {
       invocation(method, instance, null);
       fail();
-    } catch (NullPointerException e) {}
+    } catch (ProxyException e) {}
   }
 }
