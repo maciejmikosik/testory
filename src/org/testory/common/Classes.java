@@ -10,6 +10,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Classes {
+  /* untested */
+  public static boolean isPublic(Class<?> type) {
+    checkNotNull(type);
+    return Modifier.isPublic(type.getModifiers());
+  }
+
+  /* untested */
+  public static boolean isFinal(Class<?> type) {
+    checkNotNull(type);
+    return Modifier.isFinal(type.getModifiers());
+  }
+
   public static boolean canAssign(@Nullable Object instance, Class<?> type) {
     checkNotNull(type);
     return type.isPrimitive()
