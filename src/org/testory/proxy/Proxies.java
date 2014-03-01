@@ -48,21 +48,6 @@ public class Proxies {
     return Modifier.isFinal(type.getModifiers());
   }
 
-  /**
-   * Creates new proxy instance that handles invocations with specified <b>handler</b> and extends
-   * superclass and implements interfaces of <b>typing</b>.
-   * <p>
-   * <ul>
-   * <li>
-   * If extending type has final method, it is not intercepted and original method from extended
-   * type is invoked instead. This may cause unexpected effects.</li>
-   * <li>Invoking method of intercepted invocation from within <b>handler</b> causes infinite
-   * recursion and throws {@link StackOverflowError}.</li>
-   * <li>If <b>handler</b> returns null and handled method return type is primitive, then null will
-   * be replaced by binary zero.</li>
-   * <li>{@link Object#finalize()} is never intercepted</li>
-   * </ul>
-   */
   public static Object proxy(Typing typing, Handler handler) {
     check(typing != null);
     check(handler != null);
