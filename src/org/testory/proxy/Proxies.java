@@ -3,13 +3,14 @@ package org.testory.proxy;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
+import static org.testory.common.Classes.isFinal;
+import static org.testory.common.Classes.isPublic;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.ProxyException.check;
 import static org.testory.proxy.Typing.typing;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,10 +35,6 @@ public class Proxies {
   public static boolean isProxiable(Class<?> type) {
     check(type != null);
     return !isFinal(type) || isPeelable(type);
-  }
-
-  private static boolean isFinal(Class<?> type) {
-    return Modifier.isFinal(type.getModifiers());
   }
 
   public static Object proxy(Typing typing, Handler handler) {
@@ -91,10 +88,6 @@ public class Proxies {
 
   private static boolean isPeelable(Class<?> type) {
     return !isPublic(type) && isFromJdk(type) && isContainer(type);
-  }
-
-  private static boolean isPublic(Class<?> type) {
-    return Modifier.isPublic(type.getModifiers());
   }
 
   private static boolean isFromJdk(Class<?> type) {
