@@ -5,8 +5,6 @@ import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
-import static org.testory.util.Matchers.isMatcher;
-import static org.testory.util.Matchers.match;
 import static org.testory.util.Uniques.hasUniques;
 import static org.testory.util.Uniques.unique;
 
@@ -14,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
@@ -155,7 +154,7 @@ class History {
     @Nullable
     Object token;
     @Nullable
-    Object matcher;
+    Matcher matcher;
   }
 
   public <T> T logAny(Class<T> type) {
@@ -163,14 +162,13 @@ class History {
     return logAnyRaw(type, null);
   }
 
-  public <T> T logAny(Class<T> type, Object matcher) {
+  public <T> T logAny(Class<T> type, Matcher matcher) {
     checkNotNull(type);
     checkNotNull(matcher);
-    checkArgument(isMatcher(matcher));
     return logAnyRaw(type, matcher);
   }
 
-  private <T> T logAnyRaw(Class<T> type, @Nullable Object matcher) {
+  private <T> T logAnyRaw(Class<T> type, @Nullable Matcher matcher) {
     @Nullable
     T token = hasUniques(type)
         ? unique(type)
@@ -189,13 +187,12 @@ class History {
 
   public Captor buildCaptorUsingAnys(final Invocation invocation) {
     final List<Any> anys = getAnysAndConsume();
-    final List<Object> argumentMatchers = solve(invocation.arguments, anys);
-    final Object argumentsMatcher = new Object() {
-      @SuppressWarnings("unused")
+    final List<Matcher> argumentMatchers = solve(invocation.arguments, anys);
+    final Matcher argumentsMatcher = new Matcher() {
       public boolean matches(Object item) {
         List<Object> arguments = (List<Object>) item;
         for (int i = 0; i < argumentMatchers.size(); i++) {
-          if (!match(argumentMatchers.get(i), arguments.get(i))) {
+          if (!argumentMatchers.get(i).matches(arguments.get(i))) {
             return false;
           }
         }
@@ -206,7 +203,7 @@ class History {
     return new Captor() {
       public boolean matches(Invocation item) {
         return invocation.instance == item.instance && invocation.method.equals(item.method)
-            && match(argumentsMatcher, item.arguments);
+            && argumentsMatcher.matches(item.arguments);
       }
 
       public String toString() {
@@ -227,14 +224,14 @@ class History {
     };
   }
 
-  private static List<Object> solve(List<Object> arguments, List<Any> anys) {
+  private static List<Matcher> solve(List<Object> arguments, List<Any> anys) {
     for (int i = 0; i < anys.size(); i++) {
       Any any = anys.get(i);
       if (any.token != null) {
         for (int j = 0; j < arguments.size(); j++) {
           Object argument = arguments.get(j);
           if (argument == any.token) {
-            ArrayList<Object> solved = new ArrayList<Object>();
+            ArrayList<Matcher> solved = new ArrayList<Matcher>();
             List<Object> leftArguments = arguments.subList(0, j);
             List<Object> rightArguments = arguments.subList(j + 1, arguments.size());
             List<Any> leftAnys = anys.subList(0, i);
@@ -249,13 +246,12 @@ class History {
       }
     }
     if (arguments.isEmpty()) {
-      return new ArrayList<Object>();
+      return new ArrayList<Matcher>();
     }
     if (anys.isEmpty()) {
-      ArrayList<Object> solved = new ArrayList<Object>();
+      ArrayList<Matcher> solved = new ArrayList<Matcher>();
       for (final Object argument : arguments) {
-        solved.add(new Object() {
-          @SuppressWarnings("unused")
+        solved.add(new Matcher() {
           public boolean matches(Object item) {
             return areEqualDeep(argument, item);
           }
@@ -267,7 +263,7 @@ class History {
       }
       return solved;
     } else if (anys.size() == arguments.size()) {
-      ArrayList<Object> solved = new ArrayList<Object>();
+      ArrayList<Matcher> solved = new ArrayList<Matcher>();
       for (Any any : anys) {
         solved.add(asMatcher(any));
       }
@@ -277,12 +273,11 @@ class History {
     }
   }
 
-  private static Object asMatcher(final Any any) {
-    return new Object() {
-      @SuppressWarnings("unused")
+  private static Matcher asMatcher(final Any any) {
+    return new Matcher() {
       public boolean matches(Object item) {
         return any.matcher != null
-            ? match(any.matcher, item)
+            ? any.matcher.matches(item)
             : true;
       }
 

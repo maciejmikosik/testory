@@ -1,11 +1,12 @@
 package org.testory.util;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.test.Testilities.newObject;
+import static org.testory.util.Matchers.asMatcher;
 import static org.testory.util.Matchers.isMatcher;
-import static org.testory.util.Matchers.match;
 
 import org.fest.assertions.Condition;
 import org.hamcrest.Description;
@@ -18,11 +19,13 @@ import com.google.common.base.Predicate;
 
 public class Describe_Matchers {
   private Object matcher, object;
+  private String string;
 
   @Before
   public void before() {
     matcher = newObject("matcher");
     object = newObject("object");
+    string = "string";
   }
 
   @Test
@@ -56,7 +59,7 @@ public class Describe_Matchers {
       @Deprecated
       public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {}
     };
-    assertTrue(match(matcher, object));
+    assertTrue(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -73,7 +76,7 @@ public class Describe_Matchers {
       @Deprecated
       public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {}
     };
-    assertFalse(match(matcher, object));
+    assertFalse(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -93,7 +96,7 @@ public class Describe_Matchers {
         return value == object;
       }
     };
-    assertTrue(match(matcher, object));
+    assertTrue(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -103,7 +106,7 @@ public class Describe_Matchers {
         return value != object;
       }
     };
-    assertFalse(match(matcher, object));
+    assertFalse(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -123,7 +126,7 @@ public class Describe_Matchers {
         return input == object;
       }
     };
-    assertTrue(match(matcher, object));
+    assertTrue(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -133,7 +136,7 @@ public class Describe_Matchers {
         return input != object;
       }
     };
-    assertFalse(match(matcher, object));
+    assertFalse(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -153,7 +156,7 @@ public class Describe_Matchers {
         return input == object;
       }
     };
-    assertTrue(match(matcher, object));
+    assertTrue(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -163,7 +166,7 @@ public class Describe_Matchers {
         return input != object;
       }
     };
-    assertFalse(match(matcher, object));
+    assertFalse(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -185,7 +188,7 @@ public class Describe_Matchers {
         return item == object;
       }
     };
-    assertTrue(match(matcher, object));
+    assertTrue(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -196,7 +199,7 @@ public class Describe_Matchers {
         return item != object;
       }
     };
-    assertFalse(match(matcher, object));
+    assertFalse(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -218,7 +221,7 @@ public class Describe_Matchers {
         return input == object;
       }
     };
-    assertTrue(match(matcher, object));
+    assertTrue(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -229,7 +232,7 @@ public class Describe_Matchers {
         return input != object;
       }
     };
-    assertFalse(match(matcher, object));
+    assertFalse(asMatcher(matcher).matches(object));
   }
 
   @Test
@@ -240,7 +243,7 @@ public class Describe_Matchers {
         return input == null;
       }
     };
-    assertTrue(match(matcher, null));
+    assertTrue(asMatcher(matcher).matches(null));
   }
 
   @Test
@@ -299,8 +302,35 @@ public class Describe_Matchers {
   @Test
   public void should_object_without_matching_method_fail() {
     try {
-      match(matcher, object);
+      asMatcher(matcher);
       fail();
     } catch (IllegalArgumentException e) {}
+  }
+
+  @Test
+  public void should_delegate_to_string() {
+    matcher = new Object() {
+      @SuppressWarnings("unused")
+      public boolean matches(Object item) {
+        return false;
+      }
+
+      public String toString() {
+        return string;
+      }
+    };
+    assertEquals(string, asMatcher(matcher).toString());
+  }
+
+  @Test
+  public void null_cannot_be_matcher() {
+    try {
+      isMatcher(null);
+      fail();
+    } catch (NullPointerException e) {}
+    try {
+      asMatcher(null);
+      fail();
+    } catch (NullPointerException e) {}
   }
 }

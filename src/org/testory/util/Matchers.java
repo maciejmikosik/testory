@@ -6,6 +6,7 @@ import static org.testory.common.Throwables.gently;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 
 public class Matchers {
@@ -13,20 +14,28 @@ public class Matchers {
     return tryGetMatcherMethod(matcher.getClass()) != null;
   }
 
-  public static boolean match(Object matcher, @Nullable Object object) {
-    Method method = tryGetMatcherMethod(matcher.getClass());
+  public static Matcher asMatcher(final Object matcher) {
+    final Method method = tryGetMatcherMethod(matcher.getClass());
     checkArgument(method != null);
     method.setAccessible(true);
-    try {
-      return (Boolean) method.invoke(matcher, object);
-    } catch (IllegalArgumentException e) {
-      throw new Error(e);
-    } catch (IllegalAccessException e) {
-      throw new Error(e);
-    } catch (InvocationTargetException e) {
-      // matcher method does not throw any checked exceptions
-      throw gently(e.getCause());
-    }
+    return new Matcher() {
+      public boolean matches(@Nullable Object item) {
+        try {
+          return (Boolean) method.invoke(matcher, item);
+        } catch (IllegalArgumentException e) {
+          throw new Error(e);
+        } catch (IllegalAccessException e) {
+          throw new Error(e);
+        } catch (InvocationTargetException e) {
+          // matcher method does not throw any checked exceptions
+          throw gently(e.getCause());
+        }
+      }
+  
+      public String toString() {
+        return matcher.toString();
+      }
+    };
   }
 
   @Nullable
