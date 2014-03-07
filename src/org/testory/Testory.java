@@ -20,8 +20,8 @@ import static org.testory.util.Effect.hasThrown;
 import static org.testory.util.Effect.returned;
 import static org.testory.util.Effect.returnedVoid;
 import static org.testory.util.Effect.thrown;
+import static org.testory.util.Matchers.asMatcher;
 import static org.testory.util.Matchers.isMatcher;
-import static org.testory.util.Matchers.match;
 import static org.testory.util.Samples.isSampleable;
 import static org.testory.util.Samples.sample;
 
@@ -311,7 +311,7 @@ public class Testory {
     check(matcher != null);
     check(isMatcher(matcher));
     check(!type.isPrimitive());
-    return history.logAny(type, matcher);
+    return history.logAny(type, asMatcher(matcher));
   }
 
   public static Captor onInstance(final Object mock) {
@@ -425,7 +425,8 @@ public class Testory {
     Effect effect = history.getLastWhenEffect();
     boolean expected = hasReturnedObject(effect)
         && (areEqualDeep(objectOrMatcher, getReturned(effect)) || objectOrMatcher != null
-            && isMatcher(objectOrMatcher) && match(objectOrMatcher, getReturned(effect)));
+            && isMatcher(objectOrMatcher)
+            && asMatcher(objectOrMatcher).matches(getReturned(effect)));
     if (!expected) {
       throw assertionError("\n" //
           + formatSection("expected returned", objectOrMatcher) //
@@ -479,7 +480,7 @@ public class Testory {
     check(matcher != null);
     check(isMatcher(matcher));
     Effect effect = history.getLastWhenEffect();
-    boolean expected = hasThrown(effect) && match(matcher, getThrown(effect));
+    boolean expected = hasThrown(effect) && asMatcher(matcher).matches(getThrown(effect));
     if (!expected) {
       throw assertionError("\n" //
           + formatSection("expected thrown", matcher) //
@@ -541,7 +542,7 @@ public class Testory {
   public static void then(@Nullable Object object, Object matcher) {
     check(matcher != null);
     check(isMatcher(matcher));
-    if (!match(matcher, object)) {
+    if (!asMatcher(matcher).matches(object)) {
       throw assertionError("\n" //
           + formatSection("expected", matcher) //
           + formatSection("but was", object));
@@ -605,7 +606,7 @@ public class Testory {
         numberOfCalls++;
       }
     }
-    boolean expected = match(numberMatcher, numberOfCalls);
+    boolean expected = asMatcher(numberMatcher).matches(numberOfCalls);
     if (!expected) {
       throw assertionError("\n" //
           + formatSection("expected called times " + numberMatcher, captor));
