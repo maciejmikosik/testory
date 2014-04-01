@@ -31,7 +31,7 @@ public class Matchers {
           throw gently(e.getCause());
         }
       }
-  
+
       public String toString() {
         return matcher.toString();
       }
@@ -60,4 +60,14 @@ public class Matchers {
       return null;
     }
   }
+
+  public static final Matcher anything = new Matcher() {
+    public boolean matches(@Nullable Object item) {
+      return true;
+    }
+
+    public String toString() {
+      return "anything";
+    }
+  };
 }

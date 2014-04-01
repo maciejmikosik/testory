@@ -40,6 +40,7 @@ import org.testory.proxy.Invocation;
 import org.testory.proxy.Proxies;
 import org.testory.proxy.Typing;
 import org.testory.util.Effect;
+import org.testory.util.Matchers;
 
 public class Testory {
   private static History history = new History();
@@ -303,7 +304,7 @@ public class Testory {
   public static <T> T any(Class<T> type) {
     check(type != null);
     check(!type.isPrimitive());
-    return history.logAny(type);
+    return history.logAny(type, Matchers.anything);
   }
 
   public static <T> T any(Class<T> type, Object matcher) {

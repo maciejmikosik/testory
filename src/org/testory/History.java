@@ -17,6 +17,7 @@ import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.util.Effect;
+import org.testory.util.Matchers;
 
 class History {
   /** youngest at begin */
@@ -153,22 +154,12 @@ class History {
     Class<?> type;
     @Nullable
     Object token;
-    @Nullable
     Matcher matcher;
-  }
-
-  public <T> T logAny(Class<T> type) {
-    checkNotNull(type);
-    return logAnyRaw(type, null);
   }
 
   public <T> T logAny(Class<T> type, Matcher matcher) {
     checkNotNull(type);
     checkNotNull(matcher);
-    return logAnyRaw(type, matcher);
-  }
-
-  private <T> T logAnyRaw(Class<T> type, @Nullable Matcher matcher) {
     @Nullable
     T token = hasUniques(type)
         ? unique(type)
@@ -276,15 +267,13 @@ class History {
   private static Matcher asMatcher(final Any any) {
     return new Matcher() {
       public boolean matches(Object item) {
-        return any.matcher != null
-            ? any.matcher.matches(item)
-            : true;
+        return any.matcher.matches(item);
       }
 
       public String toString() {
-        return any.matcher != null
-            ? "any(" + any.type.getName() + ", " + any.matcher + ")"
-            : "any(" + any.type.getName() + ")";
+        return any.matcher == Matchers.anything
+            ? "any(" + any.type.getName() + ")"
+            : "any(" + any.type.getName() + ", " + any.matcher + ")";
       }
     };
   }
