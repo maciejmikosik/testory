@@ -1,5 +1,6 @@
 package org.testory;
 
+import static org.testory.common.CharSequences.join;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.zeroOrNull;
@@ -198,19 +199,8 @@ class History {
       }
 
       public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(dangerouslyInvokeToStringOnMock(invocation.instance));
-        builder.append(".");
-        builder.append(invocation.method.getName());
-        builder.append("(");
-        for (Object argumentMatcher : argumentMatchers) {
-          builder.append(argumentMatcher).append(", ");
-        }
-        if (argumentMatchers.size() > 0) {
-          builder.delete(builder.length() - 2, builder.length());
-        }
-        builder.append(")");
-        return builder.toString();
+        return dangerouslyInvokeToStringOnMock(invocation.instance) + "."
+            + invocation.method.getName() + "(" + join(", ", argumentMatchers) + ")";
       }
     };
   }
