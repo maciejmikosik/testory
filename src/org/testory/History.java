@@ -1,11 +1,11 @@
 package org.testory;
 
-import static org.testory.common.CharSequences.join;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
+import static org.testory.util.Matchers.invocationMatcher;
 import static org.testory.util.Uniques.hasUniques;
 import static org.testory.util.Uniques.unique;
 
@@ -180,27 +180,17 @@ class History {
   public Captor buildCaptorUsingAnys(final Invocation invocation) {
     final List<Any> anys = getAnysAndConsume();
     final List<Matcher> argumentMatchers = solve(invocation.arguments, anys);
-    final Matcher argumentsMatcher = new Matcher() {
-      public boolean matches(Object item) {
-        List<Object> arguments = (List<Object>) item;
-        for (int i = 0; i < argumentMatchers.size(); i++) {
-          if (!argumentMatchers.get(i).matches(arguments.get(i))) {
-            return false;
-          }
-        }
-        return true;
-      }
-    };
+    return asCaptor(invocationMatcher(invocation.method, invocation.instance, argumentMatchers));
+  }
 
+  private static Captor asCaptor(final Matcher invocationMatcher) {
     return new Captor() {
       public boolean matches(Invocation item) {
-        return invocation.instance == item.instance && invocation.method.equals(item.method)
-            && argumentsMatcher.matches(item.arguments);
+        return invocationMatcher.matches(item);
       }
 
       public String toString() {
-        return dangerouslyInvokeToStringOnMock(invocation.instance) + "."
-            + invocation.method.getName() + "(" + join(", ", argumentMatchers) + ")";
+        return invocationMatcher.toString();
       }
     };
   }
@@ -266,18 +256,6 @@ class History {
             : "any(" + any.type.getName() + ", " + any.matcher + ")";
       }
     };
-  }
-
-  /**
-   * Invoked only in specific situation if we know that test is failing.
-   * {@link Testory#thenCalledTimes(Object, Captor)} assertion fails, it builds error message, it
-   * invokes {@link Captor#toString()}, it invokes this method, it invokes mock.toString(). Invoking
-   * in other situations may cause not intended consequences like extra invocation to be registered
-   * and verification fails.
-   */
-
-  private static String dangerouslyInvokeToStringOnMock(Object mock) {
-    return mock.toString();
   }
 
   private List<Any> getAnysAndConsume() {
