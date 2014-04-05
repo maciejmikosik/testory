@@ -2,23 +2,16 @@ package org.testory;
 
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
-import static org.testory.common.Classes.zeroOrNull;
-import static org.testory.common.Objects.areEqualDeep;
-import static org.testory.common.Objects.print;
-import static org.testory.util.Matchers.invocationMatcher;
-import static org.testory.util.Uniques.hasUniques;
-import static org.testory.util.Uniques.unique;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
+import org.testory.util.Any;
 import org.testory.util.Effect;
-import org.testory.util.Matchers;
 
 class History {
   /** youngest at begin */
@@ -151,114 +144,11 @@ class History {
     return Collections.unmodifiableList(invocations);
   }
 
-  private static class Any {
-    Class<?> type;
-    @Nullable
-    Object token;
-    Matcher matcher;
-  }
-
-  public <T> T logAny(Class<T> type, Matcher matcher) {
-    checkNotNull(type);
-    checkNotNull(matcher);
-    @Nullable
-    T token = hasUniques(type)
-        ? unique(type)
-        : null;
-
-    Any any = new Any();
-    any.type = type;
-    any.token = token;
-    any.matcher = matcher;
+  public void logAny(Any any) {
     addEvent(any);
-
-    return token != null
-        ? token
-        : zeroOrNull(type);
   }
 
-  public Captor buildCaptorUsingAnys(final Invocation invocation) {
-    final List<Any> anys = getAnysAndConsume();
-    final List<Matcher> argumentMatchers = solve(invocation.arguments, anys);
-    return asCaptor(invocationMatcher(invocation.method, invocation.instance, argumentMatchers));
-  }
-
-  private static Captor asCaptor(final Matcher invocationMatcher) {
-    return new Captor() {
-      public boolean matches(Invocation item) {
-        return invocationMatcher.matches(item);
-      }
-
-      public String toString() {
-        return invocationMatcher.toString();
-      }
-    };
-  }
-
-  private static List<Matcher> solve(List<Object> arguments, List<Any> anys) {
-    for (int i = 0; i < anys.size(); i++) {
-      Any any = anys.get(i);
-      if (any.token != null) {
-        for (int j = 0; j < arguments.size(); j++) {
-          Object argument = arguments.get(j);
-          if (argument == any.token) {
-            ArrayList<Matcher> solved = new ArrayList<Matcher>();
-            List<Object> leftArguments = arguments.subList(0, j);
-            List<Object> rightArguments = arguments.subList(j + 1, arguments.size());
-            List<Any> leftAnys = anys.subList(0, i);
-            List<Any> rightAnys = anys.subList(i + 1, anys.size());
-            solved.addAll(solve(leftArguments, leftAnys));
-            solved.add(asMatcher(any));
-            solved.addAll(solve(rightArguments, rightAnys));
-            return solved;
-          }
-        }
-        throw new TestoryException("any() created but not passed to invocation");
-      }
-    }
-    if (arguments.isEmpty()) {
-      return new ArrayList<Matcher>();
-    }
-    if (anys.isEmpty()) {
-      ArrayList<Matcher> solved = new ArrayList<Matcher>();
-      for (final Object argument : arguments) {
-        solved.add(new Matcher() {
-          public boolean matches(Object item) {
-            return areEqualDeep(argument, item);
-          }
-
-          public String toString() {
-            return print(argument);
-          }
-        });
-      }
-      return solved;
-    } else if (anys.size() == arguments.size()) {
-      ArrayList<Matcher> solved = new ArrayList<Matcher>();
-      for (Any any : anys) {
-        solved.add(asMatcher(any));
-      }
-      return solved;
-    } else {
-      throw new TestoryException("cannot solve mixed arguments and anys");
-    }
-  }
-
-  private static Matcher asMatcher(final Any any) {
-    return new Matcher() {
-      public boolean matches(Object item) {
-        return any.matcher.matches(item);
-      }
-
-      public String toString() {
-        return any.matcher == Matchers.anything
-            ? "any(" + any.type.getName() + ")"
-            : "any(" + any.type.getName() + ", " + any.matcher + ")";
-      }
-    };
-  }
-
-  private List<Any> getAnysAndConsume() {
+  public List<Any> getAnysAndConsume() {
     class Consumer {}
     List<Any> anys = new ArrayList<Any>();
     for (Object event : getEvents()) {

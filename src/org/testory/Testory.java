@@ -33,12 +33,15 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
+import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.Proxies;
 import org.testory.proxy.Typing;
+import org.testory.util.Any;
 import org.testory.util.Effect;
 import org.testory.util.Matchers;
 
@@ -249,7 +252,7 @@ public class Testory {
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        history.logStubbing(will, history.buildCaptorUsingAnys(invocation));
+        history.logStubbing(will, solveCaptor(invocation));
         return null;
       }
     };
@@ -302,17 +305,21 @@ public class Testory {
   }
 
   public static <T> T any(Class<T> type) {
-    check(type != null);
-    check(!type.isPrimitive());
-    return history.logAny(type, Matchers.anything);
+    return any(type, Matchers.anything);
   }
 
   public static <T> T any(Class<T> type, Object matcher) {
-    check(type != null);
     check(matcher != null);
     check(isMatcher(matcher));
+    return any(type, asMatcher(matcher));
+  }
+
+  private static <T> T any(Class<T> type, Matcher matcher) {
+    check(type != null);
     check(!type.isPrimitive());
-    return history.logAny(type, asMatcher(matcher));
+    Any any = Any.any(type, matcher);
+    history.logAny(any);
+    return (T) any.tokenOrValue();
   }
 
   public static Captor onInstance(final Object mock) {
@@ -590,7 +597,7 @@ public class Testory {
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        thenCalledTimes(numberMatcher, history.buildCaptorUsingAnys(invocation));
+        thenCalledTimes(numberMatcher, solveCaptor(invocation));
         return null;
       }
     };
@@ -674,5 +681,30 @@ public class Testory {
       throw new Error();
     }
     throwable.setStackTrace(new StackTraceElement[] { stackTrace[index + 1] });
+  }
+
+  private static Captor solveCaptor(Invocation invocation) {
+    List<Any> anys = history.getAnysAndConsume();
+    return asCaptor(solveInvocationMatcher(anys, invocation));
+  }
+
+  private static Matcher solveInvocationMatcher(List<Any> anys, Invocation invocation) {
+    try {
+      return Any.solveInvocationMatcher(anys, invocation);
+    } catch (IllegalArgumentException e) {
+      throw new TestoryException(e);
+    }
+  }
+
+  private static Captor asCaptor(final Matcher invocationMatcher) {
+    return new Captor() {
+      public boolean matches(Invocation item) {
+        return invocationMatcher.matches(item);
+      }
+
+      public String toString() {
+        return invocationMatcher.toString();
+      }
+    };
   }
 }
