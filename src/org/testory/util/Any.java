@@ -11,6 +11,7 @@ import static org.testory.util.Uniques.unique;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.testory.common.Matcher;
@@ -47,12 +48,59 @@ public class Any {
   }
 
   public static Matcher solveInvocationMatcher(List<Any> anys, Invocation invocation) {
-    List<Boolean> solution = trySolveEager(anys, invocation.arguments);
+    boolean repacking = invocation.method.isVarArgs()
+        && !last(anys).mustBe(last(invocation.arguments));
+    List<Object> arguments = repacking
+        ? unpackVarargs(invocation.arguments)
+        : invocation.arguments;
+    List<Boolean> solution = solve(anys, arguments);
+    List<Matcher> matchers = matcherize(solution, anys, arguments);
+    List<Matcher> argumentsMatchers = repacking
+        ? packVarargs(invocation.method.getParameterTypes().length, matchers)
+        : matchers;
+    return invocationMatcher(invocation.method, invocation.instance, argumentsMatchers);
+  }
+
+  private static <E> E last(List<E> list) {
+    return list.get(list.size() - 1);
+  }
+
+  private static List<Boolean> solve(List<Any> anys, List<Object> arguments) {
+    List<Boolean> solution = trySolveEager(anys, arguments);
     checkArgument(solution != null);
-    checkArgument(areEqualDeep(reverse(solution),
-        trySolveEager(reverse(anys), reverse(invocation.arguments))));
-    List<Matcher> matchers = matcherize(solution, anys, invocation.arguments);
-    return invocationMatcher(invocation.method, invocation.instance, matchers);
+    checkArgument(areEqualDeep(reverse(solution), trySolveEager(reverse(anys), reverse(arguments))));
+    return solution;
+  }
+
+  private static List<Object> unpackVarargs(List<?> packed) {
+    ArrayList<Object> unpacked = new ArrayList<Object>();
+    unpacked.addAll(packed.subList(0, packed.size() - 1));
+    unpacked.addAll(Arrays.asList((Object[]) packed.get(packed.size() - 1)));
+    return unpacked;
+  }
+
+  private static List<Matcher> packVarargs(int length, List<Matcher> unpacked) {
+    List<Matcher> packed = new ArrayList<Matcher>();
+    packed.addAll(unpacked.subList(0, length - 1));
+    packed.add(arrayContainingInOrder(unpacked.subList(length - 1, unpacked.size())));
+    return packed;
+  }
+
+  private static Matcher arrayContainingInOrder(final List<Matcher> elements) {
+    return new Matcher() {
+      public boolean matches(Object uncastItem) {
+        Object[] item = (Object[]) uncastItem;
+        if (item.length != elements.size()) {
+          return false;
+        }
+        for (int i = 0; i < elements.size(); i++) {
+          if (!elements.get(i).matches(item[i])) {
+            return false;
+          }
+        }
+        return true;
+      }
+    };
   }
 
   private static List<Matcher> matcherize(List<Boolean> solution, List<Any> anys,

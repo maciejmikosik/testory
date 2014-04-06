@@ -104,11 +104,33 @@ public class Describe_any_solving {
   }
 
   @Test
-  public void cannot_solve_varargs() {
-    try {
-      given(willReturn(true), mock)
-          .varargs(any(Object.class), any(Object.class), any(Object.class));
-    } catch (TestoryException e) {}
+  public void solves_varargs() {
+    given(willReturn(true), mock).varargs(a, a, any(Object.class, same(b)), a);
+
+    assertTrue(mock.varargs(a, a, b, a));
+
+    assertFalse(mock.varargs(x, a, b, a));
+    assertFalse(mock.varargs(a, x, b, a));
+    assertFalse(mock.varargs(a, a, x, a));
+    assertFalse(mock.varargs(a, a, b, x));
+  }
+
+  @Test
+  public void solves_varargs_for_explicit_object() {
+    given(willReturn(true), mock).varargs(a, any(Object.class));
+
+    assertFalse(mock.varargs(a));
+    assertTrue(mock.varargs(a, a));
+    assertFalse(mock.varargs(a, a, a));
+  }
+
+  @Test
+  public void solves_varargs_for_explicit_array() {
+    given(willReturn(true), mock).varargs(a, any(Object[].class));
+
+    assertTrue(mock.varargs(a));
+    assertTrue(mock.varargs(a, b));
+    assertTrue(mock.varargs(a, b, b));
   }
 
   private static Object same(final Object object) {
