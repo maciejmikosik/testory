@@ -316,10 +316,9 @@ public class Testory {
 
   private static <T> T any(Class<T> type, Matcher matcher) {
     check(type != null);
-    check(!type.isPrimitive());
     Any any = Any.any(type, matcher);
     history.logAny(any);
-    return (T) any.tokenOrValue();
+    return (T) any.token();
   }
 
   public static Captor onInstance(final Object mock) {

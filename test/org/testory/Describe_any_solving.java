@@ -69,6 +69,17 @@ public class Describe_any_solving {
   }
 
   @Test
+  public void solves_wrappers() {
+    given(willReturn(true), mock).objects(a, any(int.class, same(b)), a);
+
+    assertTrue(mock.objects(a, b, a));
+
+    assertFalse(mock.objects(x, b, a));
+    assertFalse(mock.objects(a, x, a));
+    assertFalse(mock.objects(a, b, x));
+  }
+
+  @Test
   public void solves_surrounded_primitive_types() {
     given(willReturn(true), mock).objects(a, any(Object.class, same(a)),
         any(Integer.class, equal(i)), any(Integer.class, equal(i)), any(Object.class, same(a)), a);

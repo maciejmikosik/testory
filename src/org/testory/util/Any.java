@@ -3,11 +3,10 @@ package org.testory.util;
 import static java.util.Collections.nCopies;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
-import static org.testory.common.Classes.zeroOrNull;
+import static org.testory.common.Classes.tryWrap;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.util.Matchers.invocationMatcher;
-import static org.testory.util.Uniques.hasUniques;
 import static org.testory.util.Uniques.unique;
 
 import java.util.AbstractList;
@@ -21,36 +20,30 @@ import org.testory.proxy.Invocation;
 public class Any {
   private final Class<?> type;
   private final Matcher matcher;
-  private final boolean hasToken;
-  private final Object tokenOrValue;
+  private final Object token;
 
-  private Any(Class<?> type, Matcher matcher, boolean hasToken, Object token) {
+  private Any(Class<?> type, Matcher matcher, Object token) {
     this.type = type;
     this.matcher = matcher;
-    this.hasToken = hasToken;
-    this.tokenOrValue = token;
+    this.token = token;
   }
 
   public static Any any(Class<?> type, Matcher matcher) {
     checkNotNull(type);
     checkNotNull(matcher);
-    boolean hasToken = hasUniques(type);
-    Object tokenOrValue = hasToken
-        ? unique(type)
-        : zeroOrNull(type);
-    return new Any(type, matcher, hasToken, tokenOrValue);
+    return new Any(type, matcher, unique(tryWrap(type)));
   }
 
   public boolean mustBe(Object argument) {
-    return hasToken && tokenOrValue == argument;
+    return token == argument;
   }
 
   public boolean couldBe(Object argument) {
     return true;
   }
 
-  public Object tokenOrValue() {
-    return tokenOrValue;
+  public Object token() {
+    return token;
   }
 
   public static Matcher solveInvocationMatcher(List<Any> anys, Invocation invocation) {

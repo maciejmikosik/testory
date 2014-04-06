@@ -1,7 +1,6 @@
 package org.testory;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.testory.Testory.any;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
@@ -19,29 +18,39 @@ public class Describe_any_primitive {
   }
 
   @Test
-  public void fits_in_primitive() {
+  public void fits_wrapper_in_primitive() {
     given(willReturn(true), mock).primitive(any(Integer.class));
     assertTrue(mock.primitive(5));
   }
 
   @Test
-  public void fits_in_wrapper() {
+  public void fits_wrapper_in_wrapper() {
     given(willReturn(true), mock).wrapper(any(Integer.class));
     assertTrue(mock.wrapper(5));
   }
 
   @Test
-  public void fits_in_wider_primitive() {
+  public void fits_wrapper_in_wider_primitive() {
     given(willReturn(true), mock).primitive(any(Byte.class));
     assertTrue(mock.primitive(5));
   }
 
   @Test
-  public void fails_for_primitive_type() {
-    try {
-      any(int.class);
-      fail();
-    } catch (TestoryException e) {}
+  public void fits_primitive_in_primitive() {
+    given(willReturn(true), mock).primitive(any(int.class));
+    assertTrue(mock.primitive(5));
+  }
+
+  @Test
+  public void fits_primitive_in_wrapper() {
+    given(willReturn(true), mock).wrapper(any(int.class));
+    assertTrue(mock.wrapper(5));
+  }
+
+  @Test
+  public void fits_primitive_in_wider_primitive() {
+    given(willReturn(true), mock).primitive(any(byte.class));
+    assertTrue(mock.primitive(5));
   }
 
   public interface Mock {
