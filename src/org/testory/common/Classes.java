@@ -125,4 +125,29 @@ public class Classes {
     map.put(Double.class, Double.valueOf(0));
     return Collections.unmodifiableMap(map);
   }
+
+  // TODO test
+  public static Class<?> tryWrap(Class<?> type) {
+    checkNotNull(type);
+    Class<?> wrappedOrNull = wrapping.get(type);
+    return wrappedOrNull != null
+        ? wrappedOrNull
+        : type;
+  }
+
+  private static final Map<Class<?>, Class<?>> wrapping = wrapping();
+
+  private static Map<Class<?>, Class<?>> wrapping() {
+    Map<Class<?>, Class<?>> map = new HashMap<Class<?>, Class<?>>();
+    map.put(void.class, Void.class);
+    map.put(boolean.class, Boolean.class);
+    map.put(char.class, Character.class);
+    map.put(byte.class, Byte.class);
+    map.put(short.class, Short.class);
+    map.put(int.class, Integer.class);
+    map.put(long.class, Long.class);
+    map.put(float.class, Float.class);
+    map.put(double.class, Double.class);
+    return Collections.unmodifiableMap(map);
+  }
 }
