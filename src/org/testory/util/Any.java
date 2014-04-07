@@ -4,13 +4,13 @@ import static java.util.Collections.nCopies;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.tryWrap;
+import static org.testory.common.Collections.flip;
 import static org.testory.common.Collections.last;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.util.Matchers.invocationMatcher;
 import static org.testory.util.Uniques.unique;
 
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,7 +65,7 @@ public class Any {
   private static List<Boolean> solve(List<Any> anys, List<Object> arguments) {
     List<Boolean> solution = trySolveEager(anys, arguments);
     checkArgument(solution != null);
-    checkArgument(areEqualDeep(reverse(solution), trySolveEager(reverse(anys), reverse(arguments))));
+    checkArgument(areEqualDeep(flip(solution), trySolveEager(flip(anys), flip(arguments))));
     return solution;
   }
 
@@ -135,18 +135,6 @@ public class Any {
       return null;
     }
     return solution;
-  }
-
-  private static <E> List<E> reverse(final List<E> list) {
-    return new AbstractList<E>() {
-      public E get(int index) {
-        return list.get(size() - 1 - index);
-      }
-
-      public int size() {
-        return list.size();
-      }
-    };
   }
 
   private static Matcher asMatcher(final Object argument) {
