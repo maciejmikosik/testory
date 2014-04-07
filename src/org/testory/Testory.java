@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.testory.common.Matcher;
+import org.testory.common.Matchers;
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
@@ -43,7 +44,6 @@ import org.testory.proxy.Proxies;
 import org.testory.proxy.Typing;
 import org.testory.util.Any;
 import org.testory.util.Effect;
-import org.testory.util.Matchers;
 
 public class Testory {
   private static History history = new History();

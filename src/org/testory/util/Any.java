@@ -4,17 +4,20 @@ import static java.util.Collections.nCopies;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.tryWrap;
+import static org.testory.common.Collections.flip;
+import static org.testory.common.Collections.last;
+import static org.testory.common.Matchers.arrayOf;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.util.Matchers.invocationMatcher;
 import static org.testory.util.Uniques.unique;
 
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.testory.common.Matcher;
+import org.testory.common.Matchers;
 import org.testory.common.Nullable;
 import org.testory.proxy.Invocation;
 
@@ -61,14 +64,10 @@ public class Any {
     return invocationMatcher(invocation.method, invocation.instance, argumentsMatchers);
   }
 
-  private static <E> E last(List<E> list) {
-    return list.get(list.size() - 1);
-  }
-
   private static List<Boolean> solve(List<Any> anys, List<Object> arguments) {
     List<Boolean> solution = trySolveEager(anys, arguments);
     checkArgument(solution != null);
-    checkArgument(areEqualDeep(reverse(solution), trySolveEager(reverse(anys), reverse(arguments))));
+    checkArgument(areEqualDeep(flip(solution), trySolveEager(flip(anys), flip(arguments))));
     return solution;
   }
 
@@ -82,25 +81,8 @@ public class Any {
   private static List<Matcher> packVarargs(int length, List<Matcher> unpacked) {
     List<Matcher> packed = new ArrayList<Matcher>();
     packed.addAll(unpacked.subList(0, length - 1));
-    packed.add(arrayContainingInOrder(unpacked.subList(length - 1, unpacked.size())));
+    packed.add(arrayOf(unpacked.subList(length - 1, unpacked.size())));
     return packed;
-  }
-
-  private static Matcher arrayContainingInOrder(final List<Matcher> elements) {
-    return new Matcher() {
-      public boolean matches(Object uncastItem) {
-        Object[] item = (Object[]) uncastItem;
-        if (item.length != elements.size()) {
-          return false;
-        }
-        for (int i = 0; i < elements.size(); i++) {
-          if (!elements.get(i).matches(item[i])) {
-            return false;
-          }
-        }
-        return true;
-      }
-    };
   }
 
   private static List<Matcher> matcherize(List<Boolean> solution, List<Any> anys,
@@ -138,18 +120,6 @@ public class Any {
       return null;
     }
     return solution;
-  }
-
-  private static <E> List<E> reverse(final List<E> list) {
-    return new AbstractList<E>() {
-      public E get(int index) {
-        return list.get(size() - 1 - index);
-      }
-
-      public int size() {
-        return list.size();
-      }
-    };
   }
 
   private static Matcher asMatcher(final Object argument) {

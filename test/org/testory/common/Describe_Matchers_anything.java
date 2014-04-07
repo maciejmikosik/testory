@@ -1,4 +1,4 @@
-package org.testory.util;
+package org.testory.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -6,7 +6,6 @@ import static org.testory.test.Testilities.newObject;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.common.Matcher;
 
 public class Describe_Matchers_anything {
   private Matcher matcher;
