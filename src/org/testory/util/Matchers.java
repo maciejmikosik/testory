@@ -2,6 +2,7 @@ package org.testory.util;
 
 import static org.testory.common.CharSequences.join;
 import static org.testory.common.Checks.checkArgument;
+import static org.testory.common.Matchers.listOf;
 import static org.testory.common.Throwables.gently;
 
 import java.lang.reflect.InvocationTargetException;
@@ -80,28 +81,11 @@ public class Matchers {
       public boolean matches(Object item) {
         Invocation invocation = (Invocation) item;
         return instance == invocation.instance && method.equals(invocation.method)
-            && containsInOrder(arguments).matches(invocation.arguments);
+            && listOf(arguments).matches(invocation.arguments);
       }
 
       public String toString() {
         return instance + "." + method.getName() + "(" + join(", ", arguments) + ")";
-      }
-    };
-  }
-
-  private static Matcher containsInOrder(final List<Matcher> elements) {
-    return new Matcher() {
-      public boolean matches(Object uncastItem) {
-        List<?> item = (List<?>) uncastItem;
-        if (item.size() != elements.size()) {
-          return false;
-        }
-        for (int i = 0; i < elements.size(); i++) {
-          if (!elements.get(i).matches(item.get(i))) {
-            return false;
-          }
-        }
-        return true;
       }
     };
   }

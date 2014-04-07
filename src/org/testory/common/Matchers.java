@@ -33,4 +33,30 @@ public class Matchers {
       }
     };
   }
+
+  public static Matcher listOf(List<Matcher> elementsMatchers) {
+    for (Matcher matcher : elementsMatchers) {
+      checkNotNull(matcher);
+    }
+    final List<Matcher> matchers = new ArrayList<Matcher>(elementsMatchers);
+    return new Matcher() {
+      public boolean matches(@Nullable Object item) {
+        return item instanceof List<?> && matchers.size() == ((List<?>) item).size()
+            && matchesElements((List<?>) item);
+      }
+
+      private boolean matchesElements(List<?> list) {
+        for (int i = 0; i < matchers.size(); i++) {
+          if (!matchers.get(i).matches(list.get(i))) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      public String toString() {
+        return "listOf(" + join(", ", matchers) + ")";
+      }
+    };
+  }
 }
