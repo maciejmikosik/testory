@@ -6,6 +6,7 @@ import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.tryWrap;
 import static org.testory.common.Collections.flip;
 import static org.testory.common.Collections.last;
+import static org.testory.common.Matchers.arrayOf;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.util.Matchers.invocationMatcher;
@@ -79,25 +80,8 @@ public class Any {
   private static List<Matcher> packVarargs(int length, List<Matcher> unpacked) {
     List<Matcher> packed = new ArrayList<Matcher>();
     packed.addAll(unpacked.subList(0, length - 1));
-    packed.add(arrayContainingInOrder(unpacked.subList(length - 1, unpacked.size())));
+    packed.add(arrayOf(unpacked.subList(length - 1, unpacked.size())));
     return packed;
-  }
-
-  private static Matcher arrayContainingInOrder(final List<Matcher> elements) {
-    return new Matcher() {
-      public boolean matches(Object uncastItem) {
-        Object[] item = (Object[]) uncastItem;
-        if (item.length != elements.size()) {
-          return false;
-        }
-        for (int i = 0; i < elements.size(); i++) {
-          if (!elements.get(i).matches(item[i])) {
-            return false;
-          }
-        }
-        return true;
-      }
-    };
   }
 
   private static List<Matcher> matcherize(List<Boolean> solution, List<Any> anys,
