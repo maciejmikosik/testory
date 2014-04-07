@@ -4,6 +4,7 @@ import static java.util.Collections.nCopies;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.tryWrap;
+import static org.testory.common.Collections.last;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.util.Matchers.invocationMatcher;
@@ -59,10 +60,6 @@ public class Any {
         ? packVarargs(invocation.method.getParameterTypes().length, matchers)
         : matchers;
     return invocationMatcher(invocation.method, invocation.instance, argumentsMatchers);
-  }
-
-  private static <E> E last(List<E> list) {
-    return list.get(list.size() - 1);
   }
 
   private static List<Boolean> solve(List<Any> anys, List<Object> arguments) {
