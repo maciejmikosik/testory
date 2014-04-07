@@ -8,6 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Matchers {
+  public static final Matcher anything = new Matcher() {
+    public boolean matches(@Nullable Object item) {
+      return true;
+    }
+
+    public String toString() {
+      return "anything";
+    }
+  };
+
   public static Matcher arrayOf(List<Matcher> elementsMatchers) {
     for (Matcher matcher : elementsMatchers) {
       checkNotNull(matcher);

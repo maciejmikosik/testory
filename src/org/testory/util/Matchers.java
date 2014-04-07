@@ -65,16 +65,6 @@ public class Matchers {
     }
   }
 
-  public static final Matcher anything = new Matcher() {
-    public boolean matches(@Nullable Object item) {
-      return true;
-    }
-
-    public String toString() {
-      return "anything";
-    }
-  };
-
   public static Matcher invocationMatcher(final Method method, final Object instance,
       final List<Matcher> arguments) {
     return new Matcher() {
