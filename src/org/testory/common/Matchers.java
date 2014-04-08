@@ -18,6 +18,18 @@ public class Matchers {
     }
   };
 
+  public static Matcher same(@Nullable final Object object) {
+    return new Matcher() {
+      public boolean matches(@Nullable Object item) {
+        return object == item;
+      }
+
+      public String toString() {
+        return "same(" + object + ")";
+      }
+    };
+  }
+
   public static Matcher arrayOf(List<Matcher> elementsMatchers) {
     for (Matcher matcher : elementsMatchers) {
       checkNotNull(matcher);
