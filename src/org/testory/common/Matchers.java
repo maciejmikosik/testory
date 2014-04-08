@@ -94,4 +94,20 @@ public class Matchers {
       }
     };
   }
+
+  public static class ProxyMatcher implements Matcher {
+    private final Matcher target;
+
+    public ProxyMatcher(Matcher target) {
+      this.target = checkNotNull(target);
+    }
+
+    public boolean matches(@Nullable Object item) {
+      return target.matches(item);
+    }
+
+    public String toString() {
+      return target.toString();
+    }
+  }
 }
