@@ -2,6 +2,7 @@ package org.testory.common;
 
 import static org.testory.common.CharSequences.join;
 import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Objects.areEqualDeep;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -26,6 +27,18 @@ public class Matchers {
 
       public String toString() {
         return "same(" + object + ")";
+      }
+    };
+  }
+
+  public static Matcher equalDeep(@Nullable final Object object) {
+    return new Matcher() {
+      public boolean matches(@Nullable Object item) {
+        return areEqualDeep(object, item);
+      }
+
+      public String toString() {
+        return "equalDeep(" + object + ")";
       }
     };
   }
