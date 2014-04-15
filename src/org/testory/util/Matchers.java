@@ -1,17 +1,13 @@
 package org.testory.util;
 
-import static org.testory.common.CharSequences.join;
 import static org.testory.common.Checks.checkArgument;
-import static org.testory.common.Matchers.listOf;
 import static org.testory.common.Throwables.gently;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
-import org.testory.proxy.Invocation;
 
 public class Matchers {
   public static boolean isMatcher(Object matcher) {
@@ -63,20 +59,5 @@ public class Matchers {
     } catch (NoSuchMethodException e) {
       return null;
     }
-  }
-
-  public static Matcher invocationMatcher(final Method method, final Object instance,
-      final List<Matcher> arguments) {
-    return new Matcher() {
-      public boolean matches(Object item) {
-        Invocation invocation = (Invocation) item;
-        return instance == invocation.instance && method.equals(invocation.method)
-            && listOf(arguments).matches(invocation.arguments);
-      }
-
-      public String toString() {
-        return instance + "." + method.getName() + "(" + join(", ", arguments) + ")";
-      }
-    };
   }
 }
