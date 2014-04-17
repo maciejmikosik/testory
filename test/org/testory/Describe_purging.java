@@ -3,90 +3,81 @@ package org.testory;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
-import static org.testory.Testory.givenTest;
 import static org.testory.Testory.mock;
+import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
+import static org.testory.test.Testilities.newObject;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.proxy.Invocation;
 
 public class Describe_purging {
-  private Object mock;
-  private String string;
+  private Mockable mock;
+  private Object object;
 
   @Before
   public void before() {
-    string = "string";
+    mock = mock(Mockable.class);
+    object = newObject("object");
   }
 
   @Test
-  public void mock_is_unusable_after_purging() {
-    mock = mock(Object.class);
-
+  public void disables_invocation() {
     triggerPurge();
-
     try {
-      mock.toString();
-      fail();
-    } catch (TestoryException e) {}
-    try {
-      mock.equals(mock);
-      fail();
-    } catch (TestoryException e) {}
-    try {
-      mock.hashCode();
+      mock.getObject();
       fail();
     } catch (TestoryException e) {}
   }
 
   @Test
-  public void injected_mock_is_unusable_after_purging() {
-    class TestClass {
-      Object field;
+  public void disables_stubbing() {
+    triggerPurge();
+    try {
+      given(willReturn(object), mock);
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void disables_verification() {
+    triggerPurge();
+    try {
+      thenCalled(mock);
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void requires_double_when() {
+    given(willReturn(object), onInstance(mock));
+    when("");
+    assertSame(object, mock.getObject());
+    when("");
+    try {
+      mock.getObject();
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  private static void triggerPurge() {
+    when("");
+    when("");
+  }
+
+  private static Captor onInstance(final Object mock) {
+    return new Captor() {
+      public boolean matches(Invocation invocation) {
+        return invocation.instance == mock;
+      }
+    };
+  }
+
+  private static class Mockable {
+    public Object getObject() {
+      throw null;
     }
-    TestClass test = new TestClass();
-    givenTest(test);
-    mock = test.field;
-
-    triggerPurge();
-
-    try {
-      mock.toString();
-      fail();
-    } catch (TestoryException e) {}
-    try {
-      mock.equals(mock);
-      fail();
-    } catch (TestoryException e) {}
-    try {
-      mock.hashCode();
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void single_when_does_not_purge_stubbing() {
-    mock = mock(Object.class);
-    given(willReturn(string), mock).toString();
-    when("");
-    assertSame(string, mock.toString());
-  }
-
-  @Test
-  public void double_when_purges_stubbings() {
-    mock = mock(Object.class);
-    given(willReturn(string), mock).toString();
-    when("");
-    when("");
-    try {
-      mock.toString();
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  private void triggerPurge() {
-    when("");
-    when("");
   }
 }

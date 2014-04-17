@@ -4,15 +4,26 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.testory.Testory.mock;
 import static org.testory.Testory.then;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenThrown;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.testory.proxy.Invocation;
 
 public class Describe_cloaking {
   private int line;
+  private Captor neverCaptor;
+
+  @Before
+  public void before() {
+    neverCaptor = new Captor() {
+      public boolean matches(Invocation invocation) {
+        return false;
+      }
+    };
+  }
 
   @Test
   public void cloaks_at_calling_testory() {
@@ -25,7 +36,7 @@ public class Describe_cloaking {
     }
 
     try {
-      thenCalled(mock(Object.class)).toString();
+      thenCalled(neverCaptor);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(1, e.getStackTrace().length);
@@ -47,7 +58,7 @@ public class Describe_cloaking {
     line = -1;
     try {
       line = new Exception().getStackTrace()[0].getLineNumber();
-      thenCalled(mock(Object.class)).toString();
+      thenCalled(neverCaptor);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(line + 1, e.getStackTrace()[0].getLineNumber());
