@@ -10,8 +10,8 @@ import java.util.List;
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
-import org.testory.util.Any;
 import org.testory.util.Effect;
+import org.testory.util.any.Any;
 
 class History {
   /** youngest at begin */

@@ -24,6 +24,9 @@ import static org.testory.util.Matchers.asMatcher;
 import static org.testory.util.Matchers.isMatcher;
 import static org.testory.util.Samples.isSampleable;
 import static org.testory.util.Samples.sample;
+import static org.testory.util.any.Anyvocation.anyvocation;
+import static org.testory.util.any.Matcherizes.matcherize;
+import static org.testory.util.any.Repairs.repair;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -42,8 +45,9 @@ import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.Proxies;
 import org.testory.proxy.Typing;
-import org.testory.util.Any;
 import org.testory.util.Effect;
+import org.testory.util.any.Any;
+import org.testory.util.any.Anyvocation;
 
 public class Testory {
   private static History history = new History();
@@ -252,7 +256,7 @@ public class Testory {
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        history.logStubbing(will, solveCaptor(invocation));
+        history.logStubbing(will, captorize(invocation));
         return null;
       }
     };
@@ -318,7 +322,7 @@ public class Testory {
     check(type != null);
     Any any = Any.any(type, matcher);
     history.logAny(any);
-    return (T) any.token();
+    return (T) any.token;
   }
 
   public static Captor onInstance(final Object mock) {
@@ -596,7 +600,7 @@ public class Testory {
     Handler handler = new Handler() {
       @Nullable
       public Object handle(Invocation invocation) throws Throwable {
-        thenCalledTimes(numberMatcher, solveCaptor(invocation));
+        thenCalledTimes(numberMatcher, captorize(invocation));
         return null;
       }
     };
@@ -682,23 +686,25 @@ public class Testory {
     throwable.setStackTrace(new StackTraceElement[] { stackTrace[index + 1] });
   }
 
-  private static Captor solveCaptor(Invocation invocation) {
+  private static Captor captorize(Invocation invocation) {
     List<Any> anys = history.getAnysAndConsume();
-    return asCaptor(solveInvocationMatcher(anys, invocation));
+    Anyvocation anyvocation = anyvocation(invocation.method, invocation.instance,
+        invocation.arguments, anys);
+    return captorize(matcherize(repairOrFail(anyvocation)));
   }
 
-  private static Matcher solveInvocationMatcher(List<Any> anys, Invocation invocation) {
+  private static Anyvocation repairOrFail(Anyvocation anyvocation) {
     try {
-      return Any.solveInvocationMatcher(anys, invocation);
+      return repair(anyvocation);
     } catch (IllegalArgumentException e) {
       throw new TestoryException(e);
     }
   }
 
-  private static Captor asCaptor(final Matcher invocationMatcher) {
+  private static Captor captorize(final Matcher invocationMatcher) {
     return new Captor() {
-      public boolean matches(Invocation item) {
-        return invocationMatcher.matches(item);
+      public boolean matches(Invocation invocation) {
+        return invocationMatcher.matches(invocation);
       }
 
       public String toString() {
