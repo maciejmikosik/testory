@@ -185,15 +185,14 @@ In most cases you can mix `any`s with real arguments.
 
         given(willReturn(true), mock).someMethod(object, any(Object.class));
 
-In cases where you cannot (due to complicated technical limitations) `TestoryException` is thrown.
+In cases where you cannot (due to technical limitations) `TestoryException` is thrown.
 
         // throws TestoryException
-        given(willReturn(object), mock).someMethod(any(Integer.class), object, 0);
+        given(willReturn(true), mock).someMethod(any(int.class), intValue);
 
-In such cases replace more arguments with `any`s until it works
+You can workaround those cases by using additional `any`.
 
-        // works
-        given(willReturn(object), mock).someMethod(any(Integer.class), any(Object.class, equalTo(object)), 0);
+        given(willReturn(true), mock).someMethod(any(int.class), any(int.class, equalTo(intValue)));
 
 ### Spying
 
