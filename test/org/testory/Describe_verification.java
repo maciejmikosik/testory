@@ -1,6 +1,7 @@
 package org.testory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
@@ -9,415 +10,222 @@ import static org.testory.Testory.when;
 import static org.testory.test.Testilities.newObject;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Invocation;
 
 public class Describe_verification {
-  private Object object, otherObject;
-  private Object matcher;
-  private List<Object> mock, otherMock;
-  private Captor captor;
+  private Object object;
+  private Captor onAnything, onNothing;
+  private Mockable mock, never, once, twice, thrice;
+  private Object numberMatcher;
+  private Invocation invocation;
 
   @Before
   public void before() {
     object = newObject("object");
-    otherObject = newObject("otherObject");
-    matcher = new Object() {
-      @SuppressWarnings("unused")
-      public boolean matches(Object number) {
-        return false;
-      }
-    };
-    mock = mock(List.class);
-    otherMock = mock(List.class);
-  }
-
-  @Test
-  public void asserts_invocation_without_arguments() {
-    mock.size();
-    thenCalled(mock).size();
-  }
-
-  @Test
-  public void asserts_invocation_with_argument() {
-    mock.add(object);
-    thenCalled(mock).add(object);
-  }
-
-  @Test
-  public void fails_for_different_instance() {
-    otherMock.size();
-    try {
-      thenCalled(mock).size();
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected called times 1\n" //
-          + "    " + mock + ".size()\n" //
-      , e.getMessage());
-    }
-  }
-
-  @Test
-  public void fails_for_different_method() {
-    mock.clear();
-    try {
-      thenCalled(mock).size();
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected called times 1\n" //
-          + "    " + mock + ".size()\n" //
-      , e.getMessage());
-    }
-  }
-
-  @Test
-  public void fails_for_different_argument() {
-    mock.add(otherObject);
-    try {
-      thenCalled(mock).add(object);
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected called times 1\n" //
-          + "    " + mock + ".add(" + object + ")" + "\n" //
-      , e.getMessage());
-    }
-  }
-
-  @Test
-  public void fails_for_missing_invocation() {
-    try {
-      thenCalled(mock).size();
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected called times 1\n" //
-          + "    " + mock + ".size()\n" //
-      , e.getMessage());
-    }
-  }
-
-  @Test
-  public void fails_for_repeated_invocation() {
-    mock.size();
-    mock.size();
-    try {
-      thenCalled(mock).size();
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected called times 1\n" //
-          + "    " + mock + ".size()" + "\n" //
-      , e.getMessage());
-    }
-  }
-
-  @Test
-  public void asserts_invocation_with_custom_logic() {
-    mock.add(object);
-    thenCalled(new Captor() {
-      public boolean matches(Invocation invocation) {
-        return invocation.instance == mock && invocation.method.getName().equals("add")
-            && invocation.arguments.equals(Arrays.asList(object));
-      }
-    });
-  }
-
-  @Test
-  public void fails_invocation_with_custom_logic() {
-    try {
-      captor = new Captor() {
-        public boolean matches(Invocation invocation) {
-          return invocation.instance == mock && invocation.method.getName().equals("add")
-              && invocation.arguments.equals(Arrays.asList(object));
-        }
-      };
-      thenCalled(captor);
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected called times 1\n" //
-          + "    " + captor + "\n" //
-      , e.getMessage());
-    }
-  }
-
-  @Test
-  public void asserts_exact_number_of_invocations() {
-    mock.size();
-    mock.size();
-    mock.size();
-
-    thenCalledTimes(3, mock).size();
-    thenCalledTimes(3, new Captor() {
-      public boolean matches(Invocation invocation) {
-        return invocation.instance == mock && invocation.method.getName().equals("size");
-      }
-    });
-  }
-
-  @Test
-  public void asserts_zero_number_of_invocations() {
-    thenCalledTimes(0, mock).size();
-    thenCalledTimes(0, new Captor() {
-      public boolean matches(Invocation invocation) {
-        return invocation.instance == mock && invocation.method.getName().equals("size");
-      }
-    });
-  }
-
-  @Test
-  public void fails_for_less_number_of_invocations() {
-    mock.size();
-    mock.size();
-
-    try {
-      thenCalledTimes(3, mock).size();
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected called times " + 3 + "\n" //
-          + "    " + mock + ".size()" + "\n" //
-      , e.getMessage());
-    }
-
-    try {
-      captor = new Captor() {
-        public boolean matches(Invocation invocation) {
-          return invocation.instance == mock && invocation.method.getName().equals("size");
-        }
-      };
-      thenCalledTimes(3, captor);
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected called times " + 3 + "\n" //
-          + "    " + captor + "\n" //
-      , e.getMessage());
-    }
-  }
-
-  @Test
-  public void fails_for_more_number_of_invocations() {
-    mock.size();
-    mock.size();
-    mock.size();
-    mock.size();
-
-    try {
-      thenCalledTimes(3, mock).size();
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected called times " + 3 + "\n" //
-          + "    " + mock + ".size()" + "\n" //
-      , e.getMessage());
-    }
-
-    try {
-      captor = new Captor() {
-        public boolean matches(Invocation invocation) {
-          return invocation.instance == mock && invocation.method.getName().equals("size");
-        }
-      };
-      thenCalledTimes(3, captor);
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected called times " + 3 + "\n" //
-          + "    " + captor + "\n" //
-      , e.getMessage());
-    }
-  }
-
-  @Test
-  public void asserts_matching_number_of_invocations() {
-    mock.size();
-    mock.size();
-    mock.size();
-
-    matcher = new Object() {
-      @SuppressWarnings("unused")
-      public boolean matches(Object number) {
-        return number.equals(3);
-      }
-    };
-    thenCalledTimes(matcher, mock).size();
-    thenCalledTimes(matcher, new Captor() {
-      public boolean matches(Invocation invocation) {
-        return invocation.instance == mock && invocation.method.getName().equals("size");
-      }
-    });
-  }
-
-  @Test
-  public void fails_for_not_matching_number_of_invocations() {
-    mock.size();
-    mock.size();
-
-    matcher = new Object() {
-      @SuppressWarnings("unused")
-      public boolean matches(Object number) {
-        return number.equals(3);
+    onAnything = new Captor() {
+      public boolean matches(Invocation inv) {
+        return true;
       }
 
       public String toString() {
-        return "matcher";
+        return "onAnything";
       }
     };
+    onNothing = new Captor() {
+      public boolean matches(Invocation inv) {
+        return false;
+      }
 
+      public String toString() {
+        return "onNothing";
+      }
+    };
+    mock = mock(Mockable.class);
+    never = mock(Mockable.class);
+    once = mock(Mockable.class);
+    twice = mock(Mockable.class);
+    thrice = mock(Mockable.class);
+    once.invoke();
+    twice.invoke();
+    twice.invoke();
+    thrice.invoke();
+    thrice.invoke();
+    thrice.invoke();
+  }
+
+  @Test
+  public void verification_requires_one_call() {
     try {
-      thenCalledTimes(matcher, mock).size();
+      thenCalled(onInstance(never));
+      fail();
+    } catch (TestoryAssertionError e) {}
+    thenCalled(onInstance(once));
+    try {
+      thenCalled(onInstance(twice));
+      fail();
+    } catch (TestoryAssertionError e) {}
+    try {
+      thenCalled(onInstance(thrice));
+      fail();
+    } catch (TestoryAssertionError e) {}
+  }
+
+  @Test
+  public void verification_requires_number_of_calls() {
+    try {
+      thenCalledTimes(2, onInstance(never));
+      fail();
+    } catch (TestoryAssertionError e) {}
+    try {
+      thenCalledTimes(2, onInstance(once));
+      fail();
+    } catch (TestoryAssertionError e) {}
+    thenCalledTimes(2, onInstance(twice));
+    try {
+      thenCalledTimes(2, onInstance(thrice));
+      fail();
+    } catch (TestoryAssertionError e) {}
+
+    thenCalledTimes(0, onInstance(never));
+    try {
+      thenCalledTimes(0, onInstance(once));
+      fail();
+    } catch (TestoryAssertionError e) {}
+    try {
+      thenCalledTimes(0, onInstance(twice));
+      fail();
+    } catch (TestoryAssertionError e) {}
+  }
+
+  @Test
+  public void verification_requires_matching_number_of_calls() {
+    numberMatcher = number(1, 2);
+    try {
+      thenCalledTimes(numberMatcher, onInstance(never));
+      fail();
+    } catch (TestoryAssertionError e) {}
+    thenCalledTimes(numberMatcher, onInstance(once));
+    thenCalledTimes(numberMatcher, onInstance(twice));
+    try {
+      thenCalledTimes(numberMatcher, onInstance(thrice));
+      fail();
+    } catch (TestoryAssertionError e) {}
+  }
+
+  @Test
+  public void verification_prints_failed_expectation() {
+    try {
+      thenCalled(onNothing);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected called times " + matcher + "\n" //
-          + "    " + mock + ".size()" + "\n" //
+          + "  expected called times 1\n" //
+          + "    " + onNothing + "\n" //
       , e.getMessage());
     }
 
     try {
-      captor = new Captor() {
-        public boolean matches(Invocation invocation) {
-          return invocation.instance == mock && invocation.method.getName().equals("size");
-        }
-      };
-      thenCalledTimes(matcher, captor);
+      thenCalledTimes(3, onNothing);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals("\n" //
-          + "  expected called times " + matcher + "\n" //
-          + "    " + captor + "\n" //
+          + "  expected called times 3\n" //
+          + "    " + onNothing + "\n" //
+      , e.getMessage());
+    }
+
+    numberMatcher = number(2);
+    try {
+      thenCalledTimes(numberMatcher, onNothing);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n" //
+          + "  expected called times " + numberMatcher + "\n" //
+          + "    " + onNothing + "\n" //
       , e.getMessage());
     }
   }
 
   @Test
   public void verification_does_not_affect_following_verifications() {
-    mock.size();
-    thenCalled(mock).size();
-    thenCalled(mock).size();
+    thenCalled(onInstance(once));
+    thenCalled(onInstance(once));
+    thenCalledTimes(2, onInstance(twice));
+    thenCalledTimes(2, onInstance(twice));
+    thenCalledTimes(number(2), onInstance(twice));
+    thenCalledTimes(number(2), onInstance(twice));
   }
 
   @Test
-  public void invocations_inside_when_are_included() {
-    when(mock.size());
-    thenCalled(mock).size();
+  public void verification_includes_invocations_inside_when() {
+    when(mock.invoke());
+    thenCalled(onInstance(mock));
   }
 
   @Test
-  public void invocations_before_when_are_included() {
-    mock.size();
+  public void verification_includes_invocations_before_when() {
+    mock.invoke();
     when("do something");
-    thenCalled(mock).size();
+    thenCalled(onInstance(mock));
   }
 
   @Test
-  public void invocations_before_when_closure_are_included() {
-    mock.size();
+  public void verificaiton_includes_invocations_before_when_closure() {
+    mock.invoke();
     when(new Closure() {
       public Object invoke() throws Throwable {
         return null;
       }
     });
-    thenCalled(mock).size();
+    thenCalled(onInstance(mock));
   }
 
   @Test
-  public void number_of_calls_cannot_be_negative() {
-    try {
-      thenCalledTimes(-1, mock);
-      fail();
-    } catch (TestoryException e) {}
-
-    try {
-      thenCalledTimes(-1, new Captor() {
-        public boolean matches(Invocation invocation) {
-          return false;
+  public void captor_matches_invocation_on_mock() throws NoSuchMethodException {
+    mock.acceptObject(object);
+    thenCalled(new Captor() {
+      public boolean matches(Invocation inv) {
+        if (inv.instance == mock) {
+          invocation = inv;
+          return true;
         }
-      });
+        return false;
+      }
+    });
+    assertSame(mock, invocation.instance);
+    assertEquals(Mockable.class.getMethod("acceptObject", Object.class), invocation.method);
+    assertEquals(Arrays.asList(object), invocation.arguments);
+  }
+
+  @Test
+  public void checks_that_number_of_calls_is_not_negative() {
+    try {
+      thenCalledTimes(-1, onNothing);
       fail();
     } catch (TestoryException e) {}
   }
 
   @Test
-  public void number_matcher_cannot_be_any_object() {
-    matcher = new Object();
+  public void checks_that_number_matcher_is_matcher() {
     try {
-      thenCalledTimes(matcher, mock);
-      fail();
-    } catch (TestoryException e) {}
-
-    try {
-      thenCalledTimes(matcher, new Captor() {
-        public boolean matches(Invocation invocation) {
-          return false;
-        }
-      });
+      thenCalledTimes(new Object(), onAnything);
       fail();
     } catch (TestoryException e) {}
   }
 
   @Test
-  public void number_matcher_cannot_be_null() {
+  public void checks_that_number_matcher_is_not_null() {
     try {
-      thenCalledTimes(null, mock);
-      fail();
-    } catch (TestoryException e) {}
-
-    try {
-      thenCalledTimes(null, new Captor() {
-        public boolean matches(Invocation invocation) {
-          return false;
-        }
-      });
+      thenCalledTimes(null, onAnything);
       fail();
     } catch (TestoryException e) {}
   }
 
   @Test
-  public void mock_cannot_be_null() {
-    try {
-      thenCalled((Object) null);
-      fail();
-    } catch (TestoryException e) {}
-
-    try {
-      thenCalledTimes(1, (Object) null);
-      fail();
-    } catch (TestoryException e) {}
-
-    try {
-      thenCalledTimes(matcher, (Object) null);
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void mock_cannot_be_any_object() {
-    try {
-      thenCalled(new Object());
-      fail();
-    } catch (TestoryException e) {}
-
-    try {
-      thenCalledTimes(1, new Object());
-      fail();
-    } catch (TestoryException e) {}
-
-    try {
-      thenCalledTimes(matcher, new Object());
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void captor_cannot_be_null() {
+  public void checks_that_captor_is_not_null() {
     try {
       thenCalled((Captor) null);
       fail();
@@ -429,8 +237,37 @@ public class Describe_verification {
     } catch (TestoryException e) {}
 
     try {
-      thenCalledTimes(matcher, (Captor) null);
+      thenCalledTimes(number(1), (Captor) null);
       fail();
     } catch (TestoryException e) {}
+  }
+
+  private static Captor onInstance(final Object mock) {
+    return new Captor() {
+      public boolean matches(Invocation invocation) {
+        return invocation.instance == mock;
+      }
+    };
+  }
+
+  private static Object number(final Integer... numbers) {
+    return new Object() {
+      @SuppressWarnings("unused")
+      public boolean matches(Object item) {
+        return Arrays.asList(numbers).contains(item);
+      }
+
+      public String toString() {
+        return "number(" + Arrays.toString(numbers) + ")";
+      }
+    };
+  }
+
+  private static class Mockable {
+    public Object invoke() {
+      return null;
+    }
+
+    public void acceptObject(Object o) {}
   }
 }

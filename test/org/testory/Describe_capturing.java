@@ -1,115 +1,209 @@
 package org.testory;
 
-import static java.lang.String.format;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
-import static org.testory.Testory.onInstance;
-import static org.testory.Testory.onReturn;
 import static org.testory.Testory.thenCalled;
-import static org.testory.Testory.when;
+import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.willReturn;
+import static org.testory.test.Testilities.newObject;
 
-import org.junit.After;
+import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.proxy.Handler;
+import org.testory.proxy.Invocation;
 
 public class Describe_capturing {
-  private Service mock, otherMock;
-  private Data data;
-
-  public interface Data {}
-
-  public interface OtherData {}
-
-  public interface Service {
-    Data getData();
-
-    OtherData getOtherData();
-  }
+  private Object object, otherObject;
+  private Mockable mock, otherMock;
+  private Handler handler;
+  private Object numberMatcher;
 
   @Before
   public void before() {
-    purge();
-
-    mock = mock(Service.class);
-    otherMock = mock(Service.class);
-    data = mock(Data.class);
-  }
-
-  @After
-  public void after() {
-    purge();
-  }
-
-  private void purge() {
-    when("");
-    when("");
+    object = newObject("object");
+    otherObject = newObject("otherObject");
+    mock = mock(Mockable.class);
+    otherMock = mock(Mockable.class);
+    handler = new Handler() {
+      public Object handle(Invocation invocation) {
+        return null;
+      }
+    };
   }
 
   @Test
-  public void matches_same_instance() {
-    given(willReturn(data), onInstance(mock));
-    assertSame(data, mock.getData());
-    thenCalled(onInstance(mock));
+  public void stubbing_supports_capturing() {
+    given(willReturn(object), mock).returnObject(object);
+    assertSame(object, mock.returnObject(object));
+    assertNotSame(object, otherMock.returnObject(object));
+    assertNotSame(object, mock.returnOtherObject(object));
+    assertNotSame(object, mock.returnObject(otherObject));
   }
 
   @Test
-  public void not_matches_other_instance() {
-    given(willReturn(data), onInstance(mock));
-    given(willReturn("mock"), mock).toString(); // makes mock printable in error message
-    assertNotSame(data, otherMock.getData());
+  public void stubbing_checks_arguments() {
     try {
-      thenCalled(onInstance(mock));
+      given(null, mock);
       fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals(format("\n" //
-          + "  expected called times 1\n" //
-          + "    onInstance(%s)\n", //
-          mock), //
-          e.getMessage());
-    }
-  }
-
-  @Test
-  public void matches_return_type() {
-    given(willReturn(data), onReturn(Data.class));
-    assertSame(data, mock.getData());
-    thenCalled(onReturn(Data.class));
-  }
-
-  @Test
-  public void not_matches_other_return_type() {
-    given(willReturn(data), onReturn(Data.class));
-    assertNotSame(data, mock.getOtherData());
+    } catch (TestoryException e) {}
     try {
-      thenCalled(onReturn(Data.class));
+      given(handler, (Object) null);
       fail();
-    } catch (TestoryAssertionError e) {
-      assertEquals(format("\n" //
-          + "  expected called times 1\n" //
-          + "    onReturn(%s)\n", //
-          Data.class.getName()), //
-          e.getMessage());
-    }
-  }
-
-  @Test
-  public void instance_cannot_be_null() {
+    } catch (TestoryException e) {}
     try {
-      onInstance(null);
+      given(handler, new Object());
       fail();
     } catch (TestoryException e) {}
   }
 
   @Test
-  public void return_type_cannot_be_null() {
+  public void verification_supports_capturing() {
+    mock.returnObject(object);
+    thenCalled(mock).returnObject(object);
     try {
-      onReturn(null);
+      thenCalled(otherMock).returnObject(object);
+      fail();
+    } catch (TestoryAssertionError e) {}
+    try {
+      thenCalled(mock).returnOtherObject(object);
+      fail();
+    } catch (TestoryAssertionError e) {}
+    try {
+      thenCalled(mock).returnObject(otherObject);
+      fail();
+    } catch (TestoryAssertionError e) {}
+  }
+
+  @Test
+  public void verification_exact_times_supports_capturing() {
+    mock.returnObject(object);
+    mock.returnObject(object);
+    thenCalledTimes(2, mock).returnObject(object);
+    try {
+      thenCalledTimes(2, otherMock).returnObject(object);
+      fail();
+    } catch (TestoryAssertionError e) {}
+    try {
+      thenCalledTimes(2, mock).returnOtherObject(object);
+      fail();
+    } catch (TestoryAssertionError e) {}
+    try {
+      thenCalledTimes(2, mock).returnObject(otherObject);
+      fail();
+    } catch (TestoryAssertionError e) {}
+    try {
+      thenCalledTimes(3, mock).returnObject(object);
+      fail();
+    } catch (TestoryAssertionError e) {}
+  }
+
+  @Test
+  public void verification_matching_times_supports_capturing() {
+    numberMatcher = number(2);
+    mock.returnObject(object);
+    mock.returnObject(object);
+    thenCalledTimes(numberMatcher, mock).returnObject(object);
+    try {
+      thenCalledTimes(numberMatcher, otherMock).returnObject(object);
+      fail();
+    } catch (TestoryAssertionError e) {}
+    try {
+      thenCalledTimes(numberMatcher, mock).returnOtherObject(object);
+      fail();
+    } catch (TestoryAssertionError e) {}
+    try {
+      thenCalledTimes(numberMatcher, mock).returnObject(otherObject);
+      fail();
+    } catch (TestoryAssertionError e) {}
+    try {
+      thenCalledTimes(number(3), mock).returnObject(object);
+      fail();
+    } catch (TestoryAssertionError e) {}
+  }
+
+  @Test
+  public void verification_checks_arguments() {
+    try {
+      thenCalled((Object) null);
       fail();
     } catch (TestoryException e) {}
+    try {
+      thenCalledTimes(1, (Object) null);
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      thenCalledTimes(numberMatcher, (Object) null);
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      thenCalled(new Object());
+      fail();
+    } catch (TestoryException e) {}
+
+    try {
+      thenCalledTimes(1, new Object());
+      fail();
+    } catch (TestoryException e) {}
+
+    try {
+      thenCalledTimes(number(2), new Object());
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void captured_invocation_is_printable() {
+    try {
+      thenCalled(mock).invoke();
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage().contains(mock + ".invoke()"));
+    }
+    try {
+      thenCalled(mock).returnObject(object);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage().contains(mock + ".returnObject(" + object + ")"));
+    }
+    try {
+      thenCalled(mock).acceptObjects(object, otherObject);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage().contains(
+          mock + ".acceptObjects(" + object + ", " + otherObject + ")"));
+    }
+  }
+
+  private static Object number(final Integer... numbers) {
+    return new Object() {
+      @SuppressWarnings("unused")
+      public boolean matches(Object item) {
+        return Arrays.asList(numbers).contains(item);
+      }
+
+      public String toString() {
+        return "number(" + Arrays.toString(numbers) + ")";
+      }
+    };
+  }
+
+  private static class Mockable {
+    public void invoke() {}
+
+    public Object returnObject(Object object) {
+      return null;
+    }
+
+    public Object returnOtherObject(Object object) {
+      return null;
+    }
+
+    public void acceptObjects(Object object, Object otherObject) {}
   }
 }
