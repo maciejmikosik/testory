@@ -95,6 +95,21 @@ public class Describe_any_repairing {
   }
 
   @Test
+  public void solves_unsurrounded_primitive_types() {
+    given(willReturn(true), mock).objects(a, a, any(Integer.class, equal(i)),
+        any(Integer.class, equal(i)), a, a);
+
+    assertTrue(mock.objects(a, a, i, i, a, a));
+
+    assertFalse(mock.objects(x, a, i, i, a, a));
+    assertFalse(mock.objects(a, x, i, i, a, a));
+    assertFalse(mock.objects(a, a, j, i, a, a));
+    assertFalse(mock.objects(a, a, i, j, a, a));
+    assertFalse(mock.objects(a, a, i, i, x, a));
+    assertFalse(mock.objects(a, a, i, i, a, x));
+  }
+
+  @Test
   public void cannot_solve_more_anys_than_parameters() {
     try {
       any(Object.class);
