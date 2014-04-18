@@ -16,7 +16,7 @@ import org.junit.Test;
 
 public class Describe_any_repairing {
   private Object a, b, x;
-  private int i, j;
+  private int i, j, k;
   private Mock mock;
 
   @Before
@@ -27,6 +27,7 @@ public class Describe_any_repairing {
     x = newObject("x");
     i = 123;
     j = 456;
+    k = 789;
   }
 
   @After
@@ -131,6 +132,19 @@ public class Describe_any_repairing {
   }
 
   @Test
+  public void solves_primitive_varargs() {
+    given(willReturn(true), mock).primitiveVarargs(any(int.class, equal(i)),
+        any(int.class, equal(i)), any(int.class, equal(j)), any(int.class, equal(i)));
+
+    assertTrue(mock.primitiveVarargs(i, i, j, i));
+
+    assertFalse(mock.primitiveVarargs(k, i, j, i));
+    assertFalse(mock.primitiveVarargs(i, k, j, i));
+    assertFalse(mock.primitiveVarargs(i, i, k, i));
+    assertFalse(mock.primitiveVarargs(i, i, j, k));
+  }
+
+  @Test
   public void solves_varargs_for_explicit_object() {
     given(willReturn(true), mock).varargs(a, any(Object.class));
 
@@ -182,5 +196,7 @@ public class Describe_any_repairing {
     boolean objects(Object a, Object b, int c, int d, Object e, Object f);
 
     boolean varargs(Object a, Object... os);
+
+    boolean primitiveVarargs(int i, int... is);
   }
 }

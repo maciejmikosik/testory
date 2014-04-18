@@ -27,7 +27,7 @@ public class Repairs {
         : parameters;
     List<Object> repairedUnfolded = repair(unfoldedParameters, unfolded, anyvocation);
     List<Object> repaired = isVarargs
-        ? foldArguments(last(parameters), parameters.size(), repairedUnfolded)
+        ? foldArguments(parameters.size(), repairedUnfolded)
         : repairedUnfolded;
     return anyvocation(anyvocation.method, anyvocation.instance, repaired, anyvocation.anys);
   }
@@ -84,19 +84,27 @@ public class Repairs {
   private static List<Object> unfoldArguments(List<?> packed) {
     ArrayList<Object> unpacked = new ArrayList<Object>();
     unpacked.addAll(packed.subList(0, packed.size() - 1));
-    unpacked.addAll(asList((Object[]) last(packed)));
+    unpacked.addAll(asBoxingList(last(packed)));
     return unpacked;
   }
 
-  private static List<Object> foldArguments(Class<?> arrayType, int length, List<Object> arguments) {
+  private static List<Object> asBoxingList(Object array) {
+    List<Object> list = new ArrayList<Object>();
+    for (int i = 0; i < Array.getLength(array); i++) {
+      list.add(Array.get(array, i));
+    }
+    return list;
+  }
+
+  private static List<Object> foldArguments(int length, List<Object> arguments) {
     List<Object> packed = new ArrayList<Object>();
     packed.addAll(arguments.subList(0, length - 1));
-    packed.add(asArray(arrayType, arguments.subList(length - 1, arguments.size())));
+    packed.add(asArray(arguments.subList(length - 1, arguments.size())));
     return packed;
   }
 
-  private static Object asArray(Class<?> arrayType, List<Object> elements) {
-    Object array = Array.newInstance(arrayType.getComponentType(), 0);
+  private static Object asArray(List<Object> elements) {
+    Object array = Array.newInstance(Object.class, 0);
     return elements.toArray((Object[]) array);
   }
 }
