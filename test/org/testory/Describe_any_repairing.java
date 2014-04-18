@@ -16,7 +16,7 @@ import org.junit.Test;
 
 public class Describe_any_repairing {
   private Object a, b, x;
-  private int i, j;
+  private int i, j, k;
   private Mock mock;
 
   @Before
@@ -27,6 +27,7 @@ public class Describe_any_repairing {
     x = newObject("x");
     i = 123;
     j = 456;
+    k = 789;
   }
 
   @After
@@ -95,6 +96,21 @@ public class Describe_any_repairing {
   }
 
   @Test
+  public void solves_unsurrounded_primitive_types() {
+    given(willReturn(true), mock).objects(a, a, any(Integer.class, equal(i)),
+        any(Integer.class, equal(i)), a, a);
+
+    assertTrue(mock.objects(a, a, i, i, a, a));
+
+    assertFalse(mock.objects(x, a, i, i, a, a));
+    assertFalse(mock.objects(a, x, i, i, a, a));
+    assertFalse(mock.objects(a, a, j, i, a, a));
+    assertFalse(mock.objects(a, a, i, j, a, a));
+    assertFalse(mock.objects(a, a, i, i, x, a));
+    assertFalse(mock.objects(a, a, i, i, a, x));
+  }
+
+  @Test
   public void cannot_solve_more_anys_than_parameters() {
     try {
       any(Object.class);
@@ -113,6 +129,19 @@ public class Describe_any_repairing {
     assertFalse(mock.varargs(a, x, b, a));
     assertFalse(mock.varargs(a, a, x, a));
     assertFalse(mock.varargs(a, a, b, x));
+  }
+
+  @Test
+  public void solves_primitive_varargs() {
+    given(willReturn(true), mock).primitiveVarargs(any(int.class, equal(i)),
+        any(int.class, equal(i)), any(int.class, equal(j)), any(int.class, equal(i)));
+
+    assertTrue(mock.primitiveVarargs(i, i, j, i));
+
+    assertFalse(mock.primitiveVarargs(k, i, j, i));
+    assertFalse(mock.primitiveVarargs(i, k, j, i));
+    assertFalse(mock.primitiveVarargs(i, i, k, i));
+    assertFalse(mock.primitiveVarargs(i, i, j, k));
   }
 
   @Test
@@ -167,5 +196,7 @@ public class Describe_any_repairing {
     boolean objects(Object a, Object b, int c, int d, Object e, Object f);
 
     boolean varargs(Object a, Object... os);
+
+    boolean primitiveVarargs(int i, int... is);
   }
 }
