@@ -1,12 +1,10 @@
 package org.testory;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
-import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
 import static org.testory.Testory.willThrow;
 import static org.testory.test.Testilities.newObject;
@@ -14,176 +12,72 @@ import static org.testory.test.Testilities.newThrowable;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 
 public class Describe_stubbing {
-  private Object object, argument, otherArgument;
+  private Object object, otherObject;
   private Throwable throwable;
-  private Foo mock, otherMock;
+  private Invocation invocation;
+  private Captor onAlways, onNever, captor;
   private Handler handler;
-  private Captor captor;
+  private Mockable mock;
 
   @Before
   public void before() {
-    purge();
-
     object = newObject("object");
-    argument = newObject("argument");
-    otherArgument = newObject("otherArgument");
+    otherObject = newObject("otherObject");
     throwable = newThrowable("throwable");
-    mock = mock(Foo.class);
-    otherMock = mock(Foo.class);
-    handler = mock(Handler.class);
-    captor = mock(Captor.class);
-  }
-
-  @After
-  public void after() {
-    purge();
-  }
-
-  private void purge() {
-    when("");
-    when("");
-  }
-
-  class Foo {
-    Object getObject() {
-      throw new RuntimeException();
-    }
-
-    Object getObject(Object o) {
-      throw new RuntimeException();
-    }
-
-    Object getOtherObject(Object o) {
-      throw new RuntimeException();
-    }
-
-    String getString() {
-      throw new RuntimeException();
-    }
-
-    int getInt() {
-      throw new RuntimeException();
-    }
-
-    void getVoid() {
-      throw new RuntimeException();
-    }
-
-    void throwsIOException() throws IOException {
-      throw new RuntimeException();
-    }
-  }
-
-  @Test
-  public void stubs_equal_invocation() {
-    given(willReturn(object), mock).getObject(argument);
-    assertSame(object, mock.getObject(argument));
-  }
-
-  @Test
-  public void ignores_different_mock() {
-    given(willReturn(object), mock).getObject(argument);
-    assertNotSame(object, otherMock.getObject(argument));
-  }
-
-  @Test
-  public void ignores_different_method() {
-    given(willReturn(object), mock).getObject(argument);
-    assertNotSame(object, mock.getOtherObject(argument));
-  }
-
-  @Test
-  public void ignores_different_argument() {
-    given(willReturn(object), mock).getObject(argument);
-    assertNotSame(object, mock.getObject(otherArgument));
-  }
-
-  @Test
-  public void matches_invocation_with_custom_logic() {
-    given(willReturn(object), new Captor() {
-      public boolean matches(Invocation invocation) {
-        assume(invocation.method.getReturnType() == Object.class);
-        return invocation.instance == mock;
+    onAlways = new Captor() {
+      public boolean matches(Invocation inv) {
+        return true;
       }
-    });
-    assertSame(object, mock.getObject(argument));
-    assertNotSame(object, otherMock.getObject(argument));
+    };
+    onNever = new Captor() {
+      public boolean matches(Invocation inv) {
+        return false;
+      }
+    };
+    captor = mock(Captor.class);
+    handler = mock(Handler.class);
+    mock = mock(Mockable.class);
+    given(willThrow(new RuntimeException("unstubbed")), onAlways);
   }
 
   @Test
-  public void returns_object() {
-    given(willReturn(object), mock).getObject();
-    assertEquals(object, mock.getObject());
+  public void mock_returns_object() {
+    given(willReturn(object), onAlways);
+    assertSame(object, mock.returnObject());
   }
 
   @Test
-  public void returns_primitive() {
-    given(willReturn(3), mock).getInt();
-    assertEquals(3, mock.getInt());
+  public void mock_returns_primitive() {
+    given(willReturn(5), onAlways);
+    assertEquals(5, mock.returnInt());
   }
 
   @Test
-  public void returns_null() {
-    given(willReturn(null), mock).getObject();
-    assertEquals(null, mock.getObject());
+  public void mock_returns_null() {
+    given(willReturn(null), onAlways);
+    assertEquals(null, mock.returnObject());
   }
 
   @Test
-  public void returned_null_is_converted_to_void() {
-    given(willReturn(null), mock).getVoid();
-    mock.getVoid();
+  public void mock_returns_void() {
+    given(willReturn(null), onAlways);
+    mock.returnVoid();
   }
 
   @Test
-  public void does_not_return_incompatible_type() {
-    given(willReturn(object), mock).getString();
-    try {
-      mock.getString();
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void does_not_return_incompatible_primitive() {
-    given(willReturn(3f), mock).getInt();
-    try {
-      mock.getInt();
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void does_not_return_incompatible_null() {
-    given(willReturn(null), mock).getInt();
-    try {
-      mock.getInt();
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void does_not_return_incompatible_with_void() {
-    given(willReturn(object), mock).getVoid();
-    try {
-      mock.getVoid();
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void throws_error() {
+  public void mock_throws_error() {
     throwable = new Error();
-    given(willThrow(throwable), mock).getObject();
+    given(willThrow(throwable), onAlways);
     try {
-      mock.getObject();
+      mock.returnObject();
       fail();
     } catch (Throwable t) {
       assertSame(throwable, t);
@@ -191,11 +85,11 @@ public class Describe_stubbing {
   }
 
   @Test
-  public void throws_runtime_exception() {
+  public void mock_throws_runtime_exception() {
     throwable = new RuntimeException();
-    given(willThrow(throwable), mock).getObject();
+    given(willThrow(throwable), onAlways);
     try {
-      mock.getObject();
+      mock.returnObject();
       fail();
     } catch (Throwable t) {
       assertSame(throwable, t);
@@ -203,11 +97,22 @@ public class Describe_stubbing {
   }
 
   @Test
-  public void throws_declared_exception() throws IOException {
+  public void mock_throws_declared_throwable() {
+    given(willThrow(throwable), onAlways);
+    try {
+      mock.throwThrowable();
+      fail();
+    } catch (Throwable t) {
+      assertSame(throwable, t);
+    }
+  }
+
+  @Test
+  public void mock_throws_declared_exception() {
     throwable = new IOException();
-    given(willThrow(throwable), mock).throwsIOException();
+    given(willThrow(throwable), onAlways);
     try {
-      mock.throwsIOException();
+      mock.throwIOException();
       fail();
     } catch (Throwable t) {
       assertSame(throwable, t);
@@ -215,11 +120,11 @@ public class Describe_stubbing {
   }
 
   @Test
-  public void throws_subclass_of_declared_exception() throws IOException {
+  public void mock_throws_subclass_of_declared_exception() {
     throwable = new FileNotFoundException();
-    given(willThrow(throwable), mock).throwsIOException();
+    given(willThrow(throwable), onAlways);
     try {
-      mock.throwsIOException();
+      mock.throwIOException();
       fail();
     } catch (Throwable t) {
       assertSame(throwable, t);
@@ -227,64 +132,144 @@ public class Describe_stubbing {
   }
 
   @Test
-  public void does_not_throw_undeclared_exception() {
+  public void stubbing_cannot_return_super_type() {
+    given(willReturn(object), onAlways);
+    try {
+      mock.returnString();
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void stubbing_cannot_return_wider_primitive() {
+    given(willReturn(3f), onAlways);
+    try {
+      mock.returnInt();
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void stubbing_cannot_return_object_as_void() {
+    given(willReturn(object), onAlways);
+    try {
+      mock.returnVoid();
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void stubbing_cannot_return_object_as_primitive() {
+    given(willReturn(object), onAlways);
+    try {
+      mock.returnInt();
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void stubbing_cannot_return_null_as_primitive() {
+    given(willReturn(null), onAlways);
+    try {
+      mock.returnInt();
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void stubbing_cannot_not_throw_undeclared_exception() {
     throwable = new IOException();
-    given(willThrow(throwable), mock).getObject();
+    given(willThrow(throwable), onAlways);
     try {
-      mock.getObject();
+      mock.returnObject();
       fail();
     } catch (TestoryException t) {}
   }
 
   @Test
-  public void does_not_throw_superclass_of_declared_exception() throws IOException {
+  public void stubbing_cannot_throw_undeclared_throwable() {
+    given(willThrow(throwable), onAlways);
+    try {
+      mock.returnObject();
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void stubbing_cannot_throw_superclass_of_declared_exception() throws IOException {
     throwable = new Exception();
-    given(willThrow(throwable), mock).throwsIOException();
+    given(willThrow(throwable), onAlways);
     try {
-      mock.throwsIOException();
+      mock.throwIOException();
       fail();
     } catch (TestoryException t) {}
   }
 
   @Test
-  public void handler_cannot_be_null() {
-    try {
-      given(null, mock);
-      fail();
-    } catch (TestoryException e) {}
-    try {
-      given(null, captor);
-      fail();
-    } catch (TestoryException e) {}
+  public void mock_uses_last_stubbing() {
+    given(willReturn(object), onAlways);
+    given(willReturn(otherObject), onAlways);
+    assertSame(otherObject, mock.returnObject());
   }
 
   @Test
-  public void mock_cannot_be_null() {
-    try {
-      given(handler, (Object) null);
-      fail();
-    } catch (TestoryException e) {}
+  public void mock_uses_last_matching_stubbing() {
+    given(willReturn(object), onAlways);
+    given(willReturn(otherObject), onNever);
+    assertSame(object, mock.returnObject());
   }
 
   @Test
-  public void mock_cannot_be_any_object() {
-    try {
-      given(handler, new Object());
-      fail();
-    } catch (TestoryException e) {}
+  public void captor_matches_invocation_on_mock() throws NoSuchMethodException {
+    given(new Handler() {
+      public Object handle(Invocation inv) {
+        invocation = inv;
+        return null;
+      }
+    }, onAlways);
+    mock.acceptObject(object);
+    assertSame(mock, invocation.instance);
+    assertEquals(Mockable.class.getMethod("acceptObject", Object.class), invocation.method);
+    assertEquals(Arrays.asList(object), invocation.arguments);
   }
 
   @Test
-  public void captor_cannot_be_null() {
+  public void checks_that_captor_is_not_null() {
     try {
       given(handler, (Captor) null);
       fail();
     } catch (TestoryException e) {}
   }
 
-  private static void assume(boolean assumption) {
-    if (!assumption) {
-      throw new RuntimeException("wrong assumption");
+  @Test
+  public void checks_that_handler_is_not_null() {
+    try {
+      given(null, captor);
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  private static class Mockable {
+    public Object returnObject() {
+      return null;
+    }
+
+    public String returnString() {
+      return null;
+    }
+
+    public int returnInt() {
+      return 0;
+    }
+
+    public void returnVoid() {}
+
+    public void throwThrowable() throws Throwable {}
+
+    public void throwIOException() throws IOException {}
+
+    public Object acceptObject(Object argument) {
+      return null;
     }
   }
 }

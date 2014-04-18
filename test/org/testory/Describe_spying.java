@@ -5,105 +5,90 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
-import static org.testory.Testory.onInstance;
 import static org.testory.Testory.spy;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.willReturn;
 import static org.testory.Testory.willSpy;
-
-import java.util.Arrays;
-import java.util.List;
+import static org.testory.test.Testilities.newObject;
+import static org.testory.test.Testilities.newThrowable;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.proxy.Invocation;
 
 public class Describe_spying {
-  private List<Object> mock, spy, real, otherMock;
-  private Object a, b, c, x;
+  private Mockable mock, spy, real, otherMock;
+  private Object object;
+  private Throwable throwable;
 
   @Before
   public void before() {
-    mock = mock(List.class);
-    otherMock = mock(List.class);
-    a = "a";
-    b = "b";
-    c = "c";
-    x = "x";
+    mock = mock(Mockable.class);
+    otherMock = mock(Mockable.class);
+    real = new Mockable();
+    object = newObject("object");
+    throwable = newThrowable("throwable");
   }
 
   @Test
-  public void invokes_method_on_real_object() {
-    real = Arrays.asList(a, b, c);
+  public void returns_from_real_object_method() {
+    spy = spy(real);
+    assertEquals(object, spy.doReturn(object));
 
     given(willSpy(real), onInstance(mock));
-    assertEquals(b, mock.get(1));
-
-    spy = spy(real);
-    assertEquals(b, spy.get(1));
+    assertEquals(object, mock.doReturn(object));
   }
 
   @Test
-  public void throws_from_real_object_method() {
-    real = Arrays.asList(a, b, c);
+  public void throws_from_real_object_method() throws Throwable {
+    spy = spy(real);
+    try {
+      spy.doThrow(throwable);
+      fail();
+    } catch (Throwable e) {
+      assertSame(e, throwable);
+    }
 
     given(willSpy(real), onInstance(mock));
     try {
-      mock.get(3);
+      mock.doThrow(throwable);
       fail();
-    } catch (IndexOutOfBoundsException e) {}
-
-    spy = spy(real);
-    try {
-      spy.get(3);
-      fail();
-    } catch (IndexOutOfBoundsException e) {}
+    } catch (Throwable e) {
+      assertSame(e, throwable);
+    }
   }
 
   @Test
   public void can_be_stubbed() {
-    real = Arrays.asList(a, b, c);
+    spy = spy(real);
+    given(willReturn(object), onInstance(mock));
+    assertSame(object, mock.doReturn(null));
 
     given(willSpy(real), onInstance(mock));
-    given(willReturn(x), mock).get(1);
-    assertSame(a, mock.get(0));
-    assertSame(x, mock.get(1));
-
-    spy = spy(real);
-    given(willReturn(x), spy).get(1);
-    assertSame(a, spy.get(0));
-    assertSame(x, spy.get(1));
+    given(willReturn(object), onInstance(mock));
+    assertSame(object, mock.doReturn(null));
   }
 
   @Test
   public void can_be_verified() {
-    real = Arrays.asList(a, b, c);
+    spy = spy(real);
+    spy.doReturn(object);
+    thenCalled(onInstance(spy));
 
     given(willSpy(real), onInstance(mock));
-    mock.get(1);
-    thenCalled(mock).get(1);
-    try {
-      thenCalled(mock).get(2);
-      fail();
-    } catch (TestoryAssertionError e) {}
-
-    spy = spy(real);
-    spy.get(1);
-    thenCalled(spy).get(1);
-    try {
-      thenCalled(spy).get(2);
-      fail();
-    } catch (TestoryAssertionError e) {}
+    mock.doReturn(object);
+    thenCalled(onInstance(mock));
   }
 
   @Test
   public void can_spy_another_mock() {
-    given(willSpy(otherMock), onInstance(mock));
-    given(willReturn(x), otherMock).get(1);
-    assertEquals(x, mock.get(1));
-
     spy = spy(otherMock);
-    given(willReturn(x), otherMock).get(1);
-    assertEquals(x, spy.get(1));
+    given(willReturn(object), onInstance(otherMock));
+    assertEquals(object, spy.doReturn(null));
+
+    given(willSpy(otherMock), onInstance(mock));
+    given(willReturn(object), onInstance(otherMock));
+    assertEquals(object, mock.doReturn(null));
   }
 
   @Test
@@ -117,5 +102,23 @@ public class Describe_spying {
       spy(null);
       fail();
     } catch (TestoryException e) {}
+  }
+
+  private static Captor onInstance(final Object mock) {
+    return new Captor() {
+      public boolean matches(Invocation invocation) {
+        return invocation.instance == mock;
+      }
+    };
+  }
+
+  static class Mockable {
+    Object doReturn(Object o) {
+      return o;
+    }
+
+    Object doThrow(Throwable t) throws Throwable {
+      throw t;
+    }
   }
 }

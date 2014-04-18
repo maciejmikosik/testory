@@ -39,13 +39,13 @@ public class Describe_comparing_arrays {
   }
 
   @Test
-  public void stubbing_uses_deep_equals() {
+  public void capturing_during_stubbing_uses_deep_equals() {
     given(willReturn(index), mock).indexOf(new Object[] { new Object[] { object } });
     assertSame(index, mock.indexOf(new Object[] { new Object[] { object } }));
   }
 
   @Test
-  public void verification_uses_deep_equals() {
+  public void capturing_during_verification_uses_deep_equals() {
     mock.indexOf(new Object[] { new Object[] { object } });
     thenCalled(mock).indexOf(new Object[] { new Object[] { object } });
   }

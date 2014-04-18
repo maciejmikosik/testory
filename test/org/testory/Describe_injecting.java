@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
+import org.testory.proxy.Invocation;
 
 public class Describe_injecting {
   private final String string = "string";
@@ -131,7 +132,7 @@ public class Describe_injecting {
     }
     TestClass test = new TestClass();
     givenTest(test);
-    given(willReturn(string), test.field).get(0);
+    given(willReturn(string), onInstance(test.field));
     assertEquals(string, test.field.get(0));
   }
 
@@ -142,7 +143,7 @@ public class Describe_injecting {
     }
     TestClass test = new TestClass();
     givenTest(test);
-    given(willReturn(string), test.field).toString();
+    given(willReturn(string), onInstance(test.field));
     assertEquals(string, test.field.toString());
   }
 
@@ -465,6 +466,14 @@ public class Describe_injecting {
       givenTest(test);
       fail();
     } catch (TestoryException e) {}
+  }
+
+  private static Captor onInstance(final Object mock) {
+    return new Captor() {
+      public boolean matches(Invocation invocation) {
+        return invocation.instance == mock;
+      }
+    };
   }
 
   public static interface Interface {}
