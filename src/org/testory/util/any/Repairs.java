@@ -7,6 +7,7 @@ import static org.testory.common.Collections.flip;
 import static org.testory.common.Collections.last;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.util.any.Anyvocation.anyvocation;
+import static org.testory.util.any.Anyvocation.isVarargs;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -26,11 +27,6 @@ public class Repairs {
         ? foldArguments(last(parameters), parameters.size(), repairedUnfolded)
         : repairedUnfolded;
     return anyvocation(anyvocation.method, anyvocation.instance, repaired, anyvocation.anys);
-  }
-
-  private static boolean isVarargs(Anyvocation anyvocation) {
-    return anyvocation.method.isVarArgs()
-        && !mustBe(last(anyvocation.arguments), last(anyvocation.anys));
   }
 
   private static List<Object> repair(List<Object> arguments, Anyvocation anyvocation) {

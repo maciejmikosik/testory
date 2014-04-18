@@ -2,6 +2,7 @@ package org.testory.util.any;
 
 import static java.util.Collections.unmodifiableList;
 import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Collections.last;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,5 +29,10 @@ public class Anyvocation {
     checkNotNull(anys);
     return new Anyvocation(method, instance, unmodifiableList(new ArrayList<Object>(arguments)),
         unmodifiableList(new ArrayList<Any>(anys)));
+  }
+
+  public static boolean isVarargs(Anyvocation anyvocation) {
+    return anyvocation.method.isVarArgs() && !anyvocation.anys.isEmpty()
+        && last(anyvocation.anys).token != last(anyvocation.arguments);
   }
 }

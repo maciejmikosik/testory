@@ -1,5 +1,6 @@
 package org.testory;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -20,6 +21,7 @@ import org.testory.proxy.Invocation;
 
 public class Describe_capturing {
   private Object object, otherObject;
+  private int value, otherValue;
   private Mockable mock, otherMock;
   private Handler handler;
   private Object numberMatcher;
@@ -28,6 +30,8 @@ public class Describe_capturing {
   public void before() {
     object = newObject("object");
     otherObject = newObject("otherObject");
+    value = 123;
+    otherValue = 456;
     mock = mock(Mockable.class);
     otherMock = mock(Mockable.class);
     handler = new Handler() {
@@ -180,6 +184,26 @@ public class Describe_capturing {
     }
   }
 
+  @Test
+  public void capturing_works_with_varargs() {
+    given(willReturn(true), mock).varargs(object, object);
+    assertFalse(mock.varargs(object));
+    assertTrue(mock.varargs(object, object));
+    assertTrue(mock.varargs(object, new Object[] { object }));
+    assertFalse(mock.varargs(object, otherObject));
+    assertFalse(mock.varargs(object, object, object));
+  }
+
+  @Test
+  public void capturing_works_with_primitive_varargs() {
+    given(willReturn(true), mock).primitiveVarargs(value, value);
+    assertFalse(mock.primitiveVarargs(value));
+    assertTrue(mock.primitiveVarargs(value, value));
+    assertTrue(mock.primitiveVarargs(value, new int[] { value }));
+    assertFalse(mock.primitiveVarargs(value, otherValue));
+    assertFalse(mock.primitiveVarargs(value, value, value));
+  }
+
   private static Object number(final Integer... numbers) {
     return new Object() {
       @SuppressWarnings("unused")
@@ -202,6 +226,14 @@ public class Describe_capturing {
 
     public Object returnOtherObject(Object object) {
       return null;
+    }
+
+    public boolean varargs(Object object, Object... objects) {
+      return false;
+    }
+
+    public boolean primitiveVarargs(int value, int... values) {
+      return false;
     }
 
     public void acceptObjects(Object object, Object otherObject) {}

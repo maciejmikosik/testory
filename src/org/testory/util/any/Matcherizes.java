@@ -9,6 +9,7 @@ import static org.testory.common.Matchers.listOf;
 import static org.testory.common.Matchers.same;
 import static org.testory.common.Objects.print;
 import static org.testory.proxy.Invocations.invocationOf;
+import static org.testory.util.any.Anyvocation.isVarargs;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -69,11 +70,6 @@ public class Matcherizes {
         return instance + "." + method.getName() + "(" + join(", ", arguments) + ")";
       }
     };
-  }
-
-  private static boolean isVarargs(Anyvocation anyvocation) {
-    return anyvocation.method.isVarArgs()
-        && !mustBe(last(anyvocation.arguments), last(anyvocation.anys));
   }
 
   private static List<Object> unfold(List<?> packed) {
