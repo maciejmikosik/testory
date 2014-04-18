@@ -327,7 +327,7 @@ public class Testory {
       }
 
       public String toString() {
-        return "onInstance(" + dangerouslyInvokeToStringOnMock(mock) + ")";
+        return "onInstance(" + mock + ")";
       }
     };
   }
@@ -343,10 +343,6 @@ public class Testory {
         return "onReturn(" + type.getName() + ")";
       }
     };
-  }
-
-  private static String dangerouslyInvokeToStringOnMock(Object mock) {
-    return mock.toString();
   }
 
   public static <T> T when(T object) {
