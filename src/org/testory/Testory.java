@@ -223,7 +223,7 @@ public class Testory {
   }
 
   private static void stubObject(final Object mock, String name, int hash) {
-    given(willReturn(name), new Captor() {
+    given(willReturn(name), new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock && invocation.method.getName().equals("toString")
             && invocation.method.getParameterTypes().length == 0;
@@ -233,14 +233,14 @@ public class Testory {
       public Object handle(Invocation invocation) throws Throwable {
         return invocation.instance == mock && invocation.arguments.get(0) == mock;
       }
-    }, new Captor() {
+    }, new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock
             && invocation.method.getName().equals("equals")
             && Arrays.equals(invocation.method.getParameterTypes(), new Class<?>[] { Object.class });
       }
     });
-    given(willReturn(hash), new Captor() {
+    given(willReturn(hash), new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock && invocation.method.getName().equals("hashCode")
             && invocation.method.getParameterTypes().length == 0;
@@ -254,17 +254,17 @@ public class Testory {
     check(history.isMock(mock));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        history.logStubbing(will, captorize(invocation));
+        history.logStubbing(will, capture(invocation));
         return null;
       }
     };
     return proxyWrapping(mock, handler);
   }
 
-  public static void given(Handler will, Captor captor) {
+  public static void given(Handler will, InvocationMatcher invocationMatcher) {
     check(will != null);
-    check(captor != null);
-    history.logStubbing(will, captor);
+    check(invocationMatcher != null);
+    history.logStubbing(will, invocationMatcher);
   }
 
   public static Handler willReturn(@Nullable final Object object) {
@@ -319,9 +319,9 @@ public class Testory {
     return (T) any.token;
   }
 
-  public static Captor onInstance(final Object mock) {
+  public static InvocationMatcher onInstance(final Object mock) {
     check(mock != null);
-    return new Captor() {
+    return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock;
       }
@@ -332,9 +332,9 @@ public class Testory {
     };
   }
 
-  public static Captor onReturn(final Class<?> type) {
+  public static InvocationMatcher onReturn(final Class<?> type) {
     check(type != null);
-    return new Captor() {
+    return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return type == invocation.method.getReturnType();
       }
@@ -568,9 +568,9 @@ public class Testory {
     return thenCalledTimes(exactly(1), mock);
   }
 
-  public static void thenCalled(Captor captor) {
-    check(captor != null);
-    thenCalledTimes(exactly(1), captor);
+  public static void thenCalled(InvocationMatcher invocationMatcher) {
+    check(invocationMatcher != null);
+    thenCalledTimes(exactly(1), invocationMatcher);
   }
 
   public static <T> T thenCalledTimes(int number, T mock) {
@@ -580,10 +580,10 @@ public class Testory {
     return thenCalledTimes(exactly(number), mock);
   }
 
-  public static void thenCalledTimes(int number, Captor captor) {
+  public static void thenCalledTimes(int number, InvocationMatcher invocationMatcher) {
     check(number >= 0);
-    check(captor != null);
-    thenCalledTimes(exactly(number), captor);
+    check(invocationMatcher != null);
+    thenCalledTimes(exactly(number), invocationMatcher);
   }
 
   public static <T> T thenCalledTimes(final Object numberMatcher, T mock) {
@@ -593,27 +593,27 @@ public class Testory {
     check(history.isMock(mock));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        thenCalledTimes(numberMatcher, captorize(invocation));
+        thenCalledTimes(numberMatcher, capture(invocation));
         return null;
       }
     };
     return proxyWrapping(mock, handler);
   }
 
-  public static void thenCalledTimes(Object numberMatcher, Captor captor) {
+  public static void thenCalledTimes(Object numberMatcher, InvocationMatcher invocationMatcher) {
     check(numberMatcher != null);
     check(isMatcher(numberMatcher));
-    check(captor != null);
+    check(invocationMatcher != null);
     int numberOfCalls = 0;
     for (Invocation invocation : history.getInvocations()) {
-      if (captor.matches(invocation)) {
+      if (invocationMatcher.matches(invocation)) {
         numberOfCalls++;
       }
     }
     boolean expected = asMatcher(numberMatcher).matches(numberOfCalls);
     if (!expected) {
       throw assertionError("\n" //
-          + formatSection("expected called times " + numberMatcher, captor));
+          + formatSection("expected called times " + numberMatcher, invocationMatcher));
     }
   }
 
@@ -678,11 +678,11 @@ public class Testory {
     throwable.setStackTrace(new StackTraceElement[] { stackTrace[index + 1] });
   }
 
-  private static Captor captorize(Invocation invocation) {
+  private static InvocationMatcher capture(Invocation invocation) {
     List<Any> anys = history.getAnysAndConsume();
     Anyvocation anyvocation = anyvocation(invocation.method, invocation.instance,
         invocation.arguments, anys);
-    return captorize(matcherize(repairOrFail(anyvocation)));
+    return convert(matcherize(repairOrFail(anyvocation)));
   }
 
   private static Anyvocation repairOrFail(Anyvocation anyvocation) {
@@ -693,8 +693,8 @@ public class Testory {
     }
   }
 
-  private static Captor captorize(final Matcher invocationMatcher) {
-    return new Captor() {
+  private static InvocationMatcher convert(final Matcher invocationMatcher) {
+    return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocationMatcher.matches(invocation);
       }

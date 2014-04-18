@@ -149,15 +149,15 @@ You can verify number of invocations by passing exact value (may be 0) or using 
 
 ### Capturing
 
-You can take full control of matching invocations by implementing you own **Captor**.
+You can take full control of matching invocations by implementing you own `InvocationMatcher`.
 
-        Captor captor = new Captor() {
+        InvocationMatcher onCondition = new InvocationMatcher() {
           public boolean matches(Invocation invocation) {
             // custom logic
           }
         };
-        given(willReturn(object), captor);
-        thenCalled(captor);
+        given(willReturn(object), onCondition);
+        thenCalled(onCondition);
 
 Use factories for most common cases.
 

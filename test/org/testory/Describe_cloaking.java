@@ -14,11 +14,11 @@ import org.testory.proxy.Invocation;
 
 public class Describe_cloaking {
   private int line;
-  private Captor neverCaptor;
+  private InvocationMatcher onNothing;
 
   @Before
   public void before() {
-    neverCaptor = new Captor() {
+    onNothing = new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return false;
       }
@@ -36,7 +36,7 @@ public class Describe_cloaking {
     }
 
     try {
-      thenCalled(neverCaptor);
+      thenCalled(onNothing);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(1, e.getStackTrace().length);
@@ -58,7 +58,7 @@ public class Describe_cloaking {
     line = -1;
     try {
       line = new Exception().getStackTrace()[0].getLineNumber();
-      thenCalled(neverCaptor);
+      thenCalled(onNothing);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(line + 1, e.getStackTrace()[0].getLineNumber());

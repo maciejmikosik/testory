@@ -17,7 +17,7 @@ import org.testory.proxy.Invocation;
 
 public class Describe_verification {
   private Object object;
-  private Captor onAnything, onNothing;
+  private InvocationMatcher onAnything, onNothing;
   private Mockable mock, never, once, twice, thrice;
   private Object numberMatcher;
   private Invocation invocation;
@@ -25,7 +25,7 @@ public class Describe_verification {
   @Before
   public void before() {
     object = newObject("object");
-    onAnything = new Captor() {
+    onAnything = new InvocationMatcher() {
       public boolean matches(Invocation inv) {
         return true;
       }
@@ -34,7 +34,7 @@ public class Describe_verification {
         return "onAnything";
       }
     };
-    onNothing = new Captor() {
+    onNothing = new InvocationMatcher() {
       public boolean matches(Invocation inv) {
         return false;
       }
@@ -184,9 +184,9 @@ public class Describe_verification {
   }
 
   @Test
-  public void captor_matches_invocation_on_mock() throws NoSuchMethodException {
+  public void invocation_matcher_matches_invocation_on_mock() throws NoSuchMethodException {
     mock.acceptObject(object);
-    thenCalled(new Captor() {
+    thenCalled(new InvocationMatcher() {
       public boolean matches(Invocation inv) {
         if (inv.instance == mock) {
           invocation = inv;
@@ -225,25 +225,25 @@ public class Describe_verification {
   }
 
   @Test
-  public void checks_that_captor_is_not_null() {
+  public void checks_that_invocation_matcher_is_not_null() {
     try {
-      thenCalled((Captor) null);
+      thenCalled((InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {}
 
     try {
-      thenCalledTimes(1, (Captor) null);
+      thenCalledTimes(1, (InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {}
 
     try {
-      thenCalledTimes(number(1), (Captor) null);
+      thenCalledTimes(number(1), (InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {}
   }
 
-  private static Captor onInstance(final Object mock) {
-    return new Captor() {
+  private static InvocationMatcher onInstance(final Object mock) {
+    return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock;
       }

@@ -468,8 +468,8 @@ public class Describe_injecting {
     } catch (TestoryException e) {}
   }
 
-  private static Captor onInstance(final Object mock) {
-    return new Captor() {
+  private static InvocationMatcher onInstance(final Object mock) {
+    return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock;
       }

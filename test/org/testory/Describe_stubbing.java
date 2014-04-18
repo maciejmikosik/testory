@@ -23,7 +23,7 @@ public class Describe_stubbing {
   private Object object, otherObject;
   private Throwable throwable;
   private Invocation invocation;
-  private Captor onAlways, onNever, captor;
+  private InvocationMatcher onAlways, onNever, invocationMatcher;
   private Handler handler;
   private Mockable mock;
 
@@ -32,17 +32,17 @@ public class Describe_stubbing {
     object = newObject("object");
     otherObject = newObject("otherObject");
     throwable = newThrowable("throwable");
-    onAlways = new Captor() {
+    onAlways = new InvocationMatcher() {
       public boolean matches(Invocation inv) {
         return true;
       }
     };
-    onNever = new Captor() {
+    onNever = new InvocationMatcher() {
       public boolean matches(Invocation inv) {
         return false;
       }
     };
-    captor = mock(Captor.class);
+    invocationMatcher = mock(InvocationMatcher.class);
     handler = mock(Handler.class);
     mock = mock(Mockable.class);
     given(willThrow(new RuntimeException("unstubbed")), onAlways);
@@ -220,7 +220,7 @@ public class Describe_stubbing {
   }
 
   @Test
-  public void captor_matches_invocation_on_mock() throws NoSuchMethodException {
+  public void invocation_matcher_matches_invocation_on_mock() throws NoSuchMethodException {
     given(new Handler() {
       public Object handle(Invocation inv) {
         invocation = inv;
@@ -234,9 +234,9 @@ public class Describe_stubbing {
   }
 
   @Test
-  public void checks_that_captor_is_not_null() {
+  public void checks_that_invocation_matcher_is_not_null() {
     try {
-      given(handler, (Captor) null);
+      given(handler, (InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {}
   }
@@ -244,7 +244,7 @@ public class Describe_stubbing {
   @Test
   public void checks_that_handler_is_not_null() {
     try {
-      given(null, captor);
+      given(null, invocationMatcher);
       fail();
     } catch (TestoryException e) {}
   }

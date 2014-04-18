@@ -97,13 +97,13 @@ class History {
 
   private static class Stubbing {
     Handler handler;
-    Captor captor;
+    InvocationMatcher invocationMatcher;
   }
 
-  public void logStubbing(Handler handler, Captor captor) {
+  public void logStubbing(Handler handler, InvocationMatcher invocationMatcher) {
     Stubbing stubbing = new Stubbing();
     stubbing.handler = handler;
-    stubbing.captor = captor;
+    stubbing.invocationMatcher = invocationMatcher;
     addEvent(stubbing);
   }
 
@@ -122,7 +122,7 @@ class History {
     for (Object event : getEvents()) {
       if (event instanceof Stubbing) {
         Stubbing stubbing = (Stubbing) event;
-        if (stubbing.captor.matches(invocation)) {
+        if (stubbing.invocationMatcher.matches(invocation)) {
           return stubbing.handler;
         }
       }
