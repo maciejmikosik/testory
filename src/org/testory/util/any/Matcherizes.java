@@ -6,9 +6,7 @@ import static org.testory.common.Collections.last;
 import static org.testory.common.Matchers.arrayOf;
 import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.listOf;
-import static org.testory.common.Matchers.same;
 import static org.testory.common.Objects.print;
-import static org.testory.proxy.Invocations.invocationOf;
 import static org.testory.util.any.Anyvocation.isVarargs;
 
 import java.lang.reflect.Method;
@@ -18,6 +16,7 @@ import java.util.List;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
 import org.testory.common.Matchers.ProxyMatcher;
+import org.testory.proxy.Invocation;
 
 public class Matcherizes {
   public static Matcher matcherize(Anyvocation anyvocation) {
@@ -64,8 +63,13 @@ public class Matcherizes {
 
   private static Matcher matcherize(final Method method, final Object instance,
       final List<Matcher> arguments) {
-    Matcher target = invocationOf(equalDeep(method), same(instance), listOf(arguments));
-    return new ProxyMatcher(target) {
+    return new Matcher() {
+      public boolean matches(Object item) {
+        Invocation invocation = (Invocation) item;
+        return invocation.method.equals(method) && invocation.instance == instance
+            && listOf(arguments).matches(invocation.arguments);
+      }
+
       public String toString() {
         return instance + "." + method.getName() + "(" + join(", ", arguments) + ")";
       }
