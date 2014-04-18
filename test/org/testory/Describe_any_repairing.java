@@ -14,7 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class Describe_any_solving {
+public class Describe_any_repairing {
   private Object a, b, x;
   private int i, j;
   private Mock mock;
