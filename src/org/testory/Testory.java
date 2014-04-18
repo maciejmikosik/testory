@@ -177,7 +177,6 @@ public class Testory {
         ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
         : typing(type, new HashSet<Class<?>>());
     Handler handler = new Handler() {
-      @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         history.logInvocation(invocation);
         if (history.hasStubbedHandlerFor(invocation)) {
@@ -254,7 +253,6 @@ public class Testory {
     check(mock != null);
     check(history.isMock(mock));
     Handler handler = new Handler() {
-      @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         history.logStubbing(will, captorize(invocation));
         return null;
@@ -271,7 +269,6 @@ public class Testory {
 
   public static Handler willReturn(@Nullable final Object object) {
     return new Handler() {
-      @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         return object;
       }
@@ -281,7 +278,6 @@ public class Testory {
   public static Handler willThrow(final Throwable throwable) {
     check(throwable != null);
     return new Handler() {
-      @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         throw throwable.fillInStackTrace();
       }
@@ -291,7 +287,6 @@ public class Testory {
   public static Handler willRethrow(final Throwable throwable) {
     check(throwable != null);
     return new Handler() {
-      @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         throw throwable;
       }
@@ -301,7 +296,6 @@ public class Testory {
   public static Handler willSpy(final Object real) {
     check(real != null);
     return new Handler() {
-      @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         return invoke(invocation(invocation.method, real, invocation.arguments));
       }
@@ -598,7 +592,6 @@ public class Testory {
     check(mock != null);
     check(history.isMock(mock));
     Handler handler = new Handler() {
-      @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         thenCalledTimes(numberMatcher, captorize(invocation));
         return null;
@@ -652,7 +645,6 @@ public class Testory {
   private static <T> T proxyWrapping(final T wrapped, final Handler handler) {
     Typing typing = typing(wrapped.getClass(), new HashSet<Class<?>>());
     return (T) proxy(typing, new Handler() {
-      @Nullable
       public Object handle(Invocation invocation) throws Throwable {
         handler.handle(invocation(invocation.method, wrapped, invocation.arguments));
         Class<?> returnType = invocation.method.getReturnType();

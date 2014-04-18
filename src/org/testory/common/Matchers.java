@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Matchers {
   public static final Matcher anything = new Matcher() {
-    public boolean matches(@Nullable Object item) {
+    public boolean matches(Object item) {
       return true;
     }
 
@@ -21,7 +21,7 @@ public class Matchers {
 
   public static Matcher same(@Nullable final Object object) {
     return new Matcher() {
-      public boolean matches(@Nullable Object item) {
+      public boolean matches(Object item) {
         return object == item;
       }
 
@@ -33,7 +33,7 @@ public class Matchers {
 
   public static Matcher equalDeep(@Nullable final Object object) {
     return new Matcher() {
-      public boolean matches(@Nullable Object item) {
+      public boolean matches(Object item) {
         return areEqualDeep(object, item);
       }
 
@@ -49,7 +49,7 @@ public class Matchers {
     }
     final List<Matcher> matchers = new ArrayList<Matcher>(elementsMatchers);
     return new Matcher() {
-      public boolean matches(@Nullable Object item) {
+      public boolean matches(Object item) {
         return item != null && item.getClass().isArray()
             && matchers.size() == Array.getLength(item) && matchesElements(item);
       }
@@ -75,7 +75,7 @@ public class Matchers {
     }
     final List<Matcher> matchers = new ArrayList<Matcher>(elementsMatchers);
     return new Matcher() {
-      public boolean matches(@Nullable Object item) {
+      public boolean matches(Object item) {
         return item instanceof List<?> && matchers.size() == ((List<?>) item).size()
             && matchesElements((List<?>) item);
       }
@@ -102,7 +102,7 @@ public class Matchers {
       this.target = checkNotNull(target);
     }
 
-    public boolean matches(@Nullable Object item) {
+    public boolean matches(Object item) {
       return target.matches(item);
     }
 

@@ -27,7 +27,7 @@ public class Describe_Matchers_arrayOf {
     c = newObject("c");
     x = newObject("x");
     m = new Matcher() {
-      public boolean matches(@Nullable Object item) {
+      public boolean matches(Object item) {
         return true;
       }
     };
@@ -113,7 +113,7 @@ public class Describe_Matchers_arrayOf {
 
   private static Matcher same(final Object instance) {
     return new Matcher() {
-      public boolean matches(@Nullable Object item) {
+      public boolean matches(Object item) {
         return instance == item;
       }
 

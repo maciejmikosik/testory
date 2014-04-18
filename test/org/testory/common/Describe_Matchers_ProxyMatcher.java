@@ -32,7 +32,7 @@ public class Describe_Matchers_ProxyMatcher {
   @Test
   public void delegates_printing() {
     target = new Matcher() {
-      public boolean matches(@Nullable Object item) {
+      public boolean matches(Object item) {
         return false;
       }
 
@@ -54,7 +54,7 @@ public class Describe_Matchers_ProxyMatcher {
 
   private static Matcher same(final Object instance) {
     return new Matcher() {
-      public boolean matches(@Nullable Object item) {
+      public boolean matches(Object item) {
         return instance == item;
       }
 

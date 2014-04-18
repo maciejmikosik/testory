@@ -19,7 +19,7 @@ public class Matchers {
     checkArgument(method != null);
     method.setAccessible(true);
     return new Matcher() {
-      public boolean matches(@Nullable Object item) {
+      public boolean matches(Object item) {
         try {
           return (Boolean) method.invoke(matcher, item);
         } catch (IllegalArgumentException e) {
