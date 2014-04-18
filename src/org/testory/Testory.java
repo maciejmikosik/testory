@@ -617,9 +617,8 @@ public class Testory {
     }
   }
 
-  private static Object exactly(final int number) {
-    return new Object() {
-      @SuppressWarnings("unused")
+  private static Matcher exactly(final int number) {
+    return new Matcher() {
       public boolean matches(Object item) {
         return item.equals(number);
       }
