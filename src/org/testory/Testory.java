@@ -27,6 +27,7 @@ import static org.testory.util.Samples.isSampleable;
 import static org.testory.util.Samples.sample;
 import static org.testory.util.any.Anyvocation.anyvocation;
 import static org.testory.util.any.Matcherizes.matcherize;
+import static org.testory.util.any.Repairs.canRepair;
 import static org.testory.util.any.Repairs.repair;
 
 import java.lang.reflect.Array;
@@ -686,15 +687,8 @@ public class Testory {
     List<Any> anys = history.getAnysAndConsume();
     Anyvocation anyvocation = anyvocation(invocation.method, invocation.instance,
         invocation.arguments, anys);
-    return convert(matcherize(repairOrFail(anyvocation)));
-  }
-
-  private static Anyvocation repairOrFail(Anyvocation anyvocation) {
-    try {
-      return repair(anyvocation);
-    } catch (IllegalArgumentException e) {
-      throw new TestoryException(e);
-    }
+    check(canRepair(anyvocation));
+    return convert(matcherize(repair(anyvocation)));
   }
 
   private static InvocationMatcher convert(final Matcher invocationMatcher) {
