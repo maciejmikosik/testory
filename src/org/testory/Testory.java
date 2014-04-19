@@ -1,5 +1,6 @@
 package org.testory;
 
+import static org.testory.TestoryException.check;
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
 import static org.testory.common.Classes.hasMethodWithSignature;
@@ -652,12 +653,6 @@ public class Testory {
     return "" //
         + "  " + caption + "\n" //
         + "    " + print(content) + "\n";
-  }
-
-  private static void check(boolean condition) {
-    if (!condition) {
-      throw new TestoryException();
-    }
   }
 
   private static <T> T proxyWrapping(final T wrapped, final Handler handler) {

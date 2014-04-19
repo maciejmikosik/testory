@@ -1,13 +1,10 @@
 package org.testory;
 
-import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.then;
 import static org.testory.Testory.thenCalled;
-import static org.testory.Testory.thenThrown;
 
 import java.util.ArrayList;
 
@@ -73,18 +70,7 @@ public class Describe_cloaking {
       thenCalled(mock(ArrayList.class)).toString();
       fail();
     } catch (TestoryAssertionError e) {
-      e.printStackTrace();
       assertEquals(line + 1, e.getStackTrace()[0].getLineNumber());
-    }
-  }
-
-  @Test
-  public void exceptions_are_not_cloaked() {
-    try {
-      thenThrown((Throwable) null);
-      fail();
-    } catch (TestoryException e) {
-      assertThat(e.getStackTrace().length, greaterThan(1));
     }
   }
 }
