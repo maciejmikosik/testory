@@ -4,9 +4,12 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.testory.Testory.mock;
 import static org.testory.Testory.then;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenThrown;
+
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -61,6 +64,16 @@ public class Describe_cloaking {
       thenCalled(onNothing);
       fail();
     } catch (TestoryAssertionError e) {
+      assertEquals(line + 1, e.getStackTrace()[0].getLineNumber());
+    }
+
+    line = -1;
+    try {
+      line = new Exception().getStackTrace()[0].getLineNumber();
+      thenCalled(mock(ArrayList.class)).toString();
+      fail();
+    } catch (TestoryAssertionError e) {
+      e.printStackTrace();
       assertEquals(line + 1, e.getStackTrace()[0].getLineNumber());
     }
   }

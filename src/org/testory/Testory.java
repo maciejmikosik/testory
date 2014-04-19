@@ -692,7 +692,13 @@ public class Testory {
     if (index == -1 || index == stackTrace.length - 1) {
       throw new Error();
     }
-    throwable.setStackTrace(new StackTraceElement[] { stackTrace[index + 1] });
+    for (int i = index + 1; i < stackTrace.length; i++) {
+      if (stackTrace[i].getLineNumber() >= 0) {
+        index = i;
+        break;
+      }
+    }
+    throwable.setStackTrace(new StackTraceElement[] { stackTrace[index] });
   }
 
   private static InvocationMatcher capture(Invocation invocation) {
