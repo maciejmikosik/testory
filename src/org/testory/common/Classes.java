@@ -29,6 +29,18 @@ public class Classes {
         : instance == null || type.isAssignableFrom(instance.getClass());
   }
 
+  /* untested */
+  public static boolean hasMethodWithSignature(String name, Class<?>[] parameters, Class<?> type) {
+    checkNotNull(name);
+    checkNotNull(type);
+    try {
+      type.getMethod(name, parameters);
+      return true;
+    } catch (NoSuchMethodException e) {
+      return false;
+    }
+  }
+
   private static boolean canConvert(Object instance, Class<?> type) {
     checkArgument(type.isPrimitive());
     if (type == void.class) {

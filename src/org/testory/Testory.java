@@ -2,6 +2,7 @@ package org.testory;
 
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
+import static org.testory.common.Classes.hasMethodWithSignature;
 import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
@@ -222,28 +223,25 @@ public class Testory {
     }, onInstance(mock));
   }
 
-  private static void stubObject(final Object mock, String name, int hash) {
-    given(willReturn(name), new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        return invocation.instance == mock && invocation.method.getName().equals("toString")
-            && invocation.method.getParameterTypes().length == 0;
+  private static void stubObject(final Object mock, final String name, final int hash) {
+    final Object implementation = new Object() {
+      public String toString() {
+        return name;
       }
-    });
-    given(new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        return invocation.instance == mock && invocation.arguments.get(0) == mock;
+
+      public boolean equals(Object obj) {
+        return mock == obj;
       }
-    }, new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        return invocation.instance == mock
-            && invocation.method.getName().equals("equals")
-            && Arrays.equals(invocation.method.getParameterTypes(), new Class<?>[] { Object.class });
+
+      public int hashCode() {
+        return hash;
       }
-    });
-    given(willReturn(hash), new InvocationMatcher() {
+    };
+    given(willTarget(implementation), new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
-        return invocation.instance == mock && invocation.method.getName().equals("hashCode")
-            && invocation.method.getParameterTypes().length == 0;
+        return mock == invocation.instance
+            && hasMethodWithSignature(invocation.method.getName(),
+                invocation.method.getParameterTypes(), implementation.getClass());
       }
     });
   }
@@ -298,6 +296,17 @@ public class Testory {
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         return invoke(invocation(invocation.method, real, invocation.arguments));
+      }
+    };
+  }
+
+  private static Handler willTarget(final Object target) {
+    return new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        String methodName = invocation.method.getName();
+        Class<?>[] parameters = invocation.method.getParameterTypes();
+        Method method = target.getClass().getDeclaredMethod(methodName, parameters);
+        return invoke(invocation(method, target, invocation.arguments));
       }
     };
   }
