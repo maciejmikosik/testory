@@ -71,6 +71,7 @@ public class Testory {
                   && !value.equals((float) 0) && !value.equals((double) 0)
               : value != null;
           if (!isInitialized) {
+            check(canMockOrSample(field.getType()));
             field.set(test, mockOrSample(field.getType(), field.getName()));
           }
         } catch (IllegalAccessException e) {
@@ -78,6 +79,10 @@ public class Testory {
         }
       }
     }
+  }
+
+  private static boolean canMockOrSample(Class<?> type) {
+    return isProxiable(type) || type.isArray() || isSampleable(type);
   }
 
   private static Object mockOrSample(Class<?> type, String name) {
@@ -94,7 +99,7 @@ public class Testory {
     } else if (isSampleable(type)) {
       return sample(type, name);
     } else {
-      throw new TestoryException("cannot mock or sample " + type.getName() + " " + name);
+      throw new IllegalArgumentException("cannot mock or sample " + type.getName() + " " + name);
     }
   }
 
