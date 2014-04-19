@@ -433,7 +433,7 @@ public class Testory {
   }
 
   public static void thenReturned(@Nullable Object objectOrMatcher) {
-    Effect effect = history.getLastWhenEffect();
+    Effect effect = getLastEffect();
     boolean expected = hasReturnedObject(effect)
         && (areEqualDeep(objectOrMatcher, getReturned(effect)) || objectOrMatcher != null
             && isMatcher(objectOrMatcher)
@@ -478,7 +478,7 @@ public class Testory {
   }
 
   public static void thenReturned() {
-    Effect effect = history.getLastWhenEffect();
+    Effect effect = getLastEffect();
     boolean expected = hasReturned(effect);
     if (!expected) {
       throw assertionError("\n" //
@@ -490,7 +490,7 @@ public class Testory {
   public static void thenThrown(Object matcher) {
     check(matcher != null);
     check(isMatcher(matcher));
-    Effect effect = history.getLastWhenEffect();
+    Effect effect = getLastEffect();
     boolean expected = hasThrown(effect) && asMatcher(matcher).matches(getThrown(effect));
     if (!expected) {
       throw assertionError("\n" //
@@ -501,7 +501,7 @@ public class Testory {
 
   public static void thenThrown(Throwable throwable) {
     check(throwable != null);
-    Effect effect = history.getLastWhenEffect();
+    Effect effect = getLastEffect();
     boolean expected = hasThrown(effect) && areEqualDeep(throwable, getThrown(effect));
     if (!expected) {
       throw assertionError("\n" //
@@ -512,7 +512,7 @@ public class Testory {
 
   public static void thenThrown(Class<? extends Throwable> type) {
     check(type != null);
-    Effect effect = history.getLastWhenEffect();
+    Effect effect = getLastEffect();
     boolean expected = hasThrown(effect) && type.isInstance(getThrown(effect));
     if (!expected) {
       throw assertionError("\n" //
@@ -522,13 +522,18 @@ public class Testory {
   }
 
   public static void thenThrown() {
-    Effect effect = history.getLastWhenEffect();
+    Effect effect = getLastEffect();
     boolean expected = hasThrown(effect);
     if (!expected) {
       throw assertionError("\n" //
           + formatSection("expected thrown", "") //
           + formatBut(effect));
     }
+  }
+
+  private static Effect getLastEffect() {
+    check(history.hasLastWhenEffect());
+    return history.getLastWhenEffect();
   }
 
   private static String formatBut(Effect effect) {

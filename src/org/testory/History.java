@@ -53,7 +53,18 @@ class History {
     addEvent(effect);
   }
 
+  public boolean hasLastWhenEffect() {
+    return tryGetLastWhenEffect() != null;
+  }
+
   public Effect getLastWhenEffect() {
+    Effect effect = tryGetLastWhenEffect();
+    checkArgument(effect != null);
+    return effect;
+  }
+
+  @Nullable
+  private Effect tryGetLastWhenEffect() {
     Effect effect = null;
     for (Object event : getEvents()) {
       if (event instanceof Effect) {
@@ -61,14 +72,7 @@ class History {
         break;
       }
     }
-    check(effect != null);
     return effect;
-  }
-
-  private static void check(boolean condition) {
-    if (!condition) {
-      throw new TestoryException();
-    }
   }
 
   private static class Mocking {
