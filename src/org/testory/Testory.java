@@ -181,16 +181,18 @@ public class Testory {
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         history.logInvocation(invocation);
-        if (history.hasStubbedHandlerFor(invocation)) {
-          return history.getStubbedHandlerFor(invocation).handle(invocation);
-        } else {
-          throw new TestoryException("purged mock");
-        }
+        return getStubbedHandlerFor(invocation).handle(invocation);
       }
+
     };
     T mock = (T) proxy(typing, compatible(handler));
     history.logMocking(mock);
     return mock;
+  }
+
+  private static Handler getStubbedHandlerFor(Invocation invocation) {
+    check(history.hasStubbedHandlerFor(invocation));
+    return history.getStubbedHandlerFor(invocation);
   }
 
   private static Handler compatible(final Handler handler) {
