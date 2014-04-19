@@ -162,6 +162,7 @@ public class Testory {
   }
 
   public static <T> T mock(Class<T> type) {
+    check(type != null);
     check(isProxiable(type));
     final T mock = rawMock(type);
     int hash = System.identityHashCode(mock);

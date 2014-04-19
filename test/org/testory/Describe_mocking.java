@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.test.Testilities.newObject;
 
@@ -126,5 +127,13 @@ public class Describe_mocking {
     }
     Foo foo = mock(Foo.class);
     assertNull(foo.hashCode(new Foo()));
+  }
+
+  @Test
+  public void checks_if_not_null() {
+    try {
+      mock(null);
+      fail();
+    } catch (TestoryException e) {}
   }
 }
