@@ -1,5 +1,6 @@
 package org.testory;
 
+import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
@@ -46,7 +47,6 @@ import org.testory.common.Matchers;
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
-import org.testory.proxy.Proxies;
 import org.testory.proxy.Typing;
 import org.testory.util.Effect;
 import org.testory.util.any.Any;
@@ -666,35 +666,6 @@ public class Testory {
             : null;
       }
     });
-  }
-
-  private static TestoryAssertionError assertionError(String message) {
-    TestoryAssertionError error = new TestoryAssertionError(message);
-    cloakStackTrace(error);
-    return error;
-  }
-
-  private static void cloakStackTrace(Throwable throwable) {
-    StackTraceElement[] stackTrace = throwable.getStackTrace();
-
-    int index = -1;
-    for (int i = stackTrace.length - 1; i >= 0; i--) {
-      String name = stackTrace[i].getClassName();
-      if (name.equals(Testory.class.getName()) || name.startsWith(Proxies.class.getName())) {
-        index = i;
-        break;
-      }
-    }
-    if (index == -1 || index == stackTrace.length - 1) {
-      throw new Error();
-    }
-    for (int i = index + 1; i < stackTrace.length; i++) {
-      if (stackTrace[i].getLineNumber() >= 0) {
-        index = i;
-        break;
-      }
-    }
-    throwable.setStackTrace(new StackTraceElement[] { stackTrace[index] });
   }
 
   private static InvocationMatcher capture(Invocation invocation) {
