@@ -1,11 +1,10 @@
 package org.testory.util.any;
 
-import static java.util.Collections.unmodifiableList;
 import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Collections.immutable;
 import static org.testory.common.Collections.last;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Anyvocation {
@@ -27,8 +26,7 @@ public class Anyvocation {
     checkNotNull(instance);
     checkNotNull(arguments);
     checkNotNull(anys);
-    return new Anyvocation(method, instance, unmodifiableList(new ArrayList<Object>(arguments)),
-        unmodifiableList(new ArrayList<Any>(anys)));
+    return new Anyvocation(method, instance, immutable(arguments), immutable(anys));
   }
 
   public static boolean isVarargs(Anyvocation anyvocation) {

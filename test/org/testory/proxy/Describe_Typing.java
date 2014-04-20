@@ -5,7 +5,6 @@ import static org.junit.Assert.fail;
 import static org.testory.proxy.Typing.typing;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -47,7 +46,7 @@ public class Describe_Typing {
 
   @Test
   public void should_get_no_interfaces() {
-    interfaces = Collections.unmodifiableSet(new HashSet<Class<?>>());
+    interfaces = new HashSet<Class<?>>();
     typing = typing(superclass, interfaces);
     assertEquals(interfaces, typing.interfaces);
   }

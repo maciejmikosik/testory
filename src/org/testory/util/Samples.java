@@ -1,13 +1,13 @@
 package org.testory.util;
 
 import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Collections.immutable;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -37,9 +37,9 @@ public class Samples {
                         : fail(type, name);
   }
 
-  private static final Set<Class<?>> wrappers = Collections.unmodifiableSet(new HashSet<Class<?>>(
-      Arrays.asList(Boolean.class, Character.class, Byte.class, Short.class, Integer.class,
-          Long.class, Float.class, Double.class)));
+  private static final Set<Class<?>> wrappers = immutable(new HashSet<Class<?>>(Arrays.asList(
+      Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class,
+      Float.class, Double.class)));
 
   private static Object samplePrimitive(Class<?> type, String name) {
     Random random = new Random(new Random(name.hashCode()).nextLong());

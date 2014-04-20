@@ -1,13 +1,12 @@
 package org.testory.proxy;
 
-import static java.util.Collections.unmodifiableList;
 import static org.testory.common.Classes.canInvoke;
+import static org.testory.common.Collections.immutable;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.proxy.ProxyException.check;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Invocation {
@@ -26,7 +25,7 @@ public class Invocation {
     check(!Modifier.isStatic(method.getModifiers()));
     check(arguments != null);
     check(canInvoke(method, instance, arguments.toArray()));
-    return new Invocation(method, instance, unmodifiableList(new ArrayList<Object>(arguments)));
+    return new Invocation(method, instance, immutable(arguments));
   }
 
   public boolean equals(Object object) {

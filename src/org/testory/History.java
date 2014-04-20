@@ -4,7 +4,6 @@ import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.testory.common.Nullable;
@@ -145,7 +144,7 @@ class History {
         invocations.add((Invocation) event);
       }
     }
-    return Collections.unmodifiableList(invocations);
+    return invocations;
   }
 
   public void logAny(Any any) {

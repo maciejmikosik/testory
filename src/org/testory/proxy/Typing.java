@@ -1,9 +1,8 @@
 package org.testory.proxy;
 
+import static org.testory.common.Collections.immutable;
 import static org.testory.proxy.ProxyException.check;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -26,7 +25,7 @@ public class Typing {
     check(!superclass.isInterface());
     check(!superclass.isPrimitive());
     check(!superclass.isArray());
-    Set<Class<?>> interfacesCopy = Collections.unmodifiableSet(new HashSet<Class<?>>(interfaces));
+    Set<Class<?>> interfacesCopy = immutable(interfaces);
     for (Class<?> interfacee : interfacesCopy) {
       check(interfacee.isInterface() && !interfacee.isAnnotation());
     }
