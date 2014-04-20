@@ -57,6 +57,7 @@ public class Describe_Proxies_proxy {
   private Throwable throwable;
   private int counter;
   private Class<?> type;
+  public boolean invoked;
 
   @Before
   public void before() throws NoSuchMethodException {
@@ -496,6 +497,18 @@ public class Describe_Proxies_proxy {
       proxy.throwsIOException();
       fail();
     } catch (ProxyException t) {}
+  }
+
+  @Test
+  public void does_not_invoke_constructor() {
+    @SuppressWarnings("unused")
+    class Proxiable {
+      public Proxiable() {
+        invoked = true;
+      }
+    }
+    proxy(typing(Proxiable.class), handler);
+    assertFalse(invoked);
   }
 
   @Test
