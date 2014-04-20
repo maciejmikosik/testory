@@ -4,7 +4,7 @@ import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
-import static org.testory.common.Classes.hasMethodWithSignature;
+import static org.testory.common.Classes.hasMethod;
 import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
@@ -250,8 +250,8 @@ public class Testory {
     given(willTarget(implementation), new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return mock == invocation.instance
-            && hasMethodWithSignature(invocation.method.getName(),
-                invocation.method.getParameterTypes(), implementation.getClass());
+            && hasMethod(invocation.method.getName(), invocation.method.getParameterTypes(),
+                implementation.getClass());
       }
     });
   }

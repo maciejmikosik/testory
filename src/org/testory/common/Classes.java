@@ -22,15 +22,8 @@ public class Classes {
     return Modifier.isFinal(type.getModifiers());
   }
 
-  public static boolean canAssign(@Nullable Object instance, Class<?> type) {
-    checkNotNull(type);
-    return type.isPrimitive()
-        ? canConvert(instance, type)
-        : instance == null || type.isAssignableFrom(instance.getClass());
-  }
-
   /* untested */
-  public static boolean hasMethodWithSignature(String name, Class<?>[] parameters, Class<?> type) {
+  public static boolean hasMethod(String name, Class<?>[] parameters, Class<?> type) {
     checkNotNull(name);
     checkNotNull(type);
     try {
@@ -39,6 +32,13 @@ public class Classes {
     } catch (NoSuchMethodException e) {
       return false;
     }
+  }
+
+  public static boolean canAssign(@Nullable Object instance, Class<?> type) {
+    checkNotNull(type);
+    return type.isPrimitive()
+        ? canConvert(instance, type)
+        : instance == null || type.isAssignableFrom(instance.getClass());
   }
 
   private static boolean canConvert(Object instance, Class<?> type) {
