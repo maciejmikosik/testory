@@ -1,6 +1,7 @@
 package org.testory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
@@ -217,6 +218,13 @@ public class Describe_stubbing {
     given(willReturn(object), onAlways);
     given(willReturn(otherObject), onNever);
     assertSame(object, mock.returnObject());
+  }
+
+  @Test
+  public void mock_does_not_use_stubbing_preceding_its_creation() {
+    given(willReturn(object), onAlways);
+    mock = mock(Mockable.class);
+    assertNotSame(object, mock.returnObject());
   }
 
   @Test
