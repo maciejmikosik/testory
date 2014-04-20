@@ -75,6 +75,17 @@ public class Testilities {
     return writer.toString();
   }
 
+  /* untested */
+  public static StackTraceElement here() {
+    return new Exception().getStackTrace()[1];
+  }
+
+  /* untested */
+  public static StackTraceElement nextLine(StackTraceElement element) {
+    return new StackTraceElement(element.getClassName(), element.getMethodName(),
+        element.getFileName(), element.getLineNumber() + 1);
+  }
+
   public static List<Object> readDeclaredFields(Object instance) {
     List<Object> values = new ArrayList<Object>();
     try {

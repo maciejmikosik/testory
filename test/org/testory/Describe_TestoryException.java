@@ -5,22 +5,24 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
+import static org.testory.test.Testilities.here;
+import static org.testory.test.Testilities.nextLine;
 
 import org.junit.Test;
 
 public class Describe_TestoryException {
-  private int line;
+  private StackTraceElement line;
 
   @Test
   public void reports_caller_code() {
     try {
-      line = new Exception().getStackTrace()[0].getLineNumber();
+      line = nextLine(here());
       mock(null);
       fail();
     } catch (TestoryException e) {
       assertEquals("incorrect usage", e.getMessage());
       assertEquals(1, e.getStackTrace().length);
-      assertEquals(line + 1, e.getStackTrace()[0].getLineNumber());
+      assertEquals(line, e.getStackTrace()[0]);
     }
   }
 

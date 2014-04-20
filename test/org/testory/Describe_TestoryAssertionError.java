@@ -7,6 +7,8 @@ import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.then;
 import static org.testory.Testory.thenCalled;
+import static org.testory.test.Testilities.here;
+import static org.testory.test.Testilities.nextLine;
 
 import java.util.ArrayList;
 
@@ -15,7 +17,7 @@ import org.junit.Test;
 import org.testory.proxy.Invocation;
 
 public class Describe_TestoryAssertionError {
-  private int line;
+  private StackTraceElement line;
   private InvocationMatcher onNothing;
 
   @Before
@@ -30,34 +32,34 @@ public class Describe_TestoryAssertionError {
   @Test
   public void reports_caller_code() {
     try {
-      line = new Exception().getStackTrace()[0].getLineNumber();
+      line = nextLine(here());
       then(false);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(1, e.getStackTrace().length);
-      assertEquals(line + 1, e.getStackTrace()[0].getLineNumber());
+      assertEquals(line, e.getStackTrace()[0]);
       assertEquals(Describe_TestoryAssertionError.class.getName(),
           e.getStackTrace()[0].getClassName());
     }
 
     try {
-      line = new Exception().getStackTrace()[0].getLineNumber();
+      line = nextLine(here());
       thenCalled(onNothing);
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(1, e.getStackTrace().length);
-      assertEquals(line + 1, e.getStackTrace()[0].getLineNumber());
+      assertEquals(line, e.getStackTrace()[0]);
       assertEquals(Describe_TestoryAssertionError.class.getName(),
           e.getStackTrace()[0].getClassName());
     }
 
     try {
-      line = new Exception().getStackTrace()[0].getLineNumber();
+      line = nextLine(here());
       thenCalled(mock(ArrayList.class)).toString();
       fail();
     } catch (TestoryAssertionError e) {
       assertEquals(1, e.getStackTrace().length);
-      assertEquals(line + 1, e.getStackTrace()[0].getLineNumber());
+      assertEquals(line, e.getStackTrace()[0]);
       assertEquals(Describe_TestoryAssertionError.class.getName(),
           e.getStackTrace()[0].getClassName());
     }
