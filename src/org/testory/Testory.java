@@ -224,7 +224,7 @@ public class Testory {
 
   private static void stubNice(Object mock) {
     given(new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
+      public Object handle(Invocation invocation) {
         Class<?> returnType = invocation.method.getReturnType();
         return returnType.isPrimitive()
             ? zeroOrNull(returnType)
@@ -261,7 +261,7 @@ public class Testory {
     check(mock != null);
     check(history.isMock(mock));
     Handler handler = new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
+      public Object handle(Invocation invocation) {
         history.logStubbing(will, capture(invocation));
         return null;
       }
@@ -277,7 +277,7 @@ public class Testory {
 
   public static Handler willReturn(@Nullable final Object object) {
     return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
+      public Object handle(Invocation invocation) {
         return object;
       }
     };
@@ -612,7 +612,7 @@ public class Testory {
     check(mock != null);
     check(history.isMock(mock));
     Handler handler = new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
+      public Object handle(Invocation invocation) {
         thenCalledTimes(numberMatcher, capture(invocation));
         return null;
       }
