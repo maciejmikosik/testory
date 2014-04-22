@@ -4,8 +4,8 @@ import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
+import static org.testory.common.Classes.defaultValue;
 import static org.testory.common.Classes.hasMethod;
-import static org.testory.common.Classes.zeroOrNull;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
@@ -225,10 +225,7 @@ public class Testory {
   private static void stubNice(Object mock) {
     given(new Handler() {
       public Object handle(Invocation invocation) {
-        Class<?> returnType = invocation.method.getReturnType();
-        return returnType.isPrimitive()
-            ? zeroOrNull(returnType)
-            : null;
+        return defaultValue(invocation.method.getReturnType());
       }
     }, onInstance(mock));
   }
@@ -660,10 +657,7 @@ public class Testory {
     return (T) proxy(typing, new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         handler.handle(invocation(invocation.method, wrapped, invocation.arguments));
-        Class<?> returnType = invocation.method.getReturnType();
-        return returnType.isPrimitive()
-            ? zeroOrNull(returnType)
-            : null;
+        return defaultValue(invocation.method.getReturnType());
       }
     });
   }

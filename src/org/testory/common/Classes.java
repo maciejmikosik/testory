@@ -110,31 +110,23 @@ public class Classes {
     return true;
   }
 
-  public static <T> T zeroOrNull(Class<T> type) {
+  public static <T> T defaultValue(Class<T> type) {
     checkNotNull(type);
-    return (T) zeroes.get(type);
+    return (T) defaultValues.get(type);
   }
 
-  private static final Map<Class<?>, Object> zeroes = zeroes();
+  private static final Map<Class<?>, Object> defaultValues = defaultValues();
 
-  private static Map<Class<?>, Object> zeroes() {
+  private static Map<Class<?>, Object> defaultValues() {
     Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
-    map.put(boolean.class, Boolean.valueOf(false));
-    map.put(char.class, Character.valueOf((char) 0));
-    map.put(byte.class, Byte.valueOf((byte) 0));
-    map.put(short.class, Short.valueOf((short) 0));
-    map.put(int.class, Integer.valueOf(0));
-    map.put(long.class, Long.valueOf(0));
-    map.put(float.class, Float.valueOf(0));
-    map.put(double.class, Double.valueOf(0));
-    map.put(Boolean.class, Boolean.valueOf(false));
-    map.put(Character.class, Character.valueOf((char) 0));
-    map.put(Byte.class, Byte.valueOf((byte) 0));
-    map.put(Short.class, Short.valueOf((short) 0));
-    map.put(Integer.class, Integer.valueOf(0));
-    map.put(Long.class, Long.valueOf(0));
-    map.put(Float.class, Float.valueOf(0));
-    map.put(Double.class, Double.valueOf(0));
+    map.put(boolean.class, false);
+    map.put(char.class, '\0');
+    map.put(byte.class, (byte) 0);
+    map.put(short.class, (short) 0);
+    map.put(int.class, 0);
+    map.put(long.class, 0L);
+    map.put(float.class, 0f);
+    map.put(double.class, 0.0);
     return Collections.unmodifiableMap(map);
   }
 
