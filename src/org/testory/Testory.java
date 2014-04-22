@@ -6,6 +6,10 @@ import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
 import static org.testory.common.Classes.defaultValue;
 import static org.testory.common.Classes.hasMethod;
+import static org.testory.common.Classes.isFinal;
+import static org.testory.common.Classes.isStatic;
+import static org.testory.common.Classes.setAccessible;
+import static org.testory.common.Objects.areEqual;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
@@ -35,9 +39,6 @@ import static org.testory.util.any.Repairs.repair;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -56,29 +57,18 @@ public class Testory {
   private static History history = new History();
 
   public static void givenTest(Object test) {
-    for (final Field field : test.getClass().getDeclaredFields()) {
-      if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
-        AccessController.doPrivileged(new PrivilegedAction<Void>() {
-          public Void run() {
-            field.setAccessible(true);
-            return null;
-          }
-        });
-        try {
-          Object value = field.get(test);
-          boolean isInitialized = field.getType().isPrimitive()
-              ? !value.equals(false) && !value.equals((char) 0) && !value.equals((byte) 0)
-                  && !value.equals((short) 0) && !value.equals(0) && !value.equals((long) 0)
-                  && !value.equals((float) 0) && !value.equals((double) 0)
-              : value != null;
-          if (!isInitialized) {
+    try {
+      for (final Field field : test.getClass().getDeclaredFields()) {
+        if (!isStatic(field) && !isFinal(field)) {
+          setAccessible(field);
+          if (areEqual(defaultValue(field.getType()), field.get(test))) {
             check(canMockOrSample(field.getType()));
             field.set(test, mockOrSample(field.getType(), field.getName()));
           }
-        } catch (IllegalAccessException e) {
-          throw new Error(e);
         }
       }
+    } catch (IllegalAccessException e) {
+      throw new Error(e);
     }
   }
 

@@ -3,8 +3,11 @@ package org.testory.common;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +23,29 @@ public class Classes {
   public static boolean isFinal(Class<?> type) {
     checkNotNull(type);
     return Modifier.isFinal(type.getModifiers());
+  }
+
+  /* untested */
+  public static boolean isFinal(Field field) {
+    checkNotNull(field);
+    return Modifier.isFinal(field.getModifiers());
+  }
+
+  /* untested */
+  public static boolean isStatic(Field field) {
+    checkNotNull(field);
+    return Modifier.isStatic(field.getModifiers());
+  }
+
+  /* untested */
+  public static void setAccessible(final Field field) {
+    checkNotNull(field);
+    AccessController.doPrivileged(new PrivilegedAction<Void>() {
+      public Void run() {
+        field.setAccessible(true);
+        return null;
+      }
+    });
   }
 
   /* untested */
