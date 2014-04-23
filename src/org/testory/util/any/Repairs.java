@@ -30,7 +30,7 @@ public class Repairs {
   }
 
   @Nullable
-  public static Anyvocation tryRepair(Anyvocation anyvocation) {
+  private static Anyvocation tryRepair(Anyvocation anyvocation) {
     boolean isVarargs = isVarargs(anyvocation);
     List<Class<?>> parameters = asList(anyvocation.method.getParameterTypes());
     List<Object> unfolded = isVarargs
