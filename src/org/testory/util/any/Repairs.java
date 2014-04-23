@@ -102,11 +102,11 @@ public class Repairs {
     return unfolded;
   }
 
-  private static List<Object> unfoldArguments(List<?> packed) {
-    ArrayList<Object> unpacked = new ArrayList<Object>();
-    unpacked.addAll(packed.subList(0, packed.size() - 1));
-    unpacked.addAll(asBoxingList(last(packed)));
-    return unpacked;
+  private static List<Object> unfoldArguments(List<?> folded) {
+    ArrayList<Object> unfolded = new ArrayList<Object>();
+    unfolded.addAll(folded.subList(0, folded.size() - 1));
+    unfolded.addAll(asBoxingList(last(folded)));
+    return unfolded;
   }
 
   private static List<Object> asBoxingList(Object array) {
@@ -118,10 +118,10 @@ public class Repairs {
   }
 
   private static List<Object> foldArguments(int length, List<Object> arguments) {
-    List<Object> packed = new ArrayList<Object>();
-    packed.addAll(arguments.subList(0, length - 1));
-    packed.add(asArray(arguments.subList(length - 1, arguments.size())));
-    return packed;
+    List<Object> folded = new ArrayList<Object>();
+    folded.addAll(arguments.subList(0, length - 1));
+    folded.add(asArray(arguments.subList(length - 1, arguments.size())));
+    return folded;
   }
 
   private static Object asArray(List<Object> elements) {

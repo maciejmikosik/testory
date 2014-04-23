@@ -75,18 +75,18 @@ public class Matcherizes {
     };
   }
 
-  private static List<Object> unfold(List<?> packed) {
-    ArrayList<Object> unpacked = new ArrayList<Object>();
-    unpacked.addAll(packed.subList(0, packed.size() - 1));
-    unpacked.addAll(asList((Object[]) last(packed)));
-    return unpacked;
+  private static List<Object> unfold(List<?> folded) {
+    ArrayList<Object> unfolded = new ArrayList<Object>();
+    unfolded.addAll(folded.subList(0, folded.size() - 1));
+    unfolded.addAll(asList((Object[]) last(folded)));
+    return unfolded;
   }
 
-  private static List<Matcher> fold(int length, List<Matcher> unpacked) {
-    List<Matcher> packed = new ArrayList<Matcher>();
-    packed.addAll(unpacked.subList(0, length - 1));
-    packed.add(arrayOf(unpacked.subList(length - 1, unpacked.size())));
-    return packed;
+  private static List<Matcher> fold(int length, List<Matcher> unfolded) {
+    List<Matcher> folded = new ArrayList<Matcher>();
+    folded.addAll(unfolded.subList(0, length - 1));
+    folded.add(arrayOf(unfolded.subList(length - 1, unfolded.size())));
+    return folded;
   }
 
   private static Matcher arrayOf(final List<Matcher> elements) {
