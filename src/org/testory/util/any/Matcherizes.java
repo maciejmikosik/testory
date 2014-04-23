@@ -3,7 +3,6 @@ package org.testory.util.any;
 import static java.util.Arrays.asList;
 import static org.testory.common.CharSequences.join;
 import static org.testory.common.Collections.last;
-import static org.testory.common.Matchers.arrayOf;
 import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.listOf;
 import static org.testory.common.Objects.print;
@@ -88,6 +87,14 @@ public class Matcherizes {
     packed.addAll(unpacked.subList(0, length - 1));
     packed.add(arrayOf(unpacked.subList(length - 1, unpacked.size())));
     return packed;
+  }
+
+  private static Matcher arrayOf(final List<Matcher> elements) {
+    return new ProxyMatcher(Matchers.arrayOf(elements)) {
+      public String toString() {
+        return "[" + join(", ", elements) + "]";
+      }
+    };
   }
 
   private static boolean mustBe(Object argument, Any any) {

@@ -102,6 +102,17 @@ public class Describe_any {
   }
 
   @Test
+  public void printing_handles_varargs() {
+    try {
+      thenCalled(mock).varargs(object, any(Object.class));
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage().contains(
+          mock + ".varargs(" + object + ", [any(" + Object.class.getName() + ")])"));
+    }
+  }
+
+  @Test
   public void recovers_after_misuse() {
     any(Object.class);
     try {
@@ -158,6 +169,10 @@ public class Describe_any {
 
     public boolean returnBoolean(Object object) {
       return false;
+    }
+
+    public Object varargs(Object object, Object... objects) {
+      return null;
     }
   }
 

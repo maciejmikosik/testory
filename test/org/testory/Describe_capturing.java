@@ -182,6 +182,12 @@ public class Describe_capturing {
       assertTrue(e.getMessage().contains(
           mock + ".acceptObjects(" + object + ", " + otherObject + ")"));
     }
+    try {
+      thenCalled(mock).varargs(object, otherObject);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage().contains(mock + ".varargs(" + object + ", [" + otherObject + "])"));
+    }
   }
 
   @Test
