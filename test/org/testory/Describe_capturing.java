@@ -162,6 +162,26 @@ public class Describe_capturing {
   }
 
   @Test
+  public void capturing_works_with_varargs() {
+    given(willReturn(true), mock).varargs(object, object);
+    assertFalse(mock.varargs(object));
+    assertTrue(mock.varargs(object, object));
+    assertTrue(mock.varargs(object, new Object[] { object }));
+    assertFalse(mock.varargs(object, otherObject));
+    assertFalse(mock.varargs(object, object, object));
+  }
+
+  @Test
+  public void capturing_works_with_primitive_varargs() {
+    given(willReturn(true), mock).primitiveVarargs(value, value);
+    assertFalse(mock.primitiveVarargs(value));
+    assertTrue(mock.primitiveVarargs(value, value));
+    assertTrue(mock.primitiveVarargs(value, new int[] { value }));
+    assertFalse(mock.primitiveVarargs(value, otherValue));
+    assertFalse(mock.primitiveVarargs(value, value, value));
+  }
+
+  @Test
   public void captured_invocation_is_printable() {
     try {
       thenCalled(mock).invoke();
@@ -188,26 +208,6 @@ public class Describe_capturing {
     } catch (TestoryAssertionError e) {
       assertTrue(e.getMessage().contains(mock + ".varargs(" + object + ", [" + otherObject + "])"));
     }
-  }
-
-  @Test
-  public void capturing_works_with_varargs() {
-    given(willReturn(true), mock).varargs(object, object);
-    assertFalse(mock.varargs(object));
-    assertTrue(mock.varargs(object, object));
-    assertTrue(mock.varargs(object, new Object[] { object }));
-    assertFalse(mock.varargs(object, otherObject));
-    assertFalse(mock.varargs(object, object, object));
-  }
-
-  @Test
-  public void capturing_works_with_primitive_varargs() {
-    given(willReturn(true), mock).primitiveVarargs(value, value);
-    assertFalse(mock.primitiveVarargs(value));
-    assertTrue(mock.primitiveVarargs(value, value));
-    assertTrue(mock.primitiveVarargs(value, new int[] { value }));
-    assertFalse(mock.primitiveVarargs(value, otherValue));
-    assertFalse(mock.primitiveVarargs(value, value, value));
   }
 
   private static Object number(final Integer... numbers) {
