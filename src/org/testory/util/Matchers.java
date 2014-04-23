@@ -1,6 +1,7 @@
 package org.testory.util;
 
 import static org.testory.common.Checks.checkArgument;
+import static org.testory.common.Classes.setAccessible;
 import static org.testory.common.Throwables.gently;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,7 +18,7 @@ public class Matchers {
   public static Matcher asMatcher(final Object matcher) {
     final Method method = tryGetMatcherMethod(matcher.getClass());
     checkArgument(method != null);
-    method.setAccessible(true);
+    setAccessible(method);
     return new Matcher() {
       public boolean matches(Object item) {
         try {

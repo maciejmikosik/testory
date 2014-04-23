@@ -3,6 +3,7 @@ package org.testory.common;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -38,11 +39,11 @@ public class Classes {
   }
 
   /* untested */
-  public static void setAccessible(final Field field) {
-    checkNotNull(field);
+  public static void setAccessible(final AccessibleObject accessible) {
+    checkNotNull(accessible);
     AccessController.doPrivileged(new PrivilegedAction<Void>() {
       public Void run() {
-        field.setAccessible(true);
+        accessible.setAccessible(true);
         return null;
       }
     });
