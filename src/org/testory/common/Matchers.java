@@ -95,19 +95,19 @@ public class Matchers {
     };
   }
 
-  public static class ProxyMatcher implements Matcher {
-    private final Matcher target;
+  public static class MatcherDecorator implements Matcher {
+    private final Matcher decorated;
 
-    public ProxyMatcher(Matcher target) {
-      this.target = checkNotNull(target);
+    public MatcherDecorator(Matcher decorated) {
+      this.decorated = checkNotNull(decorated);
     }
 
     public boolean matches(Object item) {
-      return target.matches(item);
+      return decorated.matches(item);
     }
 
     public String toString() {
-      return target.toString();
+      return decorated.toString();
     }
   }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
-import org.testory.common.Matchers.ProxyMatcher;
+import org.testory.common.Matchers.MatcherDecorator;
 import org.testory.proxy.Invocation;
 
 public class Matcherizes {
@@ -43,7 +43,7 @@ public class Matcherizes {
   }
 
   private static Matcher matcherize(final Object argument) {
-    return new ProxyMatcher(equalDeep(argument)) {
+    return new MatcherDecorator(equalDeep(argument)) {
       public String toString() {
         return print(argument);
       }
@@ -51,7 +51,7 @@ public class Matcherizes {
   }
 
   private static Matcher matcherize(final Any any) {
-    return new ProxyMatcher(any.matcher) {
+    return new MatcherDecorator(any.matcher) {
       public String toString() {
         return any.matcher == Matchers.anything
             ? "any(" + any.type.getName() + ")"
@@ -90,7 +90,7 @@ public class Matcherizes {
   }
 
   private static Matcher arrayOf(final List<Matcher> elements) {
-    return new ProxyMatcher(Matchers.arrayOf(elements)) {
+    return new MatcherDecorator(Matchers.arrayOf(elements)) {
       public String toString() {
         return "[" + join(", ", elements) + "]";
       }

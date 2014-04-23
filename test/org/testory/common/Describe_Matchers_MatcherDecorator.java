@@ -8,10 +8,10 @@ import static org.testory.test.Testilities.newObject;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.common.Matchers.ProxyMatcher;
+import org.testory.common.Matchers.MatcherDecorator;
 
-public class Describe_Matchers_ProxyMatcher {
-  private Matcher matcher, target;
+public class Describe_Matchers_MatcherDecorator {
+  private Matcher matcher, decorated;
   private Object object, other;
   private String string;
 
@@ -24,14 +24,14 @@ public class Describe_Matchers_ProxyMatcher {
 
   @Test
   public void delegates_matching() {
-    matcher = new ProxyMatcher(same(object));
+    matcher = new MatcherDecorator(same(object));
     assertTrue(matcher.matches(object));
     assertFalse(matcher.matches(other));
   }
 
   @Test
   public void delegates_printing() {
-    target = new Matcher() {
+    decorated = new Matcher() {
       public boolean matches(Object item) {
         return false;
       }
@@ -40,14 +40,14 @@ public class Describe_Matchers_ProxyMatcher {
         return string;
       }
     };
-    matcher = new ProxyMatcher(target);
-    assertEquals(target.toString(), matcher.toString());
+    matcher = new MatcherDecorator(decorated);
+    assertEquals(decorated.toString(), matcher.toString());
   }
 
   @Test
   public void fails_for_null_matcher() {
     try {
-      new ProxyMatcher(null);
+      new MatcherDecorator(null);
       fail();
     } catch (NullPointerException e) {}
   }
