@@ -196,7 +196,7 @@ public class Describe_verification {
       }
     });
     assertSame(mock, invocation.instance);
-    assertEquals(Mockable.class.getMethod("acceptObject", Object.class), invocation.method);
+    assertEquals(Mockable.class.getDeclaredMethod("acceptObject", Object.class), invocation.method);
     assertEquals(Arrays.asList(object), invocation.arguments);
   }
 
@@ -263,11 +263,9 @@ public class Describe_verification {
     };
   }
 
-  private static class Mockable {
-    public Object invoke() {
-      return null;
-    }
+  private static abstract class Mockable {
+    abstract Object invoke();
 
-    public void acceptObject(Object o) {}
+    abstract void acceptObject(Object o);
   }
 }

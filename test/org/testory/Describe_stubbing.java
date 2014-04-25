@@ -237,7 +237,7 @@ public class Describe_stubbing {
     }, onAlways);
     mock.acceptObject(object);
     assertSame(mock, invocation.instance);
-    assertEquals(Mockable.class.getMethod("acceptObject", Object.class), invocation.method);
+    assertEquals(Mockable.class.getDeclaredMethod("acceptObject", Object.class), invocation.method);
     assertEquals(Arrays.asList(object), invocation.arguments);
   }
 
@@ -257,27 +257,19 @@ public class Describe_stubbing {
     } catch (TestoryException e) {}
   }
 
-  private static class Mockable {
-    public Object returnObject() {
-      return null;
-    }
+  private static abstract class Mockable {
+    abstract Object returnObject();
 
-    public String returnString() {
-      return null;
-    }
+    abstract String returnString();
 
-    public int returnInt() {
-      return 0;
-    }
+    abstract int returnInt();
 
-    public void returnVoid() {}
+    abstract void returnVoid();
 
-    public void throwThrowable() throws Throwable {}
+    abstract void throwThrowable() throws Throwable;
 
-    public void throwIOException() throws IOException {}
+    abstract void throwIOException() throws IOException;
 
-    public Object acceptObject(Object argument) {
-      return null;
-    }
+    abstract Object acceptObject(Object argument);
   }
 }

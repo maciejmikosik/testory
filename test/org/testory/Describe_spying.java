@@ -112,7 +112,7 @@ public class Describe_spying {
     };
   }
 
-  static class Mockable {
+  private static class Mockable {
     Object doReturn(Object o) {
       return o;
     }

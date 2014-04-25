@@ -158,22 +158,14 @@ public class Describe_any {
     };
   }
 
-  private static class Mockable {
-    public Object returnObject(Object object) {
-      return null;
-    }
+  private abstract static class Mockable {
+    abstract Object returnObject(Object object);
 
-    public Object returnOtherObject(Object object) {
-      return null;
-    }
+    abstract Object returnOtherObject(Object object);
 
-    public boolean returnBoolean(Object object) {
-      return false;
-    }
+    abstract boolean returnBoolean(Object object);
 
-    public Object varargs(Object object, Object... objects) {
-      return null;
-    }
+    abstract Object varargs(Object object, Object... objects);
   }
 
   class Compile<E> {

@@ -223,25 +223,17 @@ public class Describe_capturing {
     };
   }
 
-  private static class Mockable {
-    public void invoke() {}
+  private static abstract class Mockable {
+    abstract void invoke();
 
-    public Object returnObject(Object object) {
-      return null;
-    }
+    abstract Object returnObject(Object object);
 
-    public Object returnOtherObject(Object object) {
-      return null;
-    }
+    abstract Object returnOtherObject(Object object);
 
-    public boolean varargs(Object object, Object... objects) {
-      return false;
-    }
+    abstract boolean varargs(Object object, Object... objects);
 
-    public boolean primitiveVarargs(int value, int... values) {
-      return false;
-    }
+    abstract boolean primitiveVarargs(int value, int... values);
 
-    public void acceptObjects(Object object, Object otherObject) {}
+    abstract void acceptObjects(Object object, Object otherObject);
   }
 }

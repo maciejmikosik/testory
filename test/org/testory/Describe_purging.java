@@ -75,9 +75,7 @@ public class Describe_purging {
     };
   }
 
-  private static class Mockable {
-    public Object getObject() {
-      throw null;
-    }
+  private abstract static class Mockable {
+    abstract Object getObject();
   }
 }

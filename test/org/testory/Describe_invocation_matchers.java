@@ -34,9 +34,9 @@ public class Describe_invocation_matchers {
     otherArgument = newObject("otherArgument");
     arguments = asList(argument);
     otherArguments = asList(otherArgument);
-    method = Mockable.class.getMethod("returnReturnable", Object.class);
-    otherMethod = Mockable.class.getMethod("returnOtherReturnable", Object.class);
-    otherTypeMethod = Mockable.class.getMethod("returnObject", Object.class);
+    method = Mockable.class.getDeclaredMethod("returnReturnable", Object.class);
+    otherMethod = Mockable.class.getDeclaredMethod("returnOtherReturnable", Object.class);
+    otherTypeMethod = Mockable.class.getDeclaredMethod("returnObject", Object.class);
   }
 
   @Test
@@ -78,18 +78,11 @@ public class Describe_invocation_matchers {
 
   private static class Returnable {}
 
-  @SuppressWarnings("unused")
-  private static class Mockable {
-    public Returnable returnReturnable(Object o) {
-      return null;
-    }
+  private static abstract class Mockable {
+    abstract Returnable returnReturnable(Object o);
 
-    public Returnable returnOtherReturnable(Object o) {
-      return null;
-    }
+    abstract Returnable returnOtherReturnable(Object o);
 
-    public Object returnObject(Object o) {
-      return null;
-    }
+    abstract Object returnObject(Object o);
   }
 }
