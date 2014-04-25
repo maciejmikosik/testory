@@ -1,6 +1,5 @@
 package org.testory.proxy;
 
-import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
 import static org.testory.common.Classes.isFinal;
@@ -15,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +46,7 @@ public class Proxies {
       /** includes all constructors */
       protected void filterConstructors(Class sc, List constructors) {}
     };
-    enhancer.setClassLoader(classLoadersFor(typing));
+    enhancer.setClassLoader(Thread.currentThread().getContextClassLoader());
     enhancer.setUseFactory(true);
     enhancer.setSuperclass(typing.superclass);
     enhancer.setInterfaces(typing.interfaces.toArray(new Class[0]));
@@ -126,34 +124,6 @@ public class Proxies {
     return typing.superclass == Object.class
         ? typing(ProxiableObject.class, typing.interfaces)
         : typing;
-  }
-
-  private static ClassLoader classLoadersFor(Typing typing) {
-    LinkedHashSet<ClassLoader> loaders = new LinkedHashSet<ClassLoader>();
-    loaders.add(typing.superclass.getClassLoader());
-    loaders.add(Proxies.class.getClassLoader());
-    loaders.add(Thread.currentThread().getContextClassLoader());
-    loaders.remove(null);
-    checkArgument(!loaders.isEmpty());
-    return chain(loaders);
-  }
-
-  private static ClassLoader chain(Iterable<ClassLoader> loaders) {
-    ClassLoader loader;
-    Iterator<ClassLoader> iterator = loaders.iterator();
-    loader = iterator.next();
-    while (iterator.hasNext()) {
-      loader = chain(loader, iterator.next());
-    }
-    return loader;
-  }
-
-  private static ClassLoader chain(ClassLoader first, final ClassLoader second) {
-    return new ClassLoader(first) {
-      protected Class<?> findClass(String name) throws ClassNotFoundException {
-        return second.loadClass(name);
-      }
-    };
   }
 
   private static MethodInterceptor asMethodInterceptor(final Handler handler) {

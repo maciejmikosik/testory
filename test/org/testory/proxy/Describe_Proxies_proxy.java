@@ -511,6 +511,24 @@ public class Describe_Proxies_proxy {
     assertFalse(invoked);
   }
 
+  /* must be public for cross-classloader inheritance test */
+  public abstract class PublicFoo extends Foo {}
+
+  @Test
+  public void uses_thread_context_class_loader() {
+    Thread thread = Thread.currentThread();
+    ClassLoader original = thread.getContextClassLoader();
+    ClassLoader context = new ClassLoader(original) {};
+    assertSame(original, PublicFoo.class.getClassLoader());
+    try {
+      thread.setContextClassLoader(context);
+      proxy = (Foo) proxy(typing(PublicFoo.class), handler);
+      assertSame(context, proxy.getClass().getClassLoader());
+    } finally {
+      thread.setContextClassLoader(original);
+    }
+  }
+
   @Test
   public void recursion_causes_stack_overflow() {
     proxy = (Foo) proxy(typing, new Handler() {
