@@ -53,9 +53,7 @@ public class Matcherizes {
   private static Matcher matcherize(final Any any) {
     return new MatcherDecorator(any.matcher) {
       public String toString() {
-        return any.matcher == Matchers.anything
-            ? "any(" + any.type.getName() + ")"
-            : "any(" + any.type.getName() + ", " + any.matcher + ")";
+        return any.toString();
       }
     };
   }

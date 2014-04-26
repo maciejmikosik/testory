@@ -44,7 +44,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.testory.common.Matcher;
-import org.testory.common.Matchers;
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
@@ -309,18 +308,17 @@ public class Testory {
   }
 
   public static <T> T any(Class<T> type) {
-    return any(type, Matchers.anything);
+    check(type != null);
+    return anyImpl(Any.any(type));
   }
 
   public static <T> T any(Class<T> type, Object matcher) {
     check(matcher != null);
     check(isMatcher(matcher));
-    return any(type, asMatcher(matcher));
+    return anyImpl(Any.any(type, asMatcher(matcher)));
   }
 
-  private static <T> T any(Class<T> type, Matcher matcher) {
-    check(type != null);
-    Any any = Any.any(type, matcher);
+  private static <T> T anyImpl(Any any) {
     history.logAny(any);
     return (T) any.token;
   }
