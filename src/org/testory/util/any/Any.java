@@ -2,6 +2,7 @@ package org.testory.util.any;
 
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.tryWrap;
+import static org.testory.common.Matchers.equalDeep;
 import static org.testory.util.Uniques.unique;
 
 import org.testory.common.Matcher;
@@ -31,6 +32,15 @@ public class Any {
     return new Any(Matchers.anything, unique(tryWrap(type))) {
       public String toString() {
         return "any(" + type.getName() + ")";
+      }
+    };
+  }
+
+  public static Any a(final Object value) {
+    checkNotNull(value);
+    return new Any(equalDeep(value), unique(tryWrap(value.getClass()))) {
+      public String toString() {
+        return "a(" + value + ")";
       }
     };
   }

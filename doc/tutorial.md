@@ -190,9 +190,9 @@ In cases where you cannot (due to technical limitations) `TestoryException` is t
         // throws TestoryException
         given(willReturn(true), mock).someMethod(any(int.class), intValue);
 
-You can workaround those cases by using additional `any`.
+You can workaround those cases by wrapping primitive values in `a`.
 
-        given(willReturn(true), mock).someMethod(any(int.class), any(int.class, equalTo(intValue)));
+        given(willReturn(true), mock).someMethod(any(int.class), a(intValue));
 
 ### Spying
 

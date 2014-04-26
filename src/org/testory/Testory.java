@@ -323,6 +323,46 @@ public class Testory {
     return (T) any.token;
   }
 
+  public static boolean a(boolean value) {
+    return aImpl(boolean.class, value);
+  }
+
+  public static char a(char value) {
+    return aImpl(char.class, value);
+  }
+
+  public static byte a(byte value) {
+    return aImpl(byte.class, value);
+  }
+
+  public static short a(short value) {
+    return aImpl(short.class, value);
+  }
+
+  public static int a(int value) {
+    return aImpl(int.class, value);
+  }
+
+  public static long a(long value) {
+    return aImpl(long.class, value);
+  }
+
+  public static float a(float value) {
+    return aImpl(float.class, value);
+  }
+
+  public static double a(double value) {
+    return aImpl(double.class, value);
+  }
+
+  public static <T> T a(T value) {
+    return aImpl(value.getClass(), value);
+  }
+
+  private static <T> T aImpl(Class<?> type, final T value) {
+    return anyImpl(Any.a(value));
+  }
+
   public static InvocationMatcher onInstance(final Object mock) {
     check(mock != null);
     return new InvocationMatcher() {
