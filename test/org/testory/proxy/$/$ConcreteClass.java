@@ -1,3 +1,3 @@
-package org.testory.proxy;
+package org.testory.proxy.$;
 
 public class $ConcreteClass {}

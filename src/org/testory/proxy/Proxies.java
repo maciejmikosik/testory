@@ -32,7 +32,15 @@ import org.objenesis.ObjenesisStd;
 public class Proxies {
   public static boolean isProxiable(Class<?> type) {
     check(type != null);
-    return !isFinal(type) || isPeelable(type);
+    return isTrivial(type) || isExtendableClass(type) || isPeelable(type);
+  }
+
+  private static boolean isTrivial(Class<?> type) {
+    return isPublic(type) && !isFinal(type);
+  }
+
+  private static boolean isExtendableClass(Class<?> type) {
+    return !isFinal(type) && !type.isInterface();
   }
 
   public static Object proxy(Typing typing, Handler handler) {

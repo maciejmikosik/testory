@@ -1,4 +1,4 @@
-package org.testory.proxy;
+package org.testory.proxy.$;
 
 import static java.util.Collections.unmodifiableCollection;
 import static java.util.Collections.unmodifiableList;
@@ -46,6 +46,10 @@ import java.util.TreeSet;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.proxy.Handler;
+import org.testory.proxy.Invocation;
+import org.testory.proxy.ProxyException;
+import org.testory.proxy.Typing;
 
 public class Describe_Proxies_proxy {
   private Handler handler;
@@ -133,10 +137,17 @@ public class Describe_Proxies_proxy {
   }
 
   @Test
-  public void interfaces_are_proxiable() {
+  public void public_interfaces_are_proxiable() {
     assertProxiable(typing($InterfaceA.class, $InterfaceB.class, $InterfaceC.class));
-    assertProxiable(typing($PackagePrivateInterfaceA.class, $PackagePrivateInterfaceB.class,
-        $PackagePrivateInterfaceC.class));
+  }
+
+  @Test
+  public void package_private_interfaces_are_not_proxiable() {
+    assertFalse(isProxiable($PackagePrivateInterface.class));
+    try {
+      proxy(typing($PackagePrivateInterface.class), handler);
+      fail();
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -615,8 +626,4 @@ public class Describe_Proxies_proxy {
 
 class $PackagePrivateConcreteClass {}
 
-interface $PackagePrivateInterfaceA {}
-
-interface $PackagePrivateInterfaceB {}
-
-interface $PackagePrivateInterfaceC {}
+interface $PackagePrivateInterface {}
