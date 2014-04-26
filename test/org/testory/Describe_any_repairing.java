@@ -17,11 +17,11 @@ import org.junit.Test;
 public class Describe_any_repairing {
   private Object a, b, x;
   private int i, j, k;
-  private Mock mock;
+  private Mockable mock;
 
   @Before
   public void before() {
-    mock = mock(Mock.class);
+    mock = mock(Mockable.class);
     a = newObject("a");
     b = newObject("b");
     x = newObject("x");
@@ -190,13 +190,13 @@ public class Describe_any_repairing {
 
   private static final class FinalClass {}
 
-  public interface Mock {
-    boolean objects(Object a, Object b, Object c);
+  private static abstract class Mockable {
+    abstract boolean objects(Object a, Object b, Object c);
 
-    boolean objects(Object a, Object b, int c, int d, Object e, Object f);
+    abstract boolean objects(Object a, Object b, int c, int d, Object e, Object f);
 
-    boolean varargs(Object a, Object... os);
+    abstract boolean varargs(Object a, Object... os);
 
-    boolean primitiveVarargs(int i, int... is);
+    abstract boolean primitiveVarargs(int i, int... is);
   }
 }

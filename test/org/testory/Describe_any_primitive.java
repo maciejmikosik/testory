@@ -10,11 +10,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class Describe_any_primitive {
-  private Mock mock;
+  private Mockable mock;
 
   @Before
   public void before() {
-    mock = mock(Mock.class);
+    mock = mock(Mockable.class);
   }
 
   @Test
@@ -53,9 +53,9 @@ public class Describe_any_primitive {
     assertTrue(mock.primitive(5));
   }
 
-  public interface Mock {
-    boolean wrapper(Integer o);
+  private static abstract class Mockable {
+    abstract boolean wrapper(Integer o);
 
-    boolean primitive(int o);
+    abstract boolean primitive(int o);
   }
 }

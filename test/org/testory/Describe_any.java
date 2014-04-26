@@ -158,7 +158,7 @@ public class Describe_any {
     };
   }
 
-  private abstract static class Mockable {
+  private static abstract class Mockable {
     abstract Object returnObject(Object object);
 
     abstract Object returnOtherObject(Object object);
@@ -168,7 +168,7 @@ public class Describe_any {
     abstract Object varargs(Object object, Object... objects);
   }
 
-  class Compile<E> {
+  private static class Compile<E> {
     void compile(E o) {}
   }
 }
