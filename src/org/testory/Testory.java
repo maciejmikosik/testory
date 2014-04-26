@@ -351,6 +351,7 @@ public class Testory {
   }
 
   public static <T> T a(T value) {
+    check(value != null);
     return anyImpl(Any.a(value));
   }
 

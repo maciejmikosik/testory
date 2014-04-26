@@ -97,6 +97,14 @@ public class Describe_any_a {
   }
 
   @Test
+  public void checks_that_value_is_not_null() {
+    try {
+      a(null);
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
   public void prints_value() {
     try {
       thenCalled(mock).invoke(a(intA));
