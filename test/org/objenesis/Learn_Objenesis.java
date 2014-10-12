@@ -27,9 +27,7 @@ public class Learn_Objenesis {
   }
 
   @Test
-  public void creates_unique_empty_string() {
-    assertEquals("", objenesis.newInstance(String.class));
-    assertNotSame("", objenesis.newInstance(String.class));
+  public void creates_unique_string() {
     assertNotSame(objenesis.newInstance(String.class), objenesis.newInstance(String.class));
   }
 
