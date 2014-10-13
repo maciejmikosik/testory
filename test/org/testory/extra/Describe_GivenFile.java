@@ -14,6 +14,7 @@ import static org.testory.Testory.any;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.onInstance;
+import static org.testory.Testory.the;
 import static org.testory.Testory.willReturn;
 import static org.testory.extra.GivenFile.givenIsAbsent;
 import static org.testory.extra.GivenFile.givenIsAbsolute;
@@ -431,8 +432,8 @@ public class Describe_GivenFile {
     given(willReturn(directory), rejected).getParentFile();
     given(willReturn("accepted"), accepted).getName();
     given(willReturn("rejected"), rejected).getName();
-    given(willReturn(true), filenameFilter).accept(aSame(directory), accepted.getName());
-    given(willReturn(false), filenameFilter).accept(aSame(directory), rejected.getName());
+    given(willReturn(true), filenameFilter).accept(the(directory), accepted.getName());
+    given(willReturn(false), filenameFilter).accept(the(directory), rejected.getName());
     assertThat(directory.listFiles(filenameFilter), arrayContainingSameInAnyOrder(accepted));
 
     given(willReturn(null), directory).listFiles();
@@ -461,8 +462,8 @@ public class Describe_GivenFile {
     given(willReturn(directory), rejected).getParentFile();
     given(willReturn("accepted"), accepted).getName();
     given(willReturn("rejected"), rejected).getName();
-    given(willReturn(true), filenameFilter).accept(aSame(directory), accepted.getName());
-    given(willReturn(false), filenameFilter).accept(aSame(directory), rejected.getName());
+    given(willReturn(true), filenameFilter).accept(the(directory), accepted.getName());
+    given(willReturn(false), filenameFilter).accept(the(directory), rejected.getName());
     assertThat(directory.list(filenameFilter), arrayContainingSameInAnyOrder(accepted.getName()));
 
     given(willReturn(null), directory).listFiles();
@@ -519,14 +520,5 @@ public class Describe_GivenFile {
         mismatchDescription.appendText("was array of size " + item.length);
       }
     };
-  }
-
-  private static <T> T aSame(final T object) {
-    return (T) any(object.getClass(), new Object() {
-      @SuppressWarnings("unused")
-      public boolean matches(Object item) {
-        return item == object;
-      }
-    });
   }
 }
