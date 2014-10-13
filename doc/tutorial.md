@@ -222,6 +222,7 @@ Wherever api method accepts Object via parameter named matcher, you are free to 
 
  - [org.hamcrest.Matcher](https://github.com/hamcrest/JavaHamcrest)
  - [org.fest.assertions.Condition](https://github.com/alexruiz/fest-assert-1.x)
+ - [org.assertj.core.api.Condition](https://github.com/joel-costigliola/assertj-core)
  - [com.google.common.base.Predicate](https://code.google.com/p/guava-libraries/)
  - [com.google.common.base.Function](https://code.google.com/p/guava-libraries/)
  - dynamic matcher
