@@ -20,7 +20,7 @@ public class Describe_TestoryException {
       mock(null);
       fail();
     } catch (TestoryException e) {
-      assertEquals("incorrect usage", e.getMessage());
+      assertEquals("incorrect usage in client code", e.getMessage());
       assertEquals(1, e.getStackTrace().length);
       assertEquals(line, e.getStackTrace()[0]);
     }
@@ -33,7 +33,7 @@ public class Describe_TestoryException {
       fail();
     } catch (TestoryException e) {
       Throwable cause = e.getCause();
-      assertEquals("failed check", cause.getMessage());
+      assertEquals("failed precondition in testory code", cause.getMessage());
       assertEquals(1, cause.getStackTrace().length);
       assertEquals(Testory.class.getName(), cause.getStackTrace()[0].getClassName());
       assertEquals("mock", cause.getStackTrace()[0].getMethodName());

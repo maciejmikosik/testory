@@ -26,9 +26,9 @@ public class TestoryException extends RuntimeException {
   }
 
   private static TestoryException decorate(TestoryException original) {
-    TestoryException check = new TestoryException("failed check", original);
+    TestoryException check = new TestoryException("failed precondition in testory code", original);
     check.setStackTrace(failedCheckTrace(original.getStackTrace()));
-    TestoryException caller = new TestoryException("incorrect usage", check);
+    TestoryException caller = new TestoryException("incorrect usage in client code", check);
     caller.setStackTrace(callerTrace(original.getStackTrace()));
     return caller;
   }
