@@ -61,7 +61,7 @@ public class Testory {
         if (!isStatic(field) && !isFinal(field)) {
           setAccessible(field);
           if (areEqual(defaultValue(field.getType()), field.get(test))) {
-            check(canMockOrSample(field.getType()));
+            check(canMockOrSample(field.getType()), "cannot inject field: " + field.getName());
             field.set(test, mockOrSample(field.getType(), field.getName()));
           }
         }

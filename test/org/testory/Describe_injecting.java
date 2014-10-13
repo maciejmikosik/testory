@@ -459,13 +459,15 @@ public class Describe_injecting {
     final class FinalClass {}
     class TestClass {
       @SuppressWarnings("unused")
-      FinalClass field;
+      FinalClass fieldOfFinalClass;
     }
     TestClass test = new TestClass();
     try {
       givenTest(test);
       fail();
-    } catch (TestoryException e) {}
+    } catch (TestoryException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("fieldOfFinalClass"));
+    }
   }
 
   private static InvocationMatcher onInstance(final Object mock) {

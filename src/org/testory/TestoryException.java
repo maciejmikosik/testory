@@ -20,15 +20,19 @@ public class TestoryException extends RuntimeException {
   }
 
   public static void check(boolean condition) {
+    check(condition, "incorrect usage in client code");
+  }
+
+  public static void check(boolean condition, String message) {
     if (!condition) {
-      throw decorate(new TestoryException());
+      throw decorate(message, new TestoryException());
     }
   }
 
-  private static TestoryException decorate(TestoryException original) {
+  private static TestoryException decorate(String callerMessage, TestoryException original) {
     TestoryException check = new TestoryException("failed precondition in testory code", original);
     check.setStackTrace(failedCheckTrace(original.getStackTrace()));
-    TestoryException caller = new TestoryException("incorrect usage in client code", check);
+    TestoryException caller = new TestoryException(callerMessage, check);
     caller.setStackTrace(callerTrace(original.getStackTrace()));
     return caller;
   }
