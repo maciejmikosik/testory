@@ -3,6 +3,7 @@ package org.testory.util.any;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.tryWrap;
 import static org.testory.common.Matchers.equalDeep;
+import static org.testory.common.Matchers.same;
 import static org.testory.util.Uniques.unique;
 
 import org.testory.common.Matcher;
@@ -41,6 +42,14 @@ public class Any {
     return new Any(equalDeep(value), unique(tryWrap(value.getClass()))) {
       public String toString() {
         return "a(" + value + ")";
+      }
+    };
+  }
+
+  public static Any the(final Object instance) {
+    return new Any(same(instance), unique(tryWrap(instance.getClass()))) {
+      public String toString() {
+        return "the(" + instance + ")";
       }
     };
   }

@@ -355,6 +355,19 @@ public class Testory {
     return anyImpl(Any.a(value));
   }
 
+  public static void the(boolean value) {
+    check(false);
+  }
+
+  public static void the(double value) {
+    check(false);
+  }
+
+  public static <T> T the(T instance) {
+    check(instance != null);
+    return anyImpl(Any.the(instance));
+  }
+
   private static <T> T anyImpl(Any any) {
     history.logAny(any);
     return (T) any.token;
