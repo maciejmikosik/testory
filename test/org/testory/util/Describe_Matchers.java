@@ -8,14 +8,8 @@ import static org.testory.test.Testilities.newObject;
 import static org.testory.util.Matchers.asMatcher;
 import static org.testory.util.Matchers.isMatcher;
 
-import org.fest.assertions.Condition;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 
 public class Describe_Matchers {
   private Object matcher, object, otherObject;
@@ -31,14 +25,14 @@ public class Describe_Matchers {
 
   @Test
   public void supports_hamcrest_matcher() {
-    matcher = new Matcher<Object>() {
+    matcher = new org.hamcrest.Matcher<Object>() {
       public boolean matches(Object item) {
         return item == object;
       }
 
-      public void describeTo(Description description) {}
+      public void describeTo(org.hamcrest.Description description) {}
 
-      public void describeMismatch(Object item, Description mismatchDescription) {}
+      public void describeMismatch(Object item, org.hamcrest.Description mismatchDescription) {}
 
       @Deprecated
       public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {}
@@ -50,7 +44,7 @@ public class Describe_Matchers {
 
   @Test
   public void supports_fest_matcher() {
-    matcher = new Condition<Object>() {
+    matcher = new org.fest.assertions.Condition<Object>() {
       public boolean matches(Object value) {
         return value == object;
       }
@@ -62,7 +56,7 @@ public class Describe_Matchers {
 
   @Test
   public void supports_guava_predicate() {
-    matcher = new Predicate<Object>() {
+    matcher = new com.google.common.base.Predicate<Object>() {
       public boolean apply(Object input) {
         return input == object;
       }
@@ -74,7 +68,7 @@ public class Describe_Matchers {
 
   @Test
   public void supports_guava_function() {
-    matcher = new Function<Object, Boolean>() {
+    matcher = new com.google.common.base.Function<Object, Boolean>() {
       public Boolean apply(Object input) {
         return input == object;
       }
