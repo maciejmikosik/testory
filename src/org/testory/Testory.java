@@ -668,7 +668,8 @@ public class Testory {
     boolean expected = asMatcher(numberMatcher).matches(numberOfCalls);
     if (!expected) {
       throw assertionError("\n" //
-          + formatSection("expected called times " + numberMatcher, invocationMatcher));
+          + formatSection("expected called times " + numberMatcher, invocationMatcher)
+          + formatSection("but called", "times " + numberOfCalls));
     }
   }
 

@@ -2,6 +2,7 @@ package org.testory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
@@ -121,20 +122,20 @@ public class Describe_verification {
       thenCalled(onNothing);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
+      assertTrue(e.getMessage(), e.getMessage().contains("\n" //
           + "  expected called times 1\n" //
           + "    " + onNothing + "\n" //
-      , e.getMessage());
+      ));
     }
 
     try {
       thenCalledTimes(3, onNothing);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
+      assertTrue(e.getMessage(), e.getMessage().contains("\n" //
           + "  expected called times 3\n" //
           + "    " + onNothing + "\n" //
-      , e.getMessage());
+      ));
     }
 
     numberMatcher = number(2);
@@ -142,10 +143,44 @@ public class Describe_verification {
       thenCalledTimes(numberMatcher, onNothing);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
+      assertTrue(e.getMessage(), e.getMessage().contains("\n" //
           + "  expected called times " + numberMatcher + "\n" //
           + "    " + onNothing + "\n" //
-      , e.getMessage());
+      ));
+    }
+  }
+
+  @Test
+  public void verification_prints_actual_number_of_invocations() {
+    try {
+      thenCalled(onNothing);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("" //
+          + "  but called" + "\n" //
+          + "    times " + 0 + "\n" //
+      ));
+    }
+
+    try {
+      thenCalledTimes(3, onInstance(once));
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("" //
+          + "  but called" + "\n" //
+          + "    times " + 1 + "\n" //
+      ));
+    }
+
+    numberMatcher = number(2);
+    try {
+      thenCalledTimes(numberMatcher, onInstance(thrice));
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("" //
+          + "  but called" + "\n" //
+          + "    times " + 3 + "\n" //
+      ));
     }
   }
 
