@@ -55,6 +55,18 @@ public class Describe_Matchers {
   }
 
   @Test
+  public void supports_fest_2_matcher() {
+    matcher = new org.fest.assertions.core.Condition<Object>() {
+      public boolean matches(Object value) {
+        return value == object;
+      }
+    };
+    assertTrue(isMatcher(matcher));
+    assertTrue(asMatcher(matcher).matches(object));
+    assertFalse(asMatcher(matcher).matches(otherObject));
+  }
+
+  @Test
   public void supports_assertj_matcher() {
     matcher = new org.assertj.core.api.Condition<Object>() {
       public boolean matches(Object value) {
