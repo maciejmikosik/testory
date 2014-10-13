@@ -3,7 +3,7 @@
 ### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing) | [spying](#spying)
 ### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
 ### [macros](#macros) | [givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
-### [fine points](#fine-points) | [arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging)
+### [fine points](#fine-points) | [arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging) | [extras](#extras)
 
 # Overview
 
@@ -394,3 +394,9 @@ Purging has following consequences
  - purged mock is no longer considered to be a mock, so
   - stubbing it causes TestoryException
   - verifying it causes TestoryException
+
+### Extras
+
+Extra package contains undocumented features
+
+ - `GivenFile` contains utilities for stubbing `java.io.File`
