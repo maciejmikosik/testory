@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="main/java" output="main/sink/eclipse_bin"/>
+	<classpathentry kind="lib" path="main/java"/>
 	<classpathentry kind="lib" path="main/jar/cglib-nodep-2.2.3.jar" sourcepath="main/jar/cglib-src-2.2.3.jar"/>
 	<classpathentry kind="lib" path="main/jar/objenesis-2.0.jar" sourcepath="main/jar/objenesis-2.0-sources.jar"/>
 
