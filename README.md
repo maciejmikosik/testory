@@ -46,7 +46,7 @@ or handy macros.
         when(list.size());
         thenReturned(5);
 
-See [Tutorial](doc/tutorial.md) for complete list of features.
+See [Tutorial](main/doc/tutorial.md) for complete list of features.
 
 [Testory on Github](https://github.com/maciejmikosik/testory) |
 [Download release](https://github.com/maciejmikosik/testory/releases).

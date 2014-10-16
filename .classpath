@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="src" path="main/java" output="main/sink/eclipse_bin"/>
+	<classpathentry kind="lib" path="main/jar/cglib-nodep-2.2.3.jar" sourcepath="main/jar/cglib-src-2.2.3.jar"/>
+	<classpathentry kind="lib" path="main/jar/objenesis-2.0.jar" sourcepath="main/jar/objenesis-2.0-sources.jar"/>
+
+	<classpathentry kind="src" path="test/java" output="test/sink/eclipse_bin"/>
+	<classpathentry kind="lib" path="test/jar/assertj-core-1.7.0.jar" sourcepath="test/jar/assertj-core-1.7.0-sources.jar"/>
+	<classpathentry kind="lib" path="test/jar/fest-assert-1.4.jar" sourcepath="test/jar/fest-assert-1.4-sources.jar"/>
+	<classpathentry kind="lib" path="test/jar/fest-assert-core-2.0M5.jar" sourcepath="test/jar/fest-assert-core-2.0M5-sources.jar"/>
+	<classpathentry kind="lib" path="test/jar/fest-util-1.1.6.jar" sourcepath="test/jar/fest-util-1.1.6-sources.jar"/>
+	<classpathentry kind="lib" path="test/jar/guava-15.0.jar" sourcepath="test/jar/guava-15.0-sources.jar"/>
+	<classpathentry kind="lib" path="test/jar/hamcrest-all-1.3.jar" sourcepath="test/jar/hamcrest-all-1.3-sources.jar"/>
+	<classpathentry kind="lib" path="test/jar/junit-4.11.jar" sourcepath="test/jar/junit-4.11-sources.jar"/>
+
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="dep/assertj-core-1.7.0.jar" sourcepath="dep/assertj-core-1.7.0-sources.jar"/>
-	<classpathentry kind="lib" path="dep/cglib-nodep-2.2.3.jar" sourcepath="dep/cglib-src-2.2.3.jar"/>
-	<classpathentry kind="lib" path="dep/fest-assert-1.4.jar" sourcepath="dep/fest-assert-1.4-sources.jar"/>
-	<classpathentry kind="lib" path="dep/fest-assert-core-2.0M5.jar" sourcepath="dep/fest-assert-core-2.0M5-sources.jar"/>
-	<classpathentry kind="lib" path="dep/fest-util-1.1.6.jar" sourcepath="dep/fest-util-1.1.6-sources.jar"/>
-	<classpathentry kind="lib" path="dep/guava-15.0.jar" sourcepath="dep/guava-15.0-sources.jar"/>
-	<classpathentry kind="lib" path="dep/hamcrest-all-1.3.jar" sourcepath="dep/hamcrest-all-1.3-sources.jar"/>
-	<classpathentry kind="lib" path="dep/junit-4.11.jar" sourcepath="dep/junit-4.11-sources.jar"/>
-	<classpathentry kind="lib" path="dep/objenesis-2.0.jar" sourcepath="dep/objenesis-2.0-sources.jar"/>
-	<classpathentry kind="output" path="bin"/>
 </classpath>
