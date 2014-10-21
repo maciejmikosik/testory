@@ -176,6 +176,7 @@ public class Testory {
         : typing(type, new HashSet<Class<?>>());
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
+        check(isMock(invocation.instance));
         history.logInvocation(invocation);
         return getStubbedHandlerFor(invocation).handle(invocation);
       }
@@ -245,7 +246,7 @@ public class Testory {
   public static <T> T given(final Handler will, T mock) {
     check(will != null);
     check(mock != null);
-    check(history.isMock(mock));
+    check(isMock(mock));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         history.logStubbing(will, capture(invocation));
@@ -619,7 +620,7 @@ public class Testory {
 
   public static <T> T thenCalled(T mock) {
     check(mock != null);
-    check(history.isMock(mock));
+    check(isMock(mock));
     return thenCalledTimes(exactly(1), mock);
   }
 
@@ -631,7 +632,7 @@ public class Testory {
   public static <T> T thenCalledTimes(int number, T mock) {
     check(number >= 0);
     check(mock != null);
-    check(history.isMock(mock));
+    check(isMock(mock));
     return thenCalledTimes(exactly(number), mock);
   }
 
@@ -645,7 +646,7 @@ public class Testory {
     check(numberMatcher != null);
     check(isMatcher(numberMatcher));
     check(mock != null);
-    check(history.isMock(mock));
+    check(isMock(mock));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         thenCalledTimes(numberMatcher, capture(invocation));
@@ -683,6 +684,10 @@ public class Testory {
         return "" + number;
       }
     };
+  }
+
+  private static <T> boolean isMock(T mock) {
+    return history.isMock(mock);
   }
 
   private static String formatSection(String caption, @Nullable Object content) {

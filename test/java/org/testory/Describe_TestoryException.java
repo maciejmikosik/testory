@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
+import static org.testory.Testory.when;
 import static org.testory.test.Testilities.here;
 import static org.testory.test.Testilities.nextLine;
 
@@ -13,6 +14,7 @@ import org.junit.Test;
 public class Describe_TestoryException {
   private StackTraceElement line;
   private StackTraceElement trace;
+  private Object mock;
 
   @Test
   public void message_conforms_to_template() {
@@ -36,6 +38,19 @@ public class Describe_TestoryException {
     } catch (TestoryException e) {
       assertTrue(e.getMessage(), !e.getMessage().contains("check"));
       assertTrue(e.getMessage(), e.getMessage().contains("type != null"));
+    }
+  }
+
+  @Test
+  public void message_explains_purged_mock() {
+    mock = mock(Object.class);
+    when("");
+    when("");
+    try {
+      mock.toString();
+      fail();
+    } catch (TestoryException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("isMock"));
     }
   }
 
