@@ -67,6 +67,10 @@ cp \
   ./sink/building/testory.jar \
   ./sink
 
+echo ""
+echo "BUILD SUCCESSFUL"
+echo "created $MAIN/sink/testory.jar"
+
 #cleanup
 rm \
   --recursive \
