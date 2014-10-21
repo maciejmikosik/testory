@@ -56,6 +56,7 @@ public class Testory {
   private static History history = new History();
 
   public static void givenTest(Object test) {
+    history.reset();
     try {
       for (final Field field : test.getClass().getDeclaredFields()) {
         if (!isStatic(field) && !isFinal(field)) {

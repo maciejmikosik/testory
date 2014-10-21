@@ -36,6 +36,10 @@ class History {
 
   private static class Purge {}
 
+  public void reset() {
+    setEvents(new ArrayList<Object>());
+  }
+
   public void purge() {
     List<Object> events = getEvents();
     for (int i = 0; i < events.size(); i++) {

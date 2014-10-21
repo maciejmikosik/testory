@@ -279,6 +279,7 @@ Catches possible throwable thrown by chained method allowing test to run forward
 ### givenTest
 
 Initializes each field of **this** test and fails if initialization of any field fails.
+Also purges testory internal state (see [purging](#purging)).
 
         @Before
         public void before() {
@@ -375,18 +376,10 @@ Any of the following invokes real method on unreal (mocked/proxied) object causi
 
 ### Purging
 
-Testory maintains global state that holds information about every mock, stubbing and invocation. This data needs to be periodically released to prevent running out of memory. Since testory has no foolproof way to tell whether one test ended and another started, it relies on simplistic assumption that only one **when** is used per one test. Thus calling **when**, makes testory to forget about all events that happened before previous **when**.
+Testory maintains global state that holds information about every mock, stubbing and invocation. This data needs to be periodically released to prevent running out of memory. Since testory has no foolproof way to tell whether one test ended and another started, it relies on some simplistic assumptions
 
-    mock = mock(Object.class)
-    when(...)  // previous when
-
-    ...
-
-    when(...) // forgets about anything that happened before previous when
-    // any of the following throws TestoryException
-    mock.toString();
-    given(willReturn(""), mock).toString();
-    thenCalled(mock).toString();
+ - Only one **when** is used per one test. Thus calling **when**, makes testory to forget about all events that happened before previous **when**.
+ - Initialization using `givenTest` is done only once at the very beginning of each test. This makes testory to forget about all events that happened before.
 
 Purging has following consequences
 
@@ -394,5 +387,6 @@ Purging has following consequences
  - purged stubbing is no longer in effect
  - purged invocation is not included during verification
  - purged mock is no longer considered to be a mock, so
+  - calling it causes TestoryException
   - stubbing it causes TestoryException
   - verifying it causes TestoryException
