@@ -9,8 +9,6 @@ import java.io.InputStreamReader;
 import org.testory.proxy.Proxies;
 
 public class TestoryException extends RuntimeException {
-  private static final long serialVersionUID = -5222839249836069701L;
-
   public TestoryException() {}
 
   public TestoryException(String message) {

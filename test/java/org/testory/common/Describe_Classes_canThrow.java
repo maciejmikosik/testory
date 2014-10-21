@@ -9,7 +9,6 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
-@SuppressWarnings("serial")
 public class Describe_Classes_canThrow {
   @Test
   public void always_can_throw_error() throws Exception {

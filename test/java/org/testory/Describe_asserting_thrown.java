@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.testory.test.Testilities.Invoker;
 
-@SuppressWarnings("serial")
 public class Describe_asserting_thrown {
   private Throwable throwable, otherThrowable;
   private Object object;

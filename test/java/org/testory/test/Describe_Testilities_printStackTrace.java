@@ -18,7 +18,6 @@ public class Describe_Testilities_printStackTrace {
     string = "string";
   }
 
-  @SuppressWarnings("serial")
   @Test
   public void should_print_stack_trace() {
     throwable = new Throwable() {

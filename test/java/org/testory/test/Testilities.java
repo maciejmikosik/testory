@@ -31,7 +31,6 @@ public class Testilities {
     };
   }
 
-  @SuppressWarnings("serial")
   public static Throwable newThrowable(final String name) {
     if (name == null) {
       throw new NullPointerException();

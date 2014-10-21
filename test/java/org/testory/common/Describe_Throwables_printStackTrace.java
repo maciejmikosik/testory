@@ -18,7 +18,6 @@ public class Describe_Throwables_printStackTrace {
     stackTrace = "lineA\nlineB\nlineC";
   }
 
-  @SuppressWarnings("serial")
   @Test
   public void should_print_stack_trace() {
     throwable = new Throwable() {
