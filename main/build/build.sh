@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 BUILD_DIR=`dirname ${0}`
 cd "${BUILD_DIR}/.."
