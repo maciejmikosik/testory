@@ -30,10 +30,12 @@ cp \
 
 #copy dependencies
 unzip \
+  -q \
   ./jar/cglib-nodep-2.2.3.jar \
   -d ./sink/building \
   net/*
 unzip \
+  -q \
   ./jar/objenesis-2.0.jar \
   -d ./sink/building \
   org/*
@@ -47,6 +49,7 @@ cp \
 #zip jar
 cd ./sink/building
 zip \
+  --quiet \
   --recurse-paths \
   ./testory.jar \
   ./*
