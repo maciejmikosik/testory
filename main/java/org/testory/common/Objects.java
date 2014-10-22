@@ -1,6 +1,8 @@
 package org.testory.common;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 public class Objects {
@@ -19,26 +21,24 @@ public class Objects {
   }
 
   private static boolean areEqualArrays(Object objectA, Object objectB) {
-    Class<?> type = objectA.getClass().getComponentType();
-    return type != objectB.getClass().getComponentType()
-        ? false
-        : type == boolean.class
-            ? Arrays.equals((boolean[]) objectA, (boolean[]) objectB)
-            : type == char.class
-                ? Arrays.equals((char[]) objectA, (char[]) objectB)
-                : type == byte.class
-                    ? Arrays.equals((byte[]) objectA, (byte[]) objectB)
-                    : type == short.class
-                        ? Arrays.equals((short[]) objectA, (short[]) objectB)
-                        : type == int.class
-                            ? Arrays.equals((int[]) objectA, (int[]) objectB)
-                            : type == long.class
-                                ? Arrays.equals((long[]) objectA, (long[]) objectB)
-                                : type == float.class
-                                    ? Arrays.equals((float[]) objectA, (float[]) objectB)
-                                    : type == double.class
-                                        ? Arrays.equals((double[]) objectA, (double[]) objectB)
-                                        : Arrays.deepEquals((Object[]) objectA, (Object[]) objectB);
+    try {
+      return objectA.getClass() == objectB.getClass()
+          && (boolean) arraysEqualsMethod(objectA.getClass()).invoke(null, objectA, objectB);
+    } catch (InvocationTargetException e) {
+      throw new Error(e);
+    } catch (IllegalAccessException e) {
+      throw new Error(e);
+    }
+  }
+
+  private static Method arraysEqualsMethod(Class<?> arrayType) {
+    try {
+      return arrayType.getComponentType().isPrimitive()
+          ? Arrays.class.getMethod("equals", arrayType, arrayType)
+          : Arrays.class.getMethod("deepEquals", Object[].class, Object[].class);
+    } catch (NoSuchMethodException e) {
+      throw new Error(e);
+    }
   }
 
   // TODO test print(Object)
