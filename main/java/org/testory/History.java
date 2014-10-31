@@ -2,6 +2,7 @@ package org.testory;
 
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Collections.reverse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,6 @@ import org.testory.util.Effect;
 import org.testory.util.any.Any;
 
 class History {
-  /** youngest at begin */
   private final ThreadLocal<List<Object>> threadLocalEvents = new ThreadLocal<List<Object>>() {
     protected List<Object> initialValue() {
       return new ArrayList<Object>();
@@ -31,16 +31,16 @@ class History {
   }
 
   private void addEvent(Object event) {
-    threadLocalEvents.get().add(0, event);
+    threadLocalEvents.get().add(event);
   }
 
   private static class Purge {}
 
   public void purge() {
-    List<Object> events = getEvents();
-    for (int i = 0; i < events.size(); i++) {
-      if (events.get(i) instanceof Purge) {
-        setEvents(events.subList(0, i));
+    List<Object> latestEvents = reverse(getEvents());
+    for (int i = 0; i < latestEvents.size(); i++) {
+      if (latestEvents.get(i) instanceof Purge) {
+        setEvents(reverse(latestEvents.subList(0, i)));
         break;
       }
     }
@@ -69,7 +69,7 @@ class History {
   @Nullable
   private Effect tryGetLastWhenEffect() {
     Effect effect = null;
-    for (Object event : getEvents()) {
+    for (Object event : reverse(getEvents())) {
       if (event instanceof Effect) {
         effect = (Effect) event;
         break;
@@ -126,7 +126,7 @@ class History {
 
   @Nullable
   private Handler tryGetStubbedHandlerFor(Invocation invocation) {
-    for (Object event : getEvents()) {
+    for (Object event : reverse(getEvents())) {
       if (event instanceof Stubbing) {
         Stubbing stubbing = (Stubbing) event;
         if (stubbing.invocationMatcher.matches(invocation)) {
@@ -158,7 +158,7 @@ class History {
   public List<Any> getAnysAndConsume() {
     class Consumer {}
     List<Any> anys = new ArrayList<Any>();
-    for (Object event : getEvents()) {
+    for (Object event : reverse(getEvents())) {
       if (event instanceof Any) {
         anys.add(0, (Any) event);
       } else if (event instanceof Consumer) {
