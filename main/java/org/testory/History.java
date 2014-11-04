@@ -47,6 +47,10 @@ class History {
     addEvent(new Purge());
   }
 
+  public void purgeMark() {
+    addEvent(new Purge());
+  }
+
   public void purgeNow() {
     setEvents(new ArrayList<Object>());
   }

@@ -6,6 +6,7 @@ import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
+import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
 import static org.testory.test.Testilities.newObject;
@@ -61,6 +62,32 @@ public class Describe_purging {
       mock.getObject();
       fail();
     } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void purges_previous_when() {
+    when(mock.getObject());
+    triggerPurge();
+    thenCalledTimes(0, onInstance(mock));
+  }
+
+  @Test
+  public void purges_previous_when_closure() {
+    when(new Closure() {
+      public Object invoke() {
+        mock.getObject();
+        return null;
+      }
+    });
+    triggerPurge();
+    thenCalledTimes(0, onInstance(mock));
+  }
+
+  @Test
+  public void purges_previous_when_chained() {
+    when(mock).getObject();
+    triggerPurge();
+    thenCalledTimes(0, onInstance(mock));
   }
 
   private static void triggerPurge() {

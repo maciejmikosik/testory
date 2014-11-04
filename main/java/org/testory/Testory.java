@@ -404,6 +404,7 @@ public class Testory {
       Handler handler = new Handler() {
         public Object handle(Invocation invocation) {
           history.logWhen(effectOfInvoke(invocation));
+          history.purgeMark();
           return null;
         }
       };
@@ -415,8 +416,8 @@ public class Testory {
 
   public static void when(Closure closure) {
     check(closure != null);
-    history.purge();
     history.logWhen(effectOfInvoke(closure));
+    history.purge();
   }
 
   private static Effect effectOfInvoke(Closure closure) {
