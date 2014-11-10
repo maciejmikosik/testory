@@ -14,24 +14,20 @@ import org.testory.util.Effect;
 import org.testory.util.any.Any;
 
 class History {
-  private final ThreadLocal<List<Object>> threadLocalEvents = new ThreadLocal<List<Object>>() {
-    protected List<Object> initialValue() {
-      return new ArrayList<Object>();
-    }
-  };
+  private List<Object> events = new ArrayList<Object>();
 
   public History() {}
 
   private List<Object> getEvents() {
-    return new ArrayList<Object>(threadLocalEvents.get());
+    return new ArrayList<Object>(events);
   }
 
   private void setEvents(List<Object> events) {
-    threadLocalEvents.set(new ArrayList<Object>(events));
+    this.events = new ArrayList<Object>(events);
   }
 
   private void addEvent(Object event) {
-    threadLocalEvents.get().add(event);
+    events.add(event);
   }
 
   private static class Purge {}
