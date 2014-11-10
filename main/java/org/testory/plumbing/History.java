@@ -1,8 +1,7 @@
 package org.testory.plumbing;
 
-import static org.testory.common.Checks.checkArgument;
-import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Collections.reverse;
+import static org.testory.plumbing.PlumbingException.check;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +52,7 @@ public class History {
   }
 
   public void logWhen(Effect effect) {
-    checkNotNull(effect);
+    check(effect != null);
     addEvent(effect);
   }
 
@@ -63,7 +62,7 @@ public class History {
 
   public Effect getLastWhenEffect() {
     Effect effect = tryGetLastWhenEffect();
-    checkArgument(effect != null);
+    check(effect != null);
     return effect;
   }
 
@@ -84,14 +83,14 @@ public class History {
   }
 
   public void logMocking(Object mock) {
-    checkNotNull(mock);
+    check(mock != null);
     Mocking mocking = new Mocking();
     mocking.mock = mock;
     addEvent(mocking);
   }
 
   public boolean isMock(Object mock) {
-    checkNotNull(mock);
+    check(mock != null);
     for (Object event : getEvents()) {
       if (event instanceof Mocking) {
         Mocking mocking = (Mocking) event;
@@ -121,7 +120,7 @@ public class History {
 
   public Handler getStubbedHandlerFor(Invocation invocation) {
     Handler handler = tryGetStubbedHandlerFor(invocation);
-    checkArgument(handler != null);
+    check(handler != null);
     return handler;
   }
 
