@@ -1,4 +1,4 @@
-package org.testory;
+package org.testory.plumbing;
 
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
@@ -7,13 +7,14 @@ import static org.testory.common.Collections.reverse;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.testory.InvocationMatcher;
 import org.testory.common.Nullable;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.util.Effect;
 import org.testory.util.any.Any;
 
-class History {
+public class History {
   private List<Object> events = new ArrayList<Object>();
 
   public History() {}

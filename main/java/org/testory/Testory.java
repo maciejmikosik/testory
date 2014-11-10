@@ -45,6 +45,7 @@ import java.util.List;
 
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
+import org.testory.plumbing.History;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.Typing;
