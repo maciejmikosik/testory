@@ -16,6 +16,9 @@ import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Calling.calling;
 import static org.testory.plumbing.Calling.callings;
+import static org.testory.plumbing.Capturing.capturedAnys;
+import static org.testory.plumbing.Capturing.consumeAnys;
+import static org.testory.plumbing.Capturing.CapturingAny.capturingAny;
 import static org.testory.plumbing.Histories.log;
 import static org.testory.plumbing.Inspecting.hasInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
@@ -396,7 +399,7 @@ public class Testory {
   }
 
   private static <T> T anyImpl(Any any) {
-    getHistory().logAny(any);
+    setHistory(log(capturingAny(any), getHistory()));
     return (T) any.token;
   }
 
@@ -734,7 +737,8 @@ public class Testory {
   }
 
   private static InvocationMatcher capture(Invocation invocation) {
-    List<Any> anys = getHistory().getAnysAndConsume();
+    List<Any> anys = capturedAnys(getHistory());
+    setHistory(consumeAnys(getHistory()));
     Anyvocation anyvocation = anyvocation(invocation.method, invocation.instance,
         invocation.arguments, anys);
     check(canRepair(anyvocation));
