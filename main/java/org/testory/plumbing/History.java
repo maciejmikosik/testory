@@ -1,6 +1,7 @@
 package org.testory.plumbing;
 
 import static java.util.Collections.unmodifiableList;
+import static org.testory.common.Collections.reverse;
 import static org.testory.plumbing.PlumbingException.check;
 
 import java.util.ArrayList;
@@ -23,6 +24,10 @@ public class History {
       check(event != null);
     }
     return history;
+  }
+
+  public static List<Object> latest(History history) {
+    return reverse(history.events);
   }
 
   public static History add(Object event, History history) {

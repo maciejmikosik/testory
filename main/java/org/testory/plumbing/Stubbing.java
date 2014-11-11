@@ -1,6 +1,6 @@
 package org.testory.plumbing;
 
-import static org.testory.common.Collections.reverse;
+import static org.testory.plumbing.History.latest;
 import static org.testory.plumbing.PlumbingException.check;
 
 import org.testory.InvocationMatcher;
@@ -39,7 +39,7 @@ public class Stubbing {
 
   @Nullable
   private static Stubbing tryFindStubbing(Invocation invocation, History history) {
-    for (Object event : reverse(history.events)) {
+    for (Object event : latest(history)) {
       if (event instanceof Stubbing) {
         Stubbing stubbing = (Stubbing) event;
         if (stubbing.invocationMatcher.matches(invocation)) {

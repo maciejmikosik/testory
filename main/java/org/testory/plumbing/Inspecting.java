@@ -1,6 +1,6 @@
 package org.testory.plumbing;
 
-import static org.testory.common.Collections.reverse;
+import static org.testory.plumbing.History.latest;
 import static org.testory.plumbing.PlumbingException.check;
 
 import org.testory.common.Nullable;
@@ -35,7 +35,7 @@ public class Inspecting {
   @Nullable
   private static Inspecting tryLastInspecting(History history) {
     check(history != null);
-    for (Object event : reverse(history.events)) {
+    for (Object event : latest(history)) {
       if (event instanceof Inspecting) {
         return (Inspecting) event;
       }

@@ -2,6 +2,7 @@ package org.testory.plumbing;
 
 import static org.testory.common.Collections.reverse;
 import static org.testory.plumbing.History.history;
+import static org.testory.plumbing.History.latest;
 import static org.testory.plumbing.PlumbingException.check;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class Purging {
   public static History purge(History history) {
     check(history != null);
     List<Object> events = new ArrayList<Object>(history.events);
-    List<Object> latestEvents = reverse(events);
+    List<Object> latestEvents = latest(history);
     for (int i = 0; i < latestEvents.size(); i++) {
       if (latestEvents.get(i) instanceof Purging) {
         events = reverse(latestEvents.subList(0, i));
