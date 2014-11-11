@@ -25,9 +25,8 @@ import static org.testory.plumbing.Inspecting.hasInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Inspecting.lastInspecting;
 import static org.testory.plumbing.Mocking.mocking;
+import static org.testory.plumbing.Purging.mark;
 import static org.testory.plumbing.Purging.purge;
-import static org.testory.plumbing.Purging.purgeMark;
-import static org.testory.plumbing.Purging.purgeNow;
 import static org.testory.plumbing.Stubbing.findStubbing;
 import static org.testory.plumbing.Stubbing.hasStubbing;
 import static org.testory.plumbing.Stubbing.stubbing;
@@ -90,7 +89,7 @@ public class Testory {
   }
 
   public static void givenTest(Object test) {
-    setHistory(purgeNow(getHistory()));
+    setHistory(purge(mark(getHistory())));
     try {
       for (final Field field : test.getClass().getDeclaredFields()) {
         if (!isStatic(field) && !isFinal(field)) {
@@ -432,14 +431,14 @@ public class Testory {
   }
 
   public static <T> T when(T object) {
-    setHistory(purge(getHistory()));
+    setHistory(mark(purge(getHistory())));
     log(inspecting(returned(object)));
     boolean isProxiable = object != null && isProxiable(object.getClass());
     if (isProxiable) {
       Handler handler = new Handler() {
         public Object handle(Invocation invocation) {
           log(inspecting(effectOfInvoke(invocation)));
-          setHistory(purgeMark(getHistory()));
+          setHistory(mark(getHistory()));
           return null;
         }
       };
@@ -452,7 +451,7 @@ public class Testory {
   public static void when(Closure closure) {
     check(closure != null);
     log(inspecting(effectOfInvoke(closure)));
-    setHistory(purge(getHistory()));
+    setHistory(mark(purge(getHistory())));
   }
 
   private static Effect effectOfInvoke(Closure closure) {

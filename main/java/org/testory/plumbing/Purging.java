@@ -1,11 +1,9 @@
 package org.testory.plumbing;
 
-import static org.testory.common.Collections.reverse;
+import static org.testory.plumbing.History.add;
 import static org.testory.plumbing.History.history;
-import static org.testory.plumbing.History.latest;
 import static org.testory.plumbing.PlumbingException.check;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Purging {
@@ -21,27 +19,17 @@ public class Purging {
 
   public static History purge(History history) {
     check(history != null);
-    List<Object> events = new ArrayList<Object>(history.events);
-    List<Object> latestEvents = latest(history);
-    for (int i = 0; i < latestEvents.size(); i++) {
-      if (latestEvents.get(i) instanceof Purging) {
-        events = reverse(latestEvents.subList(0, i));
-        break;
+    List<Object> events = history.events;
+    for (int i = events.size() - 1; i >= 0; i--) {
+      if (events.get(i) instanceof Purging) {
+        return history(events.subList(i + 1, events.size()));
       }
     }
-    events.add(purging());
-    return history(events);
+    return history;
   }
 
-  public static History purgeMark(History history) {
+  public static History mark(History history) {
     check(history != null);
-    List<Object> events = new ArrayList<Object>(history.events);
-    events.add(purging());
-    return history(events);
-  }
-
-  public static History purgeNow(History history) {
-    check(history != null);
-    return history(new ArrayList<Object>());
+    return add(purging(), history);
   }
 }
