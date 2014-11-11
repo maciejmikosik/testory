@@ -20,6 +20,7 @@ import static org.testory.plumbing.Capturing.capturedAnys;
 import static org.testory.plumbing.Capturing.consumeAnys;
 import static org.testory.plumbing.Capturing.CapturingAny.capturingAny;
 import static org.testory.plumbing.Histories.log;
+import static org.testory.plumbing.History.history;
 import static org.testory.plumbing.Inspecting.hasInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Inspecting.lastInspecting;
@@ -55,6 +56,7 @@ import static org.testory.util.any.Repairs.repair;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -75,7 +77,7 @@ import org.testory.util.any.Anyvocation;
 public class Testory {
   private static ThreadLocal<History> localHistory = new ThreadLocal<History>() {
     protected History initialValue() {
-      return new History();
+      return history(new ArrayList<Object>());
     }
   };
 
