@@ -62,30 +62,6 @@ public class History {
     return effect;
   }
 
-  private static class Mocking {
-    Object mock;
-  }
-
-  public void logMocking(Object mock) {
-    check(mock != null);
-    Mocking mocking = new Mocking();
-    mocking.mock = mock;
-    addEvent(mocking);
-  }
-
-  public boolean isMock(Object mock) {
-    check(mock != null);
-    for (Object event : getEvents()) {
-      if (event instanceof Mocking) {
-        Mocking mocking = (Mocking) event;
-        if (mocking.mock == mock) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   private static class Stubbing {
     Handler handler;
     InvocationMatcher invocationMatcher;

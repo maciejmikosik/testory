@@ -14,6 +14,8 @@ import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
+import static org.testory.plumbing.Histories.log;
+import static org.testory.plumbing.Mocking.mocking;
 import static org.testory.plumbing.Purging.purge;
 import static org.testory.plumbing.Purging.purgeMark;
 import static org.testory.plumbing.Purging.purgeNow;
@@ -49,6 +51,7 @@ import java.util.List;
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.plumbing.History;
+import org.testory.plumbing.Mocking;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.Typing;
@@ -200,7 +203,7 @@ public class Testory {
       }
     };
     T mock = (T) proxy(typing, compatible(handler));
-    getHistory().logMocking(mock);
+    setHistory(log(mocking(mock), getHistory()));
     return mock;
   }
 
@@ -700,7 +703,7 @@ public class Testory {
   }
 
   private static <T> boolean isMock(T mock) {
-    return getHistory().isMock(mock);
+    return Mocking.isMock(mock, getHistory());
   }
 
   private static String formatSection(String caption, @Nullable Object content) {
