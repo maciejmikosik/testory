@@ -19,6 +19,9 @@ import static org.testory.plumbing.Mocking.mocking;
 import static org.testory.plumbing.Purging.purge;
 import static org.testory.plumbing.Purging.purgeMark;
 import static org.testory.plumbing.Purging.purgeNow;
+import static org.testory.plumbing.Stubbing.findStubbing;
+import static org.testory.plumbing.Stubbing.hasStubbing;
+import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
@@ -52,6 +55,7 @@ import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.plumbing.History;
 import org.testory.plumbing.Mocking;
+import org.testory.plumbing.Stubbing;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.Typing;
@@ -197,9 +201,10 @@ public class Testory {
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         check(isMock(invocation.instance));
-        check(getHistory().hasStubbedHandlerFor(invocation));
+        check(hasStubbing(invocation, getHistory()));
         getHistory().logInvocation(invocation);
-        return getHistory().getStubbedHandlerFor(invocation).handle(invocation);
+        Stubbing stubbing = findStubbing(invocation, getHistory());
+        return stubbing.handler.handle(invocation);
       }
     };
     T mock = (T) proxy(typing, compatible(handler));
@@ -264,7 +269,7 @@ public class Testory {
     check(isMock(mock));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
-        getHistory().logStubbing(will, capture(invocation));
+        setHistory(log(stubbing(capture(invocation), will), getHistory()));
         return null;
       }
     };
@@ -274,7 +279,7 @@ public class Testory {
   public static void given(Handler will, InvocationMatcher invocationMatcher) {
     check(will != null);
     check(invocationMatcher != null);
-    getHistory().logStubbing(will, invocationMatcher);
+    setHistory(log(stubbing(invocationMatcher, will), getHistory()));
   }
 
   public static Handler willReturn(@Nullable final Object object) {

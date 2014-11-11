@@ -6,9 +6,7 @@ import static org.testory.plumbing.PlumbingException.check;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.testory.InvocationMatcher;
 import org.testory.common.Nullable;
-import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.util.Effect;
 import org.testory.util.any.Any;
@@ -60,41 +58,6 @@ public class History {
       }
     }
     return effect;
-  }
-
-  private static class Stubbing {
-    Handler handler;
-    InvocationMatcher invocationMatcher;
-  }
-
-  public void logStubbing(Handler handler, InvocationMatcher invocationMatcher) {
-    Stubbing stubbing = new Stubbing();
-    stubbing.handler = handler;
-    stubbing.invocationMatcher = invocationMatcher;
-    addEvent(stubbing);
-  }
-
-  public boolean hasStubbedHandlerFor(Invocation invocation) {
-    return tryGetStubbedHandlerFor(invocation) != null;
-  }
-
-  public Handler getStubbedHandlerFor(Invocation invocation) {
-    Handler handler = tryGetStubbedHandlerFor(invocation);
-    check(handler != null);
-    return handler;
-  }
-
-  @Nullable
-  private Handler tryGetStubbedHandlerFor(Invocation invocation) {
-    for (Object event : reverse(getEvents())) {
-      if (event instanceof Stubbing) {
-        Stubbing stubbing = (Stubbing) event;
-        if (stubbing.invocationMatcher.matches(invocation)) {
-          return stubbing.handler;
-        }
-      }
-    }
-    return null;
   }
 
   public void logInvocation(Invocation invocation) {
