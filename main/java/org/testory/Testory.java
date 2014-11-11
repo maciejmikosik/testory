@@ -17,6 +17,9 @@ import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Calling.calling;
 import static org.testory.plumbing.Calling.callings;
 import static org.testory.plumbing.Histories.log;
+import static org.testory.plumbing.Inspecting.hasInspecting;
+import static org.testory.plumbing.Inspecting.inspecting;
+import static org.testory.plumbing.Inspecting.lastInspecting;
 import static org.testory.plumbing.Mocking.mocking;
 import static org.testory.plumbing.Purging.purge;
 import static org.testory.plumbing.Purging.purgeMark;
@@ -425,12 +428,12 @@ public class Testory {
 
   public static <T> T when(T object) {
     setHistory(purge(getHistory()));
-    getHistory().logWhen(returned(object));
+    setHistory(log(inspecting(returned(object)), getHistory()));
     boolean isProxiable = object != null && isProxiable(object.getClass());
     if (isProxiable) {
       Handler handler = new Handler() {
         public Object handle(Invocation invocation) {
-          getHistory().logWhen(effectOfInvoke(invocation));
+          setHistory(log(inspecting(effectOfInvoke(invocation)), getHistory()));
           setHistory(purgeMark(getHistory()));
           return null;
         }
@@ -443,7 +446,7 @@ public class Testory {
 
   public static void when(Closure closure) {
     check(closure != null);
-    getHistory().logWhen(effectOfInvoke(closure));
+    setHistory(log(inspecting(effectOfInvoke(closure)), getHistory()));
     setHistory(purge(getHistory()));
   }
 
@@ -601,8 +604,8 @@ public class Testory {
   }
 
   private static Effect getLastEffect() {
-    check(getHistory().hasLastWhenEffect());
-    return getHistory().getLastWhenEffect();
+    check(hasInspecting(getHistory()));
+    return lastInspecting(getHistory()).effect;
   }
 
   private static String formatBut(Effect effect) {
