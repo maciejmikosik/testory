@@ -24,4 +24,12 @@ public class History {
     }
     return history;
   }
+
+  public static History add(Object event, History history) {
+    check(event != null);
+    check(history != null);
+    List<Object> events = new ArrayList<Object>(history.events);
+    events.add(event);
+    return history(events);
+  }
 }

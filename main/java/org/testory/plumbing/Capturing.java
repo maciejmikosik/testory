@@ -1,7 +1,7 @@
 package org.testory.plumbing;
 
 import static org.testory.common.Collections.reverse;
-import static org.testory.plumbing.Histories.log;
+import static org.testory.plumbing.History.add;
 import static org.testory.plumbing.PlumbingException.check;
 
 import java.util.ArrayList;
@@ -47,6 +47,6 @@ public class Capturing {
   }
 
   public static History consumeAnys(History history) {
-    return log(new ConsumingAnys(), history);
+    return add(new ConsumingAnys(), history);
   }
 }

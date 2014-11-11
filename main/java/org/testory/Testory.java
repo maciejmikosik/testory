@@ -19,7 +19,7 @@ import static org.testory.plumbing.Calling.callings;
 import static org.testory.plumbing.Capturing.capturedAnys;
 import static org.testory.plumbing.Capturing.consumeAnys;
 import static org.testory.plumbing.Capturing.CapturingAny.capturingAny;
-import static org.testory.plumbing.Histories.log;
+import static org.testory.plumbing.History.add;
 import static org.testory.plumbing.History.history;
 import static org.testory.plumbing.Inspecting.hasInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
@@ -213,13 +213,13 @@ public class Testory {
       public Object handle(Invocation invocation) throws Throwable {
         check(isMock(invocation.instance));
         check(hasStubbing(invocation, getHistory()));
-        setHistory(log(calling(invocation), getHistory()));
+        log(calling(invocation));
         Stubbing stubbing = findStubbing(invocation, getHistory());
         return stubbing.handler.handle(invocation);
       }
     };
     T mock = (T) proxy(typing, compatible(handler));
-    setHistory(log(mocking(mock), getHistory()));
+    log(mocking(mock));
     return mock;
   }
 
@@ -280,7 +280,7 @@ public class Testory {
     check(isMock(mock));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
-        setHistory(log(stubbing(capture(invocation), will), getHistory()));
+        log(stubbing(capture(invocation), will));
         return null;
       }
     };
@@ -290,7 +290,7 @@ public class Testory {
   public static void given(Handler will, InvocationMatcher invocationMatcher) {
     check(will != null);
     check(invocationMatcher != null);
-    setHistory(log(stubbing(invocationMatcher, will), getHistory()));
+    log(stubbing(invocationMatcher, will));
   }
 
   public static Handler willReturn(@Nullable final Object object) {
@@ -401,7 +401,7 @@ public class Testory {
   }
 
   private static <T> T anyImpl(Any any) {
-    setHistory(log(capturingAny(any), getHistory()));
+    log(capturingAny(any));
     return (T) any.token;
   }
 
@@ -433,12 +433,12 @@ public class Testory {
 
   public static <T> T when(T object) {
     setHistory(purge(getHistory()));
-    setHistory(log(inspecting(returned(object)), getHistory()));
+    log(inspecting(returned(object)));
     boolean isProxiable = object != null && isProxiable(object.getClass());
     if (isProxiable) {
       Handler handler = new Handler() {
         public Object handle(Invocation invocation) {
-          setHistory(log(inspecting(effectOfInvoke(invocation)), getHistory()));
+          log(inspecting(effectOfInvoke(invocation)));
           setHistory(purgeMark(getHistory()));
           return null;
         }
@@ -451,7 +451,7 @@ public class Testory {
 
   public static void when(Closure closure) {
     check(closure != null);
-    setHistory(log(inspecting(effectOfInvoke(closure)), getHistory()));
+    log(inspecting(effectOfInvoke(closure)));
     setHistory(purge(getHistory()));
   }
 
@@ -716,6 +716,10 @@ public class Testory {
         return "" + number;
       }
     };
+  }
+
+  public static void log(Object event) {
+    setHistory(add(event, getHistory()));
   }
 
   private static <T> boolean isMock(T mock) {
