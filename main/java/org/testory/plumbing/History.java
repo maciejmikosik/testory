@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.testory.common.Nullable;
-import org.testory.proxy.Invocation;
 import org.testory.util.Effect;
 import org.testory.util.any.Any;
 
@@ -58,20 +57,6 @@ public class History {
       }
     }
     return effect;
-  }
-
-  public void logInvocation(Invocation invocation) {
-    addEvent(invocation);
-  }
-
-  public List<Invocation> getInvocations() {
-    List<Invocation> invocations = new ArrayList<Invocation>();
-    for (Object event : getEvents()) {
-      if (event instanceof Invocation) {
-        invocations.add((Invocation) event);
-      }
-    }
-    return invocations;
   }
 
   public void logAny(Any any) {

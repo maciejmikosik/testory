@@ -14,6 +14,8 @@ import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
+import static org.testory.plumbing.Calling.calling;
+import static org.testory.plumbing.Calling.callings;
 import static org.testory.plumbing.Histories.log;
 import static org.testory.plumbing.Mocking.mocking;
 import static org.testory.plumbing.Purging.purge;
@@ -53,6 +55,7 @@ import java.util.List;
 
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
+import org.testory.plumbing.Calling;
 import org.testory.plumbing.History;
 import org.testory.plumbing.Mocking;
 import org.testory.plumbing.Stubbing;
@@ -202,7 +205,7 @@ public class Testory {
       public Object handle(Invocation invocation) throws Throwable {
         check(isMock(invocation.instance));
         check(hasStubbing(invocation, getHistory()));
-        getHistory().logInvocation(invocation);
+        setHistory(log(calling(invocation), getHistory()));
         Stubbing stubbing = findStubbing(invocation, getHistory());
         return stubbing.handler.handle(invocation);
       }
@@ -682,8 +685,8 @@ public class Testory {
     check(isMatcher(numberMatcher));
     check(invocationMatcher != null);
     int numberOfCalls = 0;
-    for (Invocation invocation : getHistory().getInvocations()) {
-      if (invocationMatcher.matches(invocation)) {
+    for (Calling calling : callings(getHistory())) {
+      if (invocationMatcher.matches(calling.invocation)) {
         numberOfCalls++;
       }
     }
