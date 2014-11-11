@@ -14,6 +14,22 @@ import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
+import static org.testory.plumbing.Calling.calling;
+import static org.testory.plumbing.Calling.callings;
+import static org.testory.plumbing.Capturing.capturedAnys;
+import static org.testory.plumbing.Capturing.consumeAnys;
+import static org.testory.plumbing.Capturing.CapturingAny.capturingAny;
+import static org.testory.plumbing.History.add;
+import static org.testory.plumbing.History.history;
+import static org.testory.plumbing.Inspecting.hasInspecting;
+import static org.testory.plumbing.Inspecting.inspecting;
+import static org.testory.plumbing.Inspecting.lastInspecting;
+import static org.testory.plumbing.Mocking.mocking;
+import static org.testory.plumbing.Purging.mark;
+import static org.testory.plumbing.Purging.purge;
+import static org.testory.plumbing.Stubbing.findStubbing;
+import static org.testory.plumbing.Stubbing.hasStubbing;
+import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
@@ -39,12 +55,17 @@ import static org.testory.util.any.Repairs.repair;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
+import org.testory.plumbing.Calling;
+import org.testory.plumbing.History;
+import org.testory.plumbing.Mocking;
+import org.testory.plumbing.Stubbing;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.Typing;
@@ -53,10 +74,22 @@ import org.testory.util.any.Any;
 import org.testory.util.any.Anyvocation;
 
 public class Testory {
-  private static History history = new History();
+  private static ThreadLocal<History> localHistory = new ThreadLocal<History>() {
+    protected History initialValue() {
+      return history(new ArrayList<Object>());
+    }
+  };
+
+  private static History getHistory() {
+    return localHistory.get();
+  }
+
+  private static void setHistory(History history) {
+    localHistory.set(history);
+  }
 
   public static void givenTest(Object test) {
-    history.purgeNow();
+    setHistory(purge(mark(getHistory())));
     try {
       for (final Field field : test.getClass().getDeclaredFields()) {
         if (!isStatic(field) && !isFinal(field)) {
@@ -178,13 +211,14 @@ public class Testory {
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         check(isMock(invocation.instance));
-        check(history.hasStubbedHandlerFor(invocation));
-        history.logInvocation(invocation);
-        return history.getStubbedHandlerFor(invocation).handle(invocation);
+        check(hasStubbing(invocation, getHistory()));
+        log(calling(invocation));
+        Stubbing stubbing = findStubbing(invocation, getHistory());
+        return stubbing.handler.handle(invocation);
       }
     };
     T mock = (T) proxy(typing, compatible(handler));
-    history.logMocking(mock);
+    log(mocking(mock));
     return mock;
   }
 
@@ -245,7 +279,7 @@ public class Testory {
     check(isMock(mock));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
-        history.logStubbing(will, capture(invocation));
+        log(stubbing(capture(invocation), will));
         return null;
       }
     };
@@ -255,7 +289,7 @@ public class Testory {
   public static void given(Handler will, InvocationMatcher invocationMatcher) {
     check(will != null);
     check(invocationMatcher != null);
-    history.logStubbing(will, invocationMatcher);
+    log(stubbing(invocationMatcher, will));
   }
 
   public static Handler willReturn(@Nullable final Object object) {
@@ -366,7 +400,7 @@ public class Testory {
   }
 
   private static <T> T anyImpl(Any any) {
-    history.logAny(any);
+    log(capturingAny(any));
     return (T) any.token;
   }
 
@@ -397,14 +431,14 @@ public class Testory {
   }
 
   public static <T> T when(T object) {
-    history.purge();
-    history.logWhen(returned(object));
+    setHistory(mark(purge(getHistory())));
+    log(inspecting(returned(object)));
     boolean isProxiable = object != null && isProxiable(object.getClass());
     if (isProxiable) {
       Handler handler = new Handler() {
         public Object handle(Invocation invocation) {
-          history.logWhen(effectOfInvoke(invocation));
-          history.purgeMark();
+          log(inspecting(effectOfInvoke(invocation)));
+          setHistory(mark(getHistory()));
           return null;
         }
       };
@@ -416,8 +450,8 @@ public class Testory {
 
   public static void when(Closure closure) {
     check(closure != null);
-    history.logWhen(effectOfInvoke(closure));
-    history.purge();
+    log(inspecting(effectOfInvoke(closure)));
+    setHistory(mark(purge(getHistory())));
   }
 
   private static Effect effectOfInvoke(Closure closure) {
@@ -574,8 +608,8 @@ public class Testory {
   }
 
   private static Effect getLastEffect() {
-    check(history.hasLastWhenEffect());
-    return history.getLastWhenEffect();
+    check(hasInspecting(getHistory()));
+    return lastInspecting(getHistory()).effect;
   }
 
   private static String formatBut(Effect effect) {
@@ -658,8 +692,8 @@ public class Testory {
     check(isMatcher(numberMatcher));
     check(invocationMatcher != null);
     int numberOfCalls = 0;
-    for (Invocation invocation : history.getInvocations()) {
-      if (invocationMatcher.matches(invocation)) {
+    for (Calling calling : callings(getHistory())) {
+      if (invocationMatcher.matches(calling.invocation)) {
         numberOfCalls++;
       }
     }
@@ -683,8 +717,12 @@ public class Testory {
     };
   }
 
+  public static void log(Object event) {
+    setHistory(add(event, getHistory()));
+  }
+
   private static <T> boolean isMock(T mock) {
-    return history.isMock(mock);
+    return Mocking.isMock(mock, getHistory());
   }
 
   private static String formatSection(String caption, @Nullable Object content) {
@@ -704,7 +742,8 @@ public class Testory {
   }
 
   private static InvocationMatcher capture(Invocation invocation) {
-    List<Any> anys = history.getAnysAndConsume();
+    List<Any> anys = capturedAnys(getHistory());
+    setHistory(consumeAnys(getHistory()));
     Anyvocation anyvocation = anyvocation(invocation.method, invocation.instance,
         invocation.arguments, anys);
     check(canRepair(anyvocation));
