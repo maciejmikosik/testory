@@ -14,41 +14,25 @@ import org.testory.util.Effect;
 import org.testory.util.any.Any;
 
 public class History {
-  private List<Object> events = new ArrayList<Object>();
+  List<Object> events = new ArrayList<Object>();
 
   public History() {}
+
+  private History(List<Object> events) {
+    this.events = events;
+  }
+
+  public static History history(List<Object> events) {
+    check(events != null);
+    return new History(events);
+  }
 
   private List<Object> getEvents() {
     return new ArrayList<Object>(events);
   }
 
-  private void setEvents(List<Object> events) {
-    this.events = new ArrayList<Object>(events);
-  }
-
   private void addEvent(Object event) {
     events.add(event);
-  }
-
-  private static class Purge {}
-
-  public void purge() {
-    List<Object> latestEvents = reverse(getEvents());
-    for (int i = 0; i < latestEvents.size(); i++) {
-      if (latestEvents.get(i) instanceof Purge) {
-        setEvents(reverse(latestEvents.subList(0, i)));
-        break;
-      }
-    }
-    addEvent(new Purge());
-  }
-
-  public void purgeMark() {
-    addEvent(new Purge());
-  }
-
-  public void purgeNow() {
-    setEvents(new ArrayList<Object>());
   }
 
   public void logWhen(Effect effect) {

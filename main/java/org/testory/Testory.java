@@ -14,6 +14,9 @@ import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
+import static org.testory.plumbing.Purging.purge;
+import static org.testory.plumbing.Purging.purgeMark;
+import static org.testory.plumbing.Purging.purgeNow;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
@@ -64,8 +67,12 @@ public class Testory {
     return localHistory.get();
   }
 
+  private static void setHistory(History history) {
+    localHistory.set(history);
+  }
+
   public static void givenTest(Object test) {
-    getHistory().purgeNow();
+    setHistory(purgeNow(getHistory()));
     try {
       for (final Field field : test.getClass().getDeclaredFields()) {
         if (!isStatic(field) && !isFinal(field)) {
@@ -406,14 +413,14 @@ public class Testory {
   }
 
   public static <T> T when(T object) {
-    getHistory().purge();
+    setHistory(purge(getHistory()));
     getHistory().logWhen(returned(object));
     boolean isProxiable = object != null && isProxiable(object.getClass());
     if (isProxiable) {
       Handler handler = new Handler() {
         public Object handle(Invocation invocation) {
           getHistory().logWhen(effectOfInvoke(invocation));
-          getHistory().purgeMark();
+          setHistory(purgeMark(getHistory()));
           return null;
         }
       };
@@ -426,7 +433,7 @@ public class Testory {
   public static void when(Closure closure) {
     check(closure != null);
     getHistory().logWhen(effectOfInvoke(closure));
-    getHistory().purge();
+    setHistory(purge(getHistory()));
   }
 
   private static Effect effectOfInvoke(Closure closure) {
