@@ -211,7 +211,7 @@ public class Testory {
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         check(isMock(invocation.instance));
-        check(hasStubbing(invocation, getHistory()));
+        check(isStubbed(invocation));
         log(calling(invocation));
         Stubbing stubbing = findStubbing(invocation, getHistory());
         return stubbing.handler.handle(invocation);
@@ -723,6 +723,10 @@ public class Testory {
 
   private static <T> boolean isMock(T mock) {
     return Mocking.isMock(mock, getHistory());
+  }
+
+  private static boolean isStubbed(Invocation invocation) {
+    return hasStubbing(invocation, getHistory());
   }
 
   private static String formatSection(String caption, @Nullable Object content) {
