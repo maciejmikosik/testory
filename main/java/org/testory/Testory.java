@@ -24,6 +24,7 @@ import static org.testory.plumbing.History.history;
 import static org.testory.plumbing.Inspecting.findLastInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Mocking.mocking;
+import static org.testory.plumbing.Mocking.nameMock;
 import static org.testory.plumbing.Purging.mark;
 import static org.testory.plumbing.Purging.purge;
 import static org.testory.plumbing.Stubbing.findStubbing;
@@ -111,8 +112,9 @@ public class Testory {
   private static Object mockOrSample(Class<?> type, String name) {
     if (isProxiable(type)) {
       Object mock = rawMock(type);
+      log(mocking(mock, name));
       stubNice(mock);
-      stubObject(mock, name, name.hashCode());
+      stubObject(mock, name);
       return mock;
     } else if (type.isArray()) {
       Class<?> componentType = type.getComponentType();
@@ -188,9 +190,10 @@ public class Testory {
     check(type != null);
     check(isProxiable(type));
     final T mock = rawMock(type);
-    int hash = System.identityHashCode(mock);
+    String name = nameMock(mock, getHistory());
+    log(mocking(mock, name));
     stubNice(mock);
-    stubObject(mock, "mock_" + hash + "_" + type.getName(), hash);
+    stubObject(mock, name);
     return mock;
   }
 
@@ -216,9 +219,7 @@ public class Testory {
         return stubbing.handler.handle(invocation);
       }
     };
-    T mock = (T) proxy(typing, compatible(handler));
-    log(mocking(mock));
-    return mock;
+    return (T) proxy(typing, compatible(handler));
   }
 
   private static Handler compatible(final Handler handler) {
@@ -249,7 +250,7 @@ public class Testory {
     }, onInstance(mock));
   }
 
-  private static void stubObject(final Object mock, final String name, final int hash) {
+  private static void stubObject(final Object mock, final String name) {
     final Object implementation = new Object() {
       public String toString() {
         return name;
@@ -260,7 +261,7 @@ public class Testory {
       }
 
       public int hashCode() {
-        return hash;
+        return name.hashCode();
       }
     };
     given(willTarget(implementation), new InvocationMatcher() {

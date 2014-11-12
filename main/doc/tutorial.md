@@ -107,9 +107,9 @@ Newly created mock has following properties
  - all methods are stubbable, except finalize and final methods
  - mock is nice, returning null or binary zero for unstubbed methods
  - mock is conveniently prestubbed
-   - toString is stubbed to contain class name and [identity hash code](http://docs.oracle.com/javase/7/docs/api/java/lang/System.html#identityHashCode(java.lang.Object))
+   - toString is stubbed to contain class name and unique ordinal
    - equals is stubbed so mock is equal only to itself
-   - hashCode is stubbed to [identity hash code](http://docs.oracle.com/javase/7/docs/api/java/lang/System.html#identityHashCode(java.lang.Object))
+   - hashCode is stubbed to obey contract
 
 ### Stubbing
 

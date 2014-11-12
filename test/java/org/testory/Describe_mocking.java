@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
+import static org.testory.Testory.when;
 import static org.testory.test.Testilities.newObject;
 
 import java.util.AbstractList;
@@ -17,7 +18,6 @@ import org.junit.Test;
 
 public class Describe_mocking {
   private Object mock, object;
-  private String expected;
 
   @Before
   public void before() {
@@ -64,18 +64,31 @@ public class Describe_mocking {
   }
 
   @Test
-  public void to_string_is_prestubbed_with_class_name_and_identity_hashcode() {
+  public void to_string_is_prestubbed_with_class_name_and_ordinal_counting_from_last_purging() {
+    when(0);
     mock = mock(ArrayList.class);
-    expected = "mock_" + System.identityHashCode(mock) + "_" + ArrayList.class.getName();
-    assertEquals(expected, mock.toString());
+    assertEquals("mockArrayList0", mock.toString());
+    mock = mock(ArrayList.class);
+    assertEquals("mockArrayList1", mock.toString());
+    when(0);
+    mock = mock(ArrayList.class);
+    assertEquals("mockArrayList0", mock.toString());
+    mock = mock(ArrayList.class);
+    assertEquals("mockArrayList1", mock.toString());
+  }
 
-    mock = mock(List.class);
-    expected = "mock_" + System.identityHashCode(mock) + "_" + List.class.getName();
-    assertEquals(expected, mock.toString());
+  @Test
+  public void to_string_is_prestubbed_with_inner_class_name() {
+    class Inner {}
+    mock = mock(Inner.class);
+    assertEquals("mockInner0", mock.toString());
+  }
 
+  @Test
+  public void to_string_of_object_is_prestubbed() {
+    when(0);
     mock = mock(Object.class);
-    expected = "mock_" + System.identityHashCode(mock) + "_" + Object.class.getName();
-    assertEquals(expected, mock.toString());
+    assertEquals("mockObject0", mock.toString());
   }
 
   @Test
@@ -113,9 +126,9 @@ public class Describe_mocking {
   }
 
   @Test
-  public void hashcode_is_prestubbed_to_identity_hashcode() {
+  public void hashcode_is_prestubbed_to_name_hash() {
     mock = mock(Object.class);
-    assertEquals(mock.hashCode(), System.identityHashCode(mock));
+    assertEquals(mock.toString().hashCode(), mock.hashCode());
   }
 
   @Test
