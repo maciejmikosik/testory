@@ -2,7 +2,6 @@ package org.testory.util.any;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.nCopies;
-import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Collections.flip;
 import static org.testory.common.Collections.last;
@@ -15,22 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.testory.common.Nullable;
+import org.testory.common.Optional;
 
 public class Repairs {
-  public static boolean canRepair(Anyvocation anyvocation) {
+  public static Optional<Anyvocation> repair(Anyvocation anyvocation) {
     checkNotNull(anyvocation);
-    return tryRepair(anyvocation) != null;
-  }
-
-  public static Anyvocation repair(Anyvocation anyvocation) {
-    checkNotNull(anyvocation);
-    Anyvocation repaired = tryRepair(anyvocation);
-    checkArgument(repaired != null);
-    return repaired;
-  }
-
-  @Nullable
-  private static Anyvocation tryRepair(Anyvocation anyvocation) {
     boolean isVarargs = isVarargs(anyvocation);
     List<Class<?>> parameters = asList(anyvocation.method.getParameterTypes());
     List<Object> unfolded = isVarargs
@@ -41,12 +29,13 @@ public class Repairs {
         : parameters;
     List<Object> repairedUnfolded = repair(unfoldedParameters, unfolded, anyvocation);
     if (repairedUnfolded == null) {
-      return null;
+      return Optional.empty();
     }
     List<Object> repaired = isVarargs
         ? foldArguments(parameters.size(), repairedUnfolded)
         : repairedUnfolded;
-    return anyvocation(anyvocation.method, anyvocation.instance, repaired, anyvocation.anys);
+    return Optional.of(anyvocation(anyvocation.method, anyvocation.instance, repaired,
+        anyvocation.anys));
   }
 
   @Nullable

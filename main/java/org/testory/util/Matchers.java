@@ -1,5 +1,6 @@
 package org.testory.util;
 
+import static java.util.Arrays.asList;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Classes.setAccessible;
 import static org.testory.common.Throwables.gently;
@@ -8,16 +9,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.testory.common.Matcher;
-import org.testory.common.Nullable;
+import org.testory.common.Optional;
 
 public class Matchers {
   public static boolean isMatcher(Object matcher) {
-    return tryGetMatcherMethod(matcher.getClass()) != null;
+    return findMatchingMethod(matcher.getClass()).isPresent();
   }
 
   public static Matcher asMatcher(final Object matcher) {
-    final Method method = tryGetMatcherMethod(matcher.getClass());
-    checkArgument(method != null);
+    Optional<Method> optionalMethod = findMatchingMethod(matcher.getClass());
+    checkArgument(optionalMethod.isPresent());
+    final Method method = optionalMethod.get();
     setAccessible(method);
     return new Matcher() {
       public boolean matches(Object item) {
@@ -39,26 +41,20 @@ public class Matchers {
     };
   }
 
-  @Nullable
-  private static Method tryGetMatcherMethod(Class<?> type) {
-    Method method = tryGetMatcherMethod(type, "matches");
-    return method != null
-        ? method
-        : tryGetMatcherMethod(type, "apply");
+  private static Optional<Method> findMatchingMethod(Class<?> type) {
+    for (String name : asList("matches", "apply")) {
+      try {
+        Method method = type.getMethod(name, Object.class);
+        if (hasCorrectSignature(method)) {
+          return Optional.of(method);
+        }
+      } catch (NoSuchMethodException e) {}
+    }
+    return Optional.empty();
   }
 
-  @Nullable
-  private static Method tryGetMatcherMethod(Class<?> type, String name) {
-    try {
-      Method method = type.getMethod(name, Object.class);
-      Class<?> returnType = method.getReturnType();
-      boolean hasCorrectSignature = (returnType == boolean.class || returnType == Boolean.class)
-          && method.getExceptionTypes().length == 0;
-      return hasCorrectSignature
-          ? method
-          : null;
-    } catch (NoSuchMethodException e) {
-      return null;
-    }
+  private static boolean hasCorrectSignature(Method method) {
+    return asList(boolean.class, Boolean.class).contains(method.getReturnType())
+        && method.getExceptionTypes().length == 0;
   }
 }

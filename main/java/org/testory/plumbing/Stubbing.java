@@ -4,7 +4,7 @@ import static org.testory.plumbing.History.latest;
 import static org.testory.plumbing.PlumbingException.check;
 
 import org.testory.InvocationMatcher;
-import org.testory.common.Nullable;
+import org.testory.common.Optional;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 
@@ -27,26 +27,15 @@ public class Stubbing {
     return "stubbing(" + invocationMatcher + ", " + handler + ")";
   }
 
-  public static boolean hasStubbing(Invocation invocation, History history) {
-    return tryFindStubbing(invocation, history) != null;
-  }
-
-  public static Stubbing findStubbing(Invocation invocation, History history) {
-    Stubbing stubbing = tryFindStubbing(invocation, history);
-    check(stubbing != null);
-    return stubbing;
-  }
-
-  @Nullable
-  private static Stubbing tryFindStubbing(Invocation invocation, History history) {
+  public static Optional<Stubbing> findStubbing(Invocation invocation, History history) {
     for (Object event : latest(history)) {
       if (event instanceof Stubbing) {
         Stubbing stubbing = (Stubbing) event;
         if (stubbing.invocationMatcher.matches(invocation)) {
-          return stubbing;
+          return Optional.of(stubbing);
         }
       }
     }
-    return null;
+    return Optional.empty();
   }
 }

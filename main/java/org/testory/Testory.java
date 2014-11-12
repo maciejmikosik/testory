@@ -21,14 +21,12 @@ import static org.testory.plumbing.Capturing.consumeAnys;
 import static org.testory.plumbing.Capturing.CapturingAny.capturingAny;
 import static org.testory.plumbing.History.add;
 import static org.testory.plumbing.History.history;
-import static org.testory.plumbing.Inspecting.hasInspecting;
+import static org.testory.plumbing.Inspecting.findLastInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
-import static org.testory.plumbing.Inspecting.lastInspecting;
 import static org.testory.plumbing.Mocking.mocking;
 import static org.testory.plumbing.Purging.mark;
 import static org.testory.plumbing.Purging.purge;
 import static org.testory.plumbing.Stubbing.findStubbing;
-import static org.testory.plumbing.Stubbing.hasStubbing;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Proxies.isProxiable;
@@ -49,7 +47,6 @@ import static org.testory.util.Samples.isSampleable;
 import static org.testory.util.Samples.sample;
 import static org.testory.util.any.Anyvocation.anyvocation;
 import static org.testory.util.any.Matcherizes.matcherize;
-import static org.testory.util.any.Repairs.canRepair;
 import static org.testory.util.any.Repairs.repair;
 
 import java.lang.reflect.Array;
@@ -62,8 +59,10 @@ import java.util.List;
 
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
+import org.testory.common.Optional;
 import org.testory.plumbing.Calling;
 import org.testory.plumbing.History;
+import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Mocking;
 import org.testory.plumbing.Stubbing;
 import org.testory.proxy.Handler;
@@ -213,7 +212,7 @@ public class Testory {
         check(isMock(invocation.instance));
         check(isStubbed(invocation));
         log(calling(invocation));
-        Stubbing stubbing = findStubbing(invocation, getHistory());
+        Stubbing stubbing = findStubbing(invocation, getHistory()).get();
         return stubbing.handler.handle(invocation);
       }
     };
@@ -608,8 +607,9 @@ public class Testory {
   }
 
   private static Effect getLastEffect() {
-    check(hasInspecting(getHistory()));
-    return lastInspecting(getHistory()).effect;
+    Optional<Inspecting> inspecting = findLastInspecting(getHistory());
+    check(inspecting.isPresent());
+    return inspecting.get().effect;
   }
 
   private static String formatBut(Effect effect) {
@@ -726,7 +726,7 @@ public class Testory {
   }
 
   private static boolean isStubbed(Invocation invocation) {
-    return hasStubbing(invocation, getHistory());
+    return findStubbing(invocation, getHistory()).isPresent();
   }
 
   private static String formatSection(String caption, @Nullable Object content) {
@@ -751,7 +751,11 @@ public class Testory {
     Anyvocation anyvocation = anyvocation(invocation.method, invocation.instance,
         invocation.arguments, anys);
     check(canRepair(anyvocation));
-    return convert(matcherize(repair(anyvocation)));
+    return convert(matcherize(repair(anyvocation).get()));
+  }
+
+  private static boolean canRepair(Anyvocation anyvocation) {
+    return repair(anyvocation).isPresent();
   }
 
   private static InvocationMatcher convert(final Matcher invocationMatcher) {
