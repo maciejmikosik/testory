@@ -2,6 +2,7 @@ package org.testory;
 
 import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
+import static org.testory.common.CharSequences.join;
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
 import static org.testory.common.Classes.defaultValue;
@@ -693,7 +694,8 @@ public class Testory {
     check(isMatcher(numberMatcher));
     check(invocationMatcher != null);
     int numberOfCalls = 0;
-    for (Calling calling : callings(getHistory())) {
+    History history = getHistory();
+    for (Calling calling : callings(history)) {
       if (invocationMatcher.matches(calling.invocation)) {
         numberOfCalls++;
       }
@@ -701,8 +703,10 @@ public class Testory {
     boolean expected = asMatcher(numberMatcher).matches(numberOfCalls);
     if (!expected) {
       throw assertionError("\n" //
-          + formatSection("expected called times " + numberMatcher, invocationMatcher)
-          + formatSection("but called", "times " + numberOfCalls));
+          + formatSection("expected called times " + numberMatcher, invocationMatcher) //
+          + formatSection("but called", "times " + numberOfCalls) //
+          + formatCallings(history)) //
+      ;
     }
   }
 
@@ -734,6 +738,45 @@ public class Testory {
     return "" //
         + "  " + caption + "\n" //
         + "    " + print(content) + "\n";
+  }
+
+  private static String formatCallings(final History history) {
+    log(stubbing(new InvocationMatcher() {
+      public boolean matches(Invocation invocation) {
+        return invocation.method.getName().equals("toString")
+            && invocation.method.getParameterTypes().length == 0;
+      }
+    }, new Handler() {
+      public Object handle(Invocation invocation) {
+        for (Object event : history.events) {
+          if (event instanceof Mocking) {
+            Mocking mocking = (Mocking) event;
+            if (mocking.mock == invocation.instance) {
+              return mocking.name;
+            }
+          }
+        }
+        return "unknownMock";
+      }
+    }));
+
+    StringBuilder builder = new StringBuilder();
+    for (Object event : history.events) {
+      if (event instanceof Calling) {
+        Calling calling = (Calling) event;
+        Invocation invocation = calling.invocation;
+        builder.append("    ").append(invocation.instance).append(".")
+            .append(invocation.method.getName()).append("(")
+            .append(join(",", invocation.arguments)).append(")").append("\n");
+      }
+    }
+    if (builder.length() > 0) {
+      builder.insert(0, "  actual invocations\n");
+    } else {
+      builder.insert(0, "  actual invocations\n    none\n");
+    }
+    setHistory(history);
+    return builder.toString();
   }
 
   private static <T> T proxyWrapping(final T wrapped, final Handler handler) {
