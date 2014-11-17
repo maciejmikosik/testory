@@ -1,17 +1,17 @@
-package org.testory.util;
+package org.testory.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.testory.common.Matchers.asMatcher;
+import static org.testory.common.Matchers.isMatcher;
 import static org.testory.test.Testilities.newObject;
-import static org.testory.util.Matchers.asMatcher;
-import static org.testory.util.Matchers.isMatcher;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class Describe_Matchers {
+public class Describe_Matchers_asMatcher {
   private Object matcher, object, otherObject;
   private String string;
 
