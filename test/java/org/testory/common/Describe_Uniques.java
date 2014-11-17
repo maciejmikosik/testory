@@ -1,11 +1,11 @@
-package org.testory.util;
+package org.testory.common;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.testory.util.Uniques.hasUniques;
-import static org.testory.util.Uniques.unique;
+import static org.testory.common.Uniques.hasUniques;
+import static org.testory.common.Uniques.unique;
 
 import java.util.AbstractList;
 import java.util.ArrayList;

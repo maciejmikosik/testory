@@ -4,7 +4,7 @@ import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.tryWrap;
 import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.same;
-import static org.testory.util.Uniques.unique;
+import static org.testory.common.Uniques.unique;
 
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
