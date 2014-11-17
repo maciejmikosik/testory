@@ -43,6 +43,25 @@ public class Describe_Matchers_asMatcher {
   }
 
   @Test
+  public void supports_hamcrest_diagnosis() {
+    matcher = new org.hamcrest.Matcher<Object>() {
+      public boolean matches(Object item) {
+        return false;
+      }
+
+      public void describeTo(org.hamcrest.Description description) {}
+
+      public void describeMismatch(Object item, org.hamcrest.Description mismatchDescription) {
+        mismatchDescription.appendText(string).appendText(item.toString());
+      }
+
+      @Deprecated
+      public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {}
+    };
+    assertEquals(string + object, ((DiagnosticMatcher) asMatcher(matcher)).diagnose(object));
+  }
+
+  @Test
   public void supports_fest_matcher() {
     matcher = new org.fest.assertions.Condition<Object>() {
       public boolean matches(Object value) {

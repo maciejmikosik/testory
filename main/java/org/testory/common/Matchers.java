@@ -118,18 +118,24 @@ public class Matchers {
   }
 
   public static boolean isMatcher(Object matcher) {
-    return findMatchingMethod(matcher.getClass()).isPresent();
+    return findMatchesMethod(matcher.getClass()).isPresent();
   }
 
   public static Matcher asMatcher(final Object matcher) {
-    Optional<Method> optionalMethod = findMatchingMethod(matcher.getClass());
-    checkArgument(optionalMethod.isPresent());
-    final Method method = optionalMethod.get();
-    setAccessible(method);
+    Optional<Method> matchesMethod = findMatchesMethod(matcher.getClass());
+    checkArgument(matchesMethod.isPresent());
+    Optional<Method> diagnoseMethod = findDiagnoseMethod(matcher.getClass());
+    return diagnoseMethod.isPresent()
+        ? newDiagnosticMatcher(matcher, matchesMethod.get(), diagnoseMethod.get())
+        : newMatcher(matcher, matchesMethod.get());
+  }
+
+  private static Matcher newMatcher(final Object dynamicMatcher, final Method matchesMethod) {
     return new Matcher() {
       public boolean matches(Object item) {
         try {
-          return (Boolean) method.invoke(matcher, item);
+          setAccessible(matchesMethod);
+          return (Boolean) matchesMethod.invoke(dynamicMatcher, item);
         } catch (IllegalArgumentException e) {
           throw new Error(e);
         } catch (IllegalAccessException e) {
@@ -141,16 +147,49 @@ public class Matchers {
       }
 
       public String toString() {
-        return matcher.toString();
+        return dynamicMatcher.toString();
       }
     };
   }
 
-  private static Optional<Method> findMatchingMethod(Class<?> type) {
+  private static DiagnosticMatcher newDiagnosticMatcher(final Object dynamicMatcher,
+      final Method matchesMethod, final Method diagnoseMethod) {
+    final Matcher matcher = newMatcher(dynamicMatcher, matchesMethod);
+    return new DiagnosticMatcher() {
+      public boolean matches(Object item) {
+        return matcher.matches(item);
+      }
+
+      public String toString() {
+        return matcher.toString();
+      }
+
+      public String diagnose(@Nullable Object item) {
+        try {
+          Object description = Class.forName("org.hamcrest.StringDescription").newInstance();
+          setAccessible(diagnoseMethod);
+          diagnoseMethod.invoke(dynamicMatcher, item, description);
+          return description.toString();
+        } catch (ClassNotFoundException e) {
+          throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+          throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    };
+  }
+
+  private static Optional<Method> findMatchesMethod(Class<?> type) {
     for (String name : asList("matches", "apply")) {
       try {
         Method method = type.getMethod(name, Object.class);
-        if (hasCorrectSignature(method)) {
+        Class<?> returnType = method.getReturnType();
+        if ((returnType == boolean.class || returnType == Boolean.class)
+            && method.getExceptionTypes().length == 0) {
           return Optional.of(method);
         }
       } catch (NoSuchMethodException e) {}
@@ -158,8 +197,15 @@ public class Matchers {
     return Optional.empty();
   }
 
-  private static boolean hasCorrectSignature(Method method) {
-    return asList(boolean.class, Boolean.class).contains(method.getReturnType())
-        && method.getExceptionTypes().length == 0;
+  private static Optional<Method> findDiagnoseMethod(Class<?> type) {
+    for (Method method : type.getMethods()) {
+      Class<?>[] parameters = method.getParameterTypes();
+      if (method.getName().equals("describeMismatch") && parameters.length == 2
+          && parameters[0] == Object.class
+          && parameters[1].getName().equals("org.hamcrest.Description")) {
+        return Optional.of(method);
+      }
+    }
+    return Optional.empty();
   }
 }
