@@ -59,6 +59,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.testory.common.DiagnosticMatcher;
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.common.Optional;
@@ -516,9 +517,15 @@ public class Testory {
             && isMatcher(objectOrMatcher)
             && asMatcher(objectOrMatcher).matches(getReturned(effect)));
     if (!expected) {
+      String diagnosis = objectOrMatcher != null && isMatcher(objectOrMatcher)
+          && hasReturnedObject(effect)
+          ? tryFormatDiagnosis(objectOrMatcher, getReturned(effect))
+          : "";
       throw assertionError("\n" //
           + formatSection("expected returned", objectOrMatcher) //
-          + formatBut(effect));
+          + formatBut(effect) //
+          + diagnosis //
+      );
     }
   }
 
@@ -570,9 +577,14 @@ public class Testory {
     Effect effect = getLastEffect();
     boolean expected = hasThrown(effect) && asMatcher(matcher).matches(getThrown(effect));
     if (!expected) {
+      String diagnosis = hasThrown(effect)
+          ? tryFormatDiagnosis(matcher, getThrown(effect))
+          : "";
       throw assertionError("\n" //
           + formatSection("expected thrown", matcher) //
-          + formatBut(effect));
+          + formatBut(effect) //
+          + diagnosis //
+      );
     }
   }
 
@@ -639,7 +651,9 @@ public class Testory {
     if (!asMatcher(matcher).matches(object)) {
       throw assertionError("\n" //
           + formatSection("expected", matcher) //
-          + formatSection("but was", object));
+          + formatSection("but was", object) //
+          + tryFormatDiagnosis(matcher, object)) //
+      ;
     }
   }
 
@@ -738,6 +752,13 @@ public class Testory {
     return "" //
         + "  " + caption + "\n" //
         + "    " + print(content) + "\n";
+  }
+
+  private static String tryFormatDiagnosis(Object matcher, Object item) {
+    Matcher asMatcher = asMatcher(matcher);
+    return asMatcher instanceof DiagnosticMatcher
+        ? formatSection("diagnosis", ((DiagnosticMatcher) asMatcher).diagnose(item))
+        : "";
   }
 
   private static String formatCallings(final History history) {
