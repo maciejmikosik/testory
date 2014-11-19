@@ -1,20 +1,20 @@
-package org.testory.util;
+package org.testory.common;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.testory.common.Effect.getReturned;
+import static org.testory.common.Effect.getThrown;
+import static org.testory.common.Effect.hasReturned;
+import static org.testory.common.Effect.hasReturnedObject;
+import static org.testory.common.Effect.hasReturnedVoid;
+import static org.testory.common.Effect.hasThrown;
+import static org.testory.common.Effect.returned;
+import static org.testory.common.Effect.returnedVoid;
+import static org.testory.common.Effect.thrown;
 import static org.testory.test.Testilities.newObject;
 import static org.testory.test.Testilities.newThrowable;
-import static org.testory.util.Effect.getReturned;
-import static org.testory.util.Effect.getThrown;
-import static org.testory.util.Effect.hasReturned;
-import static org.testory.util.Effect.hasReturnedObject;
-import static org.testory.util.Effect.hasReturnedVoid;
-import static org.testory.util.Effect.hasThrown;
-import static org.testory.util.Effect.returned;
-import static org.testory.util.Effect.returnedVoid;
-import static org.testory.util.Effect.thrown;
 
 import org.junit.Before;
 import org.junit.Test;

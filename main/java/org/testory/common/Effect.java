@@ -1,9 +1,7 @@
-package org.testory.util;
+package org.testory.common;
 
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
-
-import org.testory.common.Nullable;
 
 public class Effect {
   private static enum Mode {

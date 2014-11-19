@@ -3,8 +3,8 @@ package org.testory.plumbing;
 import static org.testory.plumbing.History.latest;
 import static org.testory.plumbing.PlumbingException.check;
 
+import org.testory.common.Effect;
 import org.testory.common.Optional;
-import org.testory.util.Effect;
 
 public class Inspecting {
   public final Effect effect;
