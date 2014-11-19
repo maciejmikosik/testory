@@ -104,9 +104,7 @@ public class Samples {
                   : type == Field.class
                       ? SampleClass.class.getDeclaredField("sampleField")
                       : fail(type, name);
-    } catch (NoSuchMethodException e) {
-      throw new Error(e);
-    } catch (NoSuchFieldException e) {
+    } catch (ReflectiveOperationException e) {
       throw new Error(e);
     }
   }

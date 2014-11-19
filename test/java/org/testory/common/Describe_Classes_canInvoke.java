@@ -6,7 +6,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 import static org.testory.common.Classes.canInvoke;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -140,9 +139,7 @@ public class Describe_Classes_canInvoke {
       return true;
     } catch (IllegalArgumentException e) {
       return false;
-    } catch (InvocationTargetException e) {
-      throw new Error(e);
-    } catch (IllegalAccessException e) {
+    } catch (ReflectiveOperationException e) {
       throw new Error(e);
     }
   }

@@ -1,7 +1,6 @@
 package org.testory.common;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -24,9 +23,7 @@ public class Objects {
     try {
       return objectA.getClass() == objectB.getClass()
           && (boolean) arraysEqualsMethod(objectA.getClass()).invoke(null, objectA, objectB);
-    } catch (InvocationTargetException e) {
-      throw new Error(e);
-    } catch (IllegalAccessException e) {
+    } catch (ReflectiveOperationException e) {
       throw new Error(e);
     }
   }

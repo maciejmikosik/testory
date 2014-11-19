@@ -138,7 +138,7 @@ public class Matchers {
           return (Boolean) matchesMethod.invoke(dynamicMatcher, item);
         } catch (InvocationTargetException e) {
           throw gently(e.getCause());
-        } catch (IllegalAccessException e) {
+        } catch (ReflectiveOperationException e) {
           throw new Error(e);
         }
       }

@@ -100,7 +100,7 @@ public class Testilities {
         }
       }
       return values;
-    } catch (IllegalAccessException e) {
+    } catch (ReflectiveOperationException e) {
       throw new Error(e);
     }
   }

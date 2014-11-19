@@ -90,7 +90,7 @@ public class TestoryException extends RuntimeException {
         reader.readLine();
       }
       return reader.readLine().trim();
-    } catch (ClassNotFoundException e) {
+    } catch (ReflectiveOperationException e) {
       throw new Error(e);
     } catch (IOException e) {
       throw new Error(e);

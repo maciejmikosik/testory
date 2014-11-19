@@ -17,10 +17,10 @@ public class Invocations {
     setAccessible(method);
     try {
       return method.invoke(instance, arguments);
-    } catch (IllegalAccessException e) {
-      throw new Error(e);
     } catch (InvocationTargetException e) {
       throw e.getCause();
+    } catch (ReflectiveOperationException e) {
+      throw new Error(e);
     }
   }
 }
