@@ -1,5 +1,7 @@
 package org.testory.common;
 
+import static org.testory.common.Throwables.newLinkageError;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -24,7 +26,7 @@ public class Objects {
       return objectA.getClass() == objectB.getClass()
           && (boolean) arraysEqualsMethod(objectA.getClass()).invoke(null, objectA, objectB);
     } catch (ReflectiveOperationException e) {
-      throw new Error(e);
+      throw newLinkageError(e);
     }
   }
 
@@ -34,7 +36,7 @@ public class Objects {
           ? Arrays.class.getMethod("equals", arrayType, arrayType)
           : Arrays.class.getMethod("deepEquals", Object[].class, Object[].class);
     } catch (NoSuchMethodException e) {
-      throw new Error(e);
+      throw newLinkageError(e);
     }
   }
 

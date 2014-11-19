@@ -30,4 +30,9 @@ public class Throwables {
     stringWriter.append('\n');
     return stringWriter.toString();
   }
+
+  public static LinkageError newLinkageError(Throwable cause) {
+    checkNotNull(cause);
+    return new LinkageError(null, cause);
+  }
 }

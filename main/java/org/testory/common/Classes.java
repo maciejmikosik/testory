@@ -2,6 +2,7 @@ package org.testory.common;
 
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
+import static org.testory.common.Throwables.newLinkageError;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -93,7 +94,7 @@ public class Classes {
     } catch (IllegalArgumentException e) {
       return false;
     } catch (ReflectiveOperationException e) {
-      throw new Error(e);
+      throw newLinkageError(e);
     }
   }
 

@@ -1,5 +1,7 @@
 package org.testory;
 
+import static org.testory.common.Throwables.newLinkageError;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -91,9 +93,9 @@ public class TestoryException extends RuntimeException {
       }
       return reader.readLine().trim();
     } catch (ReflectiveOperationException e) {
-      throw new Error(e);
+      throw newLinkageError(e);
     } catch (IOException e) {
-      throw new Error(e);
+      throw newLinkageError(e);
     } finally {
       closeQuietly(reader);
     }
