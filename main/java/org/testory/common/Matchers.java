@@ -136,13 +136,10 @@ public class Matchers {
         try {
           setAccessible(matchesMethod);
           return (Boolean) matchesMethod.invoke(dynamicMatcher, item);
-        } catch (IllegalArgumentException e) {
-          throw new Error(e);
+        } catch (InvocationTargetException e) {
+          throw gently(e.getCause());
         } catch (IllegalAccessException e) {
           throw new Error(e);
-        } catch (InvocationTargetException e) {
-          // matcher method does not throw any checked exceptions
-          throw gently(e.getCause());
         }
       }
 
@@ -170,14 +167,10 @@ public class Matchers {
           setAccessible(diagnoseMethod);
           diagnoseMethod.invoke(dynamicMatcher, item, description);
           return description.toString();
-        } catch (ClassNotFoundException e) {
-          throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-          throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-          throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
-          throw new RuntimeException(e);
+          throw gently(e.getCause());
+        } catch (ReflectiveOperationException e) {
+          throw new Error(e);
         }
       }
     };
@@ -202,7 +195,8 @@ public class Matchers {
       Class<?>[] parameters = method.getParameterTypes();
       if (method.getName().equals("describeMismatch") && parameters.length == 2
           && parameters[0] == Object.class
-          && parameters[1].getName().equals("org.hamcrest.Description")) {
+          && parameters[1].getName().equals("org.hamcrest.Description")
+          && method.getExceptionTypes().length == 0) {
         return Optional.of(method);
       }
     }
