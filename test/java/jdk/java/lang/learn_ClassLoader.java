@@ -1,4 +1,4 @@
-package org.testory.java;
+package jdk.java.lang;
 
 import static org.junit.Assert.assertNull;
 
