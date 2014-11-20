@@ -48,5 +48,4 @@ or handy macros.
 
 See [Tutorial](main/doc/tutorial.md) for complete list of features.
 
-[Testory on Github](https://github.com/maciejmikosik/testory) |
-[Download release](https://github.com/maciejmikosik/testory/releases).
+[Download release](https://github.com/testory/testory/releases).
