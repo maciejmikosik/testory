@@ -1,4 +1,4 @@
-package org.testory.java;
+package jdk.java.lang.reflect;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
