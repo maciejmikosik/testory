@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.util.Objects.deepEquals;
 import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
 import static org.testory.common.CharSequences.join;
@@ -15,8 +16,6 @@ import static org.testory.common.Effect.returnedVoid;
 import static org.testory.common.Effect.thrown;
 import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isMatcher;
-import static org.testory.common.Objects.areEqual;
-import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Samples.isSampleable;
 import static org.testory.common.Samples.sample;
@@ -95,7 +94,7 @@ public class Testory {
       for (final Field field : test.getClass().getDeclaredFields()) {
         if (!isStatic(field) && !isFinal(field)) {
           setAccessible(field);
-          if (areEqual(defaultValue(field.getType()), field.get(test))) {
+          if (deepEquals(defaultValue(field.getType()), field.get(test))) {
             check(canMockOrSample(field.getType()), "cannot inject field: " + field.getName());
             field.set(test, mockOrSample(field.getType(), field.getName()));
           }
@@ -512,7 +511,7 @@ public class Testory {
   public static void thenReturned(@Nullable Object objectOrMatcher) {
     Effect effect = getLastEffect();
     boolean expected = effect instanceof ReturnedObject
-        && (areEqualDeep(objectOrMatcher, ((ReturnedObject) effect).object) || objectOrMatcher != null
+        && (deepEquals(objectOrMatcher, ((ReturnedObject) effect).object) || objectOrMatcher != null
             && isMatcher(objectOrMatcher)
             && asMatcher(objectOrMatcher).matches(((ReturnedObject) effect).object));
     if (!expected) {
@@ -592,7 +591,7 @@ public class Testory {
     check(throwable != null);
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown
-        && areEqualDeep(throwable, ((Thrown) effect).throwable);
+        && deepEquals(throwable, ((Thrown) effect).throwable);
     if (!expected) {
       throw assertionError("\n" //
           + formatSection("expected thrown", throwable) //
@@ -659,7 +658,7 @@ public class Testory {
   }
 
   public static void thenEqual(@Nullable Object object, @Nullable Object expected) {
-    if (!areEqualDeep(object, expected)) {
+    if (!deepEquals(object, expected)) {
       throw assertionError("\n" //
           + formatSection("expected", expected) //
           + formatSection("but was", object));

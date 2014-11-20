@@ -1,11 +1,11 @@
 package org.testory.common;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.deepEquals;
 import static org.testory.common.CharSequences.join;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.setAccessible;
-import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.newLinkageError;
 
@@ -41,7 +41,7 @@ public class Matchers {
   public static Matcher equalDeep(@Nullable final Object object) {
     return new Matcher() {
       public boolean matches(Object item) {
-        return areEqualDeep(object, item);
+        return deepEquals(object, item);
       }
 
       public String toString() {

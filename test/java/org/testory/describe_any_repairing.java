@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.util.Objects.deepEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.testory.Testory.any;
@@ -7,7 +8,6 @@ import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
-import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.test.Testilities.newObject;
 
 import org.junit.After;
@@ -179,7 +179,7 @@ public class describe_any_repairing {
     return new Object() {
       @SuppressWarnings("unused")
       public boolean matches(Object item) {
-        return areEqualDeep(object, item);
+        return deepEquals(object, item);
       }
 
       public String toString() {

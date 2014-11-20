@@ -2,13 +2,13 @@ package org.testory.plumbing;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.nCopies;
+import static java.util.Objects.deepEquals;
 import static org.testory.common.CharSequences.join;
 import static org.testory.common.Collections.flip;
 import static org.testory.common.Collections.immutable;
 import static org.testory.common.Collections.last;
 import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.listOf;
-import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
 import static org.testory.plumbing.PlumbingException.check;
 
@@ -80,7 +80,7 @@ public class Anyvocation {
     if (solution == null) {
       return null;
     }
-    if (!areEqualDeep(flip(solution),
+    if (!deepEquals(flip(solution),
         trySolveEager(flip(anyvocation.anys), flip(parameters), flip(arguments)))) {
       return null;
     }

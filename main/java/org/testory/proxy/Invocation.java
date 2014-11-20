@@ -1,8 +1,8 @@
 package org.testory.proxy;
 
+import static java.util.Objects.deepEquals;
 import static org.testory.common.Classes.canInvoke;
 import static org.testory.common.Collections.immutable;
-import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.proxy.ProxyException.check;
 
 import java.lang.reflect.Method;
@@ -39,7 +39,7 @@ public class Invocation {
 
   private boolean equalsArgumentsOf(Invocation invocation) {
     for (int i = 0; i < arguments.size(); i++) {
-      if (!areEqualDeep(arguments.get(i), invocation.arguments.get(i))) {
+      if (!deepEquals(arguments.get(i), invocation.arguments.get(i))) {
         return false;
       }
     }
