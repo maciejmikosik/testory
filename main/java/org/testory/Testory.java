@@ -1,7 +1,6 @@
 package org.testory;
 
 import static java.util.Objects.deepEquals;
-import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
 import static org.testory.common.CharSequences.join;
 import static org.testory.common.Classes.canReturn;
@@ -39,6 +38,8 @@ import static org.testory.plumbing.Purging.mark;
 import static org.testory.plumbing.Purging.purge;
 import static org.testory.plumbing.Stubbing.findStubbing;
 import static org.testory.plumbing.Stubbing.stubbing;
+import static org.testory.plumbing.Warning.findWarnings;
+import static org.testory.plumbing.Warning.warning;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Proxies.isProxiable;
@@ -48,6 +49,7 @@ import static org.testory.proxy.Typing.typing;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -68,6 +70,7 @@ import org.testory.plumbing.History;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Mocking;
 import org.testory.plumbing.Stubbing;
+import org.testory.plumbing.Warning;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
@@ -192,6 +195,9 @@ public class Testory {
     final T mock = rawMock(type);
     String name = nameMock(mock, getHistory());
     log(mocking(mock, name));
+    if (hasFinalMethod(type)) {
+      log(warning("class " + type.getSimpleName() + " has final method"));
+    }
     stubNice(mock);
     stubObject(mock, name);
     return mock;
@@ -736,6 +742,10 @@ public class Testory {
     };
   }
 
+  private static TestoryAssertionError assertionError(String message) {
+    return TestoryAssertionError.assertionError(message + formatWarnings(getHistory()));
+  }
+
   public static void log(Object event) {
     setHistory(add(event, getHistory()));
   }
@@ -800,6 +810,18 @@ public class Testory {
     return builder.toString();
   }
 
+  private static String formatWarnings(History history) {
+    List<Warning> warnings = findWarnings(getHistory());
+    StringBuilder builder = new StringBuilder();
+    if (!warnings.isEmpty()) {
+      builder.append("\n  warnings\n");
+      for (Warning warning : warnings) {
+        builder.append("    " + warning.message + "\n");
+      }
+    }
+    return builder.toString();
+  }
+
   private static <T> T proxyWrapping(final T wrapped, final Handler handler) {
     Typing typing = typing(wrapped.getClass(), new HashSet<Class<?>>());
     return (T) proxy(typing, new Handler() {
@@ -821,6 +843,15 @@ public class Testory {
 
   private static boolean canRepair(Anyvocation anyvocation) {
     return repair(anyvocation).isPresent();
+  }
+
+  private static boolean hasFinalMethod(Class<?> type) {
+    for (Method method : type.getDeclaredMethods()) {
+      if (Modifier.isFinal(method.getModifiers())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private static InvocationMatcher convert(final Matcher invocationMatcher) {
