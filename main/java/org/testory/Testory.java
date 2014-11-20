@@ -43,8 +43,8 @@ import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
 import static org.testory.proxy.Typing.typing;
 import static org.testory.util.any.Anyvocation.anyvocation;
-import static org.testory.util.any.Matcherizes.matcherize;
-import static org.testory.util.any.Repairs.repair;
+import static org.testory.util.any.Anyvocation.matcherize;
+import static org.testory.util.any.Anyvocation.repair;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
