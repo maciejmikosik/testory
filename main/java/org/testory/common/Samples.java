@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-// TODO test Samples
 public class Samples {
   public static boolean isSampleable(Class<?> type) {
     checkNotNull(type);
