@@ -18,7 +18,7 @@ public class Invocations {
     } catch (InvocationTargetException e) {
       throw e.getCause();
     } catch (ReflectiveOperationException e) {
-      throw new ProxyException(e);
+      throw new Error(e);
     }
   }
 }
