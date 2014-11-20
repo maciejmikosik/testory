@@ -54,6 +54,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.testory.common.Any;
 import org.testory.common.DiagnosticMatcher;
 import org.testory.common.Effect;
 import org.testory.common.Effect.Returned;
@@ -71,7 +72,6 @@ import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 import org.testory.proxy.Typing;
-import org.testory.util.any.Any;
 import org.testory.util.any.Anyvocation;
 
 public class Testory {

@@ -1,4 +1,4 @@
-package org.testory.util.any;
+package org.testory.common;
 
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.tryWrap;
@@ -6,9 +6,9 @@ import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.same;
 import static org.testory.common.Uniques.unique;
 
-import org.testory.common.Matcher;
-import org.testory.common.Matchers;
-
+/*
+ * TODO test Any
+ */
 public class Any {
   public final Matcher matcher;
   public final Object token;

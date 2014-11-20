@@ -7,6 +7,8 @@ import static org.testory.common.Collections.last;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import org.testory.common.Any;
+
 public class Anyvocation {
   public final Method method;
   public final Object instance;

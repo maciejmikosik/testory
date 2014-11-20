@@ -7,7 +7,7 @@ import static org.testory.plumbing.PlumbingException.check;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.testory.util.any.Any;
+import org.testory.common.Any;
 
 public class Capturing {
   public static class CapturingAny {
