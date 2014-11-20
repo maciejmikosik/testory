@@ -1,6 +1,7 @@
 package org.testory;
 
 import static org.junit.Assert.assertSame;
+import static org.testory.Testory.a;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
@@ -45,8 +46,20 @@ public class describe_comparing_arrays {
   }
 
   @Test
+  public void capturing_during_stubbing_with_any_uses_deep_equals() {
+    given(willReturn(index), mock).indexOf(a(new Object[] { new Object[] { object } }));
+    assertSame(index, mock.indexOf(new Object[] { new Object[] { object } }));
+  }
+
+  @Test
   public void capturing_during_verification_uses_deep_equals() {
     mock.indexOf(new Object[] { new Object[] { object } });
     thenCalled(mock).indexOf(new Object[] { new Object[] { object } });
+  }
+
+  @Test
+  public void capturing_during_verification_with_any_uses_deep_equals() {
+    mock.indexOf(new Object[] { new Object[] { object } });
+    thenCalled(mock).indexOf(a(new Object[] { new Object[] { object } }));
   }
 }
