@@ -15,6 +15,7 @@ import static org.testory.test.Testilities.newThrowable;
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Invocation;
+import org.testory.proxy.InvocationMatcher;
 
 public class describe_spying {
   private Mockable mock, spy, real, otherMock;

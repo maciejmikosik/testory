@@ -3,10 +3,10 @@ package org.testory.plumbing;
 import static org.testory.plumbing.History.latest;
 import static org.testory.plumbing.PlumbingException.check;
 
-import org.testory.InvocationMatcher;
 import org.testory.common.Optional;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
+import org.testory.proxy.InvocationMatcher;
 
 public class Stubbing {
   public final InvocationMatcher invocationMatcher;

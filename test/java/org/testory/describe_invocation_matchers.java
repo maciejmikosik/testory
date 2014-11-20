@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.proxy.InvocationMatcher;
 
 public class describe_invocation_matchers {
   private Mockable mock, otherMock;

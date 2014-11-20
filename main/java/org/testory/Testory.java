@@ -69,6 +69,7 @@ import org.testory.plumbing.Mocking;
 import org.testory.plumbing.Stubbing;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
+import org.testory.proxy.InvocationMatcher;
 import org.testory.proxy.Typing;
 import org.testory.util.any.Any;
 import org.testory.util.any.Anyvocation;

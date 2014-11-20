@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
+import org.testory.proxy.InvocationMatcher;
 
 public class describe_stubbing {
   private Object object, otherObject;

@@ -10,6 +10,7 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Invocation;
+import org.testory.proxy.InvocationMatcher;
 
 public class describe_verification_times_NumberMatcher_InvocationMatcher {
   private Mockable mock;

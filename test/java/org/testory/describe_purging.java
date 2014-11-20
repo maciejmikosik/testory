@@ -14,6 +14,7 @@ import static org.testory.test.Testilities.newObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Invocation;
+import org.testory.proxy.InvocationMatcher;
 
 public class describe_purging {
   private Mockable mock;

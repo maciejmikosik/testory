@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.testory.proxy.Invocation;
+import org.testory.proxy.InvocationMatcher;
 
 public class describe_injecting {
   private final String string = "string";
