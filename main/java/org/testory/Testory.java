@@ -10,11 +10,6 @@ import static org.testory.common.Classes.hasMethod;
 import static org.testory.common.Classes.isFinal;
 import static org.testory.common.Classes.isStatic;
 import static org.testory.common.Classes.setAccessible;
-import static org.testory.common.Effect.getReturned;
-import static org.testory.common.Effect.getThrown;
-import static org.testory.common.Effect.hasReturned;
-import static org.testory.common.Effect.hasReturnedObject;
-import static org.testory.common.Effect.hasThrown;
 import static org.testory.common.Effect.returned;
 import static org.testory.common.Effect.returnedVoid;
 import static org.testory.common.Effect.thrown;
@@ -61,6 +56,9 @@ import java.util.List;
 
 import org.testory.common.DiagnosticMatcher;
 import org.testory.common.Effect;
+import org.testory.common.Effect.Returned;
+import org.testory.common.Effect.ReturnedObject;
+import org.testory.common.Effect.Thrown;
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.common.Optional;
@@ -512,14 +510,14 @@ public class Testory {
 
   public static void thenReturned(@Nullable Object objectOrMatcher) {
     Effect effect = getLastEffect();
-    boolean expected = hasReturnedObject(effect)
-        && (areEqualDeep(objectOrMatcher, getReturned(effect)) || objectOrMatcher != null
+    boolean expected = effect instanceof ReturnedObject
+        && (areEqualDeep(objectOrMatcher, ((ReturnedObject) effect).object) || objectOrMatcher != null
             && isMatcher(objectOrMatcher)
-            && asMatcher(objectOrMatcher).matches(getReturned(effect)));
+            && asMatcher(objectOrMatcher).matches(((ReturnedObject) effect).object));
     if (!expected) {
       String diagnosis = objectOrMatcher != null && isMatcher(objectOrMatcher)
-          && hasReturnedObject(effect)
-          ? tryFormatDiagnosis(objectOrMatcher, getReturned(effect))
+          && effect instanceof ReturnedObject
+          ? tryFormatDiagnosis(objectOrMatcher, ((ReturnedObject) effect).object)
           : "";
       throw assertionError("\n" //
           + formatSection("expected returned", objectOrMatcher) //
@@ -563,7 +561,7 @@ public class Testory {
 
   public static void thenReturned() {
     Effect effect = getLastEffect();
-    boolean expected = hasReturned(effect);
+    boolean expected = effect instanceof Returned;
     if (!expected) {
       throw assertionError("\n" //
           + formatSection("expected returned", "") //
@@ -575,10 +573,11 @@ public class Testory {
     check(matcher != null);
     check(isMatcher(matcher));
     Effect effect = getLastEffect();
-    boolean expected = hasThrown(effect) && asMatcher(matcher).matches(getThrown(effect));
+    boolean expected = effect instanceof Thrown
+        && asMatcher(matcher).matches(((Thrown) effect).throwable);
     if (!expected) {
-      String diagnosis = hasThrown(effect)
-          ? tryFormatDiagnosis(matcher, getThrown(effect))
+      String diagnosis = effect instanceof Thrown
+          ? tryFormatDiagnosis(matcher, ((Thrown) effect).throwable)
           : "";
       throw assertionError("\n" //
           + formatSection("expected thrown", matcher) //
@@ -591,7 +590,8 @@ public class Testory {
   public static void thenThrown(Throwable throwable) {
     check(throwable != null);
     Effect effect = getLastEffect();
-    boolean expected = hasThrown(effect) && areEqualDeep(throwable, getThrown(effect));
+    boolean expected = effect instanceof Thrown
+        && areEqualDeep(throwable, ((Thrown) effect).throwable);
     if (!expected) {
       throw assertionError("\n" //
           + formatSection("expected thrown", throwable) //
@@ -602,7 +602,7 @@ public class Testory {
   public static void thenThrown(Class<? extends Throwable> type) {
     check(type != null);
     Effect effect = getLastEffect();
-    boolean expected = hasThrown(effect) && type.isInstance(getThrown(effect));
+    boolean expected = effect instanceof Thrown && type.isInstance(((Thrown) effect).throwable);
     if (!expected) {
       throw assertionError("\n" //
           + formatSection("expected thrown", type.getName()) //
@@ -612,7 +612,7 @@ public class Testory {
 
   public static void thenThrown() {
     Effect effect = getLastEffect();
-    boolean expected = hasThrown(effect);
+    boolean expected = effect instanceof Thrown;
     if (!expected) {
       throw assertionError("\n" //
           + formatSection("expected thrown", "") //
@@ -627,14 +627,14 @@ public class Testory {
   }
 
   private static String formatBut(Effect effect) {
-    return hasReturned(effect)
-        ? hasReturnedObject(effect)
-            ? formatSection("but returned", getReturned(effect))
+    return effect instanceof Returned
+        ? effect instanceof ReturnedObject
+            ? formatSection("but returned", ((ReturnedObject) effect).object)
             : formatSection("but returned", "void")
         : "" //
-            + formatSection("but thrown", getThrown(effect)) //
+            + formatSection("but thrown", ((Thrown) effect).throwable) //
             + "\n" //
-            + printStackTrace(getThrown(effect));
+            + printStackTrace(((Thrown) effect).throwable);
   }
 
   public static void then(boolean condition) {
