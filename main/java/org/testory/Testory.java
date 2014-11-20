@@ -22,6 +22,9 @@ import static org.testory.common.Samples.isSampleable;
 import static org.testory.common.Samples.sample;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
+import static org.testory.plumbing.Anyvocation.anyvocation;
+import static org.testory.plumbing.Anyvocation.matcherize;
+import static org.testory.plumbing.Anyvocation.repair;
 import static org.testory.plumbing.Calling.calling;
 import static org.testory.plumbing.Calling.callings;
 import static org.testory.plumbing.Capturing.capturedAnys;
@@ -42,9 +45,6 @@ import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
 import static org.testory.proxy.Typing.typing;
-import static org.testory.util.any.Anyvocation.anyvocation;
-import static org.testory.util.any.Anyvocation.matcherize;
-import static org.testory.util.any.Anyvocation.repair;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -63,6 +63,7 @@ import org.testory.common.Effect.Thrown;
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.common.Optional;
+import org.testory.plumbing.Anyvocation;
 import org.testory.plumbing.Calling;
 import org.testory.plumbing.History;
 import org.testory.plumbing.Inspecting;
@@ -72,7 +73,6 @@ import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 import org.testory.proxy.Typing;
-import org.testory.util.any.Anyvocation;
 
 public class Testory {
   private static ThreadLocal<History> localHistory = new ThreadLocal<History>() {

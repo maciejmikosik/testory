@@ -1,9 +1,8 @@
-package org.testory.util.any;
+package org.testory.plumbing;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.nCopies;
 import static org.testory.common.CharSequences.join;
-import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Collections.flip;
 import static org.testory.common.Collections.immutable;
 import static org.testory.common.Collections.last;
@@ -11,6 +10,7 @@ import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.listOf;
 import static org.testory.common.Objects.areEqualDeep;
 import static org.testory.common.Objects.print;
+import static org.testory.plumbing.PlumbingException.check;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -40,10 +40,10 @@ public class Anyvocation {
 
   public static Anyvocation anyvocation(Method method, Object instance, List<Object> arguments,
       List<Any> anys) {
-    checkNotNull(method);
-    checkNotNull(instance);
-    checkNotNull(arguments);
-    checkNotNull(anys);
+    check(method != null);
+    check(instance != null);
+    check(arguments != null);
+    check(anys != null);
     return new Anyvocation(method, instance, immutable(arguments), immutable(anys));
   }
 
@@ -53,7 +53,7 @@ public class Anyvocation {
   }
 
   public static Optional<Anyvocation> repair(Anyvocation anyvocation) {
-    checkNotNull(anyvocation);
+    check(anyvocation != null);
     boolean isVarargs = isVarargs(anyvocation);
     List<Class<?>> parameters = asList(anyvocation.method.getParameterTypes());
     List<Object> unfolded = isVarargs
