@@ -1,4 +1,4 @@
-package org.testory.util;
+package org.testory.common;
 
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Collections.immutable;
