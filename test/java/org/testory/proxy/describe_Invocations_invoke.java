@@ -1,18 +1,16 @@
-package org.testory.util;
+package org.testory.proxy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.proxy.Invocation.invocation;
+import static org.testory.proxy.Invocations.invoke;
 import static org.testory.test.Testilities.newObject;
-import static org.testory.util.Invocations.invoke;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.proxy.Invocation;
-import org.testory.proxy.ProxyException;
 
 public class describe_Invocations_invoke {
   private Invocation invocation;
