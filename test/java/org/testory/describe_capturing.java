@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
+import static org.testory.Testory.thenCalledInOrder;
 import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.willReturn;
 import static org.testory.test.Testilities.newObject;
@@ -108,6 +109,30 @@ public class describe_capturing {
   }
 
   @Test
+  public void verification_in_order_supports_capturing() {
+    mock.returnObject(object);
+    thenCalledInOrder(mock).returnObject(object);
+
+    mock.returnObject(object);
+    try {
+      thenCalledInOrder(mock).returnObject(otherObject);
+      fail();
+    } catch (TestoryAssertionError e) {}
+
+    mock.returnObject(object);
+    try {
+      thenCalledInOrder(mock).returnOtherObject(object);
+      fail();
+    } catch (TestoryAssertionError e) {}
+
+    mock.returnObject(object);
+    try {
+      thenCalledInOrder(otherMock).returnObject(object);
+      fail();
+    } catch (TestoryAssertionError e) {}
+  }
+
+  @Test
   public void verification_matching_times_supports_capturing() {
     numberMatcher = number(2);
     mock.returnObject(object);
@@ -146,17 +171,24 @@ public class describe_capturing {
       fail();
     } catch (TestoryException e) {}
     try {
-      thenCalled(new Object());
+      thenCalledInOrder((Object) null);
       fail();
     } catch (TestoryException e) {}
 
+    try {
+      thenCalled(new Object());
+      fail();
+    } catch (TestoryException e) {}
     try {
       thenCalledTimes(1, new Object());
       fail();
     } catch (TestoryException e) {}
-
     try {
       thenCalledTimes(number(2), new Object());
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      thenCalledInOrder(new Object());
       fail();
     } catch (TestoryException e) {}
   }

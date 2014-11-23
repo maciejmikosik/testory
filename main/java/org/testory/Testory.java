@@ -39,6 +39,7 @@ import static org.testory.plumbing.Purging.mark;
 import static org.testory.plumbing.Purging.purge;
 import static org.testory.plumbing.Stubbing.findStubbing;
 import static org.testory.plumbing.Stubbing.stubbing;
+import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Proxies.isProxiable;
@@ -719,6 +720,33 @@ public class Testory {
       throw assertionError("\n" //
           + formatSection("expected called times " + numberMatcher, invocationMatcher) //
           + formatSection("but called", "times " + numberOfCalls) //
+          + formatCallings(history)) //
+      ;
+    }
+  }
+
+  public static <T> T thenCalledInOrder(T mock) {
+    check(mock != null);
+    check(isMock(mock));
+    Handler handler = new Handler() {
+      public Object handle(Invocation invocation) {
+        thenCalledInOrder(capture(invocation));
+        return null;
+      }
+    };
+    return proxyWrapping(mock, handler);
+  }
+
+  public static void thenCalledInOrder(InvocationMatcher invocationMatcher) {
+    check(invocationMatcher != null);
+    History history = getHistory();
+    Optional<History> verified = verifyInOrder(invocationMatcher, history);
+    if (verified.isPresent()) {
+      setHistory(verified.get());
+    } else {
+      throw assertionError("\n" //
+          + formatSection("expected called in order", invocationMatcher) //
+          + "  but not called\n" //
           + formatCallings(history)) //
       ;
     }

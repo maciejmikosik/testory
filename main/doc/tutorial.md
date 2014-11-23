@@ -147,6 +147,14 @@ You can verify number of invocations by passing exact value (may be 0) or using 
         thenCalledTimes(0, mock).clear();
         thenCalledTimes(greaterThan(0), mock).toString();
 
+By default, order of invocations does not matter.
+
+If you need to assert that invocations happened in order, use ordered verifying.
+
+        thenCalledInOrder(mockDatabase).open();
+        thenCalledInOrder(mockDatabase).close();
+
+
 ### Capturing
 
 You can take full control of matching invocations by implementing you own `InvocationMatcher`.
