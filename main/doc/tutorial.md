@@ -189,7 +189,7 @@ or `any` with [matcher](#matchers) if you care
 
 `Class` passed to `any` is just for inferring purpose. Argument can be instance of any type and still can match.
 
-In most cases you can mix `any`s with real arguments.
+In most cases you can mix `any` with real arguments.
 
         given(willReturn(true), mock).someMethod(object, any(Object.class));
 
