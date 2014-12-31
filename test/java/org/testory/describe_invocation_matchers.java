@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.onInstance;
+import static org.testory.Testory.onRequest;
 import static org.testory.Testory.onReturn;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.test.Testilities.newObject;
@@ -60,9 +61,22 @@ public class describe_invocation_matchers {
   }
 
   @Test
+  public void on_request_matches_invocation_of_method_returning_same_type_and_equal_arguments() {
+    invocationMatcher = onRequest(type, arguments.toArray());
+    assertTrue(invocationMatcher.matches(invocation(method, mock, arguments)));
+    assertTrue(invocationMatcher.matches(invocation(otherMethod, mock, arguments)));
+    assertFalse(invocationMatcher.matches(invocation(otherTypeMethod, mock, arguments)));
+    assertTrue(invocationMatcher.matches(invocation(method, otherMock, arguments)));
+    assertFalse(invocationMatcher.matches(invocation(method, mock, otherArguments)));
+  }
+
+  @Test
   public void invocation_matchers_are_printable() {
     assertEquals("onInstance(" + mock + ")", onInstance(mock).toString());
     assertEquals("onReturn(" + type.getName() + ")", onReturn(type).toString());
+    assertEquals("onRequest(" + type.getName() + ", " + argument + ")", //
+        onRequest(type, argument).toString());
+    assertEquals("onRequest(" + type.getName() + ")", onRequest(type).toString());
   }
 
   @Test
@@ -73,6 +87,14 @@ public class describe_invocation_matchers {
     } catch (TestoryException e) {}
     try {
       onReturn(null);
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      onRequest(null);
+      fail();
+    } catch (TestoryException e) {}
+    try {
+      onRequest(type, (Object[]) null);
       fail();
     } catch (TestoryException e) {}
   }

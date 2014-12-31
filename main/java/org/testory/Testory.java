@@ -431,6 +431,27 @@ public class Testory {
     };
   }
 
+  public static InvocationMatcher onRequest(final Class<?> type, final Object... arguments) {
+    check(type != null);
+    check(arguments != null);
+    return new InvocationMatcher() {
+      public boolean matches(Invocation invocation) {
+        return type == invocation.method.getReturnType()
+            && deepEquals(arguments, invocation.arguments.toArray());
+      }
+
+      public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("onRequest(").append(type.getName());
+        for (Object argument : arguments) {
+          builder.append(", ").append(argument);
+        }
+        builder.append(")");
+        return builder.toString();
+      }
+    };
+  }
+
   public static <T> T when(T object) {
     setHistory(mark(purge(getHistory())));
     log(inspecting(returned(object)));
