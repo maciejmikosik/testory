@@ -87,6 +87,9 @@ public class TestoryException extends RuntimeException {
       }
       String simpleName = type.getSimpleName();
       InputStream resourceAsStream = type.getResourceAsStream(simpleName + ".java");
+      if (resourceAsStream == null) {
+        throw new LinkageError(simpleName + ".java not found");
+      }
       reader = new BufferedReader(new InputStreamReader(resourceAsStream));
       for (int i = 1; i < lineNumber; i++) {
         reader.readLine();

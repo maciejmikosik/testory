@@ -95,8 +95,11 @@ public class describe_when {
     });
     thread.start();
     thread.join();
-    assertTrue(throwable instanceof TestoryException);
-    assertTrue(throwable.getMessage(), throwable.getMessage().contains("inspecting"));
+    try {
+      throw throwable;
+    } catch (TestoryException e) {
+      assertTrue(throwable.getMessage(), throwable.getMessage().contains("inspecting"));
+    }
   }
 
   @Test
