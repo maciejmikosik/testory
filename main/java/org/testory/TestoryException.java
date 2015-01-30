@@ -1,7 +1,8 @@
 package org.testory;
 
+import static org.testory.common.Closeables.closeQuietly;
+
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -100,14 +101,6 @@ public class TestoryException extends RuntimeException {
     } finally {
       closeQuietly(reader);
     }
-  }
-
-  private static void closeQuietly(Closeable closeable) {
-    try {
-      if (closeable != null) {
-        closeable.close();
-      }
-    } catch (IOException e) {}
   }
 
   private static <T> T[] array(T... values) {
