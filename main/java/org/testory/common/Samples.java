@@ -2,7 +2,6 @@ package org.testory.common;
 
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Collections.immutable;
-import static org.testory.common.Throwables.newLinkageError;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -105,7 +104,7 @@ public class Samples {
                       ? SampleClass.class.getDeclaredField("sampleField")
                       : fail(type, name);
     } catch (ReflectiveOperationException e) {
-      throw newLinkageError(e);
+      throw new LinkageError(null, e);
     }
   }
 

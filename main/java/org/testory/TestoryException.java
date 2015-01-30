@@ -1,7 +1,5 @@
 package org.testory;
 
-import static org.testory.common.Throwables.newLinkageError;
-
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -85,10 +83,10 @@ public class TestoryException extends RuntimeException {
       while (type.getEnclosingClass() != null) {
         type = type.getEnclosingClass();
       }
-      String simpleName = type.getSimpleName();
-      InputStream resourceAsStream = type.getResourceAsStream(simpleName + ".java");
+      String fileName = type.getSimpleName() + ".java";
+      InputStream resourceAsStream = type.getResourceAsStream(fileName);
       if (resourceAsStream == null) {
-        throw new LinkageError(simpleName + ".java not found");
+        throw new LinkageError(fileName + " not found");
       }
       reader = new BufferedReader(new InputStreamReader(resourceAsStream));
       for (int i = 1; i < lineNumber; i++) {
@@ -96,9 +94,9 @@ public class TestoryException extends RuntimeException {
       }
       return reader.readLine().trim();
     } catch (ReflectiveOperationException e) {
-      throw newLinkageError(e);
+      throw new LinkageError(null, e);
     } catch (IOException e) {
-      throw newLinkageError(e);
+      throw new LinkageError(null, e);
     } finally {
       closeQuietly(reader);
     }

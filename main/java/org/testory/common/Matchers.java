@@ -7,7 +7,6 @@ import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.setAccessible;
 import static org.testory.common.Throwables.gently;
-import static org.testory.common.Throwables.newLinkageError;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -140,7 +139,7 @@ public class Matchers {
         } catch (InvocationTargetException e) {
           throw gently(e.getCause());
         } catch (ReflectiveOperationException e) {
-          throw newLinkageError(e);
+          throw new LinkageError(null, e);
         }
       }
 
@@ -171,7 +170,7 @@ public class Matchers {
         } catch (InvocationTargetException e) {
           throw gently(e.getCause());
         } catch (ReflectiveOperationException e) {
-          throw newLinkageError(e);
+          throw new LinkageError(null, e);
         }
       }
     };
