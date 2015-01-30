@@ -86,6 +86,12 @@ public class describe_invocation_matchers {
       fail();
     } catch (TestoryException e) {}
     try {
+      onInstance(new Object());
+      fail();
+    } catch (TestoryException e) {
+      assertTrue(e.getMessage().contains("isMock"));
+    }
+    try {
       onReturn(null);
       fail();
     } catch (TestoryException e) {}

@@ -407,6 +407,7 @@ public class Testory {
 
   public static InvocationMatcher onInstance(final Object mock) {
     check(mock != null);
+    check(isMock(mock));
     return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock;
