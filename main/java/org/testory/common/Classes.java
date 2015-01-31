@@ -157,7 +157,6 @@ public class Classes {
     return Collections.unmodifiableMap(map);
   }
 
-  // TODO test
   public static Class<?> tryWrap(Class<?> type) {
     checkNotNull(type);
     Class<?> wrappedOrNull = wrapping.get(type);
