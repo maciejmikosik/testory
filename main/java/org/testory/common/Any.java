@@ -6,9 +6,6 @@ import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.same;
 import static org.testory.common.Uniques.unique;
 
-/*
- * TODO test Any
- */
 public class Any {
   public final Matcher matcher;
   public final Object token;
