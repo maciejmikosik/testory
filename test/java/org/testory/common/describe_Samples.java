@@ -8,6 +8,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.testory.common.Samples.sample;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,14 +22,15 @@ import org.junit.Test;
  * TODO test samples of all supported types
  */
 public class describe_Samples {
-  private String seed;
-  private List<Object> samples;
+  private String seed, otherSeed;
   private int population;
+  private List<Object> samples;
 
   @Before
   public void before() {
-    population = 100;
     seed = "seed";
+    otherSeed = "otherSeed";
+    population = 100;
     samples = new ArrayList<Object>();
   }
 
@@ -111,5 +115,25 @@ public class describe_Samples {
       samples.add(sample(String.class, seed + i));
     }
     assertEquals(population, new HashSet<Object>(samples).size());
+  }
+
+  @Test
+  public void samples_class() {
+    assertEquals(sample(Class.class, seed), sample(Class.class, otherSeed));
+  }
+
+  @Test
+  public void samples_method() {
+    assertEquals(sample(Method.class, seed), sample(Method.class, otherSeed));
+  }
+
+  @Test
+  public void samples_constructor() {
+    assertEquals(sample(Constructor.class, seed), sample(Constructor.class, otherSeed));
+  }
+
+  @Test
+  public void samples_field() {
+    assertEquals(sample(Field.class, seed), sample(Field.class, otherSeed));
   }
 }
