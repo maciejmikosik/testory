@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.util.Arrays.asList;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 
@@ -49,9 +50,10 @@ public class Classes {
     });
   }
 
-  /* untested */
   public static boolean hasMethod(String name, Class<?>[] parameters, Class<?> type) {
     checkNotNull(name);
+    checkNotNull(parameters);
+    checkArgument(!asList(parameters).contains(null));
     checkNotNull(type);
     try {
       type.getMethod(name, parameters);
