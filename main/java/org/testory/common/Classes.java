@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Classes {
-  /* untested */
   public static void setAccessible(final AccessibleObject accessible) {
     checkNotNull(accessible);
     AccessController.doPrivileged(new PrivilegedAction<Void>() {
