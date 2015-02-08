@@ -16,7 +16,6 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import org.junit.Before;
 import org.junit.Test;
 
-/** more tests in then* versions */
 public class describe_when {
   private Throwable throwable;
   private Runnable runnable;
