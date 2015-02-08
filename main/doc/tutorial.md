@@ -1,4 +1,4 @@
-[overview](#overview) | [mocks](#mocks) | [utilities](#utilities) | [macros](#macros) | [fine points](#fine-points)
+[overview](#overview) | [mocks](#mocks) | [utilities](#utilities) | [macros](#macros) | [fine points](#fine-points) | [troubleshooting](#troubleshooting)
 
 # Overview
 [when](#when) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown)
@@ -398,3 +398,11 @@ Purging has following consequences
   - calling it causes TestoryException
   - stubbing it causes TestoryException
   - verifying it causes TestoryException
+
+# Troubleshooting
+
+### `NoClassDefFoundError`, package *** does not exist
+
+Testory uses `Thread.currentThread().getContextClassLoader()` to load classes generated for mocks. If you use you own classloader, it is your responsibility to properly set context classloader using `Thread.currentThread().setContextClassLoader()`. If you skip that, context classloader by default points out to system classloader (`ClassLoader.getSystemClassLoader()`).
+
+Solution is to remember to set context classloader to be same as or child of classloader that loaded testory library.
