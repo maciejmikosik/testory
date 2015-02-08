@@ -78,7 +78,6 @@ public class Testilities {
     return new Exception().getStackTrace()[1];
   }
 
-  /* untested */
   public static StackTraceElement nextLine(StackTraceElement element) {
     return new StackTraceElement(element.getClassName(), element.getMethodName(),
         element.getFileName(), element.getLineNumber() + 1);
