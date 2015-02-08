@@ -129,9 +129,6 @@ public class Testory {
     }
   }
 
-  /**
-   * Reserved for future use.
-   */
   @Deprecated
   public static Closure given(Closure closure) {
     throw new TestoryException("\n\tgiven(Closure) is confusing, do not use it\n");
