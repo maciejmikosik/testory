@@ -163,7 +163,9 @@ public class Matchers {
 
       public String diagnose(@Nullable Object item) {
         try {
-          Object description = Class.forName("org.hamcrest.StringDescription").newInstance();
+          ClassLoader loader = dynamicMatcher.getClass().getClassLoader();
+          Class<?> descriptionClass = Class.forName("org.hamcrest.StringDescription", true, loader);
+          Object description = descriptionClass.newInstance();
           setAccessible(diagnoseMethod);
           diagnoseMethod.invoke(dynamicMatcher, item, description);
           return description.toString();
