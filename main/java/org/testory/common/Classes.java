@@ -135,9 +135,8 @@ public class Classes {
 
   public static Class<?> tryWrap(Class<?> type) {
     checkNotNull(type);
-    Class<?> wrappedOrNull = wrapping.get(type);
-    return wrappedOrNull != null
-        ? wrappedOrNull
+    return wrapping.containsKey(type)
+        ? wrapping.get(type)
         : type;
   }
 
