@@ -285,6 +285,21 @@ public class describe_Proxies_proxy {
     } catch (ProxyException e) {}
   }
 
+  @Test
+  public void types_are_proxiable_from_child_classloader() {
+    Thread thread = Thread.currentThread();
+    ClassLoader original = thread.getContextClassLoader();
+    try {
+      thread.setContextClassLoader(new ClassLoader(original) {});
+      proxy(typing(ArrayList.class), handler);
+      proxy(typing(AbstractList.class), handler);
+      proxy(typing(List.class), handler);
+      proxy(typing(Object.class), handler);
+    } finally {
+      thread.setContextClassLoader(original);
+    }
+  }
+
   private static void assertProxiable(Object object) {
     Typing typing = typing(object.getClass());
     assertProxiable(typing, typing);

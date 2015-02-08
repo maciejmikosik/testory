@@ -127,8 +127,9 @@ public class Proxies {
 
   }
 
+  public static class ProxiableObject {}
+
   private static Typing tryWithoutObjectBecauseOfCglibBug(Typing typing) {
-    class ProxiableObject {}
     return typing.superclass == Object.class
         ? typing(ProxiableObject.class, typing.interfaces)
         : typing;
