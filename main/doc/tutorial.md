@@ -1,11 +1,7 @@
-
-### [overview](#overview) | [when](#when) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown)
-### [mocks](#mocks) | [stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing) | [spying](#spying)
-### [utilities](#utilities) | [matchers](#matchers) | [closures](#closures)
-### [macros](#macros) | [givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
-### [fine points](#fine-points) | [arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging)
+[overview](#overview) | [mocks](#mocks) | [utilities](#utilities) | [macros](#macros) | [fine points](#fine-points)
 
 # Overview
+[when](#when) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown)
 
 To make **given**, **when**, **then** family of methods available, add following import to your test class.
 
@@ -98,6 +94,7 @@ Notice that **when** in chained form catches any throwable. This prevents throwa
 **thenThrown** is overloaded to accept throwable instance, class or matcher.
 
 # Mocks
+[stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing) | [spying](#spying)
 
 Any non-final class or interface can be mocked.
 
@@ -223,6 +220,7 @@ Spies can be stubbed and verified like any other mock.
  - there can be many spies for same real object
 
 # Utilities
+[matchers](#matchers) | [closures](#closures)
 
 ### Matchers
 
@@ -263,6 +261,7 @@ wrap call inside Closure.
         }
 
 # Macros
+[givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
 
 Macros help you remove boilerplate code from your tests.
 
@@ -329,6 +328,7 @@ Field of final type is assigned to sample data
 Random sample data is deterministically generated using field type and field name as a seed.
 
 # Fine Points
+[arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging)
 
 ### Arrays
 
