@@ -74,7 +74,6 @@ public class Testilities {
     return writer.toString();
   }
 
-  /* untested */
   public static StackTraceElement here() {
     return new Exception().getStackTrace()[1];
   }
