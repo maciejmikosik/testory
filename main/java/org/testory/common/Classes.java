@@ -5,7 +5,6 @@ import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
@@ -15,30 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Classes {
-  /* untested */
-  public static boolean isPublic(Class<?> type) {
-    checkNotNull(type);
-    return Modifier.isPublic(type.getModifiers());
-  }
-
-  /* untested */
-  public static boolean isFinal(Class<?> type) {
-    checkNotNull(type);
-    return Modifier.isFinal(type.getModifiers());
-  }
-
-  /* untested */
-  public static boolean isFinal(Field field) {
-    checkNotNull(field);
-    return Modifier.isFinal(field.getModifiers());
-  }
-
-  /* untested */
-  public static boolean isStatic(Field field) {
-    checkNotNull(field);
-    return Modifier.isStatic(field.getModifiers());
-  }
-
   /* untested */
   public static void setAccessible(final AccessibleObject accessible) {
     checkNotNull(accessible);

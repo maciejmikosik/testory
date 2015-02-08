@@ -1,9 +1,9 @@
 package org.testory.proxy;
 
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isPublic;
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
-import static org.testory.common.Classes.isFinal;
-import static org.testory.common.Classes.isPublic;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.ProxyException.check;
 import static org.testory.proxy.Typing.typing;
@@ -36,11 +36,11 @@ public class Proxies {
   }
 
   private static boolean isTrivial(Class<?> type) {
-    return isPublic(type) && !isFinal(type);
+    return isPublic(type.getModifiers()) && !isFinal(type.getModifiers());
   }
 
   private static boolean isExtendableClass(Class<?> type) {
-    return !isFinal(type) && !type.isInterface();
+    return !isFinal(type.getModifiers()) && !type.isInterface();
   }
 
   public static Object proxy(Typing typing, Handler handler) {
@@ -93,7 +93,7 @@ public class Proxies {
   }
 
   private static boolean isPeelable(Class<?> type) {
-    return !isPublic(type) && isFromJdk(type) && isContainer(type);
+    return !isPublic(type.getModifiers()) && isFromJdk(type) && isContainer(type);
   }
 
   private static boolean isFromJdk(Class<?> type) {

@@ -1,5 +1,7 @@
 package org.testory;
 
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Objects.deepEquals;
 import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
@@ -8,8 +10,6 @@ import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
 import static org.testory.common.Classes.defaultValue;
 import static org.testory.common.Classes.hasMethod;
-import static org.testory.common.Classes.isFinal;
-import static org.testory.common.Classes.isStatic;
 import static org.testory.common.Classes.setAccessible;
 import static org.testory.common.Effect.returned;
 import static org.testory.common.Effect.returnedVoid;
@@ -93,7 +93,7 @@ public class Testory {
     setHistory(purge(mark(getHistory())));
     try {
       for (final Field field : test.getClass().getDeclaredFields()) {
-        if (!isStatic(field) && !isFinal(field)) {
+        if (!isStatic(field.getModifiers()) && !isFinal(field.getModifiers())) {
           setAccessible(field);
           if (deepEquals(defaultValue(field.getType()), field.get(test))) {
             check(canMockOrSample(field.getType()), "cannot inject field: " + field.getName());
