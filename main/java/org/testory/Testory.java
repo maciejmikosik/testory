@@ -696,6 +696,17 @@ public class Testory {
     thenCalledTimes(exactly(1), invocationMatcher);
   }
 
+  public static <T> T thenCalledNever(T mock) {
+    check(mock != null);
+    check(isMock(mock));
+    return thenCalledTimes(exactly(0), mock);
+  }
+
+  public static void thenCalledNever(InvocationMatcher invocationMatcher) {
+    check(invocationMatcher != null);
+    thenCalledTimes(exactly(0), invocationMatcher);
+  }
+
   public static <T> T thenCalledTimes(int number, T mock) {
     check(number >= 0);
     check(mock != null);
