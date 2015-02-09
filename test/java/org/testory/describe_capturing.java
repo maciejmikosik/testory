@@ -157,43 +157,6 @@ public class describe_capturing {
   }
 
   @Test
-  public void verification_checks_arguments() {
-    try {
-      thenCalled((Object) null);
-      fail();
-    } catch (TestoryException e) {}
-    try {
-      thenCalledTimes(1, (Object) null);
-      fail();
-    } catch (TestoryException e) {}
-    try {
-      thenCalledTimes(numberMatcher, (Object) null);
-      fail();
-    } catch (TestoryException e) {}
-    try {
-      thenCalledInOrder((Object) null);
-      fail();
-    } catch (TestoryException e) {}
-
-    try {
-      thenCalled(new Object());
-      fail();
-    } catch (TestoryException e) {}
-    try {
-      thenCalledTimes(1, new Object());
-      fail();
-    } catch (TestoryException e) {}
-    try {
-      thenCalledTimes(number(2), new Object());
-      fail();
-    } catch (TestoryException e) {}
-    try {
-      thenCalledInOrder(new Object());
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
   public void capturing_works_with_varargs() {
     given(willReturn(true), mock).varargs(object, object);
     assertFalse(mock.varargs(object));

@@ -85,7 +85,9 @@ public class describe_verifying {
     try {
       thenCalled((InvocationMatcher) null);
       fail();
-    } catch (TestoryException e) {}
+    } catch (TestoryException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("invocationMatcher != null"));
+    }
   }
 
   @Test
@@ -93,7 +95,19 @@ public class describe_verifying {
     try {
       thenCalled((Object) null);
       fail();
-    } catch (TestoryException e) {}
+    } catch (TestoryException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("mock != null"));
+    }
+  }
+
+  @Test
+  public void checks_that_mock_is_mock() {
+    try {
+      thenCalled(new Object());
+      fail();
+    } catch (TestoryException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("isMock(mock)"));
+    }
   }
 
   private static InvocationMatcher onInstance(final Object mock) {

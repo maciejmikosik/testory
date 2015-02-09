@@ -10,6 +10,7 @@ import static org.testory.Testory.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.proxy.InvocationMatcher;
 
 public class describe_verifying_in_order {
   private Mockable first, second, third;
@@ -120,10 +121,30 @@ public class describe_verifying_in_order {
   @Test
   public void checks_that_invocation_matcher_is_not_null() {
     try {
-      thenCalledInOrder(null);
+      thenCalledInOrder((InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {
       assertTrue(e.getMessage(), e.getMessage().contains("invocationMatcher != null"));
+    }
+  }
+
+  @Test
+  public void checks_that_mock_is_not_null() {
+    try {
+      thenCalledInOrder((Object) null);
+      fail();
+    } catch (TestoryException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("mock != null"));
+    }
+  }
+
+  @Test
+  public void checks_that_mock_is_mock() {
+    try {
+      thenCalledInOrder(new Object());
+      fail();
+    } catch (TestoryException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("isMock(mock)"));
     }
   }
 

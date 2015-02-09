@@ -89,7 +89,9 @@ public class describe_verifying_times_NumberMatcher {
     try {
       thenCalledTimes(number(1), (InvocationMatcher) null);
       fail();
-    } catch (TestoryException e) {}
+    } catch (TestoryException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("invocationMatcher != null"));
+    }
   }
 
   @Test
@@ -97,7 +99,19 @@ public class describe_verifying_times_NumberMatcher {
     try {
       thenCalledTimes(number(1), (Object) null);
       fail();
-    } catch (TestoryException e) {}
+    } catch (TestoryException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("mock != null"));
+    }
+  }
+
+  @Test
+  public void checks_that_mock_is_mock() {
+    try {
+      thenCalledTimes(number(1), new Object());
+      fail();
+    } catch (TestoryException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("isMock(mock)"));
+    }
   }
 
   private static InvocationMatcher onInstance(final Object mock) {
