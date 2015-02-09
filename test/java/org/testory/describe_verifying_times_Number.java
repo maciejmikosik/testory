@@ -3,14 +3,14 @@ package org.testory;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
-import static org.testory.Testory.thenCalled;
+import static org.testory.Testory.thenCalledTimes;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class describe_verification_times_InvocationMatcher {
+public class describe_verifying_times_Number {
   private Mockable mock;
 
   @Before
@@ -19,71 +19,65 @@ public class describe_verification_times_InvocationMatcher {
   }
 
   @Test
-  public void asserts_exactly_one_call() {
+  public void asserts_expected_number_of_calls() {
     mock.invoke();
-    thenCalled(onInstance(mock));
+    mock.invoke();
+    mock.invoke();
+    thenCalledTimes(3, onInstance(mock));
   }
 
   @Test
-  public void asserts_exactly_one_call_chained() {
+  public void asserts_expected_number_of_calls_chained() {
     mock.invoke();
-    thenCalled(mock).invoke();
+    mock.invoke();
+    mock.invoke();
+    thenCalledTimes(3, mock).invoke();
   }
 
   @Test
-  public void fails_if_no_calls() {
+  public void fails_if_unexpected_number_of_calls() {
+    mock.invoke();
+    mock.invoke();
     try {
-      thenCalled(onInstance(mock));
+      thenCalledTimes(3, onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {}
   }
 
   @Test
-  public void fails_if_no_calls_chained() {
+  public void fails_if_unexpected_number_of_calls_chained() {
+    mock.invoke();
+    mock.invoke();
     try {
-      thenCalled(mock).invoke();
+      thenCalledTimes(3, mock).invoke();
       fail();
     } catch (TestoryAssertionError e) {}
   }
 
   @Test
-  public void fails_if_more_calls() {
-    mock.invoke();
-    mock.invoke();
-    mock.invoke();
+  public void failure_prints_expected_number_of_calls() {
     try {
-      thenCalled(onInstance(mock));
-      fail();
-    } catch (TestoryAssertionError e) {}
-  }
-
-  @Test
-  public void fails_if_more_calls_chained() {
-    mock.invoke();
-    mock.invoke();
-    mock.invoke();
-    try {
-      thenCalled(mock).invoke();
-      fail();
-    } catch (TestoryAssertionError e) {}
-  }
-
-  @Test
-  public void failure_prints_that_exactly_one_call_was_expected() {
-    try {
-      thenCalled(onInstance(mock));
+      thenCalledTimes(3, onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
       assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "expected called times 1\n" //
+          + "expected called times " + 3 + "\n" //
       ));
     }
   }
 
   @Test
+  public void checks_that_number_of_calls_is_not_negative() {
+    try {
+      thenCalledTimes(-1, onInstance(mock));
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
   public void checks_that_invocation_matcher_is_not_null() {
     try {
-      thenCalled((InvocationMatcher) null);
+      thenCalledTimes(1, (InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {}
   }
@@ -91,7 +85,7 @@ public class describe_verification_times_InvocationMatcher {
   @Test
   public void checks_that_mock_is_not_null() {
     try {
-      thenCalled((Object) null);
+      thenCalledTimes(1, (Object) null);
       fail();
     } catch (TestoryException e) {}
   }

@@ -5,12 +5,14 @@ import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalledTimes;
 
+import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class describe_verification_times_Number_InvocationMatcher {
+public class describe_verifying_times_NumberMatcher {
   private Mockable mock;
 
   @Before
@@ -23,7 +25,7 @@ public class describe_verification_times_Number_InvocationMatcher {
     mock.invoke();
     mock.invoke();
     mock.invoke();
-    thenCalledTimes(3, onInstance(mock));
+    thenCalledTimes(number(3), onInstance(mock));
   }
 
   @Test
@@ -31,7 +33,7 @@ public class describe_verification_times_Number_InvocationMatcher {
     mock.invoke();
     mock.invoke();
     mock.invoke();
-    thenCalledTimes(3, mock).invoke();
+    thenCalledTimes(number(3), mock).invoke();
   }
 
   @Test
@@ -39,7 +41,7 @@ public class describe_verification_times_Number_InvocationMatcher {
     mock.invoke();
     mock.invoke();
     try {
-      thenCalledTimes(3, onInstance(mock));
+      thenCalledTimes(number(3), onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {}
   }
@@ -49,7 +51,7 @@ public class describe_verification_times_Number_InvocationMatcher {
     mock.invoke();
     mock.invoke();
     try {
-      thenCalledTimes(3, mock).invoke();
+      thenCalledTimes(number(3), mock).invoke();
       fail();
     } catch (TestoryAssertionError e) {}
   }
@@ -57,19 +59,27 @@ public class describe_verification_times_Number_InvocationMatcher {
   @Test
   public void failure_prints_expected_number_of_calls() {
     try {
-      thenCalledTimes(3, onInstance(mock));
+      thenCalledTimes(number(3), onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
       assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "expected called times " + 3 + "\n" //
+          + "expected called times " + number(3) + "\n" //
       ));
     }
   }
 
   @Test
-  public void checks_that_number_of_calls_is_not_negative() {
+  public void checks_that_number_matcher_is_matcher() {
     try {
-      thenCalledTimes(-1, onInstance(mock));
+      thenCalledTimes(new Object(), onInstance(mock));
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void checks_that_number_matcher_is_not_null() {
+    try {
+      thenCalledTimes(null, onInstance(mock));
       fail();
     } catch (TestoryException e) {}
   }
@@ -77,7 +87,7 @@ public class describe_verification_times_Number_InvocationMatcher {
   @Test
   public void checks_that_invocation_matcher_is_not_null() {
     try {
-      thenCalledTimes(1, (InvocationMatcher) null);
+      thenCalledTimes(number(1), (InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {}
   }
@@ -85,7 +95,7 @@ public class describe_verification_times_Number_InvocationMatcher {
   @Test
   public void checks_that_mock_is_not_null() {
     try {
-      thenCalledTimes(1, (Object) null);
+      thenCalledTimes(number(1), (Object) null);
       fail();
     } catch (TestoryException e) {}
   }
@@ -98,6 +108,19 @@ public class describe_verification_times_Number_InvocationMatcher {
 
       public String toString() {
         return "onInstance(" + mock + ")";
+      }
+    };
+  }
+
+  private static Object number(final Integer... numbers) {
+    return new Object() {
+      @SuppressWarnings("unused")
+      public boolean matches(Object item) {
+        return Arrays.asList(numbers).contains(item);
+      }
+
+      public String toString() {
+        return "number(" + Arrays.toString(numbers) + ")";
       }
     };
   }

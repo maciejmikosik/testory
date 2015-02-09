@@ -11,7 +11,7 @@ import static org.testory.Testory.when;
 import org.junit.Before;
 import org.junit.Test;
 
-public class describe_verification_in_order_InvocationMatcher {
+public class describe_verifying_in_order {
   private Mockable first, second, third;
 
   @Before
