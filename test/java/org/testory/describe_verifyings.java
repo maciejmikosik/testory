@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
@@ -7,24 +8,23 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
-import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.when;
 import static org.testory.test.Testilities.newObject;
-
-import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class describe_verification {
+public class describe_verifyings {
   private Object object;
   private Mockable mock;
   private Invocation invocation;
 
   @Before
   public void before() {
+    when("");
+    when("");
     object = newObject("object");
     mock = mock(Mockable.class);
   }
@@ -46,6 +46,17 @@ public class describe_verification {
   public void includes_invocations_before_when() {
     mock.invoke();
     when("do something");
+    thenCalled(onInstance(mock));
+  }
+
+  @Test
+  public void includes_invocations_inside_when_closure() {
+    when(new Closure() {
+      public Object invoke() throws Throwable {
+        mock.invoke();
+        return null;
+      }
+    });
     thenCalled(onInstance(mock));
   }
 
@@ -74,7 +85,23 @@ public class describe_verification {
     });
     assertSame(mock, invocation.instance);
     assertEquals(Mockable.class.getDeclaredMethod("acceptObject", Object.class), invocation.method);
-    assertEquals(Arrays.asList(object), invocation.arguments);
+    assertEquals(asList(object), invocation.arguments);
+  }
+
+  @Test
+  public void failure_prints_actual_number_of_calls() {
+    mock.invoke();
+    mock.invoke();
+    mock.invoke();
+    try {
+      thenCalled(onInstance(mock));
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("" //
+          + "  but called" + "\n" //
+          + "    times " + 3 + "\n" //
+      ));
+    }
   }
 
   @Test
@@ -82,26 +109,21 @@ public class describe_verification {
     mock.invoke();
     mock.acceptObject(object);
     try {
-      thenCalledTimes(0, onInstance(mock));
+      thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
       assertTrue(e.getMessage(), e.getMessage().contains("" //
           + "  actual invocations\n" //
-      ));
-      assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "    " + mock.toString() + ".invoke()\n" //
-          + "    " + mock.toString() + ".acceptObject(object)\n" //
+          + "    " + mock + ".invoke()\n" //
+          + "    " + mock + ".acceptObject(" + object + ")\n" //
       ));
     }
   }
 
   @Test
   public void failure_prints_special_message_if_no_actual_invocations() {
-    when("");
-    when("");
-    mock = mock(Mockable.class);
     try {
-      thenCalledTimes(1, onInstance(mock));
+      thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
       assertTrue(e.getMessage(), e.getMessage().contains("" //
@@ -114,16 +136,16 @@ public class describe_verification {
   @Test
   public void printing_failure_does_not_log_invocation_on_tostring() {
     mock.invoke();
-    mock.acceptObject(object);
+    mock.invoke();
     try {
-      thenCalledTimes(0, onInstance(mock));
+      thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {}
     try {
-      thenCalledTimes(0, onInstance(mock));
+      thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertFalse(e.getMessage(), e.getMessage().contains(mock.toString() + ".toString()"));
+      assertFalse(e.getMessage(), e.getMessage().contains(mock + ".toString()"));
     }
   }
 
