@@ -94,7 +94,7 @@ Notice that **when** in chained form catches any throwable. This prevents throwa
 **thenThrown** is overloaded to accept throwable instance, class or matcher.
 
 # Mocks
-[stubbing](#stubbing) | [verifying](#verifying) | [capturing](#capturing) | [spying](#spying)
+[stubbing](#stubbing) | [verifying](#verifying) | [matching invocations](#matching-invocations) | [spying](#spying)
 
 Any non-final class or interface can be mocked.
 
@@ -152,7 +152,7 @@ If you need to assert that invocations happened in order, use ordered verifying.
         thenCalledInOrder(mockDatabase).close();
 
 
-### Capturing
+### Matching Invocations
 
 You can take full control of matching invocations by implementing you own `InvocationMatcher`.
 
@@ -164,15 +164,23 @@ You can take full control of matching invocations by implementing you own `Invoc
         given(willReturn(object), onCondition);
         thenCalled(onCondition);
 
-Use factories for most common cases.
+Or use predefined factories for most common cases.
+
+ - To assert that specific number of invocations was called on mock.
+
+        thenCalledTimes(4, onInstance(mock));
 
  - To assert that no invocations was called on mock.
 
-        thenCalledTimes(0, onInstance(mock));
+        thenCalledNever(onInstance(mock));
 
  - To stub all invocations returning specified type. See [komarro library](https://code.google.com/p/komarro/) for explanation why would you want to do that.
 
         given(willReturn(person), onReturn(Person.class));
+
+ - To stub all invocations by return type and arguments.
+
+        given(willReturn(person), onRequest(Person.class, "username"));
 
 Use `any` if you do not care about argument value during stubbing or verification.
 
