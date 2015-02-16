@@ -154,7 +154,7 @@ If you need to assert that invocations happened in order, use ordered verifying.
 
 ### Matching Invocations
 
-You can take full control of matching invocations by implementing you own `InvocationMatcher`.
+You can take full control of matching invocations by implementing your own `InvocationMatcher`.
 
         InvocationMatcher onCondition = new InvocationMatcher() {
           public boolean matches(Invocation invocation) {
@@ -411,6 +411,6 @@ Purging has following consequences
 
 ### `NoClassDefFoundError`, package *** does not exist
 
-Testory uses `Thread.currentThread().getContextClassLoader()` to load classes generated for mocks. If you use you own classloader, it is your responsibility to properly set context classloader using `Thread.currentThread().setContextClassLoader()`. If you skip that, context classloader by default points out to system classloader (`ClassLoader.getSystemClassLoader()`).
+Testory uses `Thread.currentThread().getContextClassLoader()` to load classes generated for mocks. If you use your own classloader, it is your responsibility to properly set context classloader using `Thread.currentThread().setContextClassLoader()`. If you skip that, context classloader by default points out to system classloader (`ClassLoader.getSystemClassLoader()`).
 
 Solution is to remember to set context classloader to be same as or child of classloader that loaded testory library.
