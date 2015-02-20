@@ -104,9 +104,9 @@ Newly created mock has following properties
  - all methods are stubbable, except finalize and final methods
  - mock is nice, returning null or binary zero for unstubbed methods
  - mock is conveniently prestubbed
-   - toString is stubbed to contain class name and unique ordinal
-   - equals is stubbed so mock is equal only to itself
-   - hashCode is stubbed to obey contract
+   - `toString` is stubbed to contain class name and unique ordinal
+   - `equals` is stubbed so mock is equal only to itself
+   - `hashCode` is stubbed to obey contract
 
 ### Stubbing
 
@@ -124,8 +124,8 @@ Stubbing will be only effective for specified instance of mock, method and equal
 
  - void method can be stubbed to "just return" using `willReturn(null)`
  - `willThrow` [fills in stack trace](http://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#fillInStackTrace()) upon throwing, `willRethrow` does not
- - returning object incompatible with method return type causes `TestoryException` upon invocation
- - throwing throwable incompatible with method declaration causes `TestoryException` upon invocation
+ - returning `Object` incompatible with method return type causes `TestoryException` upon invocation
+ - throwing `Throwable` incompatible with method declaration causes `TestoryException` upon invocation
 
 ### Verifying
 
