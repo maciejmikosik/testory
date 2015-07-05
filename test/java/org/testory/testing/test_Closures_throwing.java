@@ -2,13 +2,13 @@ package org.testory.testing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.testory.testing.Testilities.throwing;
+import static org.testory.testing.Closures.throwing;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.Closure;
 
-public class test_Testilities_throwing {
+public class test_Closures_throwing {
   private Throwable throwable;
   private Closure closure;
 

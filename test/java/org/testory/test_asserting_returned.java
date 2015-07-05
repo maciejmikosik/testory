@@ -4,15 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.when;
+import static org.testory.testing.Closures.returning;
+import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Testilities.newObject;
 import static org.testory.testing.Testilities.newThrowable;
 import static org.testory.testing.Testilities.printStackTrace;
-import static org.testory.testing.Testilities.returning;
-import static org.testory.testing.Testilities.throwing;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.testing.Testilities.Invoker;
+import org.testory.testing.Closures.Invoker;
 
 public class test_asserting_returned {
   private String name;

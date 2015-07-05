@@ -1,13 +1,13 @@
 package org.testory.testing;
 
 import static org.junit.Assert.assertEquals;
-import static org.testory.testing.Testilities.returning;
+import static org.testory.testing.Closures.returning;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.Closure;
 
-public class test_Testilities_returning {
+public class test_Closures_returning {
   private Object object;
   private Closure closure;
 
