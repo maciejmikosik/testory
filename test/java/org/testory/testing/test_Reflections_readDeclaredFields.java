@@ -1,13 +1,13 @@
 package org.testory.testing;
 
 import static org.junit.Assert.assertEquals;
-import static org.testory.testing.Testilities.readDeclaredFields;
+import static org.testory.testing.Reflections.readDeclaredFields;
 
 import java.util.Arrays;
 
 import org.junit.Test;
 
-public class test_Testilities_readDeclaredFields {
+public class test_Reflections_readDeclaredFields {
   @SuppressWarnings("unused")
   @Test
   public void should_read_fields() {

@@ -13,7 +13,7 @@ import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.willReturn;
-import static org.testory.testing.Testilities.readDeclaredFields;
+import static org.testory.testing.Reflections.readDeclaredFields;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
