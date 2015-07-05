@@ -9,8 +9,8 @@ import static org.testory.Testory.spy;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.willReturn;
 import static org.testory.Testory.willSpy;
-import static org.testory.test.Testilities.newObject;
-import static org.testory.test.Testilities.newThrowable;
+import static org.testory.testing.Testilities.newObject;
+import static org.testory.testing.Testilities.newThrowable;
 
 import org.junit.Before;
 import org.junit.Test;

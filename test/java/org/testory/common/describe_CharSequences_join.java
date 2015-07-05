@@ -3,7 +3,7 @@ package org.testory.common;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.testory.common.CharSequences.join;
-import static org.testory.test.Testilities.newObject;
+import static org.testory.testing.Testilities.newObject;
 
 import org.junit.Before;
 import org.junit.Test;

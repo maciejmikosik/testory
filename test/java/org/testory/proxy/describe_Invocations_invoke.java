@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
-import static org.testory.test.Testilities.newObject;
+import static org.testory.testing.Testilities.newObject;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

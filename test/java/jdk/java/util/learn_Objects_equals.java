@@ -2,7 +2,7 @@ package jdk.java.util;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.testory.test.Testilities.newObject;
+import static org.testory.testing.Testilities.newObject;
 
 import java.util.Objects;
 

@@ -1,11 +1,11 @@
-package org.testory.test;
+package org.testory.testing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.testory.test.Testilities.newObject;
+import static org.testory.testing.Testilities.newObject;
 
 import org.junit.Before;
 import org.junit.Test;

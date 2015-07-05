@@ -6,8 +6,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.when;
-import static org.testory.test.Testilities.here;
-import static org.testory.test.Testilities.nextLine;
+import static org.testory.testing.Testilities.here;
+import static org.testory.testing.Testilities.nextLine;
 
 import org.junit.Test;
 

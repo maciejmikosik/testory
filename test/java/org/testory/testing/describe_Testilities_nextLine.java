@@ -1,7 +1,7 @@
-package org.testory.test;
+package org.testory.testing;
 
 import static org.junit.Assert.assertEquals;
-import static org.testory.test.Testilities.nextLine;
+import static org.testory.testing.Testilities.nextLine;
 
 import org.junit.Before;
 import org.junit.Test;

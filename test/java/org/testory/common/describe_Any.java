@@ -8,7 +8,7 @@ import static org.junit.Assert.fail;
 import static org.testory.common.Any.a;
 import static org.testory.common.Any.any;
 import static org.testory.common.Any.the;
-import static org.testory.test.Testilities.newObject;
+import static org.testory.testing.Testilities.newObject;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -7,10 +7,10 @@ import static org.testory.Testory.then;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
-import static org.testory.test.Testilities.newObject;
-import static org.testory.test.Testilities.newThrowable;
-import static org.testory.test.Testilities.returning;
-import static org.testory.test.Testilities.throwing;
+import static org.testory.testing.Testilities.newObject;
+import static org.testory.testing.Testilities.newThrowable;
+import static org.testory.testing.Testilities.returning;
+import static org.testory.testing.Testilities.throwing;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;

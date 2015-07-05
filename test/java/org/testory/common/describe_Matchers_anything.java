@@ -2,7 +2,7 @@ package org.testory.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.testory.test.Testilities.newObject;
+import static org.testory.testing.Testilities.newObject;
 
 import org.junit.Before;
 import org.junit.Test;

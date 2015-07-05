@@ -5,7 +5,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.givenTimes;
-import static org.testory.test.Testilities.returning;
+import static org.testory.testing.Testilities.returning;
 
 import java.util.concurrent.Callable;
 

@@ -7,8 +7,8 @@ import static org.junit.Assert.fail;
 import static org.testory.Testory.willRethrow;
 import static org.testory.Testory.willReturn;
 import static org.testory.Testory.willThrow;
-import static org.testory.test.Testilities.newObject;
-import static org.testory.test.Testilities.newThrowable;
+import static org.testory.testing.Testilities.newObject;
+import static org.testory.testing.Testilities.newThrowable;
 
 import java.util.Arrays;
 

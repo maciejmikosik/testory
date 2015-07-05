@@ -1,4 +1,4 @@
-package org.testory.test;
+package org.testory.testing;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

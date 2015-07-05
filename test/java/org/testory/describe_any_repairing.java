@@ -8,7 +8,7 @@ import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
-import static org.testory.test.Testilities.newObject;
+import static org.testory.testing.Testilities.newObject;
 
 import org.junit.After;
 import org.junit.Before;
