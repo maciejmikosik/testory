@@ -1,78 +1,84 @@
 #!/bin/bash -e
 
-BUILD_DIR=`dirname ${0}`
-cd "${BUILD_DIR}/.."
-MAIN=`pwd`
+HERE=`dirname ${0}`
+cd "${HERE}/../.."
+PROJECT=`pwd`
+	MAIN="${PROJECT}/main"
+		 RUN="${MAIN}/build"
+		JAVA="${MAIN}/java"
+		 JAR="${MAIN}/jar"
+		SINK="${MAIN}/sink"
+			DRAFT="${SINK}/draft"
 
 #cleanup
 rm \
   --recursive \
   --force \
-  ./sink/building
+  ${DRAFT}
 
 #compile
 mkdir \
   --parents \
-  ./sink/building
+  ${DRAFT}
 javac \
-  -classpath "./jar/cglib-nodep-2.2.3.jar:./jar/objenesis-2.0.jar" \
-  -sourcepath "./java" \
+  -classpath "${JAR}/cglib-nodep-2.2.3.jar:${JAR}/objenesis-2.0.jar" \
+  -sourcepath "${JAVA}" \
   -source 1.7 \
   -target 1.7 \
-  -d "./sink/building" \
-  ./java/org/testory/Testory.java
+  -d "${DRAFT}" \
+  "${JAVA}/org/testory/Testory.java"
 
 #copy sources
 cp \
   --recursive \
-  ./java/. \
-  ./sink/building
+  "${JAVA}/." \
+  "${DRAFT}"
 
 #copy dependencies
 unzip \
   -q \
-  ./jar/cglib-nodep-2.2.3.jar \
-  -d ./sink/building \
+  "${JAR}/cglib-nodep-2.2.3.jar" \
+  -d "${DRAFT}" \
   net/*
 unzip \
   -q \
-  ./jar/objenesis-2.0.jar \
-  -d ./sink/building \
+  "${JAR}/objenesis-2.0.jar" \
+  -d "${DRAFT}" \
   org/*
 
 #copy license files
 cp \
   --recursive \
-  ./build/license/. \
-  ./sink/building
+  "${RUN}/license/." \
+  "${DRAFT}"
 
 #zip jar
-cd ./sink/building
+cd ${DRAFT}
 zip \
   --quiet \
   --recurse-paths \
   ./testory.jar \
   ./*
-cd $MAIN
+cd "${PROJECT}"
 
 #refactor dependencies
 java \
-  -jar ./build/jarjar-1.4.jar \
-  process ./build/jarjar-rules.txt \
-  ./sink/building/testory.jar \
-  ./sink/building/testory.jar
+  -jar "${RUN}/jarjar-1.4.jar" \
+  process "${RUN}/jarjar-rules.txt" \
+  "${DRAFT}/testory.jar" \
+  "${DRAFT}/testory.jar"
 
 #copy testory.jar
 cp \
-  ./sink/building/testory.jar \
-  ./sink
+  "${DRAFT}/testory.jar" \
+  "${SINK}"
 
 echo ""
 echo "BUILD SUCCESSFUL"
-echo "created $MAIN/sink/testory.jar"
+echo "created ${SINK}/testory.jar"
 
 #cleanup
 rm \
   --recursive \
   --force \
-  ./sink/building
+  "${DRAFT}"
