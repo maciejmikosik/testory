@@ -30,12 +30,12 @@ public class describe_asserting {
       then(false);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected\n" //
-          + "    true\n" //
-          + "  but was\n" //
-          + "    false\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected\n"
+          + "    true\n"
+          + "  but was\n"
+          + "    false\n"
+          , e.getMessage());
     }
   }
 
@@ -52,12 +52,12 @@ public class describe_asserting {
       then(otherObject, matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected\n" //
-          + "    " + matcher + "\n" //
-          + "  but was\n" //
-          + "    " + otherObject + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected\n"
+          + "    " + matcher + "\n"
+          + "  but was\n"
+          + "    " + otherObject + "\n"
+          , e.getMessage());
     }
   }
 
@@ -82,12 +82,12 @@ public class describe_asserting {
       thenEqual(otherObject, object);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected\n" //
-          + "    " + object + "\n" //
-          + "  but was\n" //
-          + "    " + otherObject + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected\n"
+          + "    " + object + "\n"
+          + "  but was\n"
+          + "    " + otherObject + "\n"
+          , e.getMessage());
     }
   }
 
@@ -97,12 +97,12 @@ public class describe_asserting {
       thenEqual(object, null);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected\n" //
-          + "    null\n" //
-          + "  but was\n" //
-          + "    " + object + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected\n"
+          + "    null\n"
+          + "  but was\n"
+          + "    " + object + "\n"
+          , e.getMessage());
     }
   }
 
@@ -112,12 +112,12 @@ public class describe_asserting {
       thenEqual(null, object);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected\n" //
-          + "    " + object + "\n" //
-          + "  but was\n" //
-          + "    null\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected\n"
+          + "    " + object + "\n"
+          + "  but was\n"
+          + "    null\n"
+          , e.getMessage());
     }
   }
 

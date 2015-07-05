@@ -37,10 +37,10 @@ public class TestoryException extends RuntimeException {
   private static TestoryException decorate(String message, TestoryException exception) {
     StackTraceElement[] trace = exception.getStackTrace();
     StackTraceElement[] digestTrace = array(findPrecondition(trace), findCaller(trace));
-    String decoratedMessage = "" //
-        + "\n" //
-        + "  " + message + "\n" //
-        + "  failed precondition\n" //
+    String decoratedMessage = ""
+        + "\n"
+        + "  " + message + "\n"
+        + "  failed precondition\n"
         + "    " + trimCondition(sourceLine(findPrecondition(trace))) + "\n";
     TestoryException decorated = new TestoryException(decoratedMessage, exception);
     decorated.setStackTrace(digestTrace);

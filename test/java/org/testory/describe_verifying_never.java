@@ -53,9 +53,8 @@ public class describe_verifying_never {
       thenCalledNever(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "expected called times " + 0 + "\n" //
-      ));
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "expected called times " + 0 + "\n"));
     }
   }
 

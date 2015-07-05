@@ -22,10 +22,10 @@ public class describe_TestoryException {
       mock(null);
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage(), e.getMessage().matches("" //
-          + "\n" //
-          + "  illegal testory usage\n" //
-          + "  failed precondition\n" //
+      assertTrue(e.getMessage(), e.getMessage().matches(""
+          + "\n"
+          + "  illegal testory usage\n"
+          + "  failed precondition\n"
           + "    .*\n"));
     }
   }

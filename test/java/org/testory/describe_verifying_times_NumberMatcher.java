@@ -62,9 +62,8 @@ public class describe_verifying_times_NumberMatcher {
       thenCalledTimes(number(3), onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "expected called times " + number(3) + "\n" //
-      ));
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "expected called times " + number(3) + "\n"));
     }
   }
 

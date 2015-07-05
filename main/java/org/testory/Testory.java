@@ -539,11 +539,10 @@ public class Testory {
           && effect instanceof ReturnedObject
           ? tryFormatDiagnosis(objectOrMatcher, ((ReturnedObject) effect).object)
           : "";
-      throw assertionError("\n" //
-          + formatSection("expected returned", objectOrMatcher) //
-          + formatBut(effect) //
-          + diagnosis //
-      );
+      throw assertionError("\n"
+          + formatSection("expected returned", objectOrMatcher)
+          + formatBut(effect)
+          + diagnosis);
     }
   }
 
@@ -583,8 +582,8 @@ public class Testory {
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Returned;
     if (!expected) {
-      throw assertionError("\n" //
-          + formatSection("expected returned", "") //
+      throw assertionError("\n"
+          + formatSection("expected returned", "")
           + formatBut(effect));
     }
   }
@@ -599,11 +598,10 @@ public class Testory {
       String diagnosis = effect instanceof Thrown
           ? tryFormatDiagnosis(matcher, ((Thrown) effect).throwable)
           : "";
-      throw assertionError("\n" //
-          + formatSection("expected thrown", matcher) //
-          + formatBut(effect) //
-          + diagnosis //
-      );
+      throw assertionError("\n"
+          + formatSection("expected thrown", matcher)
+          + formatBut(effect)
+          + diagnosis);
     }
   }
 
@@ -613,8 +611,8 @@ public class Testory {
     boolean expected = effect instanceof Thrown
         && deepEquals(throwable, ((Thrown) effect).throwable);
     if (!expected) {
-      throw assertionError("\n" //
-          + formatSection("expected thrown", throwable) //
+      throw assertionError("\n"
+          + formatSection("expected thrown", throwable)
           + formatBut(effect));
     }
   }
@@ -624,8 +622,8 @@ public class Testory {
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown && type.isInstance(((Thrown) effect).throwable);
     if (!expected) {
-      throw assertionError("\n" //
-          + formatSection("expected thrown", type.getName()) //
+      throw assertionError("\n"
+          + formatSection("expected thrown", type.getName())
           + formatBut(effect));
     }
   }
@@ -634,8 +632,8 @@ public class Testory {
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown;
     if (!expected) {
-      throw assertionError("\n" //
-          + formatSection("expected thrown", "") //
+      throw assertionError("\n"
+          + formatSection("expected thrown", "")
           + formatBut(effect));
     }
   }
@@ -651,16 +649,16 @@ public class Testory {
         ? effect instanceof ReturnedObject
             ? formatSection("but returned", ((ReturnedObject) effect).object)
             : formatSection("but returned", "void")
-        : "" //
-            + formatSection("but thrown", ((Thrown) effect).throwable) //
-            + "\n" //
+        : ""
+            + formatSection("but thrown", ((Thrown) effect).throwable)
+            + "\n"
             + printStackTrace(((Thrown) effect).throwable);
   }
 
   public static void then(boolean condition) {
     if (!condition) {
-      throw assertionError("\n" //
-          + formatSection("expected", "true") //
+      throw assertionError("\n"
+          + formatSection("expected", "true")
           + formatSection("but was", "false"));
     }
   }
@@ -669,18 +667,17 @@ public class Testory {
     check(matcher != null);
     check(isMatcher(matcher));
     if (!asMatcher(matcher).matches(object)) {
-      throw assertionError("\n" //
-          + formatSection("expected", matcher) //
-          + formatSection("but was", object) //
-          + tryFormatDiagnosis(matcher, object)) //
-      ;
+      throw assertionError("\n"
+          + formatSection("expected", matcher)
+          + formatSection("but was", object)
+          + tryFormatDiagnosis(matcher, object));
     }
   }
 
   public static void thenEqual(@Nullable Object object, @Nullable Object expected) {
     if (!deepEquals(object, expected)) {
-      throw assertionError("\n" //
-          + formatSection("expected", expected) //
+      throw assertionError("\n"
+          + formatSection("expected", expected)
           + formatSection("but was", object));
     }
   }
@@ -747,11 +744,10 @@ public class Testory {
     }
     boolean expected = asMatcher(numberMatcher).matches(numberOfCalls);
     if (!expected) {
-      throw assertionError("\n" //
-          + formatSection("expected called times " + numberMatcher, invocationMatcher) //
-          + formatSection("but called", "times " + numberOfCalls) //
-          + formatCallings(history)) //
-      ;
+      throw assertionError("\n"
+          + formatSection("expected called times " + numberMatcher, invocationMatcher)
+          + formatSection("but called", "times " + numberOfCalls)
+          + formatCallings(history));
     }
   }
 
@@ -774,11 +770,10 @@ public class Testory {
     if (verified.isPresent()) {
       setHistory(verified.get());
     } else {
-      throw assertionError("\n" //
-          + formatSection("expected called in order", invocationMatcher) //
-          + "  but not called\n" //
-          + formatCallings(history)) //
-      ;
+      throw assertionError("\n"
+          + formatSection("expected called in order", invocationMatcher)
+          + "  but not called\n"
+          + formatCallings(history));
     }
   }
 
@@ -807,8 +802,8 @@ public class Testory {
   }
 
   private static String formatSection(String caption, @Nullable Object content) {
-    return "" //
-        + "  " + caption + "\n" //
+    return ""
+        + "  " + caption + "\n"
         + "    " + print(content) + "\n";
   }
 

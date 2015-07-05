@@ -97,10 +97,9 @@ public class describe_verifyings {
       thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "  but called" + "\n" //
-          + "    times " + 3 + "\n" //
-      ));
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "  but called" + "\n"
+          + "    times " + 3 + "\n"));
     }
   }
 
@@ -112,11 +111,10 @@ public class describe_verifyings {
       thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "  actual invocations\n" //
-          + "    " + mock + ".invoke()\n" //
-          + "    " + mock + ".acceptObject(" + object + ")\n" //
-      ));
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "  actual invocations\n"
+          + "    " + mock + ".invoke()\n"
+          + "    " + mock + ".acceptObject(" + object + ")\n"));
     }
   }
 
@@ -126,10 +124,9 @@ public class describe_verifyings {
       thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "  actual invocations\n" //
-          + "    none\n" //
-      ));
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "  actual invocations\n"
+          + "    none\n"));
     }
   }
 

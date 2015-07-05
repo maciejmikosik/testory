@@ -110,11 +110,10 @@ public class describe_verifying_in_order {
       thenCalledInOrder(onInstance(first));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "  expected called in order\n" //
-          + "    " + onInstance(first) + "\n" //
-          + "  but not called\n" //
-      ));
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "  expected called in order\n"
+          + "    " + onInstance(first) + "\n"
+          + "  but not called\n"));
     }
   }
 
