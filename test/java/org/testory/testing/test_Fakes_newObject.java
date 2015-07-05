@@ -5,12 +5,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.testory.testing.Testilities.newObject;
+import static org.testory.testing.Fakes.newObject;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class test_Testilities_newObject {
+public class test_Fakes_newObject {
   private String name, otherName;
   private Object object, otherObject;
 

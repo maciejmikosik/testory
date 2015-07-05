@@ -6,7 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.common.Matchers.listOf;
-import static org.testory.testing.Testilities.newObject;
+import static org.testory.testing.Fakes.newObject;
 
 import java.util.ArrayList;
 import java.util.List;

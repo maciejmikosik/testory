@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isMatcher;
-import static org.testory.testing.Testilities.newObject;
+import static org.testory.testing.Fakes.newObject;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -3,12 +3,12 @@ package org.testory.testing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.testory.testing.Testilities.newThrowable;
+import static org.testory.testing.Fakes.newThrowable;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class test_Testilities_newThrowable {
+public class test_Fakes_newThrowable {
   private String name;
   private Throwable throwable;
 

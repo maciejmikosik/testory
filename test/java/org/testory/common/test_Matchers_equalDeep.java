@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.testory.common.Matchers.equalDeep;
-import static org.testory.testing.Testilities.newObject;
+import static org.testory.testing.Fakes.newObject;
 
 import org.junit.Before;
 import org.junit.Test;

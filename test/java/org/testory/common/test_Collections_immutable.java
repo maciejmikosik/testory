@@ -3,7 +3,7 @@ package org.testory.common;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.common.Collections.immutable;
-import static org.testory.testing.Testilities.newObject;
+import static org.testory.testing.Fakes.newObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;

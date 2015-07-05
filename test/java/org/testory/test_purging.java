@@ -9,7 +9,7 @@ import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
-import static org.testory.testing.Testilities.newObject;
+import static org.testory.testing.Fakes.newObject;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -15,8 +15,8 @@ import static org.testory.common.Classes.defaultValue;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Proxies.isProxiable;
 import static org.testory.proxy.Proxies.proxy;
-import static org.testory.testing.Testilities.newObject;
-import static org.testory.testing.Testilities.newThrowable;
+import static org.testory.testing.Fakes.newObject;
+import static org.testory.testing.Fakes.newThrowable;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

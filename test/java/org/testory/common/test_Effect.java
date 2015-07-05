@@ -8,8 +8,8 @@ import static org.junit.Assert.fail;
 import static org.testory.common.Effect.returned;
 import static org.testory.common.Effect.returnedVoid;
 import static org.testory.common.Effect.thrown;
-import static org.testory.testing.Testilities.newObject;
-import static org.testory.testing.Testilities.newThrowable;
+import static org.testory.testing.Fakes.newObject;
+import static org.testory.testing.Fakes.newThrowable;
 
 import org.junit.Before;
 import org.junit.Test;

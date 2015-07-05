@@ -10,7 +10,7 @@ import static org.testory.Testory.onInstance;
 import static org.testory.Testory.onRequest;
 import static org.testory.Testory.onReturn;
 import static org.testory.proxy.Invocation.invocation;
-import static org.testory.testing.Testilities.newObject;
+import static org.testory.testing.Fakes.newObject;
 
 import java.lang.reflect.Method;
 import java.util.List;
