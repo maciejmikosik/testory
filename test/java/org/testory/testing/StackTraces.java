@@ -3,8 +3,7 @@ package org.testory.testing;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class Testilities {
-
+public class StackTraces {
   public static String printStackTrace(Throwable throwable) {
     StringWriter writer = new StringWriter();
     throwable.printStackTrace(new PrintWriter(writer));

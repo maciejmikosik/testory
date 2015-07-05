@@ -2,14 +2,14 @@ package org.testory.testing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.testory.testing.Testilities.printStackTrace;
+import static org.testory.testing.StackTraces.printStackTrace;
 
 import java.io.PrintWriter;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class test_Testilities_printStackTrace {
+public class test_StackTraces_printStackTrace {
   private String string;
   private Throwable throwable;
 

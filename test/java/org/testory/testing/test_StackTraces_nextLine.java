@@ -1,12 +1,12 @@
 package org.testory.testing;
 
 import static org.junit.Assert.assertEquals;
-import static org.testory.testing.Testilities.nextLine;
+import static org.testory.testing.StackTraces.nextLine;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class test_Testilities_nextLine {
+public class test_StackTraces_nextLine {
   private String className;
   private String methodName;
   private String fileName;

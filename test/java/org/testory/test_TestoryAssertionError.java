@@ -7,8 +7,8 @@ import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.then;
 import static org.testory.Testory.thenCalled;
-import static org.testory.testing.Testilities.here;
-import static org.testory.testing.Testilities.nextLine;
+import static org.testory.testing.StackTraces.here;
+import static org.testory.testing.StackTraces.nextLine;
 
 import java.util.ArrayList;
 
