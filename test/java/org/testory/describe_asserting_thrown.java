@@ -62,14 +62,14 @@ public class describe_asserting_thrown {
       thenThrown(ExpectedThrowable.class);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + ExpectedThrowable.class.getName() + "\n" //
-          + "  but thrown\n" //
-          + "    " + throwable + "\n" //
-          + "\n" //
-          + printStackTrace(throwable) + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + ExpectedThrowable.class.getName() + "\n"
+          + "  but thrown\n"
+          + "    " + throwable + "\n"
+          + "\n"
+          + printStackTrace(throwable) + "\n"
+          , e.getMessage());
     }
 
     when(invoker).invoke(throwing(throwable));
@@ -77,14 +77,14 @@ public class describe_asserting_thrown {
       thenThrown(ExpectedThrowable.class);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + ExpectedThrowable.class.getName() + "\n" //
-          + "  but thrown\n" //
-          + "    " + throwable + "\n" //
-          + "\n" //
-          + printStackTrace(throwable) + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + ExpectedThrowable.class.getName() + "\n"
+          + "  but thrown\n"
+          + "    " + throwable + "\n"
+          + "\n"
+          + printStackTrace(throwable) + "\n"
+          , e.getMessage());
     }
   }
 
@@ -99,14 +99,14 @@ public class describe_asserting_thrown {
       thenThrown(ExpectedThrowable.class);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + ExpectedThrowable.class.getName() + "\n" //
-          + "  but thrown\n" //
-          + "    " + throwable + "\n" //
-          + "\n" //
-          + printStackTrace(throwable) + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + ExpectedThrowable.class.getName() + "\n"
+          + "  but thrown\n"
+          + "    " + throwable + "\n"
+          + "\n"
+          + printStackTrace(throwable) + "\n"
+          , e.getMessage());
     }
 
     when(invoker).invoke(throwing(throwable));
@@ -114,14 +114,14 @@ public class describe_asserting_thrown {
       thenThrown(ExpectedThrowable.class);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + ExpectedThrowable.class.getName() + "\n" //
-          + "  but thrown\n" //
-          + "    " + throwable + "\n" //
-          + "\n" //
-          + printStackTrace(throwable) + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + ExpectedThrowable.class.getName() + "\n"
+          + "  but thrown\n"
+          + "    " + throwable + "\n"
+          + "\n"
+          + printStackTrace(throwable) + "\n"
+          , e.getMessage());
     }
   }
 
@@ -141,14 +141,14 @@ public class describe_asserting_thrown {
       thenThrown(throwable);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + throwable + "\n" //
-          + "  but thrown\n" //
-          + "    " + otherThrowable + "\n" //
-          + "\n" //
-          + printStackTrace(otherThrowable) + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + throwable + "\n"
+          + "  but thrown\n"
+          + "    " + otherThrowable + "\n"
+          + "\n"
+          + printStackTrace(otherThrowable) + "\n"
+          , e.getMessage());
     }
 
     when(invoker).invoke(throwing(otherThrowable));
@@ -156,14 +156,14 @@ public class describe_asserting_thrown {
       thenThrown(throwable);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + throwable + "\n" //
-          + "  but thrown\n" //
-          + "    " + otherThrowable + "\n" //
-          + "\n" //
-          + printStackTrace(otherThrowable) + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + throwable + "\n"
+          + "  but thrown\n"
+          + "    " + otherThrowable + "\n"
+          + "\n"
+          + printStackTrace(otherThrowable) + "\n"
+          , e.getMessage());
     }
   }
 
@@ -187,14 +187,14 @@ public class describe_asserting_thrown {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + matcher + "\n" //
-          + "  but thrown\n" //
-          + "    " + otherThrowable + "\n" //
-          + "\n" //
-          + printStackTrace(otherThrowable) + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + matcher + "\n"
+          + "  but thrown\n"
+          + "    " + otherThrowable + "\n"
+          + "\n"
+          + printStackTrace(otherThrowable) + "\n"
+          , e.getMessage());
     }
 
     when(invoker).invoke(throwing(otherThrowable));
@@ -202,14 +202,14 @@ public class describe_asserting_thrown {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + matcher + "\n" //
-          + "  but thrown\n" //
-          + "    " + otherThrowable + "\n" //
-          + "\n" //
-          + printStackTrace(otherThrowable) + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + matcher + "\n"
+          + "  but thrown\n"
+          + "    " + otherThrowable + "\n"
+          + "\n"
+          + printStackTrace(otherThrowable) + "\n"
+          , e.getMessage());
     }
   }
 
@@ -232,12 +232,12 @@ public class describe_asserting_thrown {
       thenThrown(ExpectedThrowable.class);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + ExpectedThrowable.class.getName() + "\n" //
-          + "  but returned\n" //
-          + "    " + object + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + ExpectedThrowable.class.getName() + "\n"
+          + "  but returned\n"
+          + "    " + object + "\n"
+          , e.getMessage());
     }
 
     when(invoker).invoke(returning(object));
@@ -245,12 +245,12 @@ public class describe_asserting_thrown {
       thenThrown(ExpectedThrowable.class);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + ExpectedThrowable.class.getName() + "\n" //
-          + "  but returned\n" //
-          + "    " + object + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + ExpectedThrowable.class.getName() + "\n"
+          + "  but returned\n"
+          + "    " + object + "\n"
+          , e.getMessage());
     }
 
     when(new Runnable() {
@@ -260,24 +260,24 @@ public class describe_asserting_thrown {
       thenThrown(ExpectedThrowable.class);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + ExpectedThrowable.class.getName() + "\n" //
-          + "  but returned\n" //
-          + "    void\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + ExpectedThrowable.class.getName() + "\n"
+          + "  but returned\n"
+          + "    void\n"
+          , e.getMessage());
     }
     when(returning(object));
     try {
       thenThrown(throwable);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + throwable + "\n" //
-          + "  but returned\n" //
-          + "    " + object + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + throwable + "\n"
+          + "  but returned\n"
+          + "    " + object + "\n"
+          , e.getMessage());
     }
 
     when(invoker).invoke(returning(object));
@@ -285,12 +285,12 @@ public class describe_asserting_thrown {
       thenThrown(throwable);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + throwable + "\n" //
-          + "  but returned\n" //
-          + "    " + object + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + throwable + "\n"
+          + "  but returned\n"
+          + "    " + object + "\n"
+          , e.getMessage());
     }
 
     when(new Runnable() {
@@ -300,12 +300,12 @@ public class describe_asserting_thrown {
       thenThrown(throwable);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + throwable + "\n" //
-          + "  but returned\n" //
-          + "    void\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + throwable + "\n"
+          + "  but returned\n"
+          + "    void\n"
+          , e.getMessage());
     }
 
     when(returning(object));
@@ -313,12 +313,12 @@ public class describe_asserting_thrown {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + matcher + "\n" //
-          + "  but returned\n" //
-          + "    " + object + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + matcher + "\n"
+          + "  but returned\n"
+          + "    " + object + "\n"
+          , e.getMessage());
     }
 
     when(invoker).invoke(returning(object));
@@ -326,12 +326,12 @@ public class describe_asserting_thrown {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + matcher + "\n" //
-          + "  but returned\n" //
-          + "    " + object + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + matcher + "\n"
+          + "  but returned\n"
+          + "    " + object + "\n"
+          , e.getMessage());
     }
 
     when(new Runnable() {
@@ -341,12 +341,12 @@ public class describe_asserting_thrown {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    " + matcher + "\n" //
-          + "  but returned\n" //
-          + "    void\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + matcher + "\n"
+          + "  but returned\n"
+          + "    void\n"
+          , e.getMessage());
     }
 
     when(returning(object));
@@ -354,12 +354,12 @@ public class describe_asserting_thrown {
       thenThrown();
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    \n" //
-          + "  but returned\n" //
-          + "    " + object + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    \n"
+          + "  but returned\n"
+          + "    " + object + "\n"
+          , e.getMessage());
     }
 
     when(invoker).invoke(returning(object));
@@ -367,12 +367,12 @@ public class describe_asserting_thrown {
       thenThrown();
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    \n" //
-          + "  but returned\n" //
-          + "    " + object + "\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    \n"
+          + "  but returned\n"
+          + "    " + object + "\n"
+          , e.getMessage());
     }
 
     when(new Runnable() {
@@ -382,12 +382,12 @@ public class describe_asserting_thrown {
       thenThrown();
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n" //
-          + "  expected thrown\n" //
-          + "    \n" //
-          + "  but returned\n" //
-          + "    void\n" //
-      , e.getMessage());
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    \n"
+          + "  but returned\n"
+          + "    void\n"
+          , e.getMessage());
     }
 
   }

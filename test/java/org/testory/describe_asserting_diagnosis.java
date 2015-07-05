@@ -56,10 +56,9 @@ public class describe_asserting_diagnosis {
       then(object, matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "  diagnosis\n" //
-          + "    " + mismatch + "\n" //
-      ));
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "  diagnosis\n"
+          + "    " + mismatch + "\n"));
     }
   }
 
@@ -73,10 +72,9 @@ public class describe_asserting_diagnosis {
       thenReturned(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "  diagnosis\n" //
-          + "    " + mismatch + "\n" //
-      ));
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "  diagnosis\n"
+          + "    " + mismatch + "\n"));
     }
   }
 
@@ -101,10 +99,9 @@ public class describe_asserting_diagnosis {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "  diagnosis\n" //
-          + "    " + mismatch + "\n" //
-      ));
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "  diagnosis\n"
+          + "    " + mismatch + "\n"));
     }
   }
 

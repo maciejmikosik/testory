@@ -74,9 +74,8 @@ public class describe_verifying {
       thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("" //
-          + "expected called times 1\n" //
-      ));
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "expected called times 1\n"));
     }
   }
 

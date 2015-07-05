@@ -74,7 +74,7 @@ public class describe_invocation_matchers {
   public void invocation_matchers_are_printable() {
     assertEquals("onInstance(" + mock + ")", onInstance(mock).toString());
     assertEquals("onReturn(" + type.getName() + ")", onReturn(type).toString());
-    assertEquals("onRequest(" + type.getName() + ", " + argument + ")", //
+    assertEquals("onRequest(" + type.getName() + ", " + argument + ")",
         onRequest(type, argument).toString());
     assertEquals("onRequest(" + type.getName() + ")", onRequest(type).toString());
   }
