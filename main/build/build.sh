@@ -10,16 +10,17 @@ PROJECT=`pwd`
 		SINK="${MAIN}/sink"
 			DRAFT="${SINK}/draft"
 
-#cleanup
+########## CLEANUP ##########
 rm \
   --recursive \
   --force \
   ${DRAFT}
 
-#compile
 mkdir \
   --parents \
   ${DRAFT}
+
+########## COMPILE SOURCES ##########
 javac \
   -classpath "${JAR}/cglib-nodep-2.2.3.jar:${JAR}/objenesis-2.0.jar" \
   -sourcepath "${JAVA}" \
@@ -28,13 +29,13 @@ javac \
   -d "${DRAFT}" \
   "${JAVA}/org/testory/Testory.java"
 
-#copy sources
+########## COPY SOURCES ##########
 cp \
   --recursive \
   "${JAVA}/." \
   "${DRAFT}"
 
-#copy dependencies
+########## COPY DEPENDENCIES ##########
 unzip \
   -q \
   "${JAR}/cglib-nodep-2.2.3.jar" \
@@ -46,13 +47,13 @@ unzip \
   -d "${DRAFT}" \
   org/*
 
-#copy license files
+########## COPY LICENSE FILES ##########
 cp \
   --recursive \
   "${RUN}/license/." \
   "${DRAFT}"
 
-#zip jar
+########## ZIP JAR ##########
 cd ${DRAFT}
 zip \
   --quiet \
@@ -61,14 +62,14 @@ zip \
   ./*
 cd "${PROJECT}"
 
-#refactor dependencies
+########## INLINE DEPENDENCIES ##########
 java \
   -jar "${RUN}/jarjar-1.4.jar" \
   process "${RUN}/jarjar-rules.txt" \
   "${DRAFT}/testory.jar" \
   "${DRAFT}/testory.jar"
 
-#copy testory.jar
+########## COPY PRODUCED JAR ##########
 cp \
   "${DRAFT}/testory.jar" \
   "${SINK}"
@@ -77,7 +78,7 @@ echo ""
 echo "BUILD SUCCESSFUL"
 echo "created ${SINK}/testory.jar"
 
-#cleanup
+########## CLEANUP ##########
 rm \
   --recursive \
   --force \
