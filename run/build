@@ -1,10 +1,10 @@
 #!/bin/bash -e
 
 HERE=`dirname ${0}`
-cd "${HERE}/../.."
+cd "${HERE}/.."
 PROJECT=`pwd`
+	RUN="${PROJECT}/run"
 	MAIN="${PROJECT}/main"
-		 RUN="${MAIN}/build"
 		JAVA="${MAIN}/java"
 		 JAR="${MAIN}/jar"
 		SINK="${MAIN}/sink"
