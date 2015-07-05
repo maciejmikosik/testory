@@ -22,7 +22,6 @@ public class Closures {
     };
   }
 
-  // TODO test Testilities.Invoker
   public static class Invoker {
     public Object invoke(Closure closure) throws Throwable {
       return closure.invoke();
