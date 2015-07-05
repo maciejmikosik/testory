@@ -4,11 +4,11 @@ HERE=`dirname ${0}`
 cd "${HERE}/.."
 PROJECT=`pwd`
 	RUN="${PROJECT}/run"
+	SINK="${PROJECT}/.sink"
+		DRAFT="${SINK}/draft"
 	MAIN="${PROJECT}/main"
 		JAVA="${MAIN}/java"
-		 JAR="${MAIN}/jar"
-		SINK="${MAIN}/sink"
-			DRAFT="${SINK}/draft"
+		JAR="${MAIN}/jar"
 
 ########## CLEANUP ##########
 rm \
