@@ -1,25 +1,26 @@
 package org.testory;
 
+import static java.util.Objects.deepEquals;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
-import static org.testory.Testory.mock;
 import static org.testory.Testory.willReturn;
+import static org.testory.common.Samples.sample;
 import static org.testory.testing.Reflections.readDeclaredFields;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -28,291 +29,52 @@ import org.testory.proxy.InvocationMatcher;
 
 public class test_injecting {
   private final String string = "string";
+  private List<Object> fields;
 
   @Test
-  public void injects_concrete_class() {
+  public void injects_mock_of_concrete_class() {
     class ConcreteClass {}
     class TestClass {
-      ConcreteClass field;
+      @SuppressWarnings("unused")
+      ConcreteClass a, b, c, d, e, f, g, h, i, j;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertTrue(test.field instanceof ConcreteClass);
+    assertContainsMocks(test);
   }
 
   @Test
-  public void injects_interface() {
+  public void injects_mock_of_interface() {
     class TestClass {
-      Interface field;
+      @SuppressWarnings("unused")
+      Interface a, b, c, d, e, f, g, h, i, j;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertTrue(test.field instanceof Interface);
+    assertContainsMocks(test);
   }
 
   @Test
-  public void injects_abstract_class() {
+  public void injects_mock_of_abstract_class() {
     abstract class AbstractClass {}
     class TestClass {
-      AbstractClass field;
+      @SuppressWarnings("unused")
+      AbstractClass a, b, c, d, e, f, g, h, i, j;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertTrue(test.field instanceof AbstractClass);
+    assertContainsMocks(test);
   }
 
   @Test
-  public void injects_object_class() {
+  public void injects_mock_of_object() {
     class TestClass {
-      Object field;
+      @SuppressWarnings("unused")
+      Object a, b, c, d, e, f, g, h, i, j;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertTrue(test.field instanceof Object);
-  }
-
-  @Test
-  public void mock_is_nice() {
-    class Foo {
-      Object getObject() {
-        throw new RuntimeException();
-      }
-
-      int getInt() {
-        throw new RuntimeException();
-      }
-
-      void getVoid() {
-        throw new RuntimeException();
-      }
-    }
-    Foo foo = mock(Foo.class);
-    assertNull(foo.getObject());
-    assertEquals(0, foo.getInt());
-    foo.getVoid();
-  }
-
-  @Test
-  public void to_string_is_prestubbed() {
-    class TestClass {
-      Object field;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    assertEquals("field", test.field.toString());
-  }
-
-  @Test
-  public void equals_is_prestubbed() {
-    class TestClass {
-      Object field, otherField;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    assertTrue(test.field.equals(test.field));
-    assertFalse(test.field.equals(test.otherField));
-    assertFalse(test.otherField.equals(test.field));
-    assertFalse(test.field.equals(null));
-  }
-
-  @Test
-  public void hashcode_is_prestubbed() {
-    class TestClass {
-      Object field, otherField;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    assertEquals(test.field.hashCode(), test.field.hashCode());
-    assertTrue(test.field.hashCode() != test.otherField.hashCode());
-  }
-
-  @Test
-  public void injected_mock_is_stubbable() {
-    class TestClass {
-      List<Object> field;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    given(willReturn(string), onInstance(test.field));
-    assertEquals(string, test.field.get(0));
-  }
-
-  @Test
-  public void injected_mock_is_restubbable() {
-    class TestClass {
-      Object field;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    given(willReturn(string), onInstance(test.field));
-    assertEquals(string, test.field.toString());
-  }
-
-  @Test
-  public void injects_boolean() {
-    @SuppressWarnings("unused")
-    class TestClass {
-      boolean p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
-      Boolean w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-
-    List<Object> fields = readDeclaredFields(test);
-    assertTrue(fields.contains(false));
-    assertTrue(fields.contains(true));
-  }
-
-  @Test
-  public void injects_character() {
-    @SuppressWarnings("unused")
-    class TestClass {
-      char p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
-      Character w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-
-    for (Object object : readDeclaredFields(test)) {
-      Character character = (Character) object;
-      assertTrue('a' <= character && character <= 'z');
-    }
-  }
-
-  @Test
-  public void injects_byte() {
-    @SuppressWarnings("unused")
-    class TestClass {
-      byte p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
-      Byte w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-
-    for (Object object : readDeclaredFields(test)) {
-      Byte number = (Byte) object;
-      assertTrue("" + number, 2 <= Math.abs(number) && Math.abs(number) <= 5);
-    }
-  }
-
-  @Test
-  public void injects_short() {
-    @SuppressWarnings("unused")
-    class TestClass {
-      short p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
-      Short w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-
-    for (Object object : readDeclaredFields(test)) {
-      Short number = (Short) object;
-      assertTrue("" + number, 2 <= Math.abs(number) && Math.abs(number) <= 31);
-    }
-  }
-
-  @Test
-  public void injects_integer() {
-    @SuppressWarnings("unused")
-    class TestClass {
-      int p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
-      Integer w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-
-    for (Object object : readDeclaredFields(test)) {
-      Integer number = (Integer) object;
-      assertTrue("" + number, 2 <= Math.abs(number) && Math.abs(number) <= 1290);
-    }
-  }
-
-  @Test
-  public void injects_long() {
-    @SuppressWarnings("unused")
-    class TestClass {
-      long p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
-      Long w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-
-    for (Object object : readDeclaredFields(test)) {
-      Long number = (Long) object;
-      assertTrue("" + number, 2 <= Math.abs(number) && Math.abs(number) <= 2097152);
-    }
-  }
-
-  @Test
-  public void injects_float() {
-    @SuppressWarnings("unused")
-    class TestClass {
-      float p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
-      Float w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-
-    for (Object object : readDeclaredFields(test)) {
-      Float number = (Float) object;
-      assertTrue("" + number,
-          Math.pow(2, -30) <= Math.abs(number) && Math.abs(number) <= Math.pow(2, 30));
-    }
-  }
-
-  @Test
-  public void injects_double() {
-    @SuppressWarnings("unused")
-    class TestClass {
-      double p0, p1, p2, p3, p4, p5, p6, p7, p8, p9;
-      Double w0, w1, w2, w3, w4, w5, w6, w7, w8, w9;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-
-    for (Object object : readDeclaredFields(test)) {
-      Double number = (Double) object;
-      assertTrue("" + number,
-          Math.pow(2, -300) <= Math.abs(number) && Math.abs(number) <= Math.pow(2, 300));
-    }
-  }
-
-  @Test
-  public void injects_string() {
-    class TestClass {
-      String field;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    assertEquals("field", test.field);
-  }
-
-  @Test
-  public void injects_array_of_primitives() {
-    class TestClass {
-      int[] ints;
-      Integer[] intWrappers;
-      float[] floats;
-      Float[] floatWrappers;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    assertNotEquals(0, test.ints[0]);
-    assertNotNull(test.intWrappers[0]);
-    assertNotEquals(0, test.floats[0]);
-    assertNotNull(test.floatWrappers[0]);
-  }
-
-  @Test
-  public void injects_array_of_strings() {
-    class TestClass {
-      String[] strings;
-      String[][] deepStrings;
-    }
-    TestClass test = new TestClass();
-    givenTest(test);
-    assertArrayEquals(new String[] { "strings[0]" }, test.strings);
-    assertArrayEquals(new String[][] { new String[] { "deepStrings[0][0]" } }, test.deepStrings);
+    assertContainsMocks(test);
   }
 
   @Test
@@ -337,41 +99,506 @@ public class test_injecting {
   }
 
   @Test
-  public void injects_reflection_classes() {
+  public void mock_to_string_is_prestubbed() {
     class TestClass {
-      Class<?> clazz;
-      Field field;
-      Method method;
-      Constructor<?> constructor;
+      Object field;
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertNotNull(test.clazz);
-    assertNotNull(test.field);
-    assertNotNull(test.method);
-    assertNotNull(test.constructor);
-    assertEquals(test.clazz, test.field.getDeclaringClass());
-    assertEquals(test.clazz, test.method.getDeclaringClass());
-    assertEquals(test.clazz, test.constructor.getDeclaringClass());
+    assertEquals("field", test.field.toString());
   }
 
   @Test
-  public void injects_enum() {
+  public void mock_equals_is_prestubbed() {
+    class TestClass {
+      Object field, otherField;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertTrue(test.field.equals(test.field));
+    assertFalse(test.field.equals(test.otherField));
+    assertFalse(test.otherField.equals(test.field));
+    assertFalse(test.field.equals(null));
+  }
+
+  @Test
+  public void mock_hashcode_is_prestubbed() {
+    class TestClass {
+      Object field, otherField;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertEquals(test.field.hashCode(), test.field.hashCode());
+    assertTrue(test.field.hashCode() != test.otherField.hashCode());
+  }
+
+  @Test
+  public void mock_is_stubbable() {
+    class TestClass {
+      List<Object> field;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    given(willReturn(string), onInstance(test.field));
+    assertEquals(string, test.field.get(0));
+  }
+
+  @Test
+  public void mock_is_restubbable() {
+    class TestClass {
+      Object field;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    given(willReturn(string), onInstance(test.field));
+    assertEquals(string, test.field.toString());
+  }
+
+  @Test
+  public void injects_sample_boolean() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      boolean a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Boolean() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      boolean a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_char() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      char a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Character() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Character a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_byte() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      byte a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Byte() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Byte a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_short() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      short a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Short() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Short a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_int() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      int a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Integer() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Integer a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_long() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      long a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Long() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Long a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_float() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      float a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Float() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Float a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_double() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      double a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Double() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Double a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_string() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      String a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Class() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Class<?> a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Field() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Field a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Method() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Method a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Constructor() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Constructor<?> a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainsSamples(test);
+  }
+
+  @Test
+  public void injects_sample_boolean_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      boolean[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Boolean_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Boolean[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_char_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      char[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Character_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Character[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_byte_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      byte[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Byte_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Byte[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_short_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      short[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Short_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Short[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_int_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      int[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Integer_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Integer[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_long_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      long[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Long_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Long[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_float_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      float[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Float_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Float[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_double_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      double[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_Double_array() {
+    class TestClass {
+      @SuppressWarnings("unused")
+      Double[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_String_array() throws IllegalAccessException {
+    @SuppressWarnings("unused")
+    class TestClass {
+      String[] a, b, c, d, e, f, g, h, i, j;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertContainArraysWithSamples(test);
+  }
+
+  @Test
+  public void injects_sample_deep_String_array() {
+    class TestClass {
+      String[][] deepArray;
+    }
+    TestClass test = new TestClass();
+    givenTest(test);
+    assertArrayEquals(new String[][] { { sample(String.class, "deepArray[0][0]") } },
+        test.deepArray);
+  }
+
+  @Test
+  public void injects_sample_enum() {
     @SuppressWarnings("unused")
     class TestClass {
       ElementType a, b, c, d, e, f, g, h, i, j;
     }
     TestClass test = new TestClass();
     givenTest(test);
-
-    List<Object> fields = readDeclaredFields(test);
-    assertTrue("" + fields, new HashSet<Object>(fields).size() > ElementType.values().length / 2);
+    assertContainsSamples(test);
   }
 
   @Test
   public void skips_not_null() {
+    @SuppressWarnings("unused")
     class TestClass {
-      Object field;
+      Object field = new Object();
       String stringField = "value";
       Boolean booleanField = Boolean.TRUE;
       Character characterField = Character.valueOf((char) 1);
@@ -383,19 +610,9 @@ public class test_injecting {
       Double doubleField = Double.valueOf(1);
     }
     TestClass test = new TestClass();
-    Object object = new Object();
-    test.field = object;
+    fields = readDeclaredFields(test);
     givenTest(test);
-    assertSame(object, test.field);
-    assertEquals("value", test.stringField);
-    assertEquals(Boolean.TRUE, test.booleanField);
-    assertEquals(Character.valueOf((char) 1), test.characterField);
-    assertEquals(Byte.valueOf((byte) 1), test.byteField);
-    assertEquals(Short.valueOf((short) 1), test.shortField);
-    assertEquals(Integer.valueOf(1), test.integerField);
-    assertEquals(Long.valueOf(1), test.longField);
-    assertEquals(Float.valueOf(1), test.floatField);
-    assertEquals(Double.valueOf(1), test.doubleField);
+    assertEquals(fields, readDeclaredFields(test));
   }
 
   @Test
@@ -410,6 +627,7 @@ public class test_injecting {
 
   @Test
   public void skips_primitive_not_equal_to_binary_zero() {
+    @SuppressWarnings("unused")
     class TestClass {
       boolean booleanPrimitive = true;
       boolean booleanWrapper = true;
@@ -422,16 +640,9 @@ public class test_injecting {
       double doubleField = 1;
     }
     TestClass test = new TestClass();
+    fields = readDeclaredFields(test);
     givenTest(test);
-    assertEquals(true, test.booleanPrimitive);
-    assertEquals(true, test.booleanWrapper);
-    assertEquals('a', test.charField);
-    assertEquals(1, test.byteField);
-    assertEquals(1, test.shortField);
-    assertEquals(1, test.intField);
-    assertEquals(1, test.longField);
-    assertEquals(1, test.floatField, 0);
-    assertEquals(1, test.doubleField, 0);
+    assertEquals(fields, readDeclaredFields(test));
   }
 
   static class TestClassWithStaticField {
@@ -469,6 +680,51 @@ public class test_injecting {
     } catch (TestoryException e) {
       assertTrue(e.getMessage(), e.getMessage().contains("fieldOfFinalClass"));
     }
+  }
+
+  private static void assertContainsMocks(Object instance) {
+    try {
+      for (Field field : injectableFields(instance.getClass())) {
+        Object mock = field.get(instance);
+        assertTrue(field.getType().isInstance(mock));
+        assertNotSame(field.getType(), mock.getClass());
+      }
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static void assertContainsSamples(Object instance) {
+    try {
+      for (Field field : injectableFields(instance.getClass())) {
+        assertEquals(sample(field.getType(), field.getName()), field.get(instance));
+      }
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static void assertContainArraysWithSamples(Object instance) {
+    try {
+      for (Field field : injectableFields(instance.getClass())) {
+        Object array = Array.newInstance(field.getType().getComponentType(), 1);
+        Array.set(array, 0, sample(field.getType().getComponentType(), field.getName() + "[0]"));
+        assertTrue(deepEquals(field.get(instance), array));
+      }
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+  private static List<Field> injectableFields(Class<?> type) {
+    List<Field> fields = new ArrayList<>();
+    for (Field field : type.getDeclaredFields()) {
+      if (!field.isSynthetic()) {
+        fields.add(field);
+      }
+    }
+    return fields;
   }
 
   private static InvocationMatcher onInstance(final Object mock) {
