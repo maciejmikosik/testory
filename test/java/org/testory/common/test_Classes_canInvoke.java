@@ -10,49 +10,30 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class test_Classes_canInvoke {
-  private List<Object> arguments;
-  private List<Method> methods;
-
-  @Before
-  public void before() {
-    arguments = new ArrayList<Object>();
-    arguments.add(new Object());
-    arguments.add(new Object[0]);
-    arguments.add("");
-    arguments.add(new String[0]);
-    arguments.add(null);
-
-    arguments.add(Boolean.valueOf(false));
-    arguments.add(Character.valueOf('a'));
-    arguments.add(Byte.valueOf((byte) 0));
-    arguments.add(Short.valueOf((short) 0));
-    arguments.add(Integer.valueOf(0));
-    arguments.add(Long.valueOf(0));
-    arguments.add(Float.valueOf(0));
-    arguments.add(Double.valueOf(0));
-
-    arguments.add(new int[0]);
-    arguments.add(new float[0]);
-    arguments.add(new Integer[0]);
-    arguments.add(new Float[0]);
-
-    methods = new ArrayList<Method>();
-  }
-
   @Test
   public void checks_argument_conversion() throws Exception {
-    for (Method method : Methods.class.getDeclaredMethods()) {
-      if (method.getName().equals("method") && method.getParameterTypes().length == 1) {
-        methods.add(method);
-      }
-    }
-    assume(methods.size() > 5);
-
-    for (Method method : methods) {
+    List<Object> arguments = asList(
+        new Object(),
+        new Object[0],
+        "",
+        new String[0],
+        null,
+        Boolean.valueOf(false),
+        Character.valueOf('a'),
+        Byte.valueOf((byte) 0),
+        Short.valueOf((short) 0),
+        Integer.valueOf(0),
+        Long.valueOf(0),
+        Float.valueOf(0),
+        Double.valueOf(0),
+        new int[0],
+        new float[0],
+        new Integer[0],
+        new Float[0]);
+    for (Method method : Methods.withOneParameter()) {
       for (Object argument : arguments) {
         assertCorrectness(method, null, argument);
       }
@@ -61,11 +42,7 @@ public class test_Classes_canInvoke {
 
   @Test
   public void checks_number_of_parameters() {
-    methods.add(staticMethod());
-    methods.add(staticMethod(Object.class));
-    methods.add(staticMethod(Object.class, Object.class));
-    methods.add(staticMethod(Object.class, Object.class, Object.class));
-    for (Method method : methods) {
+    for (Method method : Methods.withObjectParameters()) {
       for (int i = 0; i <= 4; i++) {
         assertCorrectness(method, null, new Object[i]);
       }
@@ -78,35 +55,33 @@ public class test_Classes_canInvoke {
     class SuperClass {
       void superMethod() {}
     }
-    class MyClass extends SuperClass {
+    class SubClass extends SuperClass {
       void superMethod() {}
 
       void method() {}
     }
-    assertCorrectness(MyClass.class.getDeclaredMethod("method"), new MyClass());
-    assertCorrectness(MyClass.class.getDeclaredMethod("method"), new SuperClass());
-    assertCorrectness(MyClass.class.getDeclaredMethod("superMethod"), new MyClass());
-    assertCorrectness(MyClass.class.getDeclaredMethod("superMethod"), new SuperClass());
-    assertCorrectness(SuperClass.class.getDeclaredMethod("superMethod"), new MyClass());
+    assertCorrectness(SubClass.class.getDeclaredMethod("method"), new SubClass());
+    assertCorrectness(SubClass.class.getDeclaredMethod("method"), new SuperClass());
+    assertCorrectness(SubClass.class.getDeclaredMethod("superMethod"), new SubClass());
+    assertCorrectness(SubClass.class.getDeclaredMethod("superMethod"), new SuperClass());
+    assertCorrectness(SuperClass.class.getDeclaredMethod("superMethod"), new SubClass());
     assertCorrectness(SuperClass.class.getDeclaredMethod("superMethod"), new SuperClass());
 
   }
 
   @Test
-  public void checks_instance_of_static_method() {
-    assertCorrectness(staticMethod(), new Object());
-    assertCorrectness(staticMethod(), null);
+  public void ignores_instance_if_method_is_static() {
+    assertCorrectness(Methods.withParameters(), new Object());
+    assertCorrectness(Methods.withParameters(), null);
   }
 
   @Test
-  public void instance_cannot_be_null_for_non_static_method() throws Exception {
-    Method method = method("nonStaticMethod");
+  public void checks_instance_if_method_is_not_static() throws Exception {
+    Method method = Methods.getInstanceMethod();
     try {
       method.invoke(null);
       fail();
-    } catch (NullPointerException e) {
-      // learning that native implementation behaves differently
-    }
+    } catch (NullPointerException e) {}
     assertFalse(canInvoke(method, null));
   }
 
@@ -121,7 +96,7 @@ public class test_Classes_canInvoke {
   @Test
   public void arguments_cannot_be_null_array() {
     try {
-      canInvoke(staticMethod(Object.class), null, (Object[]) null);
+      canInvoke(Methods.withParameters(Object.class), null, (Object[]) null);
       fail();
     } catch (NullPointerException e) {}
   }
@@ -140,62 +115,127 @@ public class test_Classes_canInvoke {
     } catch (IllegalArgumentException e) {
       return false;
     } catch (ReflectiveOperationException e) {
-      throw new Error(e);
-    }
-  }
-
-  private static void assume(boolean condition) {
-    if (!condition) {
-      throw new RuntimeException();
-    }
-  }
-
-  private static Method staticMethod(Class<?>... parameters) {
-    return method("method", parameters);
-  }
-
-  private static Method method(String name, Class<?>... parameters) {
-    try {
-      return Methods.class.getDeclaredMethod(name, parameters);
-    } catch (NoSuchMethodException e) {
-      throw new Error(e);
+      throw new LinkageError(null, e);
     }
   }
 
   @SuppressWarnings("unused")
   private static class Methods {
-    // @formatter:off
-    public static void method() {}
-    public static void method(Object arg) {}
-    public static void method(Object[] arg) {}
-    public static void method(String arg) {}
-    public static void method(String[] arg) {}
-    public static void method(Object argA, Object argB) {}
-    public static void method(Object argA, Object argB, Object argC) {}
-    public static void method(Object arg, Object... varargs) {}
-    public static void method(boolean arg) {}
-    public static void method(char arg) {}
-    public static void method(byte arg) {}
-    public static void method(short arg) {}
-    public static void method(int arg) {}
-    public static void method(long arg) {}
-    public static void method(float arg) {}
-    public static void method(double arg) {}
-    public static void method(Void arg) {}
-    public static void method(Boolean arg) {}
-    public static void method(Character arg) {}
-    public static void method(Byte arg) {}
-    public static void method(Short arg) {}
-    public static void method(Integer arg) {}
-    public static void method(Long arg) {}
-    public static void method(Float arg) {}
-    public static void method(Double arg) {}
-    public static void method(int[] arg) {}
-    public static void method(float[] arg) {}
-    public static void method(Integer[] arg) {}
-    public static void method(Float[] arg) {}
+    public static void invoke() {}
+
+    public static void invoke(Object arg) {}
+
+    public static void invoke(Object[] arg) {}
+
+    public static void invoke(String arg) {}
+
+    public static void invoke(String[] arg) {}
+
+    public static void invoke(Object argA, Object argB) {}
+
+    public static void invoke(Object argA, Object argB, Object argC) {}
+
+    public static void invoke(Object arg, Object... varargs) {}
+
+    public static void invoke(boolean arg) {}
+
+    public static void invoke(char arg) {}
+
+    public static void invoke(byte arg) {}
+
+    public static void invoke(short arg) {}
+
+    public static void invoke(int arg) {}
+
+    public static void invoke(long arg) {}
+
+    public static void invoke(float arg) {}
+
+    public static void invoke(double arg) {}
+
+    public static void invoke(Void arg) {}
+
+    public static void invoke(Boolean arg) {}
+
+    public static void invoke(Character arg) {}
+
+    public static void invoke(Byte arg) {}
+
+    public static void invoke(Short arg) {}
+
+    public static void invoke(Integer arg) {}
+
+    public static void invoke(Long arg) {}
+
+    public static void invoke(Float arg) {}
+
+    public static void invoke(Double arg) {}
+
+    public static void invoke(int[] arg) {}
+
+    public static void invoke(float[] arg) {}
+
+    public static void invoke(Integer[] arg) {}
+
+    public static void invoke(Float[] arg) {}
 
     public void nonStaticMethod() {}
-    // @formatter:on
+
+    public static List<Method> withOneParameter() {
+      List<Method> methods = new ArrayList<Method>();
+      for (Method method : Methods.class.getDeclaredMethods()) {
+        if (method.getName().equals("invoke") && hasOneParameter(method)) {
+          methods.add(method);
+        }
+      }
+      assume(methods.size() > 5);
+      return methods;
+    }
+
+    private static boolean hasOneParameter(Method method) {
+      return method.getParameterTypes().length == 1;
+    }
+
+    public static List<Method> withObjectParameters() {
+      List<Method> methods = new ArrayList<Method>();
+      for (Method method : Methods.class.getDeclaredMethods()) {
+        if (method.getName().equals("invoke") && hasObjectParameters(method)) {
+          methods.add(method);
+        }
+      }
+      assume(methods.size() > 2);
+      return methods;
+    }
+
+    private static boolean hasObjectParameters(Method method) {
+      for (Class<?> parameter : method.getParameterTypes()) {
+        if (parameter != Object.class) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    private static Method withParameters(Class<?>... parameters) {
+      try {
+        return Methods.class.getDeclaredMethod("invoke", parameters);
+      } catch (NoSuchMethodException e) {
+        throw new Error(e);
+      }
+    }
+
+    public static Method getInstanceMethod() {
+      try {
+        return Methods.class.getDeclaredMethod("nonStaticMethod");
+      } catch (NoSuchMethodException e) {
+        throw new Error(e);
+      }
+    }
+
+    private static void assume(boolean condition) {
+      if (!condition) {
+        throw new RuntimeException();
+      }
+    }
   }
 }
