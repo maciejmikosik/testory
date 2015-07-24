@@ -3,7 +3,6 @@ package org.testory.common;
 import java.lang.reflect.Array;
 
 public class Objects {
-  // TODO test print(Object)
   public static String print(@Nullable Object object) {
     return object == null
         ? "null"

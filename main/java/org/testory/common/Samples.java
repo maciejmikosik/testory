@@ -20,20 +20,20 @@ public class Samples {
     return false;
   }
 
-  public static Object sample(Class<?> type, String name) {
+  public static <T> T sample(Class<T> type, String name) {
     checkNotNull(type);
     checkNotNull(name);
     for (Method method : Samplers.class.getDeclaredMethods()) {
       if (tryWrap(method.getReturnType()).isAssignableFrom(tryWrap(type))) {
         try {
           setAccessible(method);
-          return method.invoke(null, type, name);
+          return (T) method.invoke(null, type, name);
         } catch (ReflectiveOperationException e) {
           throw new LinkageError(null, e);
         }
       }
     }
-    throw new IllegalArgumentException();
+    throw new IllegalArgumentException("type=" + type + ", name=" + name);
   }
 
   private static int randomInteger(long maxValue, Random random) {
