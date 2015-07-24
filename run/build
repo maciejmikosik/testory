@@ -53,6 +53,13 @@ cp \
   "${RUN}/license/." \
   "${DRAFT}"
 
+########## RESET TIMESTAMPS ##########
+find \
+  .sink/draft/ \
+| xargs \
+touch \
+  --date=@0
+
 ########## ZIP JAR ##########
 cd ${DRAFT}
 zip \
