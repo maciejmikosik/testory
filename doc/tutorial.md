@@ -416,10 +416,18 @@ Testory uses `Thread.currentThread().getContextClassLoader()` to load classes ge
 Solution is to remember to set context classloader to be same as or child of classloader that loaded testory library.
 
 # Development
-[building](#building)
+[building](#building) | [contributing](#contributing)
 
 ### Building
 
 You can build `testory.jar` by running bash script `./run/build` from project directory.
 Since 1.0.0 build is deterministic. This means you get identical `testory.jar` file every time.
 If you build version that has a release tag (like v1.0.0), it should be identical to released file.
+
+### Contributing
+
+If you found a bug, have an idea for a new feature, or just a question, please post it as github issue.
+
+If you want to contribute a code, please do not use github's pull request feature.
+Just publish changes anywhere and post a link to your repository in relevant issue.
+Simplest way is to fork testory repository on github.
