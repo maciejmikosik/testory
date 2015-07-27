@@ -1,4 +1,4 @@
-[overview](#overview) | [mocks](#mocks) | [utilities](#utilities) | [macros](#macros) | [fine points](#fine-points) | [troubleshooting](#troubleshooting)
+[overview](#overview) | [mocks](#mocks) | [utilities](#utilities) | [macros](#macros) | [fine points](#fine-points) | [troubleshooting](#troubleshooting) | [development](#development)
 
 # Overview
 [when](#when) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown)
@@ -414,3 +414,12 @@ Purging has following consequences
 Testory uses `Thread.currentThread().getContextClassLoader()` to load classes generated for mocks. If you use your own classloader, it is your responsibility to properly set context classloader using `Thread.currentThread().setContextClassLoader()`. If you skip that, context classloader by default points out to system classloader (`ClassLoader.getSystemClassLoader()`).
 
 Solution is to remember to set context classloader to be same as or child of classloader that loaded testory library.
+
+# Development
+[building](#building)
+
+### Building
+
+You can build `testory.jar` by running bash script `./run/build` from project directory.
+Since 1.0.0 build is deterministic. This means you get identical `testory.jar` file every time.
+If you build version that has a release tag (like v1.0.0), it should be identical to released file.
