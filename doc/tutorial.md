@@ -291,7 +291,7 @@ Catches possible throwable thrown by chained method allowing test to run forward
         when(list.size());
         thenReturned(0);
 
-### givenTest
+### givenTest (beta)
 
 Initializes each field of **this** test and fails if initialization of any field fails.
 Also purges testory internal state (see [purging](#purging)).
@@ -390,7 +390,7 @@ Any of the following invokes real method on unreal (mocked/proxied) object causi
     givenTry(instance).finalMethod();
     givenTimes(n, instance).finalMethod();
 
-### Purging
+### Purging (beta)
 
 Testory maintains global state that holds information about every mock, stubbing and invocation. This data needs to be periodically released to prevent running out of memory. Since testory has no foolproof way to tell whether one test ended and another started, it relies on some simplistic assumptions
 
