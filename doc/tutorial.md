@@ -31,16 +31,12 @@ Example test using `given`-`when`-`then` looks like this
         when(list.add("element"));
         then(!list.isEmpty());
 
-`given` and `when` can be used in chained form. This is helpful in various situations like dealing with `void` methods. Because `void` cannot be an argument
+`given` and `when` can be used in chained form. This is helpful in various situations like dealing with `void` methods.
 
-        // does not compile
-        given(list.clear());
-        when(list.clear());
+Because using `void` as an argument will not compile
 
-you should use chained forms.
-
-        given(list).clear();
-        when(list).clear();
+ - use `given(list).clear()` instead of `given(list.clear())`
+ - use `when(list).clear()` instead of `when(list.clear())` 
 
 ### when
 
@@ -110,10 +106,16 @@ Newly created mock has following properties
 
 ### Stubbing
 
-Mock can be stubbed to return `Object`, throw `Throwable` or execute custom logic.
+Mock can be stubbed to return `Object`
 
         given(willReturn(object), list).get(1);
+
+throw `Throwable`
+
         given(willThrow(new IndexOutOfBoundsException()), list).get(2);
+
+or execute custom logic.
+
         given(new Handler() {
           public Object handle(Invocation invocation) throws Throwable {
             // custom logic
@@ -138,10 +140,12 @@ It is possible to assert expected invocation on mock.
 
 Invocation is expected to be called exactly once.
 
-You can verify number of invocations by passing exact value (may be 0) or using matcher.
+You can verify number of invocations by passing exact value (may be 0)
 
         thenCalledTimes(3, mock).size();
-        thenCalledTimes(0, mock).clear();
+
+or using matcher.
+ 
         thenCalledTimes(greaterThan(0), mock).toString();
 
 By default, order of invocations does not matter.
@@ -161,8 +165,6 @@ You can take full control of matching invocations by implementing your own `Invo
             // custom logic
           }
         };
-        given(willReturn(object), onCondition);
-        thenCalled(onCondition);
 
 Or use predefined factories for most common cases.
 
@@ -184,12 +186,10 @@ Or use predefined factories for most common cases.
 
 Use `any` if you do not care about argument value during stubbing or verification.
 
-        given(willReturn(false), list).contains(any(Object.class));
         thenCalled(list).add(any(Object.class));
 
 or `any` with [matcher](#matchers) if you care
 
-        given(willThrow(new IndexOutOfBoundsException()), list).get(any(Integer.class, greaterThan(2)));
         thenCalled(list).add(any(Object.class, startsWith("prefix")));
 
 `Class` passed to `any` is just for inferring purpose. Argument can be instance of any type and still can match.
@@ -372,23 +372,21 @@ Due to technical limitations, testory does not play well with final classes and 
 
 Final classes cannot be mocked or chained. Any of the following throws `TestoryException`.
 
-    mock(FinalClass.class);
-
-    when(instanceOfFinalClass).method();
-    givenTry(instanceOfFinalClass).method();
-    givenTimes(instanceOfFinalClass).method();
+ - `mock(FinalClass.class)`
+ - `when(instanceOfFinalClass).method()`
+ - `givenTry(instanceOfFinalClass).method()`
+ - `givenTimes(instanceOfFinalClass).method()`
 
 Final methods on mock should not be invoked, stubbed or verified.
 Final methods on any object should not be proxied (used in chained form).
 Any of the following invokes real method on unreal (mocked/proxied) object causing undetermined effects!
 
-    mock.finalMethod();
-    given(willReturn(object), mock).finalMethod();
-    thenCalled(mock).finalMethod();
-
-    when(instance).finalMethod();
-    givenTry(instance).finalMethod();
-    givenTimes(n, instance).finalMethod();
+ - `mock.finalMethod()`
+ - `given(willReturn(object), mock).finalMethod()`
+ - `thenCalled(mock).finalMethod()`
+ - `when(instance).finalMethod()`
+ - `givenTry(instance).finalMethod()`
+ - `givenTimes(n, instance).finalMethod()`
 
 ### Purging (beta)
 
