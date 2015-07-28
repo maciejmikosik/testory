@@ -363,7 +363,7 @@ This applies to type of
  - objects compared by `thenEqual`
  - object matched by `then`
  - object returned from `Handler` (including object passed to `willReturn`)
- - object passed to matcher
+ - object passed to `a`
 
 ### Finals
 
