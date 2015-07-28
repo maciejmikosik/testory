@@ -3,11 +3,11 @@
 # Overview
 [when](#when) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown)
 
-To make **given**, **when**, **then** family of methods available, add following import to your test class.
+To make `given`, `when`, `then` family of methods available, add following import to your test class.
 
         import static org.testory.Testory.*;
 
-The most basic purpose of **given** and **when** is decorative so instead of writing comments like this
+The most basic purpose of `given` and `when` is decorative so instead of writing comments like this
 
         // given
         list = new ArrayList<String>();
@@ -19,19 +19,19 @@ you wrap lines inside methods
         given(list = new ArrayList<String>());
         when(list.add("element"));
 
-The purpose of **then** is to make assertions similar to junit's assertions.
+The purpose of `then` is to make assertions similar to junit's assertions.
 
  - `then(boolean)` is like `assertTrue(boolean)`
  - `then(Object, Object)` is like `assertThat(T, Matcher<T>)`
  - `thenEqual(Object, Object)` is like `assertEquals(Object, Object)`
 
-Example test using **given**-**when**-**then** looks like this
+Example test using `given`-`when`-`then` looks like this
 
         given(list = new ArrayList<String>());
         when(list.add("element"));
         then(!list.isEmpty());
 
-**Given** and **when** can be used in chained form. This is helpful in various situations like dealing with void methods. Because void cannot be an argument
+`given` and `when` can be used in chained form. This is helpful in various situations like dealing with `void` methods. Because `void` cannot be an argument
 
         // does not compile
         given(list.clear());
@@ -44,19 +44,19 @@ you should use chained forms.
 
 ### when
 
-Assertions can be used to verify result of invocation that happened at line containing **when**.
+Assertions can be used to verify result of invocation that happened at line containing `when`.
 
 Result that is going to be asserted is
 
- - object passed as an argument
+ - `Object` passed as an argument
 
         when(object);
 
- - object returned, or throwable thrown, by chained method
+ - `Object` returned, or `Throwable` thrown, by chained method
 
         when(instance).chainedMethod()
 
- - result of invoking closure
+ - result of invoking `Closure`
 
         when(new Closure() {
           public Object invoke() throws Throwable {
@@ -67,7 +67,7 @@ Result that is going to be asserted is
 ### thenReturned
 
 
-**thenReturned** is used to make assertions about object returned by **when**. Assertion fails if result is not equal to expected.
+`thenReturned` is used to make assertions about object returned by `when`. Assertion fails if result is not equal to expected.
 
         given(list = new ArrayList<String>());
         given(list.add("element"));
@@ -83,15 +83,15 @@ Result that is going to be asserted is
 
 ### thenThrown
 
-**thenThrown** is used to make assertions about throwable thrown by **when**. Because of
-java syntax **when** must be in chained form.
+`thenThrown` is used to make assertions about `Throwable` thrown by `when`. Because of
+java syntax `when` must be in chained form.
 
         given(list = new ArrayList<String>());
         when(list).get(0);
         thenThrown(IndexOutOfBoundsException.class);
 
-Notice that **when** in chained form catches any throwable. This prevents throwable from failing a test if result of **when** is not asserted by non-standalone assertion.
-**thenThrown** is overloaded to accept throwable instance, class or matcher.
+Notice that `when` in chained form catches any `Throwable`. This prevents `Throwable` from failing a test if result of `when` is not asserted by non-standalone assertion.
+`thenThrown` is overloaded to accept `Throwable` instance, `Class` or matcher.
 
 # Mocks
 [stubbing](#stubbing) | [verifying](#verifying) | [matching invocations](#matching-invocations) | [spying](#spying)
@@ -110,7 +110,7 @@ Newly created mock has following properties
 
 ### Stubbing
 
-Mock can be stubbed to return Object, throw Throwable or execute custom logic.
+Mock can be stubbed to return `Object`, throw `Throwable` or execute custom logic.
 
         given(willReturn(object), list).get(1);
         given(willThrow(new IndexOutOfBoundsException()), list).get(2);
@@ -122,7 +122,7 @@ Mock can be stubbed to return Object, throw Throwable or execute custom logic.
 
 Stubbing will be only effective for specified instance of mock, method and equal arguments.
 
- - void method can be stubbed to "just return" using `willReturn(null)`
+ - `void` method can be stubbed to "just return" using `willReturn(null)`
  - `willThrow` [fills in stack trace](http://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#fillInStackTrace()) upon throwing, `willRethrow` does not
  - returning `Object` incompatible with method return type causes `TestoryException` upon invocation
  - throwing `Throwable` incompatible with method declaration causes `TestoryException` upon invocation
@@ -232,7 +232,7 @@ Spies can be stubbed and verified like any other mock.
 
 ### Matchers
 
-Wherever api method accepts Object via parameter named matcher, you are free to pass any compatible matcher
+Wherever api method accepts `Object` via parameter named `matcher`, you are free to pass any compatible matcher
 
  - [org.hamcrest.Matcher](https://github.com/hamcrest/JavaHamcrest)
  - [org.fest.assertions.Condition](https://github.com/alexruiz/fest-assert-1.x)
@@ -250,9 +250,9 @@ Wherever api method accepts Object via parameter named matcher, you are free to 
 
 ### Closures
 
-In some cases **when** can be difficult to write. For example you want to assert that
-throwable was thrown, but cannot use chained form of **when**, because method is static. You may then
-wrap call inside Closure.
+In some cases `when` can be difficult to write. For example you want to assert that
+`Throwable` was thrown, but cannot use chained form of `when`, because method is static. You may then
+wrap call inside `Closure`.
 
         @Test
         public void should_fail_if_malformed() {
@@ -284,7 +284,7 @@ Repeats invocation many times.
 
 ### givenTry
 
-Catches possible throwable thrown by chained method allowing test to run forward. 
+Catches possible `Throwable` thrown by chained method allowing test to run forward.
 
         given(list = new ArrayList<String>());
         givenTry(list).add(5, "element");
@@ -293,7 +293,7 @@ Catches possible throwable thrown by chained method allowing test to run forward
 
 ### givenTest (beta)
 
-Initializes each field of **this** test and fails if initialization of any field fails.
+Initializes each field of `this` test and fails if initialization of any field fails.
 Also purges testory internal state (see [purging](#purging)).
 
         @Before
@@ -307,16 +307,16 @@ Field is ignored if
  - field is reference already assigned to something other than null
  - field is final
  - field is static
- - field is not declared in **test**'s class but in it's superclass
+ - field is not declared in `this` test's class but in it's superclass
 
 Initialization depends on type of field.
 
 Field of array type is initialized to array of size 1. Array's cell is initialized recursively.
 
 Field of non-final type is assigned to mock. Mock is conveniently prestubbed
- - toString is stubbed to return name of field
- - equals is stubbed so mock is equal only to itself
- - hashCode is stubbed to obey contract
+ - `toString` is stubbed to return name of field
+ - `equals` is stubbed so mock is equal only to itself
+ - `hashCode` is stubbed to obey contract
 
 Field of final type is assigned to sample data
 
@@ -328,10 +328,10 @@ Field of final type is assigned to sample data
  - `float`, `Float`, `double`, `Double` is assigned to random value such as
    - `value * value * value` does not cause overflow or underflow
    - is not equal to +0.0 or -0.0
- - String is initialized to name of field.
- - Enum is initialized to random constant.
- - Class is initialized to some sample class.
- - Field, Method and Constructor is assigned to member of sample class.
+ - `String` is initialized to name of field.
+ - `enum` is initialized to random constant.
+ - `Class` is initialized to some sample class.
+ - `Field`, `Method` and `Constructor` is assigned to member of sample class.
 
 Random sample data is deterministically generated using field type and field name as a seed.
 
@@ -394,18 +394,18 @@ Any of the following invokes real method on unreal (mocked/proxied) object causi
 
 Testory maintains global state that holds information about every mock, stubbing and invocation. This data needs to be periodically released to prevent running out of memory. Since testory has no foolproof way to tell whether one test ended and another started, it relies on some simplistic assumptions
 
- - Only one **when** is used per one test. Thus calling **when**, makes testory to forget about all events that happened before previous **when**.
+ - Only one `when` is used per one test. Thus calling `when`, makes testory to forget about all events that happened before previous `when`.
  - Initialization using `givenTest` is done only once at the very beginning of each test. This makes testory to forget about all events that happened before.
 
 Purging has following consequences
 
- - calling any method on purged mock throws TestoryException
+ - calling any method on purged mock throws `TestoryException`
  - purged stubbing is no longer in effect
  - purged invocation is not included during verification
  - purged mock is no longer considered to be a mock, so
-  - calling it causes TestoryException
-  - stubbing it causes TestoryException
-  - verifying it causes TestoryException
+  - calling it causes `TestoryException`
+  - stubbing it causes `TestoryException`
+  - verifying it causes `TestoryException`
 
 # Troubleshooting
 
@@ -422,7 +422,7 @@ Solution is to remember to set context classloader to be same as or child of cla
 
 You can build `testory.jar` by running bash script `./run/build` from project directory.
 Since 1.0.0 build is deterministic. This means you get identical `testory.jar` file every time.
-If you build version that has a release tag (like v1.0.0), it should be identical to released file.
+If you build version that has a release tag (like `v1.0.0`), it should be identical to released file.
 
 ### Contributing
 
