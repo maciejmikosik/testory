@@ -206,6 +206,10 @@ You can workaround those cases by wrapping primitive values in `a`.
 
         given(willReturn(true), mock).someMethod(any(int.class), a(intValue));
 
+Use `the` shortcut if you expect exactly same instance
+
+        given(willReturn(true), mock).someMethod(the(instance));
+
 ### Spying
 
 Spy is a mock that is prestubbed to delegate all invocations to real object.
