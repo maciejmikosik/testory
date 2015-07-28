@@ -62,7 +62,7 @@ Result that is going to be asserted is
 
 ### thenReturned
 
-`thenReturned` is used to make assertions about object returned by `when`. Assertion fails if result is not equal to expected.
+`thenReturned` is used to make assertions about `Object` returned by `when`. Assertion fails if actual result is not equal to expected `Object` or value.
 
         given(list = new ArrayList<String>());
         given(list.add("element"));
