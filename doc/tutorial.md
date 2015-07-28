@@ -85,8 +85,9 @@ java syntax `when` must be in chained form.
         when(list).get(0);
         thenThrown(IndexOutOfBoundsException.class);
 
-Notice that `when` in chained form catches any `Throwable`. This prevents `Throwable` from failing a test if result of `when` is not asserted by non-standalone assertion.
 `thenThrown` is overloaded to accept `Throwable` instance, `Class` or matcher.
+
+Notice that `when` in chained form catches any `Throwable`. This prevents `Throwable` from failing a test. If you want this to be detected, use either `thenReturned` or `thenThrown` to assert expected result.
 
 # Mocks
 [stubbing](#stubbing) | [verifying](#verifying) | [matching invocations](#matching-invocations) | [spying](#spying)
