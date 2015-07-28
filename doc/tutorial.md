@@ -62,7 +62,6 @@ Result that is going to be asserted is
 
 ### thenReturned
 
-
 `thenReturned` is used to make assertions about object returned by `when`. Assertion fails if result is not equal to expected.
 
         given(list = new ArrayList<String>());
@@ -154,7 +153,6 @@ If you need to assert that invocations happened in order, use ordered verifying.
 
         thenCalledInOrder(mockDatabase).open();
         thenCalledInOrder(mockDatabase).close();
-
 
 ### Matching Invocations
 
@@ -259,7 +257,7 @@ wrap call inside `Closure`.
           when(_parseInt("12x3"));
           thenThrown(NumberFormatException.class);
         }
-        
+
         private static Closure _parseInt(final String string) {
           return new Closure() {
             public Integer invoke() {
