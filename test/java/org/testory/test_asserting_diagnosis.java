@@ -1,7 +1,7 @@
 package org.testory;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.then;
 import static org.testory.Testory.thenReturned;
@@ -11,6 +11,7 @@ import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
+import static org.testory.testing.Matchers.hasMessageContaining;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -56,7 +57,7 @@ public class test_asserting_diagnosis {
       then(object, matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  diagnosis\n"
           + "    " + mismatch + "\n"));
     }
@@ -72,7 +73,7 @@ public class test_asserting_diagnosis {
       thenReturned(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  diagnosis\n"
           + "    " + mismatch + "\n"));
     }
@@ -85,7 +86,7 @@ public class test_asserting_diagnosis {
       thenReturned(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertFalse(e.getMessage(), e.getMessage().contains("diagnosis\n"));
+      assertThat(e, not(hasMessageContaining("diagnosis\n")));
     }
   }
 
@@ -99,7 +100,7 @@ public class test_asserting_diagnosis {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  diagnosis\n"
           + "    " + mismatch + "\n"));
     }
@@ -112,7 +113,7 @@ public class test_asserting_diagnosis {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertFalse(e.getMessage(), e.getMessage().contains("diagnosis\n"));
+      assertThat(e, not(hasMessageContaining("diagnosis\n")));
     }
   }
 }

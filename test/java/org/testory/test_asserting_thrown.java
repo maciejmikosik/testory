@@ -1,6 +1,6 @@
 package org.testory;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
@@ -8,6 +8,7 @@ import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
+import static org.testory.testing.Matchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +57,7 @@ public class test_asserting_thrown {
       thenThrown();
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  expected thrown\n"
           + "    \n"));
     }

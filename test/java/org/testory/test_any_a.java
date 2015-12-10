@@ -1,6 +1,7 @@
 package org.testory;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.a;
@@ -9,6 +10,7 @@ import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.willReturn;
 import static org.testory.testing.Fakes.newObject;
+import static org.testory.testing.Matchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -110,13 +112,13 @@ public class test_any_a {
       thenCalled(mock).invoke(a(intA));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage().contains(".invoke(a(" + intA + "))"));
+      assertThat(e, hasMessageContaining(".invoke(a(" + intA + "))"));
     }
     try {
       thenCalled(mock).invoke(a(object));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage().contains(".invoke(a(" + object + "))"));
+      assertThat(e, hasMessageContaining(".invoke(a(" + object + "))"));
     }
   }
 

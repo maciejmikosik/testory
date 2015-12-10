@@ -1,9 +1,10 @@
 package org.testory;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
+import static org.testory.testing.Matchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -74,8 +75,7 @@ public class test_verifying {
       thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
-          + "expected called times 1\n"));
+      assertThat(e, hasMessageContaining("expected called times 1\n"));
     }
   }
 
@@ -85,7 +85,7 @@ public class test_verifying {
       thenCalled((InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("invocationMatcher != null"));
+      assertThat(e, hasMessageContaining("invocationMatcher != null"));
     }
   }
 
@@ -95,7 +95,7 @@ public class test_verifying {
       thenCalled((Object) null);
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("mock != null"));
+      assertThat(e, hasMessageContaining("mock != null"));
     }
   }
 
@@ -105,7 +105,7 @@ public class test_verifying {
       thenCalled(new Object());
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("isMock(mock)"));
+      assertThat(e, hasMessageContaining("isMock(mock)"));
     }
   }
 

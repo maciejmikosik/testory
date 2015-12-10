@@ -1,6 +1,6 @@
 package org.testory;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.thenThrown;
@@ -9,6 +9,7 @@ import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
+import static org.testory.testing.Matchers.hasMessageContaining;
 import static org.testory.testing.StackTraces.printStackTrace;
 
 import org.junit.Before;
@@ -43,7 +44,7 @@ public class test_when_closure {
       thenThrown();
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  but returned\n"
           + "    " + object + "\n"));
     }
@@ -56,10 +57,11 @@ public class test_when_closure {
       thenReturned();
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  but thrown\n"
           + "    " + throwable + "\n"));
-      assertTrue(e.getMessage(), e.getMessage().contains("\n" + printStackTrace(throwable) + "\n"));
+      assertThat(e, hasMessageContaining(
+          "\n" + printStackTrace(throwable) + "\n"));
     }
   }
 

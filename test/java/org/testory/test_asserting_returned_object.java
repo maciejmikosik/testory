@@ -1,6 +1,6 @@
 package org.testory;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.when;
@@ -8,6 +8,7 @@ import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
+import static org.testory.testing.Matchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -113,7 +114,7 @@ public class test_asserting_returned_object {
       thenReturned(object);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  expected returned\n"
           + "    " + object + "\n"));
     }
@@ -126,7 +127,7 @@ public class test_asserting_returned_object {
       thenReturned(null);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  expected returned\n"
           + "    " + null + "\n"));
     }
@@ -139,7 +140,7 @@ public class test_asserting_returned_object {
       thenReturned(4);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  expected returned\n"
           + "    " + 4 + "\n"));
     }

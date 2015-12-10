@@ -1,15 +1,16 @@
 package org.testory;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.when;
 import static org.testory.testing.Fakes.newObject;
+import static org.testory.testing.Matchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -97,7 +98,7 @@ public class test_verifyings {
       thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  but called" + "\n"
           + "    times " + 3 + "\n"));
     }
@@ -111,7 +112,7 @@ public class test_verifyings {
       thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  actual invocations\n"
           + "    " + mock + ".invoke()\n"
           + "    " + mock + ".acceptObject(" + object + ")\n"));
@@ -124,7 +125,7 @@ public class test_verifyings {
       thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "  actual invocations\n"
           + "    none\n"));
     }
@@ -142,7 +143,7 @@ public class test_verifyings {
       thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertFalse(e.getMessage(), e.getMessage().contains(mock + ".toString()"));
+      assertThat(e, not(hasMessageContaining(mock + ".toString()")));
     }
   }
 

@@ -3,6 +3,7 @@ package org.testory;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
@@ -11,6 +12,7 @@ import static org.testory.Testory.onRequest;
 import static org.testory.Testory.onReturn;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.testing.Fakes.newObject;
+import static org.testory.testing.Matchers.hasMessageContaining;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -89,7 +91,7 @@ public class test_invocation_matchers {
       onInstance(new Object());
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage().contains("isMock"));
+      assertThat(e, hasMessageContaining("isMock"));
     }
     try {
       onReturn(null);

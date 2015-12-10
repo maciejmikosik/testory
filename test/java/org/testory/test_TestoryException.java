@@ -1,11 +1,15 @@
 package org.testory;
 
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.when;
+import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.Matchers.hasMessageMatching;
 import static org.testory.testing.StackTraces.here;
 import static org.testory.testing.StackTraces.nextLine;
 
@@ -22,7 +26,7 @@ public class test_TestoryException {
       mock(null);
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage(), e.getMessage().matches(""
+      assertThat(e, hasMessageMatching(""
           + "\n"
           + "  illegal testory usage\n"
           + "  failed precondition\n"
@@ -36,8 +40,8 @@ public class test_TestoryException {
       mock(null);
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage(), !e.getMessage().contains("check"));
-      assertTrue(e.getMessage(), e.getMessage().contains("type != null"));
+      assertThat(e, not(hasMessageContaining("check")));
+      assertThat(e, hasMessageContaining("type != null"));
     }
   }
 
@@ -50,7 +54,7 @@ public class test_TestoryException {
       mock.toString();
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("isMock"));
+      assertThat(e, hasMessageContaining("isMock"));
     }
   }
 

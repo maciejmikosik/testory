@@ -1,9 +1,10 @@
 package org.testory;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalledTimes;
+import static org.testory.testing.Matchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +61,7 @@ public class test_verifying_times_Number {
       thenCalledTimes(3, onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(""
+      assertThat(e, hasMessageContaining(""
           + "expected called times " + 3 + "\n"));
     }
   }
@@ -79,7 +80,7 @@ public class test_verifying_times_Number {
       thenCalledTimes(1, (InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("invocationMatcher != null"));
+      assertThat(e, hasMessageContaining("invocationMatcher != null"));
     }
   }
 
@@ -89,7 +90,7 @@ public class test_verifying_times_Number {
       thenCalledTimes(1, (Object) null);
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("mock != null"));
+      assertThat(e, hasMessageContaining("mock != null"));
     }
   }
 
@@ -99,7 +100,7 @@ public class test_verifying_times_Number {
       thenCalledTimes(1, new Object());
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("isMock(mock)"));
+      assertThat(e, hasMessageContaining("isMock(mock)"));
     }
   }
 
