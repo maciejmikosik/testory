@@ -12,27 +12,37 @@ import static org.testory.testing.Fakes.newThrowable;
 import org.junit.Before;
 import org.junit.Test;
 
-public class test_asserting_thrown {
-  private Throwable throwable;
+public class test_asserting_thrown_throwable {
+  private Throwable throwable, otherThrowable;
   private Object object;
 
   @Before
   public void before() {
     throwable = newThrowable("throwable");
+    otherThrowable = newThrowable("otherThrowable");
     object = newObject("object");
   }
 
   @Test
-  public void asserts_throwing() {
+  public void asserts_throwing_same_throwable() {
     when(throwing(throwable));
-    thenThrown();
+    thenThrown(throwable);
+  }
+
+  @Test
+  public void fails_throwing_not_same_throwable() {
+    when(throwing(otherThrowable));
+    try {
+      thenThrown(throwable);
+      fail();
+    } catch (TestoryAssertionError e) {}
   }
 
   @Test
   public void fails_returning_object() {
     when(returning(object));
     try {
-      thenThrown();
+      thenThrown(throwable);
       fail();
     } catch (TestoryAssertionError e) {}
   }
@@ -44,21 +54,29 @@ public class test_asserting_thrown {
       public void run() {}
     }).run();
     try {
-      thenThrown();
+      thenThrown(throwable);
       fail();
     } catch (TestoryAssertionError e) {}
   }
 
   @Test
-  public void failure_prints_expectation() {
+  public void failure_prints_expected_throwable() {
     when(returning(object));
     try {
-      thenThrown();
+      thenThrown(throwable);
       fail();
     } catch (TestoryAssertionError e) {
       assertTrue(e.getMessage(), e.getMessage().contains(""
           + "  expected thrown\n"
-          + "    \n"));
+          + "    " + throwable + "\n"));
     }
+  }
+
+  @Test
+  public void throwable_cannot_be_null() {
+    try {
+      thenThrown((Throwable) null);
+      fail();
+    } catch (TestoryException e) {}
   }
 }

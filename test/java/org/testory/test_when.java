@@ -1,13 +1,10 @@
 package org.testory;
 
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
+import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
-import static org.testory.testing.Closures.returning;
-import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
 
@@ -17,67 +14,70 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class test_when {
-  private Throwable throwable;
-  private Runnable runnable;
   private Object object;
+  private Throwable throwable;
 
   @Before
   public void before() {
-    throwable = newThrowable("throwable");
     object = newObject("object");
+    throwable = newThrowable("throwable");
   }
 
   @Test
-  public void proxies_instance_of_non_final_class() {
-    class Foo {}
-    object = new Foo();
-    Object when = when(object);
-    assertNotSame(object, when);
-    assertTrue(when instanceof Foo);
-  }
-
-  @Test
-  public void proxy_does_not_propagate_throwables() {
-    runnable = new Runnable() {
-      public void run() {
-        throw new RuntimeException();
-      }
-    };
-    when(runnable).run();
-  }
-
-  @Test
-  public void does_not_proxy_final_classes() {
-    final class FinalClass {}
-    FinalClass finalInstance = new FinalClass();
-    FinalClass when = when(finalInstance);
-    assertNull(when);
-  }
-
-  @Test
-  public void does_not_proxy_null_instance() {
-    Object when = when((Object) null);
-    assertNull(when);
-  }
-
-  @Test
-  public void accepts_object() {
+  public void inspects_object() {
     when(object);
+    thenReturned(object);
   }
 
   @Test
-  public void accepts_null_object() {
+  public void inspects_null_object() {
     when((Object) null);
+    thenReturned(null);
   }
 
   @Test
-  public void accepts_closure_returning() {
-    when(returning(object));
+  public void inspects_primitive() {
+    when(1234);
+    thenReturned(1234);
   }
 
   @Test
-  public void accepts_closure_throwing() {
-    when(throwing(throwable));
+  public void failure_prints_inspected_object() {
+    when(object);
+    try {
+      thenThrown();
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "  but returned\n"
+          + "    " + object + "\n"));
+    }
+  }
+
+  @Test
+  public void failure_prints_inspected_null() {
+    when((Object) null);
+    try {
+      thenThrown();
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "  but returned\n"
+          + "    " + null + "\n"));
+    }
+  }
+
+  @Test
+  public void failure_prints_inspected_primitive() {
+    when(1234);
+    try {
+      thenThrown();
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertTrue(e.getMessage(), e.getMessage().contains(""
+          + "  but returned\n"
+          + "    " + 1234 + "\n"));
+    }
   }
 
   @Test
@@ -99,13 +99,5 @@ public class test_when {
     } catch (TestoryException e) {
       assertTrue(throwable.getMessage(), throwable.getMessage().contains("inspecting"));
     }
-  }
-
-  @Test
-  public void fails_for_null_closure() {
-    try {
-      when((Closure) null);
-      fail();
-    } catch (TestoryException e) {}
   }
 }
