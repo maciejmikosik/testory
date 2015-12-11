@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.objenesis.ObjenesisStd;
+
 import net.sf.cglib.core.CodeGenerationException;
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.CallbackFilter;
@@ -26,8 +28,6 @@ import net.sf.cglib.proxy.Factory;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
-
-import org.objenesis.ObjenesisStd;
 
 public class Proxies {
   public static boolean isProxiable(Class<?> type) {
