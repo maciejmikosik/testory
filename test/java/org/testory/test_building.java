@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.util.Arrays.asList;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static javax.xml.bind.DatatypeConverter.printHexBinary;
 import static org.junit.Assert.assertEquals;
@@ -9,9 +10,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
@@ -84,5 +89,56 @@ public class test_building {
     if (!condition) {
       throw new RuntimeException();
     }
+  }
+
+  @Test
+  public void api_exposes_only_required_types() {
+    assertEquals(Build.exposed, filterNonJdk(allDependencies(Build.exposed)));
+  }
+
+  private static Set<Class<?>> allDependencies(Set<Class<?>> classes) {
+    Set<Class<?>> dependencies = new HashSet<Class<?>>();
+    Set<Class<?>> remaining = new HashSet<Class<?>>();
+    remaining.addAll(classes);
+
+    while (!remaining.isEmpty()) {
+      Class<?> current = remaining.iterator().next();
+      dependencies.add(current);
+      remaining.addAll(directDependencies(current));
+      remaining.removeAll(dependencies);
+    }
+    return dependencies;
+  }
+
+  private static Set<Class<?>> directDependencies(Class<?> type) {
+    Set<Class<?>> dependencies = new HashSet<Class<?>>();
+    for (Method method : type.getMethods()) {
+      dependencies.add(method.getReturnType());
+      dependencies.addAll(asList(method.getParameterTypes()));
+      for (Annotation annotation : method.getAnnotations()) {
+        dependencies.add(annotation.annotationType());
+      }
+      for (Annotation[] parameter : method.getParameterAnnotations()) {
+        for (Annotation annotation : parameter) {
+          dependencies.add(annotation.annotationType());
+        }
+      }
+    }
+    if (type.isArray()) {
+      dependencies.add(type.getComponentType());
+    }
+    return dependencies;
+  }
+
+  private static Set<Class<?>> filterNonJdk(Set<Class<?>> types) {
+    Set<Class<?>> filtered = new HashSet<Class<?>>();
+    for (Class<?> type : types) {
+      if (!type.isPrimitive() && !type.isArray()
+          && !type.getPackage().getName().startsWith("java.")
+          && !type.getPackage().getName().startsWith("sun.")) {
+        filtered.add(type);
+      }
+    }
+    return filtered;
   }
 }

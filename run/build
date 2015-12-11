@@ -27,7 +27,7 @@ javac \
   -source 1.7 \
   -target 1.7 \
   -d "${DRAFT}" \
-  "${JAVA}/org/testory/Testory.java"
+  "${JAVA}/org/testory/Build.java"
 
 ########## COPY SOURCES ##########
 cp \
