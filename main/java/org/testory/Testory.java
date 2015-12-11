@@ -537,8 +537,8 @@ public class Testory {
     if (!expected) {
       String diagnosis = objectOrMatcher != null && isMatcher(objectOrMatcher)
           && effect instanceof ReturnedObject
-          ? tryFormatDiagnosis(objectOrMatcher, ((ReturnedObject) effect).object)
-          : "";
+              ? tryFormatDiagnosis(objectOrMatcher, ((ReturnedObject) effect).object)
+              : "";
       throw assertionError("\n"
           + formatSection("expected returned", objectOrMatcher)
           + formatBut(effect)
