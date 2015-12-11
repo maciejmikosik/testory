@@ -7,12 +7,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.willReturn;
 import static org.testory.common.Samples.sample;
+import static org.testory.testing.Matchers.hasMessageContaining;
 import static org.testory.testing.Reflections.readDeclaredFields;
 
 import java.lang.annotation.ElementType;
@@ -678,7 +680,7 @@ public class test_injecting {
       givenTest(test);
       fail();
     } catch (TestoryException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("fieldOfFinalClass"));
+      assertThat(e, hasMessageContaining("fieldOfFinalClass"));
     }
   }
 

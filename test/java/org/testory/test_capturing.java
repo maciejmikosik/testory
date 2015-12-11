@@ -3,6 +3,7 @@ package org.testory;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
@@ -12,6 +13,7 @@ import static org.testory.Testory.thenCalledInOrder;
 import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.willReturn;
 import static org.testory.testing.Fakes.newObject;
+import static org.testory.testing.Matchers.hasMessageContaining;
 
 import java.util.Arrays;
 
@@ -182,26 +184,29 @@ public class test_capturing {
       thenCalled(mock).invoke();
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage().contains(mock + ".invoke()"));
+      assertThat(e, hasMessageContaining(
+          mock + ".invoke()"));
     }
     try {
       thenCalled(mock).returnObject(object);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage().contains(mock + ".returnObject(" + object + ")"));
+      assertThat(e, hasMessageContaining(
+          mock + ".returnObject(" + object + ")"));
     }
     try {
       thenCalled(mock).acceptObjects(object, otherObject);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage().contains(
+      assertThat(e, hasMessageContaining(
           mock + ".acceptObjects(" + object + ", " + otherObject + ")"));
     }
     try {
       thenCalled(mock).varargs(object, otherObject);
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage().contains(mock + ".varargs(" + object + ", [" + otherObject + "])"));
+      assertThat(e, hasMessageContaining(
+          mock + ".varargs(" + object + ", [" + otherObject + "])"));
     }
   }
 

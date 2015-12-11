@@ -2,6 +2,7 @@ package org.testory;
 
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.any;
@@ -11,6 +12,7 @@ import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
 import static org.testory.testing.Fakes.newObject;
+import static org.testory.testing.Matchers.hasMessageContaining;
 
 import java.util.List;
 
@@ -85,7 +87,7 @@ public class test_any {
       thenCalled(mock).returnObject(any(Object.class, matcher));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage().contains(
+      assertThat(e, hasMessageContaining(
           mock + ".returnObject(any(" + Object.class.getName() + ", " + matcher + "))"));
     }
   }
@@ -96,7 +98,7 @@ public class test_any {
       thenCalled(mock).returnObject(any(Object.class));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage().contains(
+      assertThat(e, hasMessageContaining(
           mock + ".returnObject(any(" + Object.class.getName() + "))"));
     }
   }
@@ -107,7 +109,7 @@ public class test_any {
       thenCalled(mock).varargs(object, any(Object.class));
       fail();
     } catch (TestoryAssertionError e) {
-      assertTrue(e.getMessage().contains(
+      assertThat(e, hasMessageContaining(
           mock + ".varargs(" + object + ", [any(" + Object.class.getName() + ")])"));
     }
   }

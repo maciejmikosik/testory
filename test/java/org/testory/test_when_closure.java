@@ -3,17 +3,19 @@ package org.testory;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
+import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
 import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
 import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.StackTraces.printStackTrace;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class test_asserting_returned {
+public class test_when_closure {
   private Object object;
   private Throwable throwable;
 
@@ -24,45 +26,50 @@ public class test_asserting_returned {
   }
 
   @Test
-  public void asserts_returning_object() {
+  public void inspects_closure_returning() {
     when(returning(object));
-    thenReturned();
+    thenReturned(object);
   }
 
   @Test
-  public void asserts_returning_null() {
-    when(returning(null));
-    thenReturned();
-  }
-
-  @Test
-  public void asserts_returning_void() {
-    // TODO replace by VoidClosure
-    when(new Runnable() {
-      public void run() {}
-    }).run();
-    thenReturned();
-  }
-
-  @Test
-  public void fails_throwing() {
+  public void inspects_closure_throwing() {
     when(throwing(throwable));
-    try {
-      thenReturned();
-      fail();
-    } catch (TestoryAssertionError e) {}
+    thenThrown(throwable);
   }
 
   @Test
-  public void failure_prints_expected() {
+  public void failure_prints_inspected_closure_returning() {
+    when(returning(object));
+    try {
+      thenThrown();
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertThat(e, hasMessageContaining(""
+          + "  but returned\n"
+          + "    " + object + "\n"));
+    }
+  }
+
+  @Test
+  public void failure_prints_inspected_closure_throwing() {
     when(throwing(throwable));
     try {
       thenReturned();
       fail();
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(""
-          + "  expected returned\n"
-          + "    \n"));
+          + "  but thrown\n"
+          + "    " + throwable + "\n"));
+      assertThat(e, hasMessageContaining(
+          "\n" + printStackTrace(throwable) + "\n"));
     }
+  }
+
+  @Test
+  public void closure_cannot_be_null() {
+    try {
+      when((Closure) null);
+      fail();
+    } catch (TestoryException e) {}
   }
 }
