@@ -7,12 +7,12 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
+import org.objenesis.ObjenesisStd;
+
 import net.sf.cglib.core.CodeGenerationException;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.Factory;
 import net.sf.cglib.proxy.NoOp;
-
-import org.objenesis.ObjenesisStd;
 
 public class Uniques {
   public static boolean hasUniques(Class<?> type) {
