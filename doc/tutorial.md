@@ -427,6 +427,7 @@ For sake of clarity, all exposed types are enumerated below.
 
  - `org.testory.Testory` - main entry point to library containing static methods
  - `org.testory.common.Closure` - functional interface representing piece of code returning `Object` or throwing `Throwable`
+ - `org.testory.common.VoidClosure` - functional interface representing piece of code returning `void` or throwing `Throwable`
  - `org.testory.common.Nullable` - annotation that marks optional parameters and return values
  - `org.testory.proxy.Invocation` - represents invocation on mock (method, instance and arguments)
  - `org.testory.proxy.Handler` - represents logic executed when invoking method on mock
