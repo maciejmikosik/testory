@@ -1,5 +1,7 @@
 package org.testory;
 
-public interface Closure {
-  Object invoke() throws Throwable;
-}
+/**
+ * Class has been moved to another package. Used {@link org.testory.common.Closure} instead.
+ */
+@Deprecated
+public interface Closure extends org.testory.common.Closure {}

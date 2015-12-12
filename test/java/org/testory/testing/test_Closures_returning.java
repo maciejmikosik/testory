@@ -5,7 +5,7 @@ import static org.testory.testing.Closures.returning;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.Closure;
+import org.testory.common.Closure;
 
 public class test_Closures_returning {
   private Object object;

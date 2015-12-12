@@ -339,7 +339,7 @@ Field of final type is assigned to sample data
 Random sample data is deterministically generated using field type and field name as a seed.
 
 # Fine Points
-[arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging)
+[arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging) | [api](#api)
 
 ### Arrays
 
@@ -407,6 +407,34 @@ Purging has following consequences
   - calling it causes `TestoryException`
   - stubbing it causes `TestoryException`
   - verifying it causes `TestoryException`
+
+### API
+
+Adding testory to your classpath gives you access to many public classes.
+However, not all of them are intended for external use.
+Thus, testory clarifies which classes are exposed as public API.
+If class is exposed, you can rely on it's functionality along [major](http://semver.org/) version.
+
+`org.testory.Testory` is exposed as it is the main entry point to library.
+You make testory methods available by statically importing `Testory` class.
+
+        import static org.testory.Testory.*;
+
+If class is exposed, it recursively exposes all classes available through it's public methods.
+It includes types of parameters, return types and annotations of those methods.
+
+For sake of clarity, all exposed types are enumerated below.
+
+ - `org.testory.Testory` - main entry point to library containing static methods
+ - `org.testory.common.Closure` - functional interface representing piece of code returning `Object` or throwing `Throwable`
+ - `org.testory.common.Nullable` - annotation that marks optional parameters and return values
+ - `org.testory.proxy.Invocation` - represents invocation on mock (method, instance and arguments)
+ - `org.testory.proxy.Handler` - represents logic executed when invoking method on mock
+ - `org.testory.proxy.InvocationMatcher` - predicate for matching invocation on mock when you stub/verify
+ - `org.testory.Closure` - deprecated alias for `org.testory.common.Closure`
+
+Beta features are exception to those rules.
+They can be removed at any time without incrementing major version.
 
 # Troubleshooting
 

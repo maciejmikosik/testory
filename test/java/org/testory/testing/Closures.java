@@ -1,6 +1,6 @@
 package org.testory.testing;
 
-import org.testory.Closure;
+import org.testory.common.Closure;
 
 public class Closures {
   public static Closure returning(final Object object) {

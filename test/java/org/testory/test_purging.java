@@ -13,6 +13,7 @@ import static org.testory.testing.Fakes.newObject;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.common.Closure;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
