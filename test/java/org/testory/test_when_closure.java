@@ -14,6 +14,7 @@ import static org.testory.testing.StackTraces.printStackTrace;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.common.Closure;
 
 public class test_when_closure {
   private Object object;

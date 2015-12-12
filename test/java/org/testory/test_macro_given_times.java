@@ -11,6 +11,7 @@ import java.util.concurrent.Callable;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.common.Closure;
 
 public class test_macro_given_times {
   private int times, counter, failTime;

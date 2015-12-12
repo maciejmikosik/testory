@@ -55,6 +55,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.testory.common.Any;
+import org.testory.common.Closure;
 import org.testory.common.DiagnosticMatcher;
 import org.testory.common.Effect;
 import org.testory.common.Effect.Returned;

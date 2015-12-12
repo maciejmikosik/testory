@@ -3,7 +3,7 @@ package org.testory.testing;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.testory.Closure;
+import org.testory.common.Closure;
 import org.testory.testing.Closures.Invoker;
 
 public class test_Closures_Invoker {
