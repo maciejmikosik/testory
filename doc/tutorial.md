@@ -31,34 +31,64 @@ Example test using `given`-`when`-`then` looks like this
         when(list.add("element"));
         then(!list.isEmpty());
 
-`given` and `when` can be used in chained form. This is helpful in various situations like dealing with `void` methods.
-
-Because using `void` as an argument will not compile
-
- - use `given(list).clear()` instead of `given(list.clear())`
- - use `when(list).clear()` instead of `when(list.clear())` 
-
 ### when
 
 Assertions can be used to verify result of invocation that happened at line containing `when`.
+There are several ways to capture a result you want to assert.
 
-Result that is going to be asserted is
+Most direct one is to pass it as an argument to `when` method.
+This way you can assert result of tested invocation.
 
- - `Object` passed as an argument
+        given(list = asList("element"));
+        when(list.get(0));
+        thenReturned("element");
 
-        when(object);
+Things get slightly more complicated if you want to assert, that `Throwable` is thrown.
+Testory can catch `Throwable`, but you need to help by wrapping tested expression in lambda.
 
- - `Object` returned, or `Throwable` thrown, by chained method
+        given(list = asList());
+        when(() -> list.get(0));
+        thenThrown(IndexOutOfBoundsException.class);
 
-        when(instance).chainedMethod()
+Asserting result of `void` method also requires help, because you cannot nest `void` expression as an argument.
+You need to wrap an expression in lambda, even if you don't need to catch exception.
 
- - result of invoking `Closure`
+        given(list = asList());
+        when(() -> list.clear());
+        thenReturned();
 
+If you don't use java 8, you have to expand lambda into anonymous `Closure` class.
+
+        given(list = asList());
         when(new Closure() {
-          public Object invoke() throws Throwable {
-            // custom logic
+          public Object invoke() {
+            return list.get(0);
           }
         });
+        thenThrown(IndexOutOfBoundsException.class);
+
+Or `VoidClosure` if tested expression returns `void`.
+
+        given(list = asList());
+        when(new VoidClosure() {
+          @Override
+          public void invoke() {
+            list.clear();
+          }
+        });
+        thenThrown(IndexOutOfBoundsException.class);
+
+There is one more way of capturing asserted expression that catches `Throwable`, works with `void` methods and does not require java 8.
+It involves invoking method on proxy returned by when.
+
+        given(list = asList());
+        when(list).clear();
+        thenReturned();
+
+This chained form looks simpler than using lambdas or anonymous classes.
+However there is a downside, because not all types are proxiable (for example final classes).
+In that case, `when` returns `null` and you get `NullPointerException`.
+Also final methods are not proxied resulting in unpredictable behavior.
 
 ### thenReturned
 
@@ -427,6 +457,7 @@ For sake of clarity, all exposed types are enumerated below.
 
  - `org.testory.Testory` - main entry point to library containing static methods
  - `org.testory.common.Closure` - functional interface representing piece of code returning `Object` or throwing `Throwable`
+ - `org.testory.common.VoidClosure` - functional interface representing piece of code returning `void` or throwing `Throwable`
  - `org.testory.common.Nullable` - annotation that marks optional parameters and return values
  - `org.testory.proxy.Invocation` - represents invocation on mock (method, instance and arguments)
  - `org.testory.proxy.Handler` - represents logic executed when invoking method on mock

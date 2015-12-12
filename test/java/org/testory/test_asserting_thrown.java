@@ -6,6 +6,7 @@ import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
 import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
+import static org.testory.testing.Closures.voidReturning;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
 import static org.testory.testing.Matchers.hasMessageContaining;
@@ -40,10 +41,7 @@ public class test_asserting_thrown {
 
   @Test
   public void fails_returning_void() {
-    // TODO replace by VoidClosure
-    when(new Runnable() {
-      public void run() {}
-    }).run();
+    when(voidReturning());
     try {
       thenThrown();
       fail();

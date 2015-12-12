@@ -64,6 +64,7 @@ import org.testory.common.Effect.Thrown;
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.common.Optional;
+import org.testory.common.VoidClosure;
 import org.testory.plumbing.Anyvocation;
 import org.testory.plumbing.Calling;
 import org.testory.plumbing.History;
@@ -483,6 +484,21 @@ public class Testory {
       return thrown(throwable);
     }
     return returned(object);
+  }
+
+  public static void when(VoidClosure closure) {
+    check(closure != null);
+    log(inspecting(effectOfInvoke(closure)));
+    setHistory(mark(purge(getHistory())));
+  }
+
+  private static Effect effectOfInvoke(VoidClosure closure) {
+    try {
+      closure.invoke();
+    } catch (Throwable throwable) {
+      return thrown(throwable);
+    }
+    return returnedVoid();
   }
 
   private static Effect effectOfInvoke(Invocation invocation) {
