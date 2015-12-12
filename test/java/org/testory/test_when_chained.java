@@ -45,6 +45,10 @@ public class test_when_chained {
   public void inspects_method_returning_void() throws Throwable {
     when(runnable).run();
     thenReturned();
+    try {
+      thenReturned(null);
+      fail();
+    } catch (TestoryAssertionError e) {}
   }
 
   @Test

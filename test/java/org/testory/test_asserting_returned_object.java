@@ -87,18 +87,6 @@ public class test_asserting_returned_object {
   }
 
   @Test
-  public void fails_returning_void_instead_of_null() {
-    // TODO replace by VoidClosure
-    when(new Runnable() {
-      public void run() {}
-    }).run();
-    try {
-      thenReturned(null);
-      fail();
-    } catch (TestoryAssertionError e) {}
-  }
-
-  @Test
   public void fails_throwing() {
     when(throwing(throwable));
     try {
