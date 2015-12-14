@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class test_verifying_times_NumberMatcher {
+public class test_verifying_times_dynamic_matcher {
   private Mockable mock;
 
   @Before

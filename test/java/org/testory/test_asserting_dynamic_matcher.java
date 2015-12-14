@@ -9,7 +9,7 @@ import static org.testory.testing.Matchers.hasMessageContaining;
 import org.junit.Before;
 import org.junit.Test;
 
-public class test_asserting_matcher {
+public class test_asserting_dynamic_matcher {
   private Object object, otherObject;
   private Object matcher;
 

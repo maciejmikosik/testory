@@ -14,7 +14,7 @@ import static org.testory.testing.Matchers.hasMessageContaining;
 import org.junit.Before;
 import org.junit.Test;
 
-public class test_asserting_thrown_matcher {
+public class test_asserting_thrown_dynamic_matcher {
   private Throwable throwable, otherThrowable;
   private Object object;
   private Object matcher;
