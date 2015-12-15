@@ -44,6 +44,13 @@ public class test_asserting_returned_dynamic_matcher {
   }
 
   @Test
+  public void asserts_returning_matcher() {
+    matcher = matcherSame(object);
+    when(returning(matcher));
+    thenReturned(matcher);
+  }
+
+  @Test
   public void fails_returning_void() {
     matcher = matcherSame(object);
     when(voidReturning());
