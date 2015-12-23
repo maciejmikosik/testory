@@ -8,6 +8,7 @@ import static org.testory.Testory.when;
 import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Closures.voidReturning;
+import static org.testory.testing.DynamicMatchers.same;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
 import static org.testory.testing.HamcrestMatchers.diagnosed;
@@ -31,14 +32,14 @@ public class test_asserting_thrown_dynamic_matcher {
 
   @Test
   public void asserts_throwing_matching_throwable() {
-    matcher = matcherSame(throwable);
+    matcher = same(throwable);
     when(throwing(throwable));
     thenThrown(matcher);
   }
 
   @Test
   public void fails_throwing_mismatching_throwable() {
-    matcher = matcherSame(throwable);
+    matcher = same(throwable);
     when(throwing(otherThrowable));
     try {
       thenThrown(matcher);
@@ -48,7 +49,7 @@ public class test_asserting_thrown_dynamic_matcher {
 
   @Test
   public void fails_returning_object() {
-    matcher = matcherSame(throwable);
+    matcher = same(throwable);
     when(returning(object));
     try {
       thenThrown(matcher);
@@ -58,7 +59,7 @@ public class test_asserting_thrown_dynamic_matcher {
 
   @Test
   public void fails_returning_void() {
-    matcher = matcherSame(throwable);
+    matcher = same(throwable);
     when(voidReturning());
     try {
       thenThrown(matcher);
@@ -68,7 +69,7 @@ public class test_asserting_thrown_dynamic_matcher {
 
   @Test
   public void failure_prints_expected_matcher() {
-    matcher = matcherSame(throwable);
+    matcher = same(throwable);
     when(returning(object));
     try {
       thenThrown(matcher);
@@ -120,18 +121,5 @@ public class test_asserting_thrown_dynamic_matcher {
       thenThrown((Object) null);
       fail();
     } catch (TestoryException e) {}
-  }
-
-  private static Object matcherSame(final Object expected) {
-    return new Object() {
-      @SuppressWarnings("unused")
-      public boolean matches(Object item) {
-        return item == expected;
-      }
-
-      public String toString() {
-        return "matcherSame(" + expected + ")";
-      }
-    };
   }
 }

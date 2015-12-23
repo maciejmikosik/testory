@@ -4,9 +4,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalledTimes;
+import static org.testory.testing.DynamicMatchers.number;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
-
-import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -122,19 +121,6 @@ public class test_verifying_times_dynamic_matcher {
 
       public String toString() {
         return "onInstance(" + mock + ")";
-      }
-    };
-  }
-
-  private static Object number(final Integer... numbers) {
-    return new Object() {
-      @SuppressWarnings("unused")
-      public boolean matches(Object item) {
-        return Arrays.asList(numbers).contains(item);
-      }
-
-      public String toString() {
-        return "number(" + Arrays.toString(numbers) + ")";
       }
     };
   }

@@ -8,6 +8,7 @@ import static org.testory.Testory.when;
 import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Closures.voidReturning;
+import static org.testory.testing.DynamicMatchers.same;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
 import static org.testory.testing.HamcrestMatchers.diagnosed;
@@ -31,14 +32,14 @@ public class test_asserting_returned_dynamic_matcher {
 
   @Test
   public void asserts_returning_matching_object() {
-    matcher = matcherSame(object);
+    matcher = same(object);
     when(returning(object));
     thenReturned(matcher);
   }
 
   @Test
   public void fails_returning_mismatching_object() {
-    matcher = matcherSame(object);
+    matcher = same(object);
     when(returning(otherObject));
     try {
       thenReturned(matcher);
@@ -48,14 +49,14 @@ public class test_asserting_returned_dynamic_matcher {
 
   @Test
   public void asserts_returning_matcher() {
-    matcher = matcherSame(object);
+    matcher = same(object);
     when(returning(matcher));
     thenReturned(matcher);
   }
 
   @Test
   public void fails_returning_void() {
-    matcher = matcherSame(object);
+    matcher = same(object);
     when(voidReturning());
     try {
       thenReturned(matcher);
@@ -65,7 +66,7 @@ public class test_asserting_returned_dynamic_matcher {
 
   @Test
   public void fails_throwing() {
-    matcher = matcherSame(object);
+    matcher = same(object);
     when(throwing(throwable));
     try {
       thenReturned(matcher);
@@ -75,7 +76,7 @@ public class test_asserting_returned_dynamic_matcher {
 
   @Test
   public void failure_prints_expected_matcher() {
-    matcher = matcherSame(object);
+    matcher = same(object);
     when(throwing(throwable));
     try {
       thenReturned(matcher);
@@ -111,18 +112,5 @@ public class test_asserting_returned_dynamic_matcher {
     } catch (TestoryAssertionError e) {
       assertThat(e, not(hasMessageContaining("diagnosis\n")));
     }
-  }
-
-  private static Object matcherSame(final Object expected) {
-    return new Object() {
-      @SuppressWarnings("unused")
-      public boolean matches(Object item) {
-        return item == expected;
-      }
-
-      public String toString() {
-        return "matcherSame(" + expected + ")";
-      }
-    };
   }
 }
