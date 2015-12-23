@@ -8,7 +8,7 @@ import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 

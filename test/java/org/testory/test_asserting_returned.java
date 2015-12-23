@@ -9,7 +9,7 @@ import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Closures.voidReturning;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;

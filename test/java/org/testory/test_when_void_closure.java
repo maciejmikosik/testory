@@ -8,7 +8,7 @@ import static org.testory.Testory.when;
 import static org.testory.testing.Closures.voidReturning;
 import static org.testory.testing.Closures.voidThrowing;
 import static org.testory.testing.Fakes.newThrowable;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 import static org.testory.testing.StackTraces.printStackTrace;
 
 import org.junit.Before;

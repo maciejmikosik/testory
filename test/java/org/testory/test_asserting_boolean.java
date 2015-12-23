@@ -3,7 +3,7 @@ package org.testory;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.then;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Test;
 

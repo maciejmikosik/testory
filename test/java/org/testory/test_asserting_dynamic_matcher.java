@@ -4,7 +4,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.then;
 import static org.testory.testing.Fakes.newObject;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.diagnosed;
+import static org.testory.testing.HamcrestMatchers.hamcrestDiagnosticMatcher;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +48,19 @@ public class test_asserting_dynamic_matcher {
           + "    " + matcher + "\n"
           + "  but was\n"
           + "    " + otherObject + "\n"));
+    }
+  }
+
+  @Test
+  public void failure_diagnoses_mismatch() {
+    matcher = hamcrestDiagnosticMatcher();
+    try {
+      then(object, matcher);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertThat(e, hasMessageContaining(""
+          + "  diagnosis\n"
+          + "    " + diagnosed(object) + "\n"));
     }
   }
 

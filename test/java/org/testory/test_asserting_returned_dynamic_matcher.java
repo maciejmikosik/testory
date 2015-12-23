@@ -1,5 +1,6 @@
 package org.testory;
 
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
@@ -9,7 +10,9 @@ import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Closures.voidReturning;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.diagnosed;
+import static org.testory.testing.HamcrestMatchers.hamcrestDiagnosticMatcher;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -81,6 +84,32 @@ public class test_asserting_returned_dynamic_matcher {
       assertThat(e, hasMessageContaining(""
           + "  expected returned\n"
           + "    " + matcher + "\n"));
+    }
+  }
+
+  @Test
+  public void failure_diagnoses_mismatch() {
+    matcher = hamcrestDiagnosticMatcher();
+    when(returning(object));
+    try {
+      thenReturned(matcher);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertThat(e, hasMessageContaining(""
+          + "  diagnosis\n"
+          + "    " + diagnosed(object) + "\n"));
+    }
+  }
+
+  @Test
+  public void failure_skips_diagnosis_if_thrown() {
+    matcher = hamcrestDiagnosticMatcher();
+    when(throwing(throwable));
+    try {
+      thenReturned(matcher);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertThat(e, not(hasMessageContaining("diagnosis\n")));
     }
   }
 

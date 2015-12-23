@@ -13,7 +13,7 @@ import static org.testory.Testory.thenCalledInOrder;
 import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.willReturn;
 import static org.testory.testing.Fakes.newObject;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import java.util.Arrays;
 
