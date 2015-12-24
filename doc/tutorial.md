@@ -97,6 +97,7 @@ This chained form looks simpler than using lambdas or anonymous classes.
 However there is a downside, because not all types are proxiable (for example final classes).
 In that case, `when` returns `null` and you get `NullPointerException`.
 Also final methods are not proxied, which results in unpredictable behavior.
+Additionally static calls cannot be written this way, because there is no `this` to wrap in proxy.
 
 ### thenReturned
 
@@ -264,7 +265,7 @@ Spies can be stubbed and verified like any other mock.
  - there can be many spies for same real object
 
 # Utilities
-[matchers](#matchers) | [closures](#closures)
+[matchers](#matchers)
 
 ### Matchers
 
@@ -283,26 +284,6 @@ Wherever api method accepts `Object` via parameter named `matcher`, you are free
             return ...;
           }
         };
-
-### Closures
-
-In some cases `when` can be difficult to write. For example you want to assert that
-`Throwable` was thrown, but cannot use chained form of `when`, because method is static. You may then
-wrap call inside `Closure`.
-
-        @Test
-        public void should_fail_if_malformed() {
-          when(_parseInt("12x3"));
-          thenThrown(NumberFormatException.class);
-        }
-
-        private static Closure _parseInt(final String string) {
-          return new Closure() {
-            public Integer invoke() {
-              return Integer.parseInt(string);
-            }
-          };
-        }
 
 # Macros
 [givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
