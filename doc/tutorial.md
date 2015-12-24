@@ -5,19 +5,19 @@
 
 To make `given`, `when`, `then` family of methods available, add following import to your test class.
 
-        import static org.testory.Testory.*;
+    import static org.testory.Testory.*;
 
 The most basic purpose of `given` and `when` is decorative so instead of writing comments like this
 
-        // given
-        list = new ArrayList<String>();
-        // when
-        list.add("element");
+    // given
+    list = new ArrayList<String>();
+    // when
+    list.add("element");
 
 you wrap lines inside methods
 
-        given(list = new ArrayList<String>());
-        when(list.add("element"));
+    given(list = new ArrayList<String>());
+    when(list.add("element"));
 
 The purpose of `then` is to make assertions similar to junit's assertions.
 
@@ -27,9 +27,9 @@ The purpose of `then` is to make assertions similar to junit's assertions.
 
 Example test using `given`-`when`-`then` looks like this
 
-        given(list = new ArrayList<String>());
-        when(list.add("element"));
-        then(!list.isEmpty());
+    given(list = new ArrayList<String>());
+    when(list.add("element"));
+    then(!list.isEmpty());
 
 ### when
 
@@ -39,49 +39,49 @@ There are several ways to capture a result you want to assert.
 Most direct one is to pass it as an argument to `when` method.
 This way you can assert result of tested invocation.
 
-        given(list = asList("element"));
-        when(list.get(0));
-        thenReturned("element");
+    given(list = asList("element"));
+    when(list.get(0));
+    thenReturned("element");
 
 Things get slightly more complicated if you want to assert, that `Throwable` is thrown.
 Testory can catch `Throwable`, but you need to help by wrapping tested expression in lambda.
 
-        given(list = asList());
-        when(() -> list.get(0));
-        thenThrown(IndexOutOfBoundsException.class);
+    given(list = asList());
+    when(() -> list.get(0));
+    thenThrown(IndexOutOfBoundsException.class);
 
 Asserting result of `void` method also requires help, because you cannot nest `void` expression as an argument.
 You need to wrap an expression in lambda, even if you don't need to catch throwable.
 And because now throwable is caught, it will not make test fail as usual.
 To restore this behavior, you need to assert explicitly that you expect expression to not throw anything, using `thenReturned()`.
 
-        given(list = new ArrayList<String>());
-        given(list.add("element"));
-        when(() -> list.clear());
-        thenReturned();
-        then(list.isEmpty());
+    given(list = new ArrayList<String>());
+    given(list.add("element"));
+    when(() -> list.clear());
+    thenReturned();
+    then(list.isEmpty());
 
 ### thenReturned
 
 `thenReturned` is used to make assertions about `Object` returned by `when`. Assertion fails if actual result is not equal to expected `Object` or value.
 
-        given(list = asList("element"));
-        when(list.get(0));
-        thenReturned("element");
+    given(list = asList("element"));
+    when(list.get(0));
+    thenReturned("element");
 
 [Matchers](#matchers) can be used to make custom assertions
 
-        given(list = asList("element"));
-        when(list.clone());
-        thenReturned(not(sameInstance(list)));
+    given(list = asList("element"));
+    when(list.clone());
+    thenReturned(not(sameInstance(list)));
 
 ### thenThrown
 
 `thenThrown` is used to make assertions about `Throwable` thrown by `when`.
 
-        given(list = asList());
-        when(() -> list.get(0));
-        thenThrown(IndexOutOfBoundsException.class);
+    given(list = asList());
+    when(() -> list.get(0));
+    thenThrown(IndexOutOfBoundsException.class);
 
 `thenThrown` is overloaded to accept `Throwable` instance, `Class` or matcher.
 
@@ -90,7 +90,7 @@ To restore this behavior, you need to assert explicitly that you expect expressi
 
 Any non-final class or interface can be mocked.
 
-        given(list = mock(List.class));
+    given(list = mock(List.class));
 
 Newly created mock has following properties
  - all methods are stubbable, except finalize and final methods
@@ -104,19 +104,19 @@ Newly created mock has following properties
 
 Mock can be stubbed to return `Object`
 
-        given(willReturn(object), list).get(1);
+    given(willReturn(object), list).get(1);
 
 throw `Throwable`
 
-        given(willThrow(new IndexOutOfBoundsException()), list).get(2);
+    given(willThrow(new IndexOutOfBoundsException()), list).get(2);
 
 or execute custom logic.
 
-        given(new Handler() {
-          public Object handle(Invocation invocation) throws Throwable {
-            // custom logic
-          }
-        }, mock).toString();
+    given(new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        // custom logic
+      }
+    }, mock).toString();
 
 Stubbing will be only effective for specified instance of mock, method and equal arguments.
 
@@ -129,82 +129,82 @@ Stubbing will be only effective for specified instance of mock, method and equal
 
 It is possible to assert expected invocation on mock.
 
-        given(output = mock(OutputStream.class));
-        given(filterOutput = new FilterOutputStream(output));
-        when(filterOutput).close();
-        thenCalled(output).close();
+    given(output = mock(OutputStream.class));
+    given(filterOutput = new FilterOutputStream(output));
+    when(filterOutput).close();
+    thenCalled(output).close();
 
 Invocation is expected to be called exactly once.
 
 You can verify number of invocations by passing exact value (may be 0)
 
-        thenCalledTimes(3, mock).size();
+    thenCalledTimes(3, mock).size();
 
 or using matcher.
  
-        thenCalledTimes(greaterThan(0), mock).toString();
+    thenCalledTimes(greaterThan(0), mock).toString();
 
 By default, order of invocations does not matter.
 
 If you need to assert that invocations happened in order, use ordered verifying.
 
-        thenCalledInOrder(mockDatabase).open();
-        thenCalledInOrder(mockDatabase).close();
+    thenCalledInOrder(mockDatabase).open();
+    thenCalledInOrder(mockDatabase).close();
 
 ### Matching Invocations
 
 You can take full control of matching invocations by implementing your own `InvocationMatcher`.
 
-        InvocationMatcher onCondition = new InvocationMatcher() {
-          public boolean matches(Invocation invocation) {
-            // custom logic
-          }
-        };
+    InvocationMatcher onCondition = new InvocationMatcher() {
+      public boolean matches(Invocation invocation) {
+        // custom logic
+      }
+    };
 
 Or use predefined factories for most common cases.
 
  - To assert that specific number of invocations was called on mock.
 
-        thenCalledTimes(4, onInstance(mock));
+    thenCalledTimes(4, onInstance(mock));
 
  - To assert that no invocations was called on mock.
 
-        thenCalledNever(onInstance(mock));
+    thenCalledNever(onInstance(mock));
 
  - To stub all invocations returning specified type. See [komarro library](https://code.google.com/p/komarro/) for explanation why would you want to do that.
 
-        given(willReturn(person), onReturn(Person.class));
+    given(willReturn(person), onReturn(Person.class));
 
  - To stub all invocations by return type and arguments.
 
-        given(willReturn(person), onRequest(Person.class, "username"));
+    given(willReturn(person), onRequest(Person.class, "username"));
 
 Use `any` if you do not care about argument value during stubbing or verification.
 
-        thenCalled(list).add(any(Object.class));
+    thenCalled(list).add(any(Object.class));
 
 or `any` with [matcher](#matchers) if you care
 
-        thenCalled(list).add(any(Object.class, startsWith("prefix")));
+    thenCalled(list).add(any(Object.class, startsWith("prefix")));
 
 `Class` passed to `any` is just for inferring purpose. Argument can be instance of any type and still can match.
 
 In most cases you can mix `any` with real arguments.
 
-        given(willReturn(true), mock).someMethod(object, any(Object.class));
+    given(willReturn(true), mock).someMethod(object, any(Object.class));
 
 In cases where you cannot (due to technical limitations) `TestoryException` is thrown.
 
-        // throws TestoryException
-        given(willReturn(true), mock).someMethod(any(int.class), intValue);
+    // throws TestoryException
+    given(willReturn(true), mock).someMethod(any(int.class), intValue);
 
 You can workaround those cases by wrapping primitive values in `a`.
 
-        given(willReturn(true), mock).someMethod(any(int.class), a(intValue));
+    given(willReturn(true), mock).someMethod(any(int.class), a(intValue));
 
 Use `the` shortcut if you expect exactly same instance
 
-        given(willReturn(true), mock).someMethod(the(instance));
+    given(willReturn(true), mock).someMethod(the(instance));
 
 ### Spying
 
@@ -212,14 +212,14 @@ Spy is a mock that is prestubbed to delegate all invocations to real object.
 
 You can create spy as a new mock
 
-        given(real = Arrays.asList("a", "b", "c"));
-        given(spy = spy(real));
+    given(real = Arrays.asList("a", "b", "c"));
+    given(spy = spy(real));
 
 or stub an existing mock to act as a spy
 
-        given(real = Arrays.asList("a", "b", "c"));
-        given(mock = mock(List.class));
-        given(willSpy(real), onInstance(mock));
+    given(real = Arrays.asList("a", "b", "c"));
+    given(mock = mock(List.class));
+    given(willSpy(real), onInstance(mock));
 
 Spies can be stubbed and verified like any other mock.
 
@@ -241,11 +241,11 @@ Wherever api method accepts `Object` via parameter named `matcher`, you are free
  - [com.google.common.base.Function](https://code.google.com/p/guava-libraries/)
  - dynamic matcher
  
-        Object matcher = new Object() {
-          public boolean matches(Object item) {
-            return ...;
-          }
-        };
+    Object matcher = new Object() {
+      public boolean matches(Object item) {
+        return ...;
+      }
+    };
 
 # Macros
 [givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
@@ -256,29 +256,29 @@ Macros help you remove boilerplate code from your tests.
 
 Repeats invocation many times.
 
-        given(list = new ArrayList<String>());
-        givenTimes(5, list).add("element");
-        when(list.size());
-        thenReturned(5);
+    given(list = new ArrayList<String>());
+    givenTimes(5, list).add("element");
+    when(list.size());
+    thenReturned(5);
 
 ### givenTry
 
 Catches possible `Throwable` thrown by chained method allowing test to run forward.
 
-        given(list = new ArrayList<String>());
-        givenTry(list).add(5, "element");
-        when(list.size());
-        thenReturned(0);
+    given(list = new ArrayList<String>());
+    givenTry(list).add(5, "element");
+    when(list.size());
+    thenReturned(0);
 
 ### givenTest (beta)
 
 Initializes each field of `this` test and fails if initialization of any field fails.
 Also purges testory internal state (see [purging](#purging)).
 
-        @Before
-        public void before() {
-          givenTest(this);
-        }
+    @Before
+    public void before() {
+      givenTest(this);
+    }
 
 Field is ignored if
 
@@ -326,37 +326,37 @@ Still it is compatible with java 7, but there are some inconveniences you need t
 Using `when` for catching `Throwable`, or with `void` expression,
 would require you to expand lambda into anonymous `Closure` or `VoidClosure` class.
 
-        given(list = asList());
-        when(new Closure() {
-          public Object invoke() {
-            return list.get(0);
-          }
-        });
-        thenThrown(IndexOutOfBoundsException.class);
+    given(list = asList());
+    when(new Closure() {
+      public Object invoke() {
+        return list.get(0);
+      }
+    });
+    thenThrown(IndexOutOfBoundsException.class);
 
-        given(list = new ArrayList<String>());
-        given(list.add("element"));
-        when(new VoidClosure() {
-          @Override
-          public void invoke() {
-            list.clear();
-          }
-        });
-        thenReturned();
-        then(list.isEmpty());
+    given(list = new ArrayList<String>());
+    given(list.add("element"));
+    when(new VoidClosure() {
+      @Override
+      public void invoke() {
+        list.clear();
+      }
+    });
+    thenReturned();
+    then(list.isEmpty());
 
 Alternatively you can use chained form.
 It involves invoking method on proxy returned by `when`.
 
-        given(list = asList());
-        when(list).get(0);
-        thenThrown(IndexOutOfBoundsException.class);
+    given(list = asList());
+    when(list).get(0);
+    thenThrown(IndexOutOfBoundsException.class);
 
-        given(list = new ArrayList<String>());
-        given(list.add("element"));
-        when(list).clear();
-        thenReturned();
-        then(list.isEmpty());
+    given(list = new ArrayList<String>());
+    given(list.add("element"));
+    when(list).clear();
+    thenReturned();
+    then(list.isEmpty());
 
 This chained form looks simpler than using anonymous classes (or even lambdas!).
 However there is a downside, because not all types are proxiable (for example final classes).
@@ -441,7 +441,7 @@ If class is exposed, you can rely on it's functionality along [major](http://sem
 `org.testory.Testory` is exposed as it is the main entry point to library.
 You make testory methods available by statically importing `Testory` class.
 
-        import static org.testory.Testory.*;
+    import static org.testory.Testory.*;
 
 If class is exposed, it recursively exposes all classes available through it's public methods.
 It includes types of parameters, return types and annotations of those methods.
