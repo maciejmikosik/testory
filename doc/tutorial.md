@@ -1,75 +1,68 @@
 [overview](#overview) | [mocks](#mocks) | [utilities](#utilities) | [macros](#macros) | [fine points](#fine-points) | [troubleshooting](#troubleshooting) | [development](#development)
 
 # Overview
-[when](#when) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown)
+[then](#then) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown) | [void](#void)
 
-To make `given`, `when`, `then` family of methods available, add following import to your test class.
+Traditionally, test written in BDD fashion has 3 sections: given, when, then.
+Those sections are preceded by comments. Example test could look like this.
+
+    public class ArrayListTest {
+      private List<Object> list;
+
+      @Test
+      public void is_not_empty_after_adding_first_element() {
+        // given
+        list = new ArrayList<>();
+
+        // when
+        list.add("element");
+
+        // then
+        assertFalse(list.isEmpty());
+      } 
+    }
+
+Testory makes your tests more human-readable.
+It provides family of `given`, `when`, `then` methods that make those sections explicit.
 
     import static org.testory.Testory.*;
 
-The most basic purpose of `given` and `when` is decorative so instead of writing comments like this
+    public class ArrayListTest {
+      private List<Object> list;
 
-    // given
-    list = new ArrayList<String>();
-    // when
-    list.add("element");
+      @Test
+      public void is_not_empty_after_adding_first_element() {
+        given(list = new ArrayList<>());
+        when(list.add("element"));
+        then(!list.isEmpty());
+      }
+    }
 
-you wrap lines inside methods
+This family has plenty of overloaded methods to cover scenarios like
+asserting exceptions, accepting matchers, stubbing and verifying mocks and more.
 
-    given(list = new ArrayList<String>());
-    when(list.add("element"));
+### then
 
-The purpose of `then` is to make assertions similar to junit's assertions.
+`then` methods allow you to assert that specific condition is true.
+These are similar to junit assertion methods.
 
  - `then(boolean)` is like `assertTrue(boolean)`
  - `then(Object, Object)` is like `assertThat(T, Matcher<T>)`
  - `thenEqual(Object, Object)` is like `assertEquals(Object, Object)`
 
-Example test using `given`-`when`-`then` looks like this
-
-    given(list = new ArrayList<String>());
-    when(list.add("element"));
-    then(!list.isEmpty());
-
-### when
-
-Assertions can be used to verify result of invocation that happened at line containing `when`.
-There are several ways to capture a result you want to assert.
-
-Most direct one is to pass it as an argument to `when` method.
-This way you can assert result of tested invocation.
-
-    given(list = asList("element"));
-    when(list.get(0));
-    thenReturned("element");
-
-Things get slightly more complicated if you want to assert, that `Throwable` is thrown.
-Testory can catch `Throwable`, but you need to help by wrapping tested expression in lambda.
-
-    given(list = asList());
-    when(() -> list.get(0));
-    thenThrown(IndexOutOfBoundsException.class);
-
-Asserting result of `void` method also requires help, because you cannot nest `void` expression as an argument.
-You need to wrap an expression in lambda, even if you don't need to catch throwable.
-And because now throwable is caught, it will not make test fail as usual.
-To restore this behavior, you need to assert explicitly that you expect expression to not throw anything, using `thenReturned()`.
-
-    given(list = new ArrayList<String>());
-    given(list.add("element"));
-    when(() -> list.clear());
-    thenReturned();
-    then(list.isEmpty());
+Those are standalone assertions, which means they do not rely on what happened at `when` line like other assertions do.
 
 ### thenReturned
 
-`thenReturned` is used to make assertions about `Object` returned by `when`. Assertion fails if actual result is not equal to expected `Object` or value.
+Expression nested in `when` method usually returns a result.
+You can assert your expectation about this result using `thenReturned` method.
+Assertion fails if actual result is not equal to expected `Object` or value.
 
     given(list = asList("element"));
     when(list.get(0));
     thenReturned("element");
 
-[Matchers](#matchers) can be used to make custom assertions
+If you need more complicated logic than `equals` you can use [Matchers](#matchers) from external libraries.
 
     given(list = asList("element"));
     when(list.clone());
@@ -77,13 +70,30 @@ To restore this behavior, you need to assert explicitly that you expect expressi
 
 ### thenThrown
 
-`thenThrown` is used to make assertions about `Throwable` thrown by `when`.
+Expression nested in `when` can also throw `Throwable`.
+Normally it would make a test fail, but there are situations where this is expected behavior you want to assert.
+Testory can catch `Throwable` for you, but you need to help by wrapping tested expression in lambda.
+After that you can assert that caught `Throwable` meets you expectations.
 
     given(list = asList());
     when(() -> list.get(0));
     thenThrown(IndexOutOfBoundsException.class);
 
 `thenThrown` is overloaded to accept `Throwable` instance, `Class` or matcher.
+Of course assertion fails if expression did not throw anything.
+
+### void
+
+Asserting result of `void` method also requires help, because you cannot nest `void` expression as an argument.
+You need to wrap an expression in lambda, even if you don't need to catch throwable.
+And because now throwable is caught, it will not make test fail as usual.
+To restore this behavior, you need to assert explicitly that you expect expression to not throw anything, using `thenReturned()`.
+
+    given(list = new ArrayList<>());
+    given(list.add("element"));
+    when(() -> list.clear());
+    thenReturned();
+    then(list.isEmpty());
 
 # Mocks
 [stubbing](#stubbing) | [verifying](#verifying) | [matching invocations](#matching-invocations) | [spying](#spying)
