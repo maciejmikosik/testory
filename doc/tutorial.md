@@ -51,11 +51,15 @@ Testory can catch `Throwable`, but you need to help by wrapping tested expressio
         thenThrown(IndexOutOfBoundsException.class);
 
 Asserting result of `void` method also requires help, because you cannot nest `void` expression as an argument.
-You need to wrap an expression in lambda, even if you don't need to catch exception.
+You need to wrap an expression in lambda, even if you don't need to catch throwable.
+And because now throwable is caught it will not make test fail as usual.
+To restore this behavior, you need to assert explicitly that you expect expression to not throw anything, using `thenReturned()`.
 
-        given(list = asList());
+        given(list = new ArrayList<String>());
+        given(list.add("element"));
         when(() -> list.clear());
         thenReturned();
+        then(list.isEmpty());
 
 If you don't use java 8, you have to expand lambda into anonymous `Closure` class.
 
@@ -69,55 +73,54 @@ If you don't use java 8, you have to expand lambda into anonymous `Closure` clas
 
 Or `VoidClosure` if tested expression returns `void`.
 
-        given(list = asList());
+        given(list = new ArrayList<String>());
+        given(list.add("element"));
         when(new VoidClosure() {
           @Override
           public void invoke() {
             list.clear();
           }
         });
-        thenThrown(IndexOutOfBoundsException.class);
+        thenReturned();
+        then(list.isEmpty());
 
 There is one more way of capturing asserted expression that catches `Throwable`, works with `void` methods and does not require java 8.
 It involves invoking method on proxy returned by when.
 
-        given(list = asList());
+        given(list = new ArrayList<String>());
+        given(list.add("element"));
         when(list).clear();
         thenReturned();
+        then(list.isEmpty());
 
 This chained form looks simpler than using lambdas or anonymous classes.
 However there is a downside, because not all types are proxiable (for example final classes).
 In that case, `when` returns `null` and you get `NullPointerException`.
-Also final methods are not proxied resulting in unpredictable behavior.
+Also final methods are not proxied, which results in unpredictable behavior.
 
 ### thenReturned
 
 `thenReturned` is used to make assertions about `Object` returned by `when`. Assertion fails if actual result is not equal to expected `Object` or value.
 
-        given(list = new ArrayList<String>());
-        given(list.add("element"));
+        given(list = asList("element"));
         when(list.get(0));
         thenReturned("element");
 
 [Matchers](#matchers) can be used to make custom assertions
 
-        given(list = new ArrayList<String>());
-        given(list.add("element"));
+        given(list = asList("element"));
         when(list.clone());
         thenReturned(not(sameInstance(list)));
 
 ### thenThrown
 
-`thenThrown` is used to make assertions about `Throwable` thrown by `when`. Because of
-java syntax `when` must be in chained form.
+`thenThrown` is used to make assertions about `Throwable` thrown by `when`.
 
-        given(list = new ArrayList<String>());
-        when(list).get(0);
+        given(list = asList());
+        when(() -> list.get(0));
         thenThrown(IndexOutOfBoundsException.class);
 
 `thenThrown` is overloaded to accept `Throwable` instance, `Class` or matcher.
-
-Notice that `when` in chained form catches any `Throwable`. This prevents `Throwable` from failing a test. If you want this to be detected, use either `thenReturned` or `thenThrown` to assert expected result.
 
 # Mocks
 [stubbing](#stubbing) | [verifying](#verifying) | [matching invocations](#matching-invocations) | [spying](#spying)
