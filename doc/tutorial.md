@@ -52,7 +52,7 @@ Testory can catch `Throwable`, but you need to help by wrapping tested expressio
 
 Asserting result of `void` method also requires help, because you cannot nest `void` expression as an argument.
 You need to wrap an expression in lambda, even if you don't need to catch throwable.
-And because now throwable is caught it will not make test fail as usual.
+And because now throwable is caught, it will not make test fail as usual.
 To restore this behavior, you need to assert explicitly that you expect expression to not throw anything, using `thenReturned()`.
 
         given(list = new ArrayList<String>());
@@ -60,44 +60,6 @@ To restore this behavior, you need to assert explicitly that you expect expressi
         when(() -> list.clear());
         thenReturned();
         then(list.isEmpty());
-
-If you don't use java 8, you have to expand lambda into anonymous `Closure` class.
-
-        given(list = asList());
-        when(new Closure() {
-          public Object invoke() {
-            return list.get(0);
-          }
-        });
-        thenThrown(IndexOutOfBoundsException.class);
-
-Or `VoidClosure` if tested expression returns `void`.
-
-        given(list = new ArrayList<String>());
-        given(list.add("element"));
-        when(new VoidClosure() {
-          @Override
-          public void invoke() {
-            list.clear();
-          }
-        });
-        thenReturned();
-        then(list.isEmpty());
-
-There is one more way of capturing asserted expression that catches `Throwable`, works with `void` methods and does not require java 8.
-It involves invoking method on proxy returned by when.
-
-        given(list = new ArrayList<String>());
-        given(list.add("element"));
-        when(list).clear();
-        thenReturned();
-        then(list.isEmpty());
-
-This chained form looks simpler than using lambdas or anonymous classes.
-However there is a downside, because not all types are proxiable (for example final classes).
-In that case, `when` returns `null` and you get `NullPointerException`.
-Also final methods are not proxied, which results in unpredictable behavior.
-Additionally static calls cannot be written this way, because there is no `this` to wrap in proxy.
 
 ### thenReturned
 
@@ -353,7 +315,54 @@ Field of final type is assigned to sample data
 Random sample data is deterministically generated using field type and field name as a seed.
 
 # Fine Points
-[arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging) | [api](#api)
+[java 7](#java-7) | [arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging) | [api](#api)
+
+### Java 7
+
+Testory is java8-friendly.
+It uses functional interfaces wherever possible, so you can take advantage of lambdas.
+Still it is compatible with java 7, but there are some inconveniences you need to be aware of.
+
+Using `when` for catching `Throwable`, or with `void` expression,
+would require you to expand lambda into anonymous `Closure` or `VoidClosure` class.
+
+        given(list = asList());
+        when(new Closure() {
+          public Object invoke() {
+            return list.get(0);
+          }
+        });
+        thenThrown(IndexOutOfBoundsException.class);
+
+        given(list = new ArrayList<String>());
+        given(list.add("element"));
+        when(new VoidClosure() {
+          @Override
+          public void invoke() {
+            list.clear();
+          }
+        });
+        thenReturned();
+        then(list.isEmpty());
+
+Alternatively you can use chained form.
+It involves invoking method on proxy returned by `when`.
+
+        given(list = asList());
+        when(list).get(0);
+        thenThrown(IndexOutOfBoundsException.class);
+
+        given(list = new ArrayList<String>());
+        given(list.add("element"));
+        when(list).clear();
+        thenReturned();
+        then(list.isEmpty());
+
+This chained form looks simpler than using anonymous classes (or even lambdas!).
+However there is a downside, because not all types are proxiable (for example final classes).
+In that case, `when` returns `null` and you get `NullPointerException`.
+Also final methods are not proxied, which results in unpredictable behavior.
+Additionally static calls cannot be written this way, because there is no `this` to wrap in proxy.
 
 ### Arrays
 
@@ -387,7 +396,7 @@ This applies to type of
 
 Due to technical limitations, testory does not play well with final classes and final methods.
 
-Final classes cannot be mocked or chained. Any of the following throws `TestoryException`.
+Final classes cannot be mocked or chained. Any of the following throws exception.
 
  - `mock(FinalClass.class)`
  - `when(instanceOfFinalClass).method()`
