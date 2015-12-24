@@ -12,10 +12,9 @@ import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenCalledInOrder;
 import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.willReturn;
+import static org.testory.testing.DynamicMatchers.number;
 import static org.testory.testing.Fakes.newObject;
-import static org.testory.testing.Matchers.hasMessageContaining;
-
-import java.util.Arrays;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -208,19 +207,6 @@ public class test_capturing {
       assertThat(e, hasMessageContaining(
           mock + ".varargs(" + object + ", [" + otherObject + "])"));
     }
-  }
-
-  private static Object number(final Integer... numbers) {
-    return new Object() {
-      @SuppressWarnings("unused")
-      public boolean matches(Object item) {
-        return Arrays.asList(numbers).contains(item);
-      }
-
-      public String toString() {
-        return "number(" + Arrays.toString(numbers) + ")";
-      }
-    };
   }
 
   private static abstract class Mockable {

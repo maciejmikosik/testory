@@ -12,7 +12,7 @@ import static org.testory.Testory.onRequest;
 import static org.testory.Testory.onReturn;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.testing.Fakes.newObject;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import java.lang.reflect.Method;
 import java.util.List;

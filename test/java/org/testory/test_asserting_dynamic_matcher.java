@@ -3,13 +3,16 @@ package org.testory;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.then;
+import static org.testory.testing.DynamicMatchers.same;
 import static org.testory.testing.Fakes.newObject;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.diagnosed;
+import static org.testory.testing.HamcrestMatchers.hamcrestDiagnosticMatcher;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class test_asserting_matcher {
+public class test_asserting_dynamic_matcher {
   private Object object, otherObject;
   private Object matcher;
 
@@ -21,13 +24,13 @@ public class test_asserting_matcher {
 
   @Test
   public void asserts_matching_object() {
-    matcher = matcherSame(object);
+    matcher = same(object);
     then(object, matcher);
   }
 
   @Test
   public void fails_for_not_matching_object() {
-    matcher = matcherSame(object);
+    matcher = same(object);
     try {
       then(otherObject, matcher);
       fail();
@@ -36,7 +39,7 @@ public class test_asserting_matcher {
 
   @Test
   public void failure_prints_matcher_and_object() {
-    matcher = matcherSame(object);
+    matcher = same(object);
     try {
       then(otherObject, matcher);
       fail();
@@ -46,6 +49,19 @@ public class test_asserting_matcher {
           + "    " + matcher + "\n"
           + "  but was\n"
           + "    " + otherObject + "\n"));
+    }
+  }
+
+  @Test
+  public void failure_diagnoses_mismatch() {
+    matcher = hamcrestDiagnosticMatcher();
+    try {
+      then(object, matcher);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertThat(e, hasMessageContaining(""
+          + "  diagnosis\n"
+          + "    " + diagnosed(object) + "\n"));
     }
   }
 
@@ -63,18 +79,5 @@ public class test_asserting_matcher {
       then(object, null);
       fail();
     } catch (TestoryException e) {}
-  }
-
-  private static Object matcherSame(final Object expected) {
-    return new Object() {
-      @SuppressWarnings("unused")
-      public boolean matches(Object item) {
-        return item == expected;
-      }
-
-      public String toString() {
-        return "matcherSame(" + expected + ")";
-      }
-    };
   }
 }

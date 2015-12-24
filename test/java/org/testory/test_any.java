@@ -11,8 +11,9 @@ import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
+import static org.testory.testing.DynamicMatchers.same;
 import static org.testory.testing.Fakes.newObject;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import java.util.List;
 
@@ -145,19 +146,6 @@ public class test_any {
       any(Object.class, new Object());
       fail();
     } catch (TestoryException e) {}
-  }
-
-  private static Object same(final Object object) {
-    return new Object() {
-      @SuppressWarnings("unused")
-      public boolean matches(Object item) {
-        return object == item;
-      }
-
-      public String toString() {
-        return "same(" + object + ")";
-      }
-    };
   }
 
   private static abstract class Mockable {

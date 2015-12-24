@@ -8,8 +8,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.when;
-import static org.testory.testing.Matchers.hasMessageContaining;
-import static org.testory.testing.Matchers.hasMessageMatching;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessageMatching;
 import static org.testory.testing.StackTraces.here;
 import static org.testory.testing.StackTraces.nextLine;
 

@@ -7,7 +7,7 @@ import static org.testory.Testory.onInstance;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenCalledInOrder;
 import static org.testory.Testory.when;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;

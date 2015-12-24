@@ -10,7 +10,7 @@ import static org.testory.Testory.the;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.willReturn;
 import static org.testory.testing.Fakes.newObject;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;

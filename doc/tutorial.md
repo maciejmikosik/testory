@@ -456,12 +456,16 @@ It includes types of parameters, return types and annotations of those methods.
 For sake of clarity, all exposed types are enumerated below.
 
  - `org.testory.Testory` - main entry point to library containing static methods
+ - `org.testory.common.Matcher` - functional interface representing predicate
  - `org.testory.common.Closure` - functional interface representing piece of code returning `Object` or throwing `Throwable`
  - `org.testory.common.VoidClosure` - functional interface representing piece of code returning `void` or throwing `Throwable`
  - `org.testory.common.Nullable` - annotation that marks optional parameters and return values
  - `org.testory.proxy.Invocation` - represents invocation on mock (method, instance and arguments)
  - `org.testory.proxy.Handler` - represents logic executed when invoking method on mock
  - `org.testory.proxy.InvocationMatcher` - predicate for matching invocation on mock when you stub/verify
+
+Deprecated classes that will be removed in next major version.
+
  - `org.testory.Closure` - deprecated alias for `org.testory.common.Closure`
 
 Beta features are exception to those rules.

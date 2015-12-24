@@ -14,7 +14,7 @@ import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.willReturn;
 import static org.testory.common.Samples.sample;
-import static org.testory.testing.Matchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 import static org.testory.testing.Reflections.readDeclaredFields;
 
 import java.lang.annotation.ElementType;

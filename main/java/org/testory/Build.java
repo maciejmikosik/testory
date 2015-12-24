@@ -13,6 +13,7 @@ class Build {
       org.testory.common.Closure.class,
       org.testory.Closure.class,
       org.testory.common.VoidClosure.class,
+      org.testory.common.Matcher.class,
       org.testory.common.Nullable.class,
       org.testory.proxy.Invocation.class,
       org.testory.proxy.Handler.class,

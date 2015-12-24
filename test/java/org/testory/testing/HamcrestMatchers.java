@@ -1,10 +1,13 @@
 package org.testory.testing;
 
+import static java.text.MessageFormat.format;
+
+import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class Matchers {
+public class HamcrestMatchers {
   public static Matcher<Throwable> hasMessageContaining(final String substring) {
     return new TypeSafeMatcher<Throwable>() {
       protected boolean matchesSafely(Throwable throwable) {
@@ -27,5 +30,25 @@ public class Matchers {
         description.appendText("hasMessageMatching(" + regex + ")");
       }
     };
+  }
+
+  public static <T> Matcher<T> hamcrestDiagnosticMatcher() {
+    return new BaseMatcher<T>() {
+      public boolean matches(Object item) {
+        return false;
+      }
+
+      public void describeMismatch(Object item, Description description) {
+        description.appendText(diagnosed(item));
+      }
+
+      public void describeTo(Description description) {
+        description.appendText("hamcrestDiagnosticMatcher.toString()");
+      }
+    };
+  }
+
+  public static String diagnosed(Object item) {
+    return format("diagnosed({0})", item);
   }
 }
