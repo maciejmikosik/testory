@@ -72,6 +72,14 @@ If you need more complicated logic than `equals` you can use [Matchers](#matcher
 
 Expression nested in `when` can also throw `Throwable`.
 Normally it would make a test fail, but there are situations where this is expected behavior you want to assert.
+Classic idiom for asserting that throwable was thrown uses `try-catch` clause.
+
+    list = asList();
+    try {
+      list.get(0);
+      fail();
+    } catch (IndexOutOfBoundsException e) {}
+
 Testory can catch `Throwable` for you, but you need to help by wrapping tested expression in lambda.
 After that you can assert that caught `Throwable` meets you expectations.
 
