@@ -459,7 +459,6 @@ It includes types of parameters, return types and annotations of those methods.
 For sake of clarity, all exposed types are enumerated below.
 
  - `org.testory.Testory` - main entry point to library containing static methods
- - `org.testory.common.Matcher` - functional interface representing predicate
  - `org.testory.common.Closure` - functional interface representing piece of code returning `Object` or throwing `Throwable`
  - `org.testory.common.VoidClosure` - functional interface representing piece of code returning `void` or throwing `Throwable`
  - `org.testory.common.Nullable` - annotation that marks optional parameters and return values
