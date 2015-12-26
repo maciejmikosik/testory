@@ -1,7 +1,7 @@
 [overview](#overview) | [mocks](#mocks) | [utilities](#utilities) | [macros](#macros) | [fine points](#fine-points) | [troubleshooting](#troubleshooting) | [development](#development)
 
 # Overview
-[then](#then) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown) | [void](#void)
+[then](#then) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown) | [when](#when)
 
 Traditionally, test written in BDD fashion has 3 sections: given, when, then.
 Those sections are preceded by comments. Example test could look like this.
@@ -90,7 +90,7 @@ After that you can assert that caught `Throwable` meets you expectations.
 `thenThrown` is overloaded to accept `Throwable` instance, `Class` or matcher.
 Of course assertion fails if expression did not throw anything.
 
-### void
+### when
 
 Asserting result of `void` method also requires help, because you cannot nest `void` expression as an argument.
 You need to wrap an expression in lambda, even if you don't need to catch throwable.
@@ -102,6 +102,25 @@ To restore this behavior, you need to assert explicitly that you expect expressi
     when(() -> list.clear());
     thenReturned();
     then(list.isEmpty());
+
+There is an alternative to using lambdas.
+It involves invoking method on proxy returned by `when`.
+
+    given(list = asList());
+    when(list).get(0);
+    thenThrown(IndexOutOfBoundsException.class);
+
+    given(list = new ArrayList<String>());
+    given(list.add("element"));
+    when(list).clear();
+    thenReturned();
+    then(list.isEmpty());
+
+If you can't use lambdas (you do not use java8), this looks like better alternative that using expanded anonymous classes.
+However there is a downside, because not all types are proxiable (for example final classes).
+In that case, `when` returns `null` and you get `NullPointerException`.
+Also final methods are not proxied, which results in unpredictable behavior.
+Additionally static calls cannot be written this way, because there is no `this` to wrap in proxy.
 
 # Mocks
 [stubbing](#stubbing) | [verifying](#verifying) | [matching invocations](#matching-invocations) | [spying](#spying)
@@ -372,54 +391,7 @@ Field of final type is assigned to sample data
 Random sample data is deterministically generated using field type and field name as a seed.
 
 # Fine Points
-[java 7](#java-7) | [arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging) | [api](#api)
-
-### Java 7
-
-Testory is java8-friendly.
-It uses functional interfaces wherever possible, so you can take advantage of lambdas.
-Still it is compatible with java 7, but there are some inconveniences you need to be aware of.
-
-Using `when` for catching `Throwable`, or with `void` expression,
-would require you to expand lambda into anonymous `Closure` or `VoidClosure` class.
-
-    given(list = asList());
-    when(new Closure() {
-      public Object invoke() {
-        return list.get(0);
-      }
-    });
-    thenThrown(IndexOutOfBoundsException.class);
-
-    given(list = new ArrayList<String>());
-    given(list.add("element"));
-    when(new VoidClosure() {
-      @Override
-      public void invoke() {
-        list.clear();
-      }
-    });
-    thenReturned();
-    then(list.isEmpty());
-
-Alternatively you can use chained form.
-It involves invoking method on proxy returned by `when`.
-
-    given(list = asList());
-    when(list).get(0);
-    thenThrown(IndexOutOfBoundsException.class);
-
-    given(list = new ArrayList<String>());
-    given(list.add("element"));
-    when(list).clear();
-    thenReturned();
-    then(list.isEmpty());
-
-This chained form looks simpler than using anonymous classes (or even lambdas!).
-However there is a downside, because not all types are proxiable (for example final classes).
-In that case, `when` returns `null` and you get `NullPointerException`.
-Also final methods are not proxied, which results in unpredictable behavior.
-Additionally static calls cannot be written this way, because there is no `this` to wrap in proxy.
+[arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging) | [api](#api)
 
 ### Arrays
 
