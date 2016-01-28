@@ -316,12 +316,14 @@ Wherever api method accepts `Object` via parameter named `matcher`, you are free
  - [com.google.common.base.Predicate](https://code.google.com/p/guava-libraries/)
  - [com.google.common.base.Function](https://code.google.com/p/guava-libraries/)
  - dynamic matcher
- 
+
+```
     Object matcher = new Object() {
       public boolean matches(Object item) {
         return ...;
       }
     };
+```
 
 # Macros
 [givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
