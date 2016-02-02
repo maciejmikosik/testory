@@ -3,7 +3,7 @@
 # Overview
 [then](#then) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown) | [when](#when)
 
-Traditionally, test written in BDD fashion has 3 sections: given, when, then.
+Traditionally, test written in [BDD](https://en.wikipedia.org/wiki/Behavior-driven_development) fashion has 3 sections: given, when, then.
 Those sections are preceded by comments. Example test could look like this.
 
     public class ArrayListTest {
@@ -71,7 +71,7 @@ If you need more complicated logic than `equals` you can use [Matchers](#matcher
 ### thenThrown
 
 Expression nested in `when` can also throw `Throwable`.
-Normally it would make a test fail, but there are situations where this is expected behavior you want to assert.
+Normally it would make a test fail, but sometimes `Throwable` is exactly what you expect.
 Classic idiom for asserting that throwable was thrown uses `try-catch` clause.
 
     list = asList();
@@ -116,7 +116,7 @@ It involves invoking method on proxy returned by `when`.
     thenReturned();
     then(list.isEmpty());
 
-If you can't use lambdas (you do not use java8), this looks like better alternative that using expanded anonymous classes.
+If you can't use lambdas (you do not use java8), this looks like better alternative than using expanded anonymous classes.
 However there is a downside, because not all types are proxiable (for example final classes).
 In that case, `when` returns `null` and you get `NullPointerException`.
 Also final methods are not proxied, which results in unpredictable behavior.
@@ -125,7 +125,7 @@ Additionally static calls cannot be written this way, because there is no `this`
 # Mocks
 [stubbing](#stubbing) | [verifying](#verifying) | [matching invocations](#matching-invocations) | [spying](#spying)
 
-Testory is full-featured mocking framework with intuitive grammar.
+Testory is a full-featured mocking framework with intuitive grammar.
 Mocks are programmable objects inheriting interface from specific type.
 You create a mock by providing `class` or `interface`.
 
@@ -163,11 +163,13 @@ upon throwing.
 If you need more complex logic to happen on invocation, implement custom `Handler`.
 
     given((invocation -> {
-      int index = (int) invocation.arguments.get(0);
-      if (index < 0 || 1 < index) {
-        throw new IndexOutOfBoundsException();
+      Method method = invocation.method;
+      Object instance = invocation.instance;
+      List<Object> arguments =  invocation.arguments;
+      if(...) {
+        return ...
       } else {
-        return object;
+        throw ...
       }
     }), list).get(0);
 
