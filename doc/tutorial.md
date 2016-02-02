@@ -1,9 +1,9 @@
 [overview](#overview) | [mocks](#mocks) | [utilities](#utilities) | [macros](#macros) | [fine points](#fine-points) | [troubleshooting](#troubleshooting) | [development](#development)
 
 # Overview
-[then](#then) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown) | [void](#void)
+[then](#then) | [thenReturned](#thenreturned) | [thenThrown](#thenthrown) | [when](#when)
 
-Traditionally, test written in BDD fashion has 3 sections: given, when, then.
+Traditionally, test written in [BDD](https://en.wikipedia.org/wiki/Behavior-driven_development) fashion has 3 sections: given, when, then.
 Those sections are preceded by comments. Example test could look like this.
 
     public class ArrayListTest {
@@ -71,7 +71,15 @@ If you need more complicated logic than `equals` you can use [Matchers](#matcher
 ### thenThrown
 
 Expression nested in `when` can also throw `Throwable`.
-Normally it would make a test fail, but there are situations where this is expected behavior you want to assert.
+Normally it would make a test fail, but sometimes `Throwable` is exactly what you expect.
+Classic idiom for asserting that throwable was thrown uses `try-catch` clause.
+
+    list = asList();
+    try {
+      list.get(0);
+      fail();
+    } catch (IndexOutOfBoundsException e) {}
+
 Testory can catch `Throwable` for you, but you need to help by wrapping tested expression in lambda.
 After that you can assert that caught `Throwable` meets you expectations.
 
@@ -82,7 +90,7 @@ After that you can assert that caught `Throwable` meets you expectations.
 `thenThrown` is overloaded to accept `Throwable` instance, `Class` or matcher.
 Of course assertion fails if expression did not throw anything.
 
-### void
+### when
 
 Asserting result of `void` method also requires help, because you cannot nest `void` expression as an argument.
 You need to wrap an expression in lambda, even if you don't need to catch throwable.
@@ -95,67 +103,110 @@ To restore this behavior, you need to assert explicitly that you expect expressi
     thenReturned();
     then(list.isEmpty());
 
+There is an alternative to using lambdas.
+It involves invoking method on proxy returned by `when`.
+
+    given(list = asList());
+    when(list).get(0);
+    thenThrown(IndexOutOfBoundsException.class);
+
+    given(list = new ArrayList<String>());
+    given(list.add("element"));
+    when(list).clear();
+    thenReturned();
+    then(list.isEmpty());
+
+If you can't use lambdas (you do not use java8), this looks like better alternative than using expanded anonymous classes.
+However there is a downside, because not all types are proxiable (for example final classes).
+In that case, `when` returns `null` and you get `NullPointerException`.
+Also final methods are not proxied, which results in unpredictable behavior.
+Additionally static calls cannot be written this way, because there is no `this` to wrap in proxy.
+
 # Mocks
 [stubbing](#stubbing) | [verifying](#verifying) | [matching invocations](#matching-invocations) | [spying](#spying)
 
-Any non-final class or interface can be mocked.
+Testory is a full-featured mocking framework with intuitive grammar.
+Mocks are programmable objects inheriting interface from specific type.
+You create a mock by providing `class` or `interface`.
 
     given(list = mock(List.class));
 
-Newly created mock has following properties
- - all methods are stubbable, except finalize and final methods
- - mock is nice, returning null or binary zero for unstubbed methods
- - mock is conveniently prestubbed
-   - `toString` is stubbed to contain class name and unique ordinal
-   - `equals` is stubbed so mock is equal only to itself
-   - `hashCode` is stubbed to obey contract
-
 ### Stubbing
 
-Mock can be stubbed to return `Object`
+Stubbing is telling a mock what should happen if particular invocation occurs.
+You need to define what invocation you are talking about (what mock, which method with what arguments).
+Also you need to define what should happen on invocation (return object, throw throwable).
+
+One way to specify invocation is by providing mock, method and arguments explicitly.
+More complex ways are described in [matching invocations section](#matching-invocations).
+Thing that can happen on invocation can be as simple as returning an object.
+For example, if you want `list.get(1)` to return `object`, you stub it using `willReturn(object)`.
 
     given(willReturn(object), list).get(1);
 
-throw `Throwable`
+If you want to stub `void` method to just return without throwing, use `willReturn(null)`.
+
+    given(willReturn(null)), list).clear();
+
+Other thing that can happen on invocation is throwing `Throwable`.
+For this purpose use `willThrow`.
 
     given(willThrow(new IndexOutOfBoundsException()), list).get(2);
 
-or execute custom logic.
+Throwing throwable preserves original stack trace which may be inconvenient during debugging.
+Using `willRethrow`
+[fills in stack trace](http://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#fillInStackTrace())
+upon throwing.
 
-    given(new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        // custom logic
+    given(willRethrow(new IndexOutOfBoundsException()), list).get(2);
+
+If you need more complex logic to happen on invocation, implement custom `Handler`.
+
+    given((invocation -> {
+      Method method = invocation.method;
+      Object instance = invocation.instance;
+      List<Object> arguments =  invocation.arguments;
+      if(...) {
+        return ...
+      } else {
+        throw ...
       }
-    }, mock).toString();
+    }), list).get(0);
 
-Stubbing will be only effective for specified instance of mock, method and equal arguments.
+If you stub a mock to return object incompatible with method return type,
+or throw throwable incompatible with method signature,
+you will get `TestoryException` upon invocation.
 
- - `void` method can be stubbed to "just return" using `willReturn(null)`
- - `willThrow` [fills in stack trace](http://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#fillInStackTrace()) upon throwing, `willRethrow` does not
- - returning `Object` incompatible with method return type causes `TestoryException` upon invocation
- - throwing `Throwable` incompatible with method declaration causes `TestoryException` upon invocation
+You can restub already stubbed invocation, because most recent stubbing takes precedence over earlier one.
+Newly created mock is already stubbed for convenience.
+`equals`/`hashCode` is stubbed, so mock is equal only to itself.
+`toString` is stubbed to contain class name and unique ordinal.
+All other methods are stubbed to return `null` (or binary zero for primitive types).
+Those default stubbings can be restubbed as any other stubbing.
 
 ### Verifying
 
-It is possible to assert expected invocation on mock.
+Additionally to being stubbable, mocks remember invocations that happened on them.
+You can use this feature to assert your expectations about how tested object should collaborate with its dependencies.
+Simplest way is to define your expectation by using `thenCalled` and providing mock, method and arguments of expected invocation.
+For example, `FilterOutputStream` (tested class), when being closed, should also close `OutputStream` it decorates.
 
     given(output = mock(OutputStream.class));
     given(filterOutput = new FilterOutputStream(output));
     when(filterOutput).close();
     thenCalled(output).close();
 
-Invocation is expected to be called exactly once.
-
-You can verify number of invocations by passing exact value (may be 0)
+By default, invocation is expected to be called exactly once.
+Assertion fails if there are none or more than one matching invocations.
+You can verify other number of invocations by passing exact value (may be 0).
 
     thenCalledTimes(3, mock).size();
 
-or using matcher.
- 
+You can also use matcher to be more flexible about number of invocations.
+
     thenCalledTimes(greaterThan(0), mock).toString();
 
 By default, order of invocations does not matter.
-
 If you need to assert that invocations happened in order, use ordered verifying.
 
     thenCalledInOrder(mockDatabase).open();
@@ -163,47 +214,25 @@ If you need to assert that invocations happened in order, use ordered verifying.
 
 ### Matching Invocations
 
-You can take full control of matching invocations by implementing your own `InvocationMatcher`.
-
-    InvocationMatcher onCondition = new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        // custom logic
-      }
-    };
-
-Or use predefined factories for most common cases.
-
- - To assert that specific number of invocations was called on mock.
-
-    thenCalledTimes(4, onInstance(mock));
-
- - To assert that no invocations was called on mock.
-
-    thenCalledNever(onInstance(mock));
-
- - To stub all invocations returning specified type. See [komarro library](https://code.google.com/p/komarro/) for explanation why would you want to do that.
-
-    given(willReturn(person), onReturn(Person.class));
-
- - To stub all invocations by return type and arguments.
-
-    given(willReturn(person), onRequest(Person.class, "username"));
-
-Use `any` if you do not care about argument value during stubbing or verification.
+In previous examples of stubbing and verifying we always specified invocation by providing exact mock, method and arguments.
+Sometimes you don't care about arguments.
+It this situation, you can use `any` as a placeholder for arguments you don't care about.
+For example, asserting that `add` method was called on mock `list` with any argument.
 
     thenCalled(list).add(any(Object.class));
 
-or `any` with [matcher](#matchers) if you care
+If you don't want to specify exact argument, but still care about its value, you can provide matcher.
 
     thenCalled(list).add(any(Object.class, startsWith("prefix")));
 
-`Class` passed to `any` is just for inferring purpose. Argument can be instance of any type and still can match.
+`Class` passed to `any` is just for inferring purpose.
+Argument can be instance of any type and still can match.
 
 In most cases you can mix `any` with real arguments.
 
-    given(willReturn(true), mock).someMethod(object, any(Object.class));
+    thenCalled(list).add(0, any(Object.class));
 
-In cases where you cannot (due to technical limitations) `TestoryException` is thrown.
+In cases where you cannot (due to technical limitations of primitives) `TestoryException` is thrown.
 
     // throws TestoryException
     given(willReturn(true), mock).someMethod(any(int.class), intValue);
@@ -216,25 +245,64 @@ Use `the` shortcut if you expect exactly same instance
 
     given(willReturn(true), mock).someMethod(the(instance));
 
+Above examples work well if you known exact mock and method of invocation.
+Sometimes you want to be less specific that that.
+You can take full control of matching invocations by implementing your own `InvocationMatcher`.
+It is functional interface that answers, whether particular invocation is one you are interested about.
+Using this interface you can stub or verify invocation on more than one method, or even more than one mock, at once.
+
+    InvocationMatcher onCondition = new InvocationMatcher() {
+      public boolean matches(Invocation invocation) {
+        // custom logic
+      }
+    };
+
+There are some built-in invocation matchers to support most popular idioms.
+By convention they start with `on` prefix.
+For example, you want to assert that there were no interactions on mock, meaning none of its methods was called.
+Asserting that there were no invocations on each method one by one would be tedious.
+You can achieve it using `onInstance` invocation matcher in combination with `thenCalledNever` assertion.
+
+    `thenCalledNever(onInstance(mock))`
+
+There are times when tested object has many collaborators and they are subjects to constant change.
+You want to write test in manner that would not require to correct stubbings every time a method is moved from one collaborator to another.
+This is usual for projects using service or dao objects.
+Solution is to stub mocks in a way, that does not care about mock, but only about return type (and arguments).
+See [komarro library](https://code.google.com/p/komarro/) for more on the topic.
+
+    given(willReturn(person), onReturn(Person.class));
+    given(willReturn(person), onRequest(Person.class, "username"));
+
 ### Spying
 
-Spy is a mock that is prestubbed to delegate all invocations to real object.
+Spy is a mixture of real object and mock.
+Technically it is a mock, which means it can be stubbed and verified like any other mock.
+Difference is that at creation, spy is provided with spied object.
+Any invocation on spy will be delegated to spied object, unless that invocation was restubbed.
 
-You can create spy as a new mock
+Spies can be used in situations where you would like to assert that invocation happened on object that is not a mock.
+Replacing object by mock would not achieve a goal, because object would lose its original non-mocky behavior.
+For example, you test method that copies data from one stream to another.
+You want to assert that method closes streams when done.
+This would require streams to be mocks.
+On the other hand input stream has to have real data, otherwise copy method would never reach the end of stream.
+This is possible by spying on real streams.
 
-    given(real = Arrays.asList("a", "b", "c"));
-    given(spy = spy(real));
+    given(input = spy(new ByteArrayInputStream(new byte[] { 1, 2, 3 })));
+    given(output = spy(new ByteArrayOutputStream()));
+    when(copy(input, output));
+    thenCalled(input).close();
+    thenCalled(output).close();
 
-or stub an existing mock to act as a spy
+Also you can stub an existing mock to act as a spy using `willSpy` handler.
 
-    given(real = Arrays.asList("a", "b", "c"));
-    given(mock = mock(List.class));
-    given(willSpy(real), onInstance(mock));
+    given(real = new ByteArrayInputStream(new byte[] { 1, 2, 3 }));
+    given(input = mock(InputStream.class));
+    given(willSpy(real), onInstance(input));
 
-Spies can be stubbed and verified like any other mock.
-
- - real object does not have to be actually real, it can be other mock/spy
- - there can be many spies for same real object
+Real object does not have to be actually real, it can be other mock/spy.
+There can be many spies for same real object.
 
 # Utilities
 [matchers](#matchers)
@@ -250,12 +318,14 @@ Wherever api method accepts `Object` via parameter named `matcher`, you are free
  - [com.google.common.base.Predicate](https://code.google.com/p/guava-libraries/)
  - [com.google.common.base.Function](https://code.google.com/p/guava-libraries/)
  - dynamic matcher
- 
+
+```
     Object matcher = new Object() {
       public boolean matches(Object item) {
         return ...;
       }
     };
+```
 
 # Macros
 [givenTimes](#giventimes) | [givenTry](#giventry) | [givenTest](#giventest)
@@ -325,54 +395,7 @@ Field of final type is assigned to sample data
 Random sample data is deterministically generated using field type and field name as a seed.
 
 # Fine Points
-[java 7](#java-7) | [arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging) | [api](#api)
-
-### Java 7
-
-Testory is java8-friendly.
-It uses functional interfaces wherever possible, so you can take advantage of lambdas.
-Still it is compatible with java 7, but there are some inconveniences you need to be aware of.
-
-Using `when` for catching `Throwable`, or with `void` expression,
-would require you to expand lambda into anonymous `Closure` or `VoidClosure` class.
-
-    given(list = asList());
-    when(new Closure() {
-      public Object invoke() {
-        return list.get(0);
-      }
-    });
-    thenThrown(IndexOutOfBoundsException.class);
-
-    given(list = new ArrayList<String>());
-    given(list.add("element"));
-    when(new VoidClosure() {
-      @Override
-      public void invoke() {
-        list.clear();
-      }
-    });
-    thenReturned();
-    then(list.isEmpty());
-
-Alternatively you can use chained form.
-It involves invoking method on proxy returned by `when`.
-
-    given(list = asList());
-    when(list).get(0);
-    thenThrown(IndexOutOfBoundsException.class);
-
-    given(list = new ArrayList<String>());
-    given(list.add("element"));
-    when(list).clear();
-    thenReturned();
-    then(list.isEmpty());
-
-This chained form looks simpler than using anonymous classes (or even lambdas!).
-However there is a downside, because not all types are proxiable (for example final classes).
-In that case, `when` returns `null` and you get `NullPointerException`.
-Also final methods are not proxied, which results in unpredictable behavior.
-Additionally static calls cannot be written this way, because there is no `this` to wrap in proxy.
+[arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging) | [api](#api)
 
 ### Arrays
 
