@@ -1,7 +1,6 @@
 package org.testory.plumbing;
 
 import static org.testory.plumbing.History.add;
-import static org.testory.plumbing.History.latest;
 import static org.testory.plumbing.PlumbingException.check;
 
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public class Capturing {
   public static List<Any> capturedAnys(History history) {
     check(history != null);
     List<Any> anys = new ArrayList<Any>();
-    for (Object event : latest(history)) {
+    for (Object event : history.events) {
       if (event instanceof CapturingAny) {
         anys.add(0, ((CapturingAny) event).any);
       } else if (event instanceof ConsumingAnys) {

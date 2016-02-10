@@ -1,40 +1,32 @@
 package org.testory.plumbing;
 
-import static java.util.Collections.unmodifiableList;
-import static org.testory.common.Collections.reverse;
 import static org.testory.plumbing.PlumbingException.check;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.testory.common.Chain;
 
 public class History {
-  public final List<Object> events;
+  public final Chain<Object> events;
 
-  private History(List<Object> events) {
+  private History(Chain<Object> events) {
     this.events = events;
   }
 
-  public static History history(List<Object> events) {
+  public static History history(Chain<Object> events) {
     check(events != null);
-    return verify(new History(unmodifiableList(new ArrayList<Object>(events))));
-  }
-
-  private static History verify(History history) {
-    for (Object event : history.events) {
-      check(event != null);
-    }
-    return history;
-  }
-
-  public static List<Object> latest(History history) {
-    return reverse(history.events);
+    return new History(events);
   }
 
   public static History add(Object event, History history) {
     check(event != null);
     check(history != null);
-    List<Object> events = new ArrayList<Object>(history.events);
-    events.add(event);
-    return history(events);
+    return new History(history.events.add(event));
+  }
+
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    for (Object event : events) {
+      builder.append(event).append('\n');
+    }
+    return builder.toString();
   }
 }
