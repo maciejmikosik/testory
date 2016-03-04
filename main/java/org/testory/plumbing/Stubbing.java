@@ -1,5 +1,6 @@
 package org.testory.plumbing;
 
+import static org.testory.plumbing.Cache.newCache;
 import static org.testory.plumbing.PlumbingException.check;
 
 import org.testory.common.Optional;
@@ -27,7 +28,9 @@ public class Stubbing {
   }
 
   public static Optional<Stubbing> findStubbing(Invocation invocation, History history) {
-    for (Object event : history.events) {
+    Cache cache = localCache.get().update(history);
+    localCache.set(cache);
+    for (Object event : cache.untilLastTyped) {
       if (event instanceof Stubbing) {
         Stubbing stubbing = (Stubbing) event;
         if (stubbing.invocationMatcher.matches(invocation)) {
@@ -37,4 +40,10 @@ public class Stubbing {
     }
     return Optional.empty();
   }
+
+  private static ThreadLocal<Cache> localCache = new ThreadLocal<Cache>() {
+    protected Cache initialValue() {
+      return newCache(Stubbing.class);
+    }
+  };
 }
