@@ -1,6 +1,5 @@
 package org.testory.plumbing;
 
-import static org.testory.plumbing.History.latest;
 import static org.testory.plumbing.PlumbingException.check;
 
 import org.testory.common.Effect;
@@ -24,7 +23,7 @@ public class Inspecting {
 
   public static Optional<Inspecting> findLastInspecting(History history) {
     check(history != null);
-    for (Object event : latest(history)) {
+    for (Object event : history.events) {
       if (event instanceof Inspecting) {
         return Optional.of((Inspecting) event);
       }

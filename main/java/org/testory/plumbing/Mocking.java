@@ -1,5 +1,6 @@
 package org.testory.plumbing;
 
+import static org.testory.plumbing.Cache.newCache;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.Purging.purge;
 
@@ -28,7 +29,9 @@ public class Mocking {
   public static boolean isMock(Object mock, History history) {
     check(mock != null);
     check(history != null);
-    for (Object event : history.events) {
+    Cache cache = localCache.get().update(history);
+    localCache.set(cache);
+    for (Object event : cache.untilLastTyped) {
       if (event instanceof Mocking) {
         Mocking mocking = (Mocking) event;
         if (mocking.mock == mock) {
@@ -90,4 +93,10 @@ public class Mocking {
         ? "Object"
         : name;
   }
+
+  private static ThreadLocal<Cache> localCache = new ThreadLocal<Cache>() {
+    protected Cache initialValue() {
+      return newCache(Mocking.class);
+    }
+  };
 }

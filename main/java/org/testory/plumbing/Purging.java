@@ -1,10 +1,11 @@
 package org.testory.plumbing;
 
+import static org.testory.common.Chain.chain;
 import static org.testory.plumbing.History.add;
 import static org.testory.plumbing.History.history;
 import static org.testory.plumbing.PlumbingException.check;
 
-import java.util.List;
+import org.testory.common.Chain;
 
 public class Purging {
   private Purging() {}
@@ -19,13 +20,15 @@ public class Purging {
 
   public static History purge(History history) {
     check(history != null);
-    List<Object> events = history.events;
-    for (int i = events.size() - 1; i >= 0; i--) {
-      if (events.get(i) instanceof Purging) {
-        return history(events.subList(i + 1, events.size()));
+    Chain<Object> purged = chain();
+    for (Object event : history.events) {
+      if (event instanceof Purging) {
+        break;
+      } else {
+        purged = purged.add(event);
       }
     }
-    return history;
+    return history(purged.reverse());
   }
 
   public static History mark(History history) {

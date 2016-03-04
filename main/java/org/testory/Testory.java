@@ -5,6 +5,7 @@ import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Objects.deepEquals;
 import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
+import static org.testory.common.Chain.chain;
 import static org.testory.common.CharSequences.join;
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
@@ -49,7 +50,6 @@ import static org.testory.proxy.Typing.typing;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -79,7 +79,7 @@ import org.testory.proxy.Typing;
 public class Testory {
   private static ThreadLocal<History> localHistory = new ThreadLocal<History>() {
     protected History initialValue() {
-      return history(new ArrayList<Object>());
+      return history(chain());
     }
   };
 
@@ -852,7 +852,7 @@ public class Testory {
     }));
 
     StringBuilder builder = new StringBuilder();
-    for (Object event : history.events) {
+    for (Object event : history.events.reverse()) {
       if (event instanceof Calling) {
         Calling calling = (Calling) event;
         Invocation invocation = calling.invocation;
