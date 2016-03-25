@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.testory.proxy.Proxies;
+import org.testory.proxy.CglibProxer;
 
 public class TestoryException extends RuntimeException {
   public TestoryException() {}
@@ -53,8 +53,9 @@ public class TestoryException extends RuntimeException {
 
   private static StackTraceElement findCaller(StackTraceElement[] stackTrace) {
     for (int i = stackTrace.length - 1; i >= 0; i--) {
+      // TODO implement more generic way that handles other Proxers
       String name = stackTrace[i].getClassName();
-      if (name.equals(Testory.class.getName()) || name.startsWith(Proxies.class.getName())) {
+      if (name.equals(Testory.class.getName()) || name.startsWith(CglibProxer.class.getName())) {
         for (int j = i + 1; j < stackTrace.length; j++) {
           if (stackTrace[j].getLineNumber() >= 0) {
             return stackTrace[j];

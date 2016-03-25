@@ -1,9 +1,6 @@
 package org.testory.proxy;
 
-import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isPublic;
-import static org.testory.common.Classes.canReturn;
-import static org.testory.common.Classes.canThrow;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.ProxyException.check;
 import static org.testory.proxy.Typing.typing;
@@ -20,7 +17,6 @@ import java.util.Set;
 
 import org.objenesis.ObjenesisStd;
 
-import net.sf.cglib.core.CodeGenerationException;
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.CallbackFilter;
 import net.sf.cglib.proxy.Enhancer;
@@ -29,21 +25,8 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
 
-public class Proxies {
-  public static boolean isProxiable(Class<?> type) {
-    check(type != null);
-    return isTrivial(type) || isExtendableClass(type) || isPeelable(type);
-  }
-
-  private static boolean isTrivial(Class<?> type) {
-    return isPublic(type.getModifiers()) && !isFinal(type.getModifiers());
-  }
-
-  private static boolean isExtendableClass(Class<?> type) {
-    return !isFinal(type.getModifiers()) && !type.isInterface();
-  }
-
-  public static Object proxy(Typing typing, Handler handler) {
+public class CglibProxer implements Proxer {
+  public Object proxy(Typing typing, Handler handler) {
     check(typing != null);
     check(handler != null);
     return newProxyByCglib(tryAsProxiable(typing), handler);
@@ -67,18 +50,9 @@ public class Proxies {
             : 0;
       }
     });
-    Class<?> proxyClass;
-    try {
-      proxyClass = enhancer.createClass();
-    } catch (CodeGenerationException e) {
-      throw new ProxyException(e);
-    } catch (IllegalArgumentException e) {
-      throw new ProxyException(e);
-    }
-
+    Class<?> proxyClass = enhancer.createClass();
     Factory proxy = (Factory) new ObjenesisStd().newInstance(proxyClass);
-    proxy.setCallbacks(new Callback[] { asMethodInterceptor(compatible(handler)),
-        new SerializableNoOp() });
+    proxy.setCallbacks(new Callback[] { asMethodInterceptor(handler), new SerializableNoOp() });
     return proxy;
   }
 
@@ -142,26 +116,6 @@ public class Proxies {
         return isFinalize(method)
             ? null
             : handler.handle(invocation(method, obj, Arrays.asList(args)));
-      }
-    };
-  }
-
-  private static Handler compatible(final Handler handler) {
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        Object returned;
-        try {
-          returned = handler.handle(invocation);
-        } catch (Throwable throwable) {
-          check(canThrow(throwable, invocation.method));
-          throw throwable;
-        }
-        check(canReturn(returned, invocation.method) || canReturnVoid(returned, invocation.method));
-        return returned;
-      }
-
-      private boolean canReturnVoid(Object returned, Method method) {
-        return method.getReturnType() == void.class && returned == null;
       }
     };
   }

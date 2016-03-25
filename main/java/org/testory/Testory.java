@@ -7,8 +7,6 @@ import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
 import static org.testory.common.Chain.chain;
 import static org.testory.common.CharSequences.join;
-import static org.testory.common.Classes.canReturn;
-import static org.testory.common.Classes.canThrow;
 import static org.testory.common.Classes.defaultValue;
 import static org.testory.common.Classes.hasMethod;
 import static org.testory.common.Classes.setAccessible;
@@ -43,8 +41,6 @@ import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
-import static org.testory.proxy.Proxies.isProxiable;
-import static org.testory.proxy.Proxies.proxy;
 import static org.testory.proxy.Typing.typing;
 
 import java.lang.reflect.Array;
@@ -71,12 +67,16 @@ import org.testory.plumbing.History;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Mocking;
 import org.testory.plumbing.Stubbing;
+import org.testory.proxy.CglibProxer;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
+import org.testory.proxy.Proxer;
 import org.testory.proxy.Typing;
 
 public class Testory {
+  private static final Proxer proxer = new TestoryProxer(new CglibProxer());
+
   private static ThreadLocal<History> localHistory = new ThreadLocal<History>() {
     protected History initialValue() {
       return history(chain());
@@ -98,8 +98,11 @@ public class Testory {
         if (!isStatic(field.getModifiers()) && !isFinal(field.getModifiers())) {
           setAccessible(field);
           if (deepEquals(defaultValue(field.getType()), field.get(test))) {
-            check(canMockOrSample(field.getType()), "cannot inject field: " + field.getName());
-            field.set(test, mockOrSample(field.getType(), field.getName()));
+            try {
+              field.set(test, mockOrSample(field.getType(), field.getName()));
+            } catch (RuntimeException e) {
+              throw new TestoryException("cannot inject field: " + field.getName());
+            }
           }
         }
       }
@@ -108,18 +111,8 @@ public class Testory {
     }
   }
 
-  private static boolean canMockOrSample(Class<?> type) {
-    return isProxiable(type) || type.isArray() || isSampleable(type);
-  }
-
   private static Object mockOrSample(Class<?> type, String name) {
-    if (isProxiable(type)) {
-      Object mock = rawMock(type);
-      log(mocking(mock, name));
-      stubNice(mock);
-      stubObject(mock, name);
-      return mock;
-    } else if (type.isArray()) {
+    if (type.isArray()) {
       Class<?> componentType = type.getComponentType();
       Object array = Array.newInstance(componentType, 1);
       Array.set(array, 0, mockOrSample(componentType, name + "[0]"));
@@ -127,7 +120,11 @@ public class Testory {
     } else if (isSampleable(type)) {
       return sample(type, name);
     } else {
-      throw new IllegalArgumentException("cannot mock or sample " + type.getName() + " " + name);
+      Object mock = rawMock(type);
+      log(mocking(mock, name));
+      stubNice(mock);
+      stubObject(mock, name);
+      return mock;
     }
   }
 
@@ -146,7 +143,6 @@ public class Testory {
 
   public static <T> T givenTry(T object) {
     check(object != null);
-    check(isProxiable(object.getClass()));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         try {
@@ -174,7 +170,6 @@ public class Testory {
   public static <T> T givenTimes(final int number, T object) {
     check(number >= 0);
     check(object != null);
-    check(isProxiable(object.getClass()));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         for (int i = 0; i < number; i++) {
@@ -188,7 +183,6 @@ public class Testory {
 
   public static <T> T mock(Class<T> type) {
     check(type != null);
-    check(isProxiable(type));
     final T mock = rawMock(type);
     String name = nameMock(mock, getHistory());
     log(mocking(mock, name));
@@ -206,7 +200,6 @@ public class Testory {
   }
 
   private static <T> T rawMock(Class<T> type) {
-    check(isProxiable(type));
     Typing typing = type.isInterface()
         ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
         : typing(type, new HashSet<Class<?>>());
@@ -219,27 +212,7 @@ public class Testory {
         return stubbing.handler.handle(invocation);
       }
     };
-    return (T) proxy(typing, compatible(handler));
-  }
-
-  private static Handler compatible(final Handler handler) {
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        Object returned;
-        try {
-          returned = handler.handle(invocation);
-        } catch (Throwable throwable) {
-          check(canThrow(throwable, invocation.method));
-          throw throwable;
-        }
-        check(canReturn(returned, invocation.method) || canReturnVoid(returned, invocation.method));
-        return returned;
-      }
-
-      private boolean canReturnVoid(Object returned, Method method) {
-        return method.getReturnType() == void.class && returned == null;
-      }
-    };
+    return (T) proxer.proxy(typing, handler);
   }
 
   private static void stubNice(Object mock) {
@@ -455,17 +428,15 @@ public class Testory {
   public static <T> T when(T object) {
     setHistory(mark(purge(getHistory())));
     log(inspecting(returned(object)));
-    boolean isProxiable = object != null && isProxiable(object.getClass());
-    if (isProxiable) {
-      Handler handler = new Handler() {
+    try {
+      return proxyWrapping(object, new Handler() {
         public Object handle(Invocation invocation) {
           log(inspecting(effectOfInvoke(invocation)));
           setHistory(mark(getHistory()));
           return null;
         }
-      };
-      return proxyWrapping(object, handler);
-    } else {
+      });
+    } catch (RuntimeException e) {
       return null;
     }
   }
@@ -872,7 +843,7 @@ public class Testory {
 
   private static <T> T proxyWrapping(final T wrapped, final Handler handler) {
     Typing typing = typing(wrapped.getClass(), new HashSet<Class<?>>());
-    return (T) proxy(typing, new Handler() {
+    return (T) proxer.proxy(typing, new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         handler.handle(invocation(invocation.method, wrapped, invocation.arguments));
         return defaultValue(invocation.method.getReturnType());
