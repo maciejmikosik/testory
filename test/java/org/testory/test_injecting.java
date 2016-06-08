@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.willReturn;
-import static org.testory.common.Samples.sample;
+import static org.testory.common.Samplers.fairSampler;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 import static org.testory.testing.Reflections.readDeclaredFields;
 
@@ -26,11 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.testory.common.Sampler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
 public class test_injecting {
-  private final String string = "string";
+  private static final String string = "string";
+  private static final Sampler fairSampler = fairSampler();
   private List<Object> fields;
 
   @Test
@@ -581,7 +583,7 @@ public class test_injecting {
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertArrayEquals(new String[][] { { sample(String.class, "deepArray[0][0]") } },
+    assertArrayEquals(new String[][] { { fairSampler.sample(String.class, "deepArray[0][0]") } },
         test.deepArray);
   }
 
@@ -699,7 +701,7 @@ public class test_injecting {
   private static void assertContainsSamples(Object instance) {
     try {
       for (Field field : injectableFields(instance.getClass())) {
-        assertEquals(sample(field.getType(), field.getName()), field.get(instance));
+        assertEquals(fairSampler.sample(field.getType(), field.getName()), field.get(instance));
       }
     } catch (IllegalAccessException e) {
       throw new RuntimeException(e);
@@ -710,7 +712,7 @@ public class test_injecting {
     try {
       for (Field field : injectableFields(instance.getClass())) {
         Object array = Array.newInstance(field.getType().getComponentType(), 1);
-        Array.set(array, 0, sample(field.getType().getComponentType(), field.getName() + "[0]"));
+        Array.set(array, 0, fairSampler.sample(field.getType().getComponentType(), field.getName() + "[0]"));
         assertTrue(deepEquals(field.get(instance), array));
       }
     } catch (IllegalAccessException e) {

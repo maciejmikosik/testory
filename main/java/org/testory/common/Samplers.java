@@ -9,31 +9,25 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-public class Samples {
-  public static boolean isSampleable(Class<?> type) {
-    checkNotNull(type);
-    for (Method method : Samplers.class.getDeclaredMethods()) {
-      if (tryWrap(method.getReturnType()).isAssignableFrom(tryWrap(type))) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public static <T> T sample(Class<T> type, String name) {
-    checkNotNull(type);
-    checkNotNull(name);
-    for (Method method : Samplers.class.getDeclaredMethods()) {
-      if (tryWrap(method.getReturnType()).isAssignableFrom(tryWrap(type))) {
-        try {
-          setAccessible(method);
-          return (T) method.invoke(null, type, name);
-        } catch (ReflectiveOperationException e) {
-          throw new LinkageError(null, e);
+public class Samplers {
+  public static Sampler fairSampler() {
+    return new Sampler() {
+      public <T> T sample(Class<T> type, String name) {
+        checkNotNull(type);
+        checkNotNull(name);
+        for (Method method : SampleFactories.class.getDeclaredMethods()) {
+          if (tryWrap(method.getReturnType()).isAssignableFrom(tryWrap(type))) {
+            try {
+              setAccessible(method);
+              return (T) method.invoke(null, type, name);
+            } catch (ReflectiveOperationException e) {
+              throw new LinkageError(null, e);
+            }
+          }
         }
+        throw new IllegalArgumentException("type=" + type + ", name=" + name);
       }
-    }
-    throw new IllegalArgumentException("type=" + type + ", name=" + name);
+    };
   }
 
   private static int randomInteger(long maxValue, Random random) {
@@ -55,7 +49,7 @@ public class Samples {
   }
 
   @SuppressWarnings("unused")
-  private static class Samplers {
+  private static class SampleFactories {
     private static boolean sampleBoolean(Class<?> type, String name) {
       return newRandom(name).nextBoolean();
     }

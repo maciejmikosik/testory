@@ -16,8 +16,7 @@ import static org.testory.common.Effect.thrown;
 import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Objects.print;
-import static org.testory.common.Samples.isSampleable;
-import static org.testory.common.Samples.sample;
+import static org.testory.common.Samplers.fairSampler;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Anyvocation.anyvocation;
@@ -60,6 +59,7 @@ import org.testory.common.Effect.Thrown;
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.common.Optional;
+import org.testory.common.Sampler;
 import org.testory.common.VoidClosure;
 import org.testory.plumbing.Anyvocation;
 import org.testory.plumbing.Calling;
@@ -76,6 +76,7 @@ import org.testory.proxy.Typing;
 
 public class Testory {
   private static final Proxer proxer = new TestoryProxer(new CglibProxer());
+  private static final Sampler sampler = fairSampler();
 
   private static ThreadLocal<History> localHistory = new ThreadLocal<History>() {
     protected History initialValue() {
@@ -117,14 +118,16 @@ public class Testory {
       Object array = Array.newInstance(componentType, 1);
       Array.set(array, 0, mockOrSample(componentType, name + "[0]"));
       return array;
-    } else if (isSampleable(type)) {
-      return sample(type, name);
     } else {
-      Object mock = rawMock(type);
-      log(mocking(mock, name));
-      stubNice(mock);
-      stubObject(mock, name);
-      return mock;
+      try {
+        return sampler.sample(type, name);
+      } catch (RuntimeException e) {
+        Object mock = rawMock(type);
+        log(mocking(mock, name));
+        stubNice(mock);
+        stubObject(mock, name);
+        return mock;
+      }
     }
   }
 
