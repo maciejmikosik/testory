@@ -4,6 +4,7 @@ import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.setAccessible;
 import static org.testory.common.Classes.tryWrap;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -116,5 +117,23 @@ public class Samplers {
       Enum<?>[] constants = type.getEnumConstants();
       return constants[random.nextInt(constants.length)];
     }
+  }
+
+  public static Sampler withSingleElementArray(final Sampler sampler) {
+    return new Sampler() {
+      public <T> T sample(Class<T> type, String name) {
+        return type.isArray()
+            ? sampleArray(type, name)
+            : sampler.sample(type, name);
+      }
+
+      private <T> T sampleArray(Class<T> arrayType, String name) {
+        Class<?> componentType = arrayType.getComponentType();
+        Object array = Array.newInstance(componentType, 1);
+        Object element = sample(componentType, name + "[0]");
+        Array.set(array, 0, element);
+        return (T) array;
+      }
+    };
   }
 }

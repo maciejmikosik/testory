@@ -168,6 +168,22 @@ public class test_Samplers_fairSampler {
     assertSame(sampleField.getDeclaringClass(), sampleClass);
   }
 
+  @Test
+  public void fails_for_unknown_type() {
+    try {
+      sampler.sample(Object.class, seed);
+      fail();
+    } catch (RuntimeException e) {}
+  }
+
+  @Test
+  public void fails_for_array_of_unknown_type() {
+    try {
+      sampler.sample(Object[].class, seed);
+      fail();
+    } catch (RuntimeException e) {}
+  }
+
   private static <T> List<T> population(int count, Sampler sampler, Class<T> type, String seed) {
     List<T> samples = new ArrayList<>();
     for (int i = 0; i < count; i++) {

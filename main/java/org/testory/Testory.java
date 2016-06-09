@@ -17,6 +17,7 @@ import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Objects.print;
 import static org.testory.common.Samplers.fairSampler;
+import static org.testory.common.Samplers.withSingleElementArray;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Anyvocation.anyvocation;
@@ -76,7 +77,7 @@ import org.testory.proxy.Typing;
 
 public class Testory {
   private static final Proxer proxer = new TestoryProxer(new CglibProxer());
-  private static final Sampler sampler = fairSampler();
+  private static final Sampler sampler = withSingleElementArray(fairSampler());
 
   private static ThreadLocal<History> localHistory = new ThreadLocal<History>() {
     protected History initialValue() {
@@ -100,7 +101,7 @@ public class Testory {
           setAccessible(field);
           if (deepEquals(defaultValue(field.getType()), field.get(test))) {
             try {
-              field.set(test, mockOrSample(field.getType(), field.getName()));
+              field.set(test, mockOrSampleField(field.getType(), field.getName()));
             } catch (RuntimeException e) {
               throw new TestoryException("cannot inject field: " + field.getName());
             }
@@ -112,22 +113,26 @@ public class Testory {
     }
   }
 
-  private static Object mockOrSample(Class<?> type, String name) {
+  private static Object mockOrSampleField(Class<?> type, String name) {
+    try {
+      return sampler.sample(type, name);
+    } catch (RuntimeException e) {
+      return mockField(type, name);
+    }
+  }
+
+  private static Object mockField(Class<?> type, String name) {
     if (type.isArray()) {
       Class<?> componentType = type.getComponentType();
       Object array = Array.newInstance(componentType, 1);
-      Array.set(array, 0, mockOrSample(componentType, name + "[0]"));
+      Array.set(array, 0, mockField(componentType, name + "[0]"));
       return array;
     } else {
-      try {
-        return sampler.sample(type, name);
-      } catch (RuntimeException e) {
-        Object mock = rawMock(type);
-        log(mocking(mock, name));
-        stubNice(mock);
-        stubObject(mock, name);
-        return mock;
-      }
+      Object mock = rawMock(type);
+      log(mocking(mock, name));
+      stubNice(mock);
+      stubObject(mock, name);
+      return mock;
     }
   }
 
