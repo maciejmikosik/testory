@@ -8,7 +8,6 @@ import static org.testory.TestoryException.check;
 import static org.testory.common.Chain.chain;
 import static org.testory.common.CharSequences.join;
 import static org.testory.common.Classes.defaultValue;
-import static org.testory.common.Classes.hasMethod;
 import static org.testory.common.Classes.setAccessible;
 import static org.testory.common.Effect.returned;
 import static org.testory.common.Effect.returnedVoid;
@@ -38,14 +37,15 @@ import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
 import static org.testory.plumbing.inject.PrimitiveMaker.randomPrimitiveMaker;
+import static org.testory.plumbing.mock.NiceMockMaker.nice;
 import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
+import static org.testory.plumbing.mock.SaneMockMaker.sane;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Typing.typing;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 
@@ -88,9 +88,17 @@ public class Testory {
     localHistory.set(history);
   }
 
-  private static final Proxer proxer = new TestoryProxer(new CglibProxer());
-  private static final Maker sampler = singletonArray(chain(randomPrimitiveMaker(), finalMaker()));
-  private static final Maker rawMockMaker = rawMockMaker(proxer, localHistory);
+  private static final Proxer proxer;
+  private static final Maker sampler;
+  private static final Maker mockMaker;
+
+  static {
+    proxer = new TestoryProxer(new CglibProxer());
+    sampler = singletonArray(chain(randomPrimitiveMaker(), finalMaker()));
+    Maker rawMockMaker = rawMockMaker(proxer, localHistory);
+    Maker niceMockMaker = nice(rawMockMaker, localHistory);
+    mockMaker = sane(niceMockMaker, localHistory);
+  }
 
   public static void givenTest(Object test) {
     setHistory(purge(mark(getHistory())));
@@ -127,10 +135,7 @@ public class Testory {
       Array.set(array, 0, mockField(componentType, name + "[0]"));
       return array;
     } else {
-      Object mock = rawMockMaker.make(type, "");
-      stubNice(mock);
-      stubObject(mock, name);
-      return mock;
+      return mockMaker.make(type, name);
     }
   }
 
@@ -190,10 +195,7 @@ public class Testory {
   public static <T> T mock(Class<T> type) {
     check(type != null);
     String name = nameMock(type, getHistory());
-    final T mock = rawMockMaker.make(type, name);
-    stubNice(mock);
-    stubObject(mock, name);
-    return mock;
+    return mockMaker.make(type, name);
   }
 
   public static <T> T spy(T real) {
@@ -202,37 +204,6 @@ public class Testory {
     T mock = mock(type);
     given(willSpy(real), onInstance(mock));
     return mock;
-  }
-
-  private static void stubNice(Object mock) {
-    given(new Handler() {
-      public Object handle(Invocation invocation) {
-        return defaultValue(invocation.method.getReturnType());
-      }
-    }, onInstance(mock));
-  }
-
-  private static void stubObject(final Object mock, final String name) {
-    final Object implementation = new Object() {
-      public String toString() {
-        return name;
-      }
-
-      public boolean equals(Object obj) {
-        return mock == obj;
-      }
-
-      public int hashCode() {
-        return name.hashCode();
-      }
-    };
-    given(willTarget(implementation), new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        return mock == invocation.instance
-            && hasMethod(invocation.method.getName(), invocation.method.getParameterTypes(),
-                implementation.getClass());
-      }
-    });
   }
 
   public static <T> T given(final Handler will, T mock) {
@@ -285,17 +256,6 @@ public class Testory {
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         return invoke(invocation(invocation.method, real, invocation.arguments));
-      }
-    };
-  }
-
-  private static Handler willTarget(final Object target) {
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        String methodName = invocation.method.getName();
-        Class<?>[] parameters = invocation.method.getParameterTypes();
-        Method method = target.getClass().getDeclaredMethod(methodName, parameters);
-        return invoke(invocation(method, target, invocation.arguments));
       }
     };
   }
