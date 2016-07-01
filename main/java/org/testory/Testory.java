@@ -44,7 +44,6 @@ import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Typing.typing;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.List;
@@ -89,15 +88,15 @@ public class Testory {
   }
 
   private static final Proxer proxer;
-  private static final Maker sampler;
+  private static final Maker fieldMaker;
   private static final Maker mockMaker;
 
   static {
     proxer = new TestoryProxer(new CglibProxer());
-    sampler = singletonArray(chain(randomPrimitiveMaker(), finalMaker()));
     Maker rawMockMaker = rawMockMaker(proxer, localHistory);
     Maker niceMockMaker = nice(rawMockMaker, localHistory);
     mockMaker = sane(niceMockMaker, localHistory);
+    fieldMaker = singletonArray(chain(randomPrimitiveMaker(), finalMaker(), mockMaker));
   }
 
   public static void givenTest(Object test) {
@@ -108,7 +107,7 @@ public class Testory {
           setAccessible(field);
           if (deepEquals(defaultValue(field.getType()), field.get(test))) {
             try {
-              field.set(test, mockOrSampleField(field.getType(), field.getName()));
+              field.set(test, fieldMaker.make(field.getType(), field.getName()));
             } catch (RuntimeException e) {
               throw new TestoryException("cannot inject field: " + field.getName(), e);
             }
@@ -117,25 +116,6 @@ public class Testory {
       }
     } catch (ReflectiveOperationException e) {
       throw new Error(e);
-    }
-  }
-
-  private static Object mockOrSampleField(Class<?> type, String name) {
-    try {
-      return sampler.make(type, name);
-    } catch (RuntimeException e) {
-      return mockField(type, name);
-    }
-  }
-
-  private static Object mockField(Class<?> type, String name) {
-    if (type.isArray()) {
-      Class<?> componentType = type.getComponentType();
-      Object array = Array.newInstance(componentType, 1);
-      Array.set(array, 0, mockField(componentType, name + "[0]"));
-      return array;
-    } else {
-      return mockMaker.make(type, name);
     }
   }
 
