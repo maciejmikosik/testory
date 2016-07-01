@@ -13,7 +13,10 @@ import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
 import static org.testory.Testory.givenTest;
 import static org.testory.Testory.willReturn;
-import static org.testory.common.Samplers.fairSampler;
+import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
+import static org.testory.plumbing.inject.ChainedMaker.chain;
+import static org.testory.plumbing.inject.FinalMaker.finalMaker;
+import static org.testory.plumbing.inject.PrimitiveMaker.randomPrimitiveMaker;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 import static org.testory.testing.Reflections.readDeclaredFields;
 
@@ -26,13 +29,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.testory.common.Sampler;
+import org.testory.plumbing.Maker;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
 public class test_injecting {
   private static final String string = "string";
-  private static final Sampler fairSampler = fairSampler();
+  private static final Maker maker = singletonArray(chain(randomPrimitiveMaker(), finalMaker()));
   private List<Object> fields;
 
   @Test
@@ -335,7 +338,7 @@ public class test_injecting {
   }
 
   @Test
-  public void injects_sample_string() {
+  public void injects_sample_String() {
     class TestClass {
       @SuppressWarnings("unused")
       String a, b, c, d, e, f, g, h, i, j;
@@ -583,7 +586,7 @@ public class test_injecting {
     }
     TestClass test = new TestClass();
     givenTest(test);
-    assertArrayEquals(new String[][] { { fairSampler.sample(String.class, "deepArray[0][0]") } },
+    assertArrayEquals(new String[][] { { maker.make(String.class, "deepArray[0][0]") } },
         test.deepArray);
   }
 
@@ -701,7 +704,7 @@ public class test_injecting {
   private static void assertContainsSamples(Object instance) {
     try {
       for (Field field : injectableFields(instance.getClass())) {
-        assertEquals(fairSampler.sample(field.getType(), field.getName()), field.get(instance));
+        assertEquals(maker.make(field.getType(), field.getName()), field.get(instance));
       }
     } catch (IllegalAccessException e) {
       throw new RuntimeException(e);
@@ -712,7 +715,7 @@ public class test_injecting {
     try {
       for (Field field : injectableFields(instance.getClass())) {
         Object array = Array.newInstance(field.getType().getComponentType(), 1);
-        Array.set(array, 0, fairSampler.sample(field.getType().getComponentType(), field.getName() + "[0]"));
+        Array.set(array, 0, maker.make(field.getType().getComponentType(), field.getName() + "[0]"));
         assertTrue(deepEquals(field.get(instance), array));
       }
     } catch (IllegalAccessException e) {

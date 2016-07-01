@@ -16,8 +16,6 @@ import static org.testory.common.Effect.thrown;
 import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Objects.print;
-import static org.testory.common.Samplers.fairSampler;
-import static org.testory.common.Samplers.withSingleElementArray;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Anyvocation.anyvocation;
@@ -39,6 +37,10 @@ import static org.testory.plumbing.Purging.purge;
 import static org.testory.plumbing.Stubbing.findStubbing;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
+import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
+import static org.testory.plumbing.inject.ChainedMaker.chain;
+import static org.testory.plumbing.inject.FinalMaker.finalMaker;
+import static org.testory.plumbing.inject.PrimitiveMaker.randomPrimitiveMaker;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Typing.typing;
@@ -60,12 +62,12 @@ import org.testory.common.Effect.Thrown;
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.common.Optional;
-import org.testory.common.Sampler;
 import org.testory.common.VoidClosure;
 import org.testory.plumbing.Anyvocation;
 import org.testory.plumbing.Calling;
 import org.testory.plumbing.History;
 import org.testory.plumbing.Inspecting;
+import org.testory.plumbing.Maker;
 import org.testory.plumbing.Mocking;
 import org.testory.plumbing.Stubbing;
 import org.testory.proxy.CglibProxer;
@@ -77,7 +79,7 @@ import org.testory.proxy.Typing;
 
 public class Testory {
   private static final Proxer proxer = new TestoryProxer(new CglibProxer());
-  private static final Sampler sampler = withSingleElementArray(fairSampler());
+  private static final Maker maker = singletonArray(chain(randomPrimitiveMaker(), finalMaker()));
 
   private static ThreadLocal<History> localHistory = new ThreadLocal<History>() {
     protected History initialValue() {
@@ -103,7 +105,7 @@ public class Testory {
             try {
               field.set(test, mockOrSampleField(field.getType(), field.getName()));
             } catch (RuntimeException e) {
-              throw new TestoryException("cannot inject field: " + field.getName());
+              throw new TestoryException("cannot inject field: " + field.getName(), e);
             }
           }
         }
@@ -115,7 +117,7 @@ public class Testory {
 
   private static Object mockOrSampleField(Class<?> type, String name) {
     try {
-      return sampler.sample(type, name);
+      return maker.make(type, name);
     } catch (RuntimeException e) {
       return mockField(type, name);
     }
