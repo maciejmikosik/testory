@@ -41,6 +41,10 @@ public class Stubbing {
     return Optional.empty();
   }
 
+  public static boolean isStubbed(Invocation invocation, History history) {
+    return findStubbing(invocation, history).isPresent();
+  }
+
   private static ThreadLocal<Cache> localCache = new ThreadLocal<Cache>() {
     protected Cache initialValue() {
       return newCache(Stubbing.class);

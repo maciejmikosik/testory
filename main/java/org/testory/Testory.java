@@ -21,7 +21,6 @@ import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Anyvocation.anyvocation;
 import static org.testory.plumbing.Anyvocation.matcherize;
 import static org.testory.plumbing.Anyvocation.repair;
-import static org.testory.plumbing.Calling.calling;
 import static org.testory.plumbing.Calling.callings;
 import static org.testory.plumbing.Capturing.capturedAnys;
 import static org.testory.plumbing.Capturing.consumeAnys;
@@ -30,17 +29,16 @@ import static org.testory.plumbing.History.add;
 import static org.testory.plumbing.History.history;
 import static org.testory.plumbing.Inspecting.findLastInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
-import static org.testory.plumbing.Mocking.mocking;
 import static org.testory.plumbing.Mocking.nameMock;
 import static org.testory.plumbing.Purging.mark;
 import static org.testory.plumbing.Purging.purge;
-import static org.testory.plumbing.Stubbing.findStubbing;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
 import static org.testory.plumbing.inject.PrimitiveMaker.randomPrimitiveMaker;
+import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Typing.typing;
@@ -48,7 +46,6 @@ import static org.testory.proxy.Typing.typing;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -69,7 +66,6 @@ import org.testory.plumbing.History;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.Mocking;
-import org.testory.plumbing.Stubbing;
 import org.testory.proxy.CglibProxer;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
@@ -78,9 +74,6 @@ import org.testory.proxy.Proxer;
 import org.testory.proxy.Typing;
 
 public class Testory {
-  private static final Proxer proxer = new TestoryProxer(new CglibProxer());
-  private static final Maker maker = singletonArray(chain(randomPrimitiveMaker(), finalMaker()));
-
   private static ThreadLocal<History> localHistory = new ThreadLocal<History>() {
     protected History initialValue() {
       return history(chain());
@@ -94,6 +87,10 @@ public class Testory {
   private static void setHistory(History history) {
     localHistory.set(history);
   }
+
+  private static final Proxer proxer = new TestoryProxer(new CglibProxer());
+  private static final Maker sampler = singletonArray(chain(randomPrimitiveMaker(), finalMaker()));
+  private static final Maker rawMockMaker = rawMockMaker(proxer, localHistory);
 
   public static void givenTest(Object test) {
     setHistory(purge(mark(getHistory())));
@@ -117,7 +114,7 @@ public class Testory {
 
   private static Object mockOrSampleField(Class<?> type, String name) {
     try {
-      return maker.make(type, name);
+      return sampler.make(type, name);
     } catch (RuntimeException e) {
       return mockField(type, name);
     }
@@ -130,8 +127,7 @@ public class Testory {
       Array.set(array, 0, mockField(componentType, name + "[0]"));
       return array;
     } else {
-      Object mock = rawMock(type);
-      log(mocking(mock, name));
+      Object mock = rawMockMaker.make(type, "");
       stubNice(mock);
       stubObject(mock, name);
       return mock;
@@ -193,9 +189,8 @@ public class Testory {
 
   public static <T> T mock(Class<T> type) {
     check(type != null);
-    final T mock = rawMock(type);
-    String name = nameMock(mock, getHistory());
-    log(mocking(mock, name));
+    String name = nameMock(type, getHistory());
+    final T mock = rawMockMaker.make(type, name);
     stubNice(mock);
     stubObject(mock, name);
     return mock;
@@ -207,22 +202,6 @@ public class Testory {
     T mock = mock(type);
     given(willSpy(real), onInstance(mock));
     return mock;
-  }
-
-  private static <T> T rawMock(Class<T> type) {
-    Typing typing = type.isInterface()
-        ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
-        : typing(type, new HashSet<Class<?>>());
-    Handler handler = new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        check(isMock(invocation.instance));
-        check(isStubbed(invocation));
-        log(calling(invocation));
-        Stubbing stubbing = findStubbing(invocation, getHistory()).get();
-        return stubbing.handler.handle(invocation);
-      }
-    };
-    return (T) proxer.proxy(typing, handler);
   }
 
   private static void stubNice(Object mock) {
@@ -793,10 +772,6 @@ public class Testory {
 
   private static <T> boolean isMock(T mock) {
     return Mocking.isMock(mock, getHistory());
-  }
-
-  private static boolean isStubbed(Invocation invocation) {
-    return findStubbing(invocation, getHistory()).isPresent();
   }
 
   private static String formatSection(String caption, @Nullable Object content) {

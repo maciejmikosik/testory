@@ -42,11 +42,11 @@ public class Mocking {
     return false;
   }
 
-  public static String nameMock(Object mock, History history) {
+  public static String nameMock(Class<?> type, History history) {
     List<String> mockNames = mockNames(history);
-    String mockedType = mockedType(mock);
+    String typeName = type.getSimpleName();
     for (int i = 0;; i++) {
-      String name = "mock" + mockedType + i;
+      String name = "mock" + typeName + i;
       if (!mockNames.contains(name)) {
         return name;
       }
@@ -62,36 +62,6 @@ public class Mocking {
       }
     }
     return mockNames;
-  }
-
-  private static String mockedType(Object mock) {
-    String name = mock.getClass().getSimpleName();
-    return hideProxiable(removeInnerClassIndex(removeOuterClass(removeCglib(name))));
-  }
-
-  private static String removeCglib(String name) {
-    return name.split("\\$\\$")[0];
-  }
-
-  private static String removeOuterClass(String name) {
-    String[] split = name.split("\\$");
-    return split[split.length - 1];
-  }
-
-  private static String removeInnerClassIndex(String name) {
-    char[] chars = name.toCharArray();
-    for (int i = 0; i < chars.length; i++) {
-      if (!Character.isDigit(chars[i])) {
-        return String.valueOf(chars, i, chars.length - i);
-      }
-    }
-    return name;
-  }
-
-  private static String hideProxiable(String name) {
-    return name.equals("ProxiableObject")
-        ? "Object"
-        : name;
   }
 
   private static ThreadLocal<Cache> localCache = new ThreadLocal<Cache>() {
