@@ -7,6 +7,8 @@ import static org.testory.plumbing.Purging.purge;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.testory.common.Chain;
+
 public class Mocking {
   public final Object mock;
   public final String name;
@@ -26,7 +28,7 @@ public class Mocking {
     return "mocking(" + mock + ", " + name + ")";
   }
 
-  public static boolean isMock(Object mock, History history) {
+  public static boolean isMock(Object mock, Chain<Object> history) {
     check(mock != null);
     check(history != null);
     Cache cache = localCache.get().update(history);
@@ -42,7 +44,7 @@ public class Mocking {
     return false;
   }
 
-  public static String nameMock(Class<?> type, History history) {
+  public static String nameMock(Class<?> type, Chain<Object> history) {
     List<String> mockNames = mockNames(history);
     String typeName = type.getSimpleName();
     for (int i = 0;; i++) {
@@ -53,9 +55,9 @@ public class Mocking {
     }
   }
 
-  private static List<String> mockNames(History history) {
+  private static List<String> mockNames(Chain<Object> history) {
     List<String> mockNames = new ArrayList<String>();
-    for (Object event : purge(history).events) {
+    for (Object event : purge(history)) {
       if (event instanceof Mocking) {
         Mocking mocking = (Mocking) event;
         mockNames.add(mocking.name);

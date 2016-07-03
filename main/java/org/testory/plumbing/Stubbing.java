@@ -3,6 +3,7 @@ package org.testory.plumbing;
 import static org.testory.plumbing.Cache.newCache;
 import static org.testory.plumbing.PlumbingException.check;
 
+import org.testory.common.Chain;
 import org.testory.common.Optional;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
@@ -27,7 +28,7 @@ public class Stubbing {
     return "stubbing(" + invocationMatcher + ", " + handler + ")";
   }
 
-  public static Optional<Stubbing> findStubbing(Invocation invocation, History history) {
+  public static Optional<Stubbing> findStubbing(Invocation invocation, Chain<Object> history) {
     Cache cache = localCache.get().update(history);
     localCache.set(cache);
     for (Object event : cache.untilLastTyped) {
@@ -41,7 +42,7 @@ public class Stubbing {
     return Optional.empty();
   }
 
-  public static boolean isStubbed(Invocation invocation, History history) {
+  public static boolean isStubbed(Invocation invocation, Chain<Object> history) {
     return findStubbing(invocation, history).isPresent();
   }
 

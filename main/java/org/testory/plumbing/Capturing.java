@@ -1,12 +1,12 @@
 package org.testory.plumbing;
 
-import static org.testory.plumbing.History.add;
 import static org.testory.plumbing.PlumbingException.check;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.testory.common.Any;
+import org.testory.common.Chain;
 
 public class Capturing {
   public static class CapturingAny {
@@ -32,10 +32,10 @@ public class Capturing {
     }
   }
 
-  public static List<Any> capturedAnys(History history) {
+  public static List<Any> capturedAnys(Chain<Object> history) {
     check(history != null);
     List<Any> anys = new ArrayList<Any>();
-    for (Object event : history.events) {
+    for (Object event : history) {
       if (event instanceof CapturingAny) {
         anys.add(0, ((CapturingAny) event).any);
       } else if (event instanceof ConsumingAnys) {
@@ -45,7 +45,7 @@ public class Capturing {
     return anys;
   }
 
-  public static History consumeAnys(History history) {
-    return add(new ConsumingAnys(), history);
+  public static Chain<Object> consumeAnys(Chain<Object> history) {
+    return history.add(new ConsumingAnys());
   }
 }

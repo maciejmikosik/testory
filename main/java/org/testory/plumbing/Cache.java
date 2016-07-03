@@ -20,20 +20,20 @@ public class Cache {
     return new Cache(type, chain(), chain());
   }
 
-  public Cache update(History history) {
+  public Cache update(Chain<Object> history) {
     check(history != null);
-    Chain<Object> events = history.events;
+    Chain<Object> events = history;
     while (events.size() > 0) {
       if (events == untilLastEvent) {
-        return new Cache(type, history.events, untilLastTyped);
+        return new Cache(type, history, untilLastTyped);
       }
       if (type.isInstance(events.get())) {
-        return new Cache(type, history.events, events);
+        return new Cache(type, history, events);
       }
       events = events.remove();
     }
     if (events.size() == 0) {
-      return new Cache(type, history.events, history.events);
+      return new Cache(type, history, history);
     }
     return this;
   }

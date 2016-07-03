@@ -24,8 +24,6 @@ import static org.testory.plumbing.Calling.callings;
 import static org.testory.plumbing.Capturing.capturedAnys;
 import static org.testory.plumbing.Capturing.consumeAnys;
 import static org.testory.plumbing.Capturing.CapturingAny.capturingAny;
-import static org.testory.plumbing.History.add;
-import static org.testory.plumbing.History.history;
 import static org.testory.plumbing.Inspecting.findLastInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Mocking.nameMock;
@@ -49,6 +47,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.testory.common.Any;
+import org.testory.common.Chain;
 import org.testory.common.Closure;
 import org.testory.common.DiagnosticMatcher;
 import org.testory.common.Effect;
@@ -61,7 +60,6 @@ import org.testory.common.Optional;
 import org.testory.common.VoidClosure;
 import org.testory.plumbing.Anyvocation;
 import org.testory.plumbing.Calling;
-import org.testory.plumbing.History;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.Mocking;
@@ -73,17 +71,17 @@ import org.testory.proxy.Proxer;
 import org.testory.proxy.Typing;
 
 public class Testory {
-  private static ThreadLocal<History> localHistory = new ThreadLocal<History>() {
-    protected History initialValue() {
-      return history(chain());
+  private static ThreadLocal<Chain<Object>> localHistory = new ThreadLocal<Chain<Object>>() {
+    protected Chain<Object> initialValue() {
+      return chain();
     }
   };
 
-  private static History getHistory() {
+  private static Chain<Object> getHistory() {
     return localHistory.get();
   }
 
-  private static void setHistory(History history) {
+  private static void setHistory(Chain<Object> history) {
     localHistory.set(history);
   }
 
@@ -653,7 +651,7 @@ public class Testory {
     check(isMatcher(numberMatcher));
     check(invocationMatcher != null);
     int numberOfCalls = 0;
-    History history = getHistory();
+    Chain<Object> history = getHistory();
     for (Calling calling : callings(history)) {
       if (invocationMatcher.matches(calling.invocation)) {
         numberOfCalls++;
@@ -682,8 +680,8 @@ public class Testory {
 
   public static void thenCalledInOrder(InvocationMatcher invocationMatcher) {
     check(invocationMatcher != null);
-    History history = getHistory();
-    Optional<History> verified = verifyInOrder(invocationMatcher, history);
+    Chain<Object> history = getHistory();
+    Optional<Chain<Object>> verified = verifyInOrder(invocationMatcher, history);
     if (verified.isPresent()) {
       setHistory(verified.get());
     } else {
@@ -707,7 +705,7 @@ public class Testory {
   }
 
   public static void log(Object event) {
-    setHistory(add(event, getHistory()));
+    setHistory(getHistory().add(event));
   }
 
   private static <T> boolean isMock(T mock) {
@@ -727,7 +725,7 @@ public class Testory {
         : "";
   }
 
-  private static String formatCallings(final History history) {
+  private static String formatCallings(final Chain<Object> history) {
     log(stubbing(new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocation.method.getName().equals("toString")
@@ -735,7 +733,7 @@ public class Testory {
       }
     }, new Handler() {
       public Object handle(Invocation invocation) {
-        for (Object event : history.events) {
+        for (Object event : history) {
           if (event instanceof Mocking) {
             Mocking mocking = (Mocking) event;
             if (mocking.mock == invocation.instance) {
@@ -748,7 +746,7 @@ public class Testory {
     }));
 
     StringBuilder builder = new StringBuilder();
-    for (Object event : history.events.reverse()) {
+    for (Object event : history.reverse()) {
       if (event instanceof Calling) {
         Calling calling = (Calling) event;
         Invocation invocation = calling.invocation;
