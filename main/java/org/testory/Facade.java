@@ -21,17 +21,35 @@ import org.testory.proxy.CglibProxer;
 import org.testory.proxy.Proxer;
 
 public class Facade {
-  public final History history = new History();
-  public final Proxer proxer = new CglibProxer();
-  private final Proxer mockProxer = mockProxer(history, proxer);
-  private final Maker rawMockMaker = rawMockMaker(mockProxer, history);
-  private final Maker niceMockMaker = nice(rawMockMaker, history);
-  public final Namer mockNamer = uniqueNamer(history);
-  public final Maker mockMaker = sane(niceMockMaker, history);
-  public final Injector injector = new Injector(singletonArray(
-      chain(randomPrimitiveMaker(), finalMaker(), mockMaker)));
+  public final History history;
+  public final Proxer proxer;
+  public final Namer mockNamer;
+  public final Maker mockMaker;
+  public final Injector injector;
 
-  private final FilteredHistory<Mocking> mockingHistory = filter(Mocking.class, history);
+  private final FilteredHistory<Mocking> mockingHistory;
+
+  public Facade() {
+    history = new History();
+    proxer = new CglibProxer();
+    mockNamer = uniqueNamer(history);
+    mockMaker = mockMaker(history, proxer);
+    injector = injector(mockMaker);
+    mockingHistory = filter(Mocking.class, history);
+  }
+
+  private static Maker mockMaker(History history, Proxer proxer) {
+    Proxer mockProxer = mockProxer(history, proxer);
+    Maker rawMockMaker = rawMockMaker(mockProxer, history);
+    Maker niceMockMaker = nice(rawMockMaker, history);
+    Maker saneNiceMockMaker = sane(niceMockMaker, history);
+    return saneNiceMockMaker;
+  }
+
+  private static Injector injector(Maker mockMaker) {
+    Maker fieldMaker = singletonArray(chain(randomPrimitiveMaker(), finalMaker(), mockMaker));
+    return new Injector(fieldMaker);
+  }
 
   public boolean isMock(Object instance) {
     for (Mocking mocking : mockingHistory.get()) {
