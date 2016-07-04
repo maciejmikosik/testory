@@ -1,5 +1,6 @@
 package org.testory;
 
+import static org.testory.MockProxer.mockProxer;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
@@ -18,8 +19,9 @@ import org.testory.proxy.Proxer;
 
 public class Facade {
   public final History history = new History();
-  public final Proxer proxer = new TestoryProxer(new CglibProxer());
-  private final Maker rawMockMaker = rawMockMaker(proxer, history);
+  public final Proxer proxer = new CglibProxer();
+  private final Proxer mockProxer = mockProxer(history, proxer);
+  private final Maker rawMockMaker = rawMockMaker(mockProxer, history);
   private final Maker niceMockMaker = nice(rawMockMaker, history);
   public final Namer mockNamer = uniqueNamer(history);
   public final Maker mockMaker = sane(niceMockMaker, history);

@@ -1,10 +1,9 @@
 package org.testory.plumbing.mock;
 
-import static org.testory.TestoryException.check;
 import static org.testory.plumbing.Calling.calling;
 import static org.testory.plumbing.FilteredHistory.filter;
-import static org.testory.plumbing.Mocking.isMock;
 import static org.testory.plumbing.Mocking.mocking;
+import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.proxy.Typing.typing;
 
 import java.util.Arrays;
@@ -55,7 +54,6 @@ public class RawMockMaker implements Maker {
   private Handler handler() {
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        check(isMock(invocation.instance, history.get()));
         history.add(calling(invocation));
         Stubbing stubbing = stubbingFor(invocation);
         return stubbing.handler.handle(invocation);

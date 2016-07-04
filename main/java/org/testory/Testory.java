@@ -53,6 +53,7 @@ import org.testory.plumbing.inject.Injector;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
+import org.testory.proxy.Proxer;
 import org.testory.proxy.Typing;
 
 public class Testory {
@@ -734,12 +735,30 @@ public class Testory {
 
   private static <T> T proxyWrapping(final T wrapped, final Handler handler) {
     Typing typing = typing(wrapped.getClass(), new HashSet<Class<?>>());
-    return (T) getFacade().proxer.proxy(typing, new Handler() {
+    Proxer proxer = getFacade().proxer;
+    Handler proxyHandler = returningDefaultValue(delegatingTo(wrapped, handler));
+    try {
+      return (T) proxer.proxy(typing, proxyHandler);
+    } catch (RuntimeException e) {
+      throw new TestoryException(e);
+    }
+  }
+
+  private static Handler returningDefaultValue(final Handler handler) {
+    return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        handler.handle(invocation(invocation.method, wrapped, invocation.arguments));
+        handler.handle(invocation);
         return defaultValue(invocation.method.getReturnType());
       }
-    });
+    };
+  }
+
+  private static Handler delegatingTo(final Object instance, final Handler handler) {
+    return new Handler() {
+      public Object handle(Invocation invocation) throws Throwable {
+        return handler.handle(invocation(invocation.method, instance, invocation.arguments));
+      }
+    };
   }
 
   private static InvocationMatcher capture(Invocation invocation) {
