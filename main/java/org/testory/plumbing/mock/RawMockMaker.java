@@ -1,19 +1,19 @@
 package org.testory.plumbing.mock;
 
 import static org.testory.plumbing.Calling.calling;
-import static org.testory.plumbing.FilteredHistory.filter;
 import static org.testory.plumbing.Mocking.mocking;
 import static org.testory.plumbing.PlumbingException.check;
+import static org.testory.plumbing.history.FilteredHistory.filter;
 import static org.testory.proxy.Typing.typing;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.testory.plumbing.FilteredHistory;
-import org.testory.plumbing.History;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.PlumbingException;
 import org.testory.plumbing.Stubbing;
+import org.testory.plumbing.history.FilteredHistory;
+import org.testory.plumbing.history.History;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.Proxer;

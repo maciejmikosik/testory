@@ -22,8 +22,6 @@ import static org.testory.plumbing.Capturing.consumeAnys;
 import static org.testory.plumbing.Capturing.CapturingAny.capturingAny;
 import static org.testory.plumbing.Inspecting.findLastInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
-import static org.testory.plumbing.Purging.mark;
-import static org.testory.plumbing.Purging.purge;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
 import static org.testory.proxy.Invocation.invocation;
@@ -76,7 +74,6 @@ public class Testory {
   }
 
   public static void givenTest(Object test) {
-    setHistory(purge(mark(getHistory())));
     Injector injector = getFacade().injector;
     try {
       injector.inject(test);
@@ -322,13 +319,11 @@ public class Testory {
   }
 
   public static <T> T when(T object) {
-    setHistory(mark(purge(getHistory())));
     log(inspecting(returned(object)));
     try {
       return proxyWrapping(object, new Handler() {
         public Object handle(Invocation invocation) {
           log(inspecting(effectOfInvoke(invocation)));
-          setHistory(mark(getHistory()));
           return null;
         }
       });
@@ -340,7 +335,6 @@ public class Testory {
   public static void when(Closure closure) {
     check(closure != null);
     log(inspecting(effectOfInvoke(closure)));
-    setHistory(mark(purge(getHistory())));
   }
 
   private static Effect effectOfInvoke(Closure closure) {
@@ -356,7 +350,6 @@ public class Testory {
   public static void when(VoidClosure closure) {
     check(closure != null);
     log(inspecting(effectOfInvoke(closure)));
-    setHistory(mark(purge(getHistory())));
   }
 
   private static Effect effectOfInvoke(VoidClosure closure) {
@@ -674,7 +667,7 @@ public class Testory {
   }
 
   public static void log(Object event) {
-    setHistory(getHistory().add(event));
+    getFacade().history.add(event);
   }
 
   private static boolean isMock(Object object) {

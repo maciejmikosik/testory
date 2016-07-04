@@ -3,13 +3,13 @@ package org.testory;
 import static org.testory.TestoryException.check;
 import static org.testory.common.Classes.canReturn;
 import static org.testory.common.Classes.canThrow;
-import static org.testory.plumbing.FilteredHistory.filter;
+import static org.testory.plumbing.history.FilteredHistory.filter;
 
 import java.lang.reflect.Method;
 
-import org.testory.plumbing.FilteredHistory;
-import org.testory.plumbing.History;
 import org.testory.plumbing.Mocking;
+import org.testory.plumbing.history.FilteredHistory;
+import org.testory.plumbing.history.History;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.Proxer;

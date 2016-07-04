@@ -7,9 +7,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
-import static org.testory.Testory.when;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 import static org.testory.testing.HamcrestMatchers.hasMessageMatching;
+import static org.testory.testing.Purging.triggerPurge;
 import static org.testory.testing.StackTraces.here;
 import static org.testory.testing.StackTraces.nextLine;
 
@@ -48,8 +48,7 @@ public class test_TestoryException {
   @Test
   public void message_explains_purged_mock() {
     mock = mock(Object.class);
-    when("");
-    when("");
+    triggerPurge();
     try {
       mock.toString();
       fail();

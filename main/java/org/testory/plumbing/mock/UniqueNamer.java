@@ -1,13 +1,12 @@
 package org.testory.plumbing.mock;
 
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.Purging.purge;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.testory.plumbing.History;
 import org.testory.plumbing.Mocking;
+import org.testory.plumbing.history.History;
 
 public class UniqueNamer implements Namer {
   private final History history;
@@ -34,7 +33,7 @@ public class UniqueNamer implements Namer {
 
   private List<String> usedNames() {
     List<String> usedNames = new ArrayList<String>();
-    for (Object event : purge(history.get())) {
+    for (Object event : history.get()) {
       if (event instanceof Mocking) {
         usedNames.add(((Mocking) event).name);
       }

@@ -1,7 +1,8 @@
 package org.testory;
 
 import static org.testory.MockProxer.mockProxer;
-import static org.testory.plumbing.FilteredHistory.filter;
+import static org.testory.plumbing.history.FilteredHistory.filter;
+import static org.testory.plumbing.history.PurgedHistory.newPurgedHistory;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
@@ -11,10 +12,10 @@ import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
 import static org.testory.plumbing.mock.SaneMockMaker.sane;
 import static org.testory.plumbing.mock.UniqueNamer.uniqueNamer;
 
-import org.testory.plumbing.FilteredHistory;
-import org.testory.plumbing.History;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.Mocking;
+import org.testory.plumbing.history.FilteredHistory;
+import org.testory.plumbing.history.History;
 import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
 import org.testory.proxy.CglibProxer;
@@ -30,7 +31,7 @@ public class Facade {
   private final FilteredHistory<Mocking> mockingHistory;
 
   public Facade() {
-    history = new History();
+    history = newPurgedHistory();
     proxer = new CglibProxer();
     mockNamer = uniqueNamer(history);
     mockMaker = mockMaker(history, proxer);

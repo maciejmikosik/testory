@@ -9,11 +9,11 @@ import static org.testory.Testory.any;
 import static org.testory.Testory.given;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
-import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
 import static org.testory.testing.DynamicMatchers.same;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
+import static org.testory.testing.Purging.triggerPurge;
 
 import java.util.List;
 
@@ -35,8 +35,7 @@ public class test_any {
 
   @After
   public void after() {
-    when("");
-    when("");
+    triggerPurge();
   }
 
   @SuppressWarnings("rawtypes")

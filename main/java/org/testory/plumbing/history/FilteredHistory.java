@@ -1,4 +1,4 @@
-package org.testory.plumbing;
+package org.testory.plumbing.history;
 
 import static org.testory.common.Chain.chain;
 import static org.testory.plumbing.PlumbingException.check;

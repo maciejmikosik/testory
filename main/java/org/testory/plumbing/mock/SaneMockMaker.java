@@ -4,9 +4,9 @@ import static java.util.Objects.deepEquals;
 import static org.testory.TestoryException.check;
 import static org.testory.plumbing.Stubbing.stubbing;
 
-import org.testory.plumbing.History;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.Stubbing;
+import org.testory.plumbing.history.History;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
