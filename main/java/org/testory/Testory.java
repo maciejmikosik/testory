@@ -1,13 +1,10 @@
 package org.testory;
 
-import static java.lang.reflect.Modifier.isFinal;
-import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Objects.deepEquals;
 import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
 import static org.testory.common.CharSequences.join;
 import static org.testory.common.Classes.defaultValue;
-import static org.testory.common.Classes.setAccessible;
 import static org.testory.common.Effect.returned;
 import static org.testory.common.Effect.returnedVoid;
 import static org.testory.common.Effect.thrown;
@@ -34,7 +31,6 @@ import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Typing.typing;
 
-import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.List;
 
@@ -54,6 +50,7 @@ import org.testory.plumbing.Anyvocation;
 import org.testory.plumbing.Calling;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Mocking;
+import org.testory.plumbing.inject.Injector;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
@@ -80,21 +77,11 @@ public class Testory {
 
   public static void givenTest(Object test) {
     setHistory(purge(mark(getHistory())));
+    Injector injector = getFacade().injector;
     try {
-      for (final Field field : test.getClass().getDeclaredFields()) {
-        if (!isStatic(field.getModifiers()) && !isFinal(field.getModifiers())) {
-          setAccessible(field);
-          if (deepEquals(defaultValue(field.getType()), field.get(test))) {
-            try {
-              field.set(test, getFacade().fieldMaker.make(field.getType(), field.getName()));
-            } catch (RuntimeException e) {
-              throw new TestoryException("cannot inject field: " + field.getName(), e);
-            }
-          }
-        }
-      }
-    } catch (ReflectiveOperationException e) {
-      throw new Error(e);
+      injector.inject(test);
+    } catch (RuntimeException e) {
+      throw new TestoryException(e);
     }
   }
 

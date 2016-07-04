@@ -10,6 +10,7 @@ import static org.testory.plumbing.mock.SaneMockMaker.sane;
 
 import org.testory.plumbing.History;
 import org.testory.plumbing.Maker;
+import org.testory.plumbing.inject.Injector;
 import org.testory.proxy.CglibProxer;
 import org.testory.proxy.Proxer;
 
@@ -19,7 +20,6 @@ public class Facade {
   private final Maker rawMockMaker = rawMockMaker(proxer, history);
   private final Maker niceMockMaker = nice(rawMockMaker, history);
   public final Maker mockMaker = sane(niceMockMaker, history);
-  public final Maker fieldMaker = singletonArray(
-      chain(randomPrimitiveMaker(), finalMaker(), mockMaker));
-
+  public final Injector injector = new Injector(singletonArray(
+      chain(randomPrimitiveMaker(), finalMaker(), mockMaker)));
 }

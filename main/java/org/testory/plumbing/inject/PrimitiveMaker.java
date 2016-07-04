@@ -31,7 +31,7 @@ public class PrimitiveMaker {
         } else if (type == Double.class || type == double.class) {
           return (T) (Double) randomDouble(300, random);
         }
-        throw new RuntimeException(format("unknown type %s", type));
+        throw new RuntimeException(format("cannot make %s of type %s", name, type.getName()));
       }
     };
   }

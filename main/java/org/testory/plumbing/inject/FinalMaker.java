@@ -31,7 +31,7 @@ public class FinalMaker {
         } else if (Enum.class.isAssignableFrom(type)) {
           return (T) randomEnum((Class<? extends Enum<?>>) type, name);
         }
-        throw new RuntimeException(format("unknown type %s", type));
+        throw new RuntimeException(format("cannot make %s of type %s", name, type.getName()));
       }
     };
   }

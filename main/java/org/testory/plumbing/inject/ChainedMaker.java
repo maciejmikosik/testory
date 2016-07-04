@@ -23,7 +23,7 @@ public class ChainedMaker {
             return maker.make(type, name);
           } catch (RuntimeException e) {}
         }
-        throw new RuntimeException(format("unknown type %s", type));
+        throw new RuntimeException(format("cannot make %s of type %s", name, type.getName()));
       }
     };
   }
