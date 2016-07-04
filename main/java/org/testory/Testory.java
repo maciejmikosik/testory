@@ -5,7 +5,6 @@ import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Objects.deepEquals;
 import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
-import static org.testory.common.Chain.chain;
 import static org.testory.common.CharSequences.join;
 import static org.testory.common.Classes.defaultValue;
 import static org.testory.common.Classes.setAccessible;
@@ -31,13 +30,6 @@ import static org.testory.plumbing.Purging.mark;
 import static org.testory.plumbing.Purging.purge;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
-import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
-import static org.testory.plumbing.inject.ChainedMaker.chain;
-import static org.testory.plumbing.inject.FinalMaker.finalMaker;
-import static org.testory.plumbing.inject.PrimitiveMaker.randomPrimitiveMaker;
-import static org.testory.plumbing.mock.NiceMockMaker.nice;
-import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
-import static org.testory.plumbing.mock.SaneMockMaker.sane;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Typing.typing;
@@ -61,40 +53,29 @@ import org.testory.common.VoidClosure;
 import org.testory.plumbing.Anyvocation;
 import org.testory.plumbing.Calling;
 import org.testory.plumbing.Inspecting;
-import org.testory.plumbing.Maker;
 import org.testory.plumbing.Mocking;
-import org.testory.proxy.CglibProxer;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
-import org.testory.proxy.Proxer;
 import org.testory.proxy.Typing;
 
 public class Testory {
-  private static ThreadLocal<Chain<Object>> localHistory = new ThreadLocal<Chain<Object>>() {
-    protected Chain<Object> initialValue() {
-      return chain();
+  private static final ThreadLocal<Facade> localFacade = new ThreadLocal<Facade>() {
+    protected Facade initialValue() {
+      return new Facade();
     }
   };
 
+  private static Facade getFacade() {
+    return localFacade.get();
+  }
+
   private static Chain<Object> getHistory() {
-    return localHistory.get();
+    return getFacade().localHistory.get();
   }
 
   private static void setHistory(Chain<Object> history) {
-    localHistory.set(history);
-  }
-
-  private static final Proxer proxer;
-  private static final Maker fieldMaker;
-  private static final Maker mockMaker;
-
-  static {
-    proxer = new TestoryProxer(new CglibProxer());
-    Maker rawMockMaker = rawMockMaker(proxer, localHistory);
-    Maker niceMockMaker = nice(rawMockMaker, localHistory);
-    mockMaker = sane(niceMockMaker, localHistory);
-    fieldMaker = singletonArray(chain(randomPrimitiveMaker(), finalMaker(), mockMaker));
+    getFacade().localHistory.set(history);
   }
 
   public static void givenTest(Object test) {
@@ -105,7 +86,7 @@ public class Testory {
           setAccessible(field);
           if (deepEquals(defaultValue(field.getType()), field.get(test))) {
             try {
-              field.set(test, fieldMaker.make(field.getType(), field.getName()));
+              field.set(test, getFacade().fieldMaker.make(field.getType(), field.getName()));
             } catch (RuntimeException e) {
               throw new TestoryException("cannot inject field: " + field.getName(), e);
             }
@@ -173,7 +154,7 @@ public class Testory {
   public static <T> T mock(Class<T> type) {
     check(type != null);
     String name = nameMock(type, getHistory());
-    return mockMaker.make(type, name);
+    return getFacade().mockMaker.make(type, name);
   }
 
   public static <T> T spy(T real) {
@@ -766,7 +747,7 @@ public class Testory {
 
   private static <T> T proxyWrapping(final T wrapped, final Handler handler) {
     Typing typing = typing(wrapped.getClass(), new HashSet<Class<?>>());
-    return (T) proxer.proxy(typing, new Handler() {
+    return (T) getFacade().proxer.proxy(typing, new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         handler.handle(invocation(invocation.method, wrapped, invocation.arguments));
         return defaultValue(invocation.method.getReturnType());
