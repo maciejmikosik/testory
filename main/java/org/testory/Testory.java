@@ -677,8 +677,8 @@ public class Testory {
     setHistory(getHistory().add(event));
   }
 
-  private static <T> boolean isMock(T mock) {
-    return Mocking.isMock(mock, getHistory());
+  private static boolean isMock(Object object) {
+    return getFacade().isMock(object);
   }
 
   private static String formatSection(String caption, @Nullable Object content) {
