@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import org.testory.common.Chain;
+import org.testory.plumbing.History;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.Stubbing;
 import org.testory.proxy.Handler;
@@ -20,17 +21,17 @@ import org.testory.proxy.Proxer;
 import org.testory.proxy.Typing;
 
 public class RawMockMaker {
-  public static Maker rawMockMaker(final Proxer proxer, final ThreadLocal<Chain<Object>> mutableHistory) {
+  public static Maker rawMockMaker(final Proxer proxer, final History history) {
     check(proxer != null);
-    check(mutableHistory != null);
+    check(history != null);
     return new Maker() {
       public <T> T make(Class<T> type, String name) {
         check(type != null);
         check(name != null);
         Typing typing = typingFor(type);
-        Handler handler = handler(mutableHistory);
+        Handler handler = handler(history);
         Object mock = proxer.proxy(typing, handler);
-        mutableHistory.set(mutableHistory.get().add(mocking(mock, name)));
+        history.add(mocking(mock, name));
         return (T) mock;
       }
     };
@@ -42,14 +43,14 @@ public class RawMockMaker {
         : typing(type, new HashSet<Class<?>>());
   }
 
-  private static Handler handler(final ThreadLocal<Chain<Object>> mutableHistory) {
+  private static Handler handler(final History history) {
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        Chain<Object> history = mutableHistory.get();
-        check(isMock(invocation.instance, history));
-        check(isStubbed(invocation, history));
-        mutableHistory.set(history.add(calling(invocation)));
-        Stubbing stubbing = findStubbing(invocation, history).get();
+        Chain<Object> events = history.get();
+        check(isMock(invocation.instance, events));
+        check(isStubbed(invocation, events));
+        history.add(calling(invocation));
+        Stubbing stubbing = findStubbing(invocation, events).get();
         return stubbing.handler.handle(invocation);
       }
     };

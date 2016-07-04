@@ -71,11 +71,11 @@ public class Testory {
   }
 
   private static Chain<Object> getHistory() {
-    return getFacade().localHistory.get();
+    return getFacade().history.get();
   }
 
   private static void setHistory(Chain<Object> history) {
-    getFacade().localHistory.set(history);
+    getFacade().history.set(history);
   }
 
   public static void givenTest(Object test) {
