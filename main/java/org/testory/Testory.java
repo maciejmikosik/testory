@@ -22,7 +22,6 @@ import static org.testory.plumbing.Capturing.consumeAnys;
 import static org.testory.plumbing.Capturing.CapturingAny.capturingAny;
 import static org.testory.plumbing.Inspecting.findLastInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
-import static org.testory.plumbing.Mocking.nameMock;
 import static org.testory.plumbing.Purging.mark;
 import static org.testory.plumbing.Purging.purge;
 import static org.testory.plumbing.Stubbing.stubbing;
@@ -140,8 +139,9 @@ public class Testory {
 
   public static <T> T mock(Class<T> type) {
     check(type != null);
-    String name = nameMock(type, getHistory());
-    return getFacade().mockMaker.make(type, name);
+    Facade facade = getFacade();
+    String name = facade.mockNamer.name(type);
+    return facade.mockMaker.make(type, name);
   }
 
   public static <T> T spy(T real) {

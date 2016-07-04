@@ -2,10 +2,6 @@ package org.testory.plumbing;
 
 import static org.testory.plumbing.Cache.newCache;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.Purging.purge;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.testory.common.Chain;
 
@@ -42,28 +38,6 @@ public class Mocking {
       }
     }
     return false;
-  }
-
-  public static String nameMock(Class<?> type, Chain<Object> history) {
-    List<String> mockNames = mockNames(history);
-    String typeName = type.getSimpleName();
-    for (int i = 0;; i++) {
-      String name = "mock" + typeName + i;
-      if (!mockNames.contains(name)) {
-        return name;
-      }
-    }
-  }
-
-  private static List<String> mockNames(Chain<Object> history) {
-    List<String> mockNames = new ArrayList<String>();
-    for (Object event : purge(history)) {
-      if (event instanceof Mocking) {
-        Mocking mocking = (Mocking) event;
-        mockNames.add(mocking.name);
-      }
-    }
-    return mockNames;
   }
 
   private static ThreadLocal<Cache> localCache = new ThreadLocal<Cache>() {
