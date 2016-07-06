@@ -1,11 +1,10 @@
-package org.testory.plumbing;
+package org.testory.plumbing.capture;
 
 import static org.testory.plumbing.PlumbingException.check;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.testory.common.Any;
 import org.testory.common.Chain;
 
 public class Capturing {

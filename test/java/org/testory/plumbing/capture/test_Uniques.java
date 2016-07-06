@@ -1,11 +1,11 @@
-package org.testory.common;
+package org.testory.plumbing.capture;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.testory.common.Uniques.hasUniques;
-import static org.testory.common.Uniques.unique;
+import static org.testory.plumbing.capture.Uniques.hasUniques;
+import static org.testory.plumbing.capture.Uniques.unique;
 
 import java.util.AbstractList;
 import java.util.ArrayList;

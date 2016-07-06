@@ -1,4 +1,4 @@
-package org.testory.plumbing;
+package org.testory.plumbing.capture;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.nCopies;
@@ -17,7 +17,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.testory.common.Any;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
 import org.testory.common.Matchers.MatcherDecorator;

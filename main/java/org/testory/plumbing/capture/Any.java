@@ -1,10 +1,13 @@
-package org.testory.common;
+package org.testory.plumbing.capture;
 
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.tryWrap;
 import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.same;
-import static org.testory.common.Uniques.unique;
+import static org.testory.plumbing.capture.Uniques.unique;
+
+import org.testory.common.Matcher;
+import org.testory.common.Matchers;
 
 public class Any {
   public final Matcher matcher;

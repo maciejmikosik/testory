@@ -1,17 +1,18 @@
-package org.testory.common;
+package org.testory.plumbing.capture;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.testory.common.Any.a;
-import static org.testory.common.Any.any;
-import static org.testory.common.Any.the;
+import static org.testory.plumbing.capture.Any.a;
+import static org.testory.plumbing.capture.Any.any;
+import static org.testory.plumbing.capture.Any.the;
 import static org.testory.testing.Fakes.newObject;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.common.Matcher;
 
 public class test_Any {
   private Matcher matcher;

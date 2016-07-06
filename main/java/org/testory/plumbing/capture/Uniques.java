@@ -1,4 +1,4 @@
-package org.testory.common;
+package org.testory.plumbing.capture;
 
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
