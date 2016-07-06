@@ -3,14 +3,12 @@ package org.testory;
 import static java.util.Objects.deepEquals;
 import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
-import static org.testory.common.CharSequences.join;
 import static org.testory.common.Classes.defaultValue;
 import static org.testory.common.Effect.returned;
 import static org.testory.common.Effect.returnedVoid;
 import static org.testory.common.Effect.thrown;
 import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isMatcher;
-import static org.testory.common.Objects.print;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Anyvocation.anyvocation;
@@ -46,7 +44,6 @@ import org.testory.common.VoidClosure;
 import org.testory.plumbing.Anyvocation;
 import org.testory.plumbing.Calling;
 import org.testory.plumbing.Inspecting;
-import org.testory.plumbing.Mocking;
 import org.testory.plumbing.inject.Injector;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
@@ -624,7 +621,7 @@ public class Testory {
       throw assertionError("\n"
           + formatSection("expected called times " + numberMatcher, invocationMatcher)
           + formatSection("but called", "times " + numberOfCalls)
-          + formatCallings(history));
+          + formatCallings());
     }
   }
 
@@ -650,7 +647,7 @@ public class Testory {
       throw assertionError("\n"
           + formatSection("expected called in order", invocationMatcher)
           + "  but not called\n"
-          + formatCallings(history));
+          + formatCallings());
     }
   }
 
@@ -677,7 +674,7 @@ public class Testory {
   private static String formatSection(String caption, @Nullable Object content) {
     return ""
         + "  " + caption + "\n"
-        + "    " + print(content) + "\n";
+        + "    " + getFacade().formatter.format(content) + "\n";
   }
 
   private static String tryFormatDiagnosis(Object matcher, Object item) {
@@ -687,34 +684,15 @@ public class Testory {
         : "";
   }
 
-  private static String formatCallings(final Chain<Object> history) {
-    log(stubbing(new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        return invocation.method.getName().equals("toString")
-            && invocation.method.getParameterTypes().length == 0;
-      }
-    }, new Handler() {
-      public Object handle(Invocation invocation) {
-        for (Object event : history) {
-          if (event instanceof Mocking) {
-            Mocking mocking = (Mocking) event;
-            if (mocking.mock == invocation.instance) {
-              return mocking.name;
-            }
-          }
-        }
-        return "unknownMock";
-      }
-    }));
-
+  private static String formatCallings() {
+    Facade facade = getFacade();
     StringBuilder builder = new StringBuilder();
-    for (Object event : history.reverse()) {
+
+    for (Object event : facade.history.get().reverse()) {
       if (event instanceof Calling) {
         Calling calling = (Calling) event;
         Invocation invocation = calling.invocation;
-        builder.append("    ").append(invocation.instance).append(".")
-            .append(invocation.method.getName()).append("(")
-            .append(join(",", invocation.arguments)).append(")").append("\n");
+        builder.append("    ").append(facade.formatter.format(invocation)).append("\n");
       }
     }
     if (builder.length() > 0) {
@@ -722,7 +700,6 @@ public class Testory {
     } else {
       builder.insert(0, "  actual invocations\n    none\n");
     }
-    setHistory(history);
     return builder.toString();
   }
 
