@@ -16,18 +16,11 @@ import static org.testory.plumbing.Inspecting.findLastInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
-import static org.testory.plumbing.capture.Anyvocation.anyvocation;
-import static org.testory.plumbing.capture.Anyvocation.matcherize;
-import static org.testory.plumbing.capture.Anyvocation.repair;
-import static org.testory.plumbing.capture.Capturing.capturedAnys;
-import static org.testory.plumbing.capture.Capturing.consumeAnys;
-import static org.testory.plumbing.capture.Capturing.CapturingAny.capturingAny;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Typing.typing;
 
 import java.util.HashSet;
-import java.util.List;
 
 import org.testory.common.Chain;
 import org.testory.common.Closure;
@@ -42,8 +35,6 @@ import org.testory.common.Optional;
 import org.testory.common.VoidClosure;
 import org.testory.plumbing.Calling;
 import org.testory.plumbing.Inspecting;
-import org.testory.plumbing.capture.Any;
-import org.testory.plumbing.capture.Anyvocation;
 import org.testory.plumbing.inject.Injector;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
@@ -153,7 +144,7 @@ public class Testory {
     check(isMock(mock));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
-        log(stubbing(capture(invocation), will));
+        log(stubbing(getFacade().capture(invocation), will));
         return null;
       }
     };
@@ -202,69 +193,59 @@ public class Testory {
   }
 
   public static <T> T any(Class<T> type) {
-    check(type != null);
-    return anyImpl(Any.any(type));
+    return getFacade().any(type);
   }
 
   public static <T> T any(Class<T> type, Object matcher) {
-    check(matcher != null);
-    check(isMatcher(matcher));
-    return anyImpl(Any.any(type, asMatcher(matcher)));
+    return getFacade().any(type, matcher);
   }
 
   public static boolean a(boolean value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static char a(char value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static byte a(byte value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static short a(short value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static int a(int value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static long a(long value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static float a(float value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static double a(double value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static <T> T a(T value) {
-    check(value != null);
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static void the(boolean value) {
-    check(false);
+    throw new TestoryException();
   }
 
   public static void the(double value) {
-    check(false);
+    throw new TestoryException();
   }
 
   public static <T> T the(T instance) {
-    check(instance != null);
-    return anyImpl(Any.the(instance));
-  }
-
-  private static <T> T anyImpl(Any any) {
-    log(capturingAny(any));
-    return (T) any.token;
+    return getFacade().the(instance);
   }
 
   public static InvocationMatcher onInstance(final Object mock) {
@@ -598,7 +579,7 @@ public class Testory {
     check(isMock(mock));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
-        thenCalledTimes(numberMatcher, capture(invocation));
+        thenCalledTimes(numberMatcher, getFacade().capture(invocation));
         return null;
       }
     };
@@ -630,7 +611,7 @@ public class Testory {
     check(isMock(mock));
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
-        thenCalledInOrder(capture(invocation));
+        thenCalledInOrder(getFacade().capture(invocation));
         return null;
       }
     };
@@ -727,31 +708,6 @@ public class Testory {
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         return handler.handle(invocation(invocation.method, instance, invocation.arguments));
-      }
-    };
-  }
-
-  private static InvocationMatcher capture(Invocation invocation) {
-    List<Any> anys = capturedAnys(getHistory());
-    setHistory(consumeAnys(getHistory()));
-    Anyvocation anyvocation = anyvocation(invocation.method, invocation.instance,
-        invocation.arguments, anys);
-    check(canRepair(anyvocation));
-    return convert(matcherize(repair(anyvocation).get()));
-  }
-
-  private static boolean canRepair(Anyvocation anyvocation) {
-    return repair(anyvocation).isPresent();
-  }
-
-  private static InvocationMatcher convert(final Matcher invocationMatcher) {
-    return new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        return invocationMatcher.matches(invocation);
-      }
-
-      public String toString() {
-        return invocationMatcher.toString();
       }
     };
   }

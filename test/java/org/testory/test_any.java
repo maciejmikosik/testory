@@ -1,5 +1,7 @@
 package org.testory;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
@@ -15,6 +17,8 @@ import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 import static org.testory.testing.Purging.triggerPurge;
 
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
@@ -48,6 +52,19 @@ public class test_any {
     new Compile<Iterable>().compile(any(List.class));
     new Compile<Iterable<?>>().compile(any(List.class));
     new Compile<Iterable<String>>().compile(any(List.class));
+  }
+
+  @Test
+  public void runs_with_various_types() {
+    for (Class<?> type : asList(
+        Object.class,
+        List.class,
+        AbstractList.class,
+        ArrayList.class,
+        Integer.class,
+        String.class)) {
+      assertThat(any(type), instanceOf(type));
+    }
   }
 
   @Test
