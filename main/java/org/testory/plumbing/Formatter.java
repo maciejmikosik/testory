@@ -49,7 +49,7 @@ public class Formatter {
       return String.format("%s.%s(%s)",
           format(invocation.instance),
           invocation.method.getName(),
-          formatJoin(",", invocation.arguments));
+          formatJoin(", ", invocation.arguments));
     } finally {
       isFormatting--;
     }
