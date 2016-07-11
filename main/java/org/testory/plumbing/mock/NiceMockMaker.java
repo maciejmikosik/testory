@@ -1,7 +1,7 @@
 package org.testory.plumbing.mock;
 
-import static org.testory.TestoryException.check;
 import static org.testory.common.Classes.defaultValue;
+import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.Stubbing.stubbing;
 
 import org.testory.plumbing.Maker;
