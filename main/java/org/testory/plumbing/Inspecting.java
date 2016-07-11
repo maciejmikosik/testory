@@ -2,9 +2,7 @@ package org.testory.plumbing;
 
 import static org.testory.plumbing.PlumbingException.check;
 
-import org.testory.common.Chain;
 import org.testory.common.Effect;
-import org.testory.common.Optional;
 
 public class Inspecting {
   public final Effect effect;
@@ -20,15 +18,5 @@ public class Inspecting {
 
   public String toString() {
     return "inspecting(" + effect + ")";
-  }
-
-  public static Optional<Inspecting> findLastInspecting(Chain<Object> history) {
-    check(history != null);
-    for (Object event : history) {
-      if (event instanceof Inspecting) {
-        return Optional.of((Inspecting) event);
-      }
-    }
-    return Optional.empty();
   }
 }

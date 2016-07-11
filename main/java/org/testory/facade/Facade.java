@@ -14,7 +14,6 @@ import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.facade.MockProxer.mockProxer;
 import static org.testory.plumbing.Calling.callings;
 import static org.testory.plumbing.Formatter.formatter;
-import static org.testory.plumbing.Inspecting.findLastInspecting;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
@@ -36,6 +35,7 @@ import static org.testory.proxy.Typing.typing;
 import java.util.HashSet;
 
 import org.testory.TestoryException;
+import org.testory.common.Chain;
 import org.testory.common.Closure;
 import org.testory.common.DiagnosticMatcher;
 import org.testory.common.Effect;
@@ -76,6 +76,7 @@ public class Facade {
   private final Capturer capturer;
   private final AnySupport anySupport;
   private final FilteredHistory<Mocking> mockingHistory;
+  private final FilteredHistory<Inspecting> inspectingHistory;
 
   public Facade(
       History history,
@@ -85,6 +86,7 @@ public class Facade {
       Maker mockMaker,
       Injector injector,
       FilteredHistory<Mocking> mockingHistory,
+      FilteredHistory<Inspecting> inspectingHistory,
       AnySupport anySupport,
       Capturer capturer) {
     this.history = history;
@@ -94,6 +96,7 @@ public class Facade {
     this.mockMaker = mockMaker;
     this.injector = injector;
     this.mockingHistory = mockingHistory;
+    this.inspectingHistory = inspectingHistory;
     this.anySupport = anySupport;
     this.capturer = capturer;
   }
@@ -106,10 +109,11 @@ public class Facade {
     Maker mockMaker = mockMaker(history, proxer);
     Injector injector = injector(mockMaker);
     FilteredHistory<Mocking> mockingHistory = filter(Mocking.class, history);
+    FilteredHistory<Inspecting> inspectingHistory = filter(Inspecting.class, history);
     AnySupport anySupport = anySupport(history, repairer());
     Capturer capturer = anySupport.getCapturer();
     return new Facade(history, formatter, proxer, mockNamer, mockMaker, injector,
-        mockingHistory, anySupport, capturer);
+        mockingHistory, inspectingHistory, anySupport, capturer);
   }
 
   private static Maker mockMaker(History history, Proxer proxer) {
@@ -696,9 +700,9 @@ public class Facade {
   }
 
   private Effect getLastEffect() {
-    Optional<Inspecting> inspecting = findLastInspecting(history.get());
-    check(inspecting.isPresent());
-    return inspecting.get().effect;
+    Chain<Inspecting> inspectings = inspectingHistory.get();
+    check(inspectings.size() > 0);
+    return inspectings.get().effect;
   }
 
   private String formatSection(String caption, @Nullable Object content) {
