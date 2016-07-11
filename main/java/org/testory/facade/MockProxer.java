@@ -1,4 +1,4 @@
-package org.testory;
+package org.testory.facade;
 
 import static org.testory.TestoryException.check;
 import static org.testory.common.Classes.canReturn;
@@ -7,6 +7,7 @@ import static org.testory.plumbing.history.FilteredHistory.filter;
 
 import java.lang.reflect.Method;
 
+import org.testory.TestoryException;
 import org.testory.plumbing.Mocking;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;

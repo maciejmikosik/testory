@@ -1,15 +1,19 @@
 package org.testory;
 
+import static org.testory.facade.Facade.newFacade;
+import static org.testory.plumbing.history.PurgedHistory.newPurgedHistory;
+
 import org.testory.common.Closure;
 import org.testory.common.Nullable;
 import org.testory.common.VoidClosure;
+import org.testory.facade.Facade;
 import org.testory.proxy.Handler;
 import org.testory.proxy.InvocationMatcher;
 
 public class Testory {
   private static final ThreadLocal<Facade> localFacade = new ThreadLocal<Facade>() {
     protected Facade initialValue() {
-      return new Facade();
+      return newFacade(newPurgedHistory());
     }
   };
 

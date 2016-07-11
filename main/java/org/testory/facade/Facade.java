@@ -1,7 +1,6 @@
-package org.testory;
+package org.testory.facade;
 
 import static java.util.Objects.deepEquals;
-import static org.testory.MockProxer.mockProxer;
 import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.TestoryException.check;
 import static org.testory.common.Classes.defaultValue;
@@ -12,6 +11,7 @@ import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
+import static org.testory.facade.MockProxer.mockProxer;
 import static org.testory.plumbing.Calling.callings;
 import static org.testory.plumbing.Formatter.formatter;
 import static org.testory.plumbing.Inspecting.findLastInspecting;
@@ -21,7 +21,6 @@ import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
 import static org.testory.plumbing.capture.AnySupport.anySupport;
 import static org.testory.plumbing.capture.Repairer.repairer;
 import static org.testory.plumbing.history.FilteredHistory.filter;
-import static org.testory.plumbing.history.PurgedHistory.newPurgedHistory;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
@@ -36,6 +35,7 @@ import static org.testory.proxy.Typing.typing;
 
 import java.util.HashSet;
 
+import org.testory.TestoryException;
 import org.testory.common.Chain;
 import org.testory.common.Closure;
 import org.testory.common.DiagnosticMatcher;
@@ -77,16 +77,39 @@ public class Facade {
   private final AnySupport anySupport;
   private final FilteredHistory<Mocking> mockingHistory;
 
-  public Facade() {
-    formatter = formatter();
-    history = formatter.plug(newPurgedHistory());
-    proxer = new CglibProxer();
-    mockNamer = uniqueNamer(history);
-    mockMaker = mockMaker(history, proxer);
-    injector = injector(mockMaker);
-    mockingHistory = filter(Mocking.class, history);
-    anySupport = anySupport(history, repairer());
-    capturer = anySupport.getCapturer();
+  public Facade(
+      History history,
+      Formatter formatter,
+      Proxer proxer,
+      Namer mockNamer,
+      Maker mockMaker,
+      Injector injector,
+      FilteredHistory<Mocking> mockingHistory,
+      AnySupport anySupport,
+      Capturer capturer) {
+    this.history = history;
+    this.formatter = formatter;
+    this.proxer = proxer;
+    this.mockNamer = mockNamer;
+    this.mockMaker = mockMaker;
+    this.injector = injector;
+    this.mockingHistory = mockingHistory;
+    this.anySupport = anySupport;
+    this.capturer = capturer;
+  }
+
+  public static Facade newFacade(History mutableHistory) {
+    Formatter formatter = formatter();
+    History history = formatter.plug(mutableHistory);
+    Proxer proxer = new CglibProxer();
+    Namer mockNamer = uniqueNamer(history);
+    Maker mockMaker = mockMaker(history, proxer);
+    Injector injector = injector(mockMaker);
+    FilteredHistory<Mocking> mockingHistory = filter(Mocking.class, history);
+    AnySupport anySupport = anySupport(history, repairer());
+    Capturer capturer = anySupport.getCapturer();
+    return new Facade(history, formatter, proxer, mockNamer, mockMaker, injector,
+        mockingHistory, anySupport, capturer);
   }
 
   private static Maker mockMaker(History history, Proxer proxer) {

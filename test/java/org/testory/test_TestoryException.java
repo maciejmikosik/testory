@@ -14,6 +14,7 @@ import static org.testory.testing.StackTraces.here;
 import static org.testory.testing.StackTraces.nextLine;
 
 import org.junit.Test;
+import org.testory.facade.Facade;
 
 public class test_TestoryException {
   private StackTraceElement line;
