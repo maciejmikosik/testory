@@ -44,4 +44,10 @@ public class test_CharSequences_join {
     joined = join(separator, asList(null, null));
     assertEquals("" + null + separator + null, joined.toString());
   }
+
+  @Test
+  public void prints_array_elements() {
+    joined = join(separator, asList(new Object[] { a }, new Object[] { b, c }));
+    assertEquals("[" + a + "]" + separator + "[" + b + ", " + c + "]", joined.toString());
+  }
 }

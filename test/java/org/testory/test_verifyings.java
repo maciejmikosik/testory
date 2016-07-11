@@ -121,6 +121,19 @@ public class test_verifyings {
   }
 
   @Test
+  public void failure_prints_actual_invocations_with_array_arguments() {
+    mock.invoke();
+    mock.acceptObject(new Object[][] { { object } });
+    try {
+      thenCalled(onInstance(mock));
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertThat(e, hasMessageContaining(""
+          + "    " + mock + ".acceptObject([[" + object + "]])\n"));
+    }
+  }
+
+  @Test
   public void failure_prints_special_message_if_no_actual_invocations() {
     try {
       thenCalled(onInstance(mock));
