@@ -451,7 +451,9 @@ Any of the following invokes real method on unreal (mocked/proxied) object causi
 ### Purging
 (this feature is in beta)
 
-Testory maintains global state that holds information about every mock, stubbing and invocation. This data needs to be periodically released to prevent running out of memory. Since testory has no foolproof way to tell whether one test ended and another started, it relies on some simplistic assumptions
+Testory maintains global state that holds information about every mock, stubbing and invocation.
+This data needs to be periodically released to prevent running out of memory.
+Since testory has no foolproof way to tell whether one test ended and another started, it relies on some simplistic assumptions
 
  - Only one `when` is used per one test. Thus calling `when`, makes testory to forget about all events that happened before previous `when`.
  - Initialization using `givenTest` is done only once at the very beginning of each test. This makes testory to forget about all events that happened before.
