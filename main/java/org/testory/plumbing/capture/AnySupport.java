@@ -33,6 +33,7 @@ public class AnySupport {
 
   public static AnySupport anySupport(History history, Repairer repairer) {
     check(history != null);
+    check(repairer != null);
     return new AnySupport(history, repairer);
   }
 
@@ -61,6 +62,7 @@ public class AnySupport {
   }
 
   public Object any(final Class<?> type) {
+    check(type != null);
     return anyImpl(Matchers.anything, type, new Object() {
       public String toString() {
         return format("any(%s)", type.getName());
@@ -69,6 +71,7 @@ public class AnySupport {
   }
 
   public Object any(final Class<?> type, Object matcher) {
+    check(type != null);
     check(matcher != null);
     check(isMatcher(matcher));
     final Matcher asMatcher = asMatcher(matcher);
