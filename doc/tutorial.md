@@ -246,7 +246,7 @@ Use `the` shortcut if you expect exactly same instance
     given(willReturn(true), mock).someMethod(the(instance));
 
 Above examples work well if you known exact mock and method of invocation.
-Sometimes you want to be less specific that that.
+Sometimes you want to be less specific than that.
 You can take full control of matching invocations by implementing your own `InvocationMatcher`.
 It is functional interface that answers, whether particular invocation is one you are interested about.
 Using this interface you can stub or verify invocation on more than one method, or even more than one mock, at once.
@@ -350,7 +350,8 @@ Catches possible `Throwable` thrown by chained method allowing test to run forwa
     when(list.size());
     thenReturned(0);
 
-### givenTest (beta)
+### givenTest
+(this feature is in beta)
 
 Initializes each field of `this` test and fails if initialization of any field fails.
 Also purges testory internal state (see [purging](#purging)).
@@ -447,9 +448,12 @@ Any of the following invokes real method on unreal (mocked/proxied) object causi
  - `givenTry(instance).finalMethod()`
  - `givenTimes(n, instance).finalMethod()`
 
-### Purging (beta)
+### Purging
+(this feature is in beta)
 
-Testory maintains global state that holds information about every mock, stubbing and invocation. This data needs to be periodically released to prevent running out of memory. Since testory has no foolproof way to tell whether one test ended and another started, it relies on some simplistic assumptions
+Testory maintains global state that holds information about every mock, stubbing and invocation.
+This data needs to be periodically released to prevent running out of memory.
+Since testory has no foolproof way to tell whether one test ended and another started, it relies on some simplistic assumptions
 
  - Only one `when` is used per one test. Thus calling `when`, makes testory to forget about all events that happened before previous `when`.
  - Initialization using `givenTest` is done only once at the very beginning of each test. This makes testory to forget about all events that happened before.
