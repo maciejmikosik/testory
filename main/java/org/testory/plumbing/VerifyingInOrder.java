@@ -19,14 +19,13 @@ public class VerifyingInOrder {
     return new VerifyingInOrder(unverified);
   }
 
-  public static Optional<Chain<Object>> verifyInOrder(InvocationMatcher invocationMatcher, Chain<Object> history) {
+  public static Optional<VerifyingInOrder> verifyInOrder(InvocationMatcher invocationMatcher, Chain<Object> history) {
     Chain<Object> unverified = unverifiedReversed(history);
     while (unverified.size() > 0) {
       Object event = unverified.get();
       unverified = unverified.remove();
       if (event instanceof Calling && invocationMatcher.matches(((Calling) event).invocation)) {
-        VerifyingInOrder verifyingInOrder = verifyingInOrder(unverified.reverse());
-        return Optional.of(history.add(verifyingInOrder));
+        return Optional.of(verifyingInOrder(unverified.reverse()));
       }
     }
     return Optional.empty();

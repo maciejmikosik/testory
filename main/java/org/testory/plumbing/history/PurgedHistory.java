@@ -20,12 +20,6 @@ public class PurgedHistory implements History {
     return events;
   }
 
-  // TODO remove from interface
-  public void set(Chain<Object> events) {
-    check(events != null);
-    this.events = events;
-  }
-
   public History add(Object event) {
     check(event != null);
     events = events.add(event);

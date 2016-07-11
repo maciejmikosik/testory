@@ -36,7 +36,6 @@ import static org.testory.proxy.Typing.typing;
 import java.util.HashSet;
 
 import org.testory.TestoryException;
-import org.testory.common.Chain;
 import org.testory.common.Closure;
 import org.testory.common.DiagnosticMatcher;
 import org.testory.common.Effect;
@@ -52,6 +51,7 @@ import org.testory.plumbing.Formatter;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.Mocking;
+import org.testory.plumbing.VerifyingInOrder;
 import org.testory.plumbing.capture.AnyException;
 import org.testory.plumbing.capture.AnySupport;
 import org.testory.plumbing.capture.Capturer;
@@ -667,9 +667,9 @@ public class Facade {
 
   public void thenCalledInOrder(InvocationMatcher invocationMatcher) {
     check(invocationMatcher != null);
-    Optional<Chain<Object>> verified = verifyInOrder(invocationMatcher, history.get());
+    Optional<VerifyingInOrder> verified = verifyInOrder(invocationMatcher, history.get());
     if (verified.isPresent()) {
-      history.set(verified.get());
+      history.add(verified.get());
     } else {
       throw assertionError("\n"
           + formatSection("expected called in order", invocationMatcher)

@@ -63,13 +63,6 @@ public class Formatter {
     check(history != null);
     final Object stubbingToString = stubbingToString(history);
     return new History() {
-      public void set(Chain<Object> events) {
-        if (isFormatting()) {
-          throw new UnsupportedOperationException();
-        }
-        history.set(events);
-      }
-
       public Chain<Object> get() {
         return isFormatting()
             ? history.get().add(stubbingToString)
