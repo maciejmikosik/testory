@@ -5,6 +5,7 @@ import static org.testory.plumbing.PlumbingException.check;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.testory.common.Chain;
 import org.testory.proxy.Invocation;
 
 public class Calling {
@@ -23,9 +24,9 @@ public class Calling {
     return "calling(" + invocation + ")";
   }
 
-  public static List<Calling> callings(History history) {
+  public static List<Calling> callings(Chain<Object> history) {
     List<Calling> callings = new ArrayList<Calling>();
-    for (Object event : history.events) {
+    for (Object event : history) {
       if (event instanceof Calling) {
         callings.add((Calling) event);
       }

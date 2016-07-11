@@ -1,907 +1,307 @@
 package org.testory;
 
-import static java.lang.reflect.Modifier.isFinal;
-import static java.lang.reflect.Modifier.isStatic;
-import static java.util.Objects.deepEquals;
-import static org.testory.TestoryAssertionError.assertionError;
-import static org.testory.TestoryException.check;
-import static org.testory.common.Chain.chain;
-import static org.testory.common.CharSequences.join;
-import static org.testory.common.Classes.canReturn;
-import static org.testory.common.Classes.canThrow;
-import static org.testory.common.Classes.defaultValue;
-import static org.testory.common.Classes.hasMethod;
-import static org.testory.common.Classes.setAccessible;
-import static org.testory.common.Effect.returned;
-import static org.testory.common.Effect.returnedVoid;
-import static org.testory.common.Effect.thrown;
-import static org.testory.common.Matchers.asMatcher;
-import static org.testory.common.Matchers.isMatcher;
-import static org.testory.common.Objects.print;
-import static org.testory.common.Samples.isSampleable;
-import static org.testory.common.Samples.sample;
-import static org.testory.common.Throwables.gently;
-import static org.testory.common.Throwables.printStackTrace;
-import static org.testory.plumbing.Anyvocation.anyvocation;
-import static org.testory.plumbing.Anyvocation.matcherize;
-import static org.testory.plumbing.Anyvocation.repair;
-import static org.testory.plumbing.Calling.calling;
-import static org.testory.plumbing.Calling.callings;
-import static org.testory.plumbing.Capturing.capturedAnys;
-import static org.testory.plumbing.Capturing.consumeAnys;
-import static org.testory.plumbing.Capturing.CapturingAny.capturingAny;
-import static org.testory.plumbing.History.add;
-import static org.testory.plumbing.History.history;
-import static org.testory.plumbing.Inspecting.findLastInspecting;
-import static org.testory.plumbing.Inspecting.inspecting;
-import static org.testory.plumbing.Mocking.mocking;
-import static org.testory.plumbing.Mocking.nameMock;
-import static org.testory.plumbing.Purging.mark;
-import static org.testory.plumbing.Purging.purge;
-import static org.testory.plumbing.Stubbing.findStubbing;
-import static org.testory.plumbing.Stubbing.stubbing;
-import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
-import static org.testory.proxy.Invocation.invocation;
-import static org.testory.proxy.Invocations.invoke;
-import static org.testory.proxy.Proxies.isProxiable;
-import static org.testory.proxy.Proxies.proxy;
-import static org.testory.proxy.Typing.typing;
+import static org.testory.facade.Facade.newFacade;
+import static org.testory.plumbing.history.PurgedHistory.newPurgedHistory;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
-import org.testory.common.Any;
 import org.testory.common.Closure;
-import org.testory.common.DiagnosticMatcher;
-import org.testory.common.Effect;
-import org.testory.common.Effect.Returned;
-import org.testory.common.Effect.ReturnedObject;
-import org.testory.common.Effect.Thrown;
-import org.testory.common.Matcher;
 import org.testory.common.Nullable;
-import org.testory.common.Optional;
 import org.testory.common.VoidClosure;
-import org.testory.plumbing.Anyvocation;
-import org.testory.plumbing.Calling;
-import org.testory.plumbing.History;
-import org.testory.plumbing.Inspecting;
-import org.testory.plumbing.Mocking;
-import org.testory.plumbing.Stubbing;
+import org.testory.facade.Facade;
 import org.testory.proxy.Handler;
-import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
-import org.testory.proxy.Typing;
 
 public class Testory {
-  private static ThreadLocal<History> localHistory = new ThreadLocal<History>() {
-    protected History initialValue() {
-      return history(chain());
+  private static final ThreadLocal<Facade> localFacade = new ThreadLocal<Facade>() {
+    protected Facade initialValue() {
+      return newFacade(newPurgedHistory());
     }
   };
 
-  private static History getHistory() {
-    return localHistory.get();
-  }
-
-  private static void setHistory(History history) {
-    localHistory.set(history);
+  private static Facade getFacade() {
+    return localFacade.get();
   }
 
   public static void givenTest(Object test) {
-    setHistory(purge(mark(getHistory())));
-    try {
-      for (final Field field : test.getClass().getDeclaredFields()) {
-        if (!isStatic(field.getModifiers()) && !isFinal(field.getModifiers())) {
-          setAccessible(field);
-          if (deepEquals(defaultValue(field.getType()), field.get(test))) {
-            check(canMockOrSample(field.getType()), "cannot inject field: " + field.getName());
-            field.set(test, mockOrSample(field.getType(), field.getName()));
-          }
-        }
-      }
-    } catch (ReflectiveOperationException e) {
-      throw new Error(e);
-    }
+    getFacade().givenTest(test);
   }
 
-  private static boolean canMockOrSample(Class<?> type) {
-    return isProxiable(type) || type.isArray() || isSampleable(type);
-  }
-
-  private static Object mockOrSample(Class<?> type, String name) {
-    if (isProxiable(type)) {
-      Object mock = rawMock(type);
-      log(mocking(mock, name));
-      stubNice(mock);
-      stubObject(mock, name);
-      return mock;
-    } else if (type.isArray()) {
-      Class<?> componentType = type.getComponentType();
-      Object array = Array.newInstance(componentType, 1);
-      Array.set(array, 0, mockOrSample(componentType, name + "[0]"));
-      return array;
-    } else if (isSampleable(type)) {
-      return sample(type, name);
-    } else {
-      throw new IllegalArgumentException("cannot mock or sample " + type.getName() + " " + name);
-    }
-  }
-
-  @Deprecated
-  public static Closure given(Closure closure) {
-    throw new TestoryException("\n\tgiven(Closure) is confusing, do not use it\n");
+  public static void given(Closure closure) {
+    getFacade().given(closure);
   }
 
   public static <T> T given(T object) {
-    return object;
+    return getFacade().given(object);
   }
 
-  public static void given(boolean primitive) {}
+  public static void given(boolean primitive) {
+    getFacade().given(primitive);
+  }
 
-  public static void given(double primitive) {}
+  public static void given(double primitive) {
+    getFacade().given(primitive);
+  }
 
   public static <T> T givenTry(T object) {
-    check(object != null);
-    check(isProxiable(object.getClass()));
-    Handler handler = new Handler() {
-      public Object handle(Invocation invocation) {
-        try {
-          return invoke(invocation);
-        } catch (Throwable e) {
-          return null;
-        }
-      }
-    };
-    return proxyWrapping(object, handler);
+    return getFacade().givenTry(object);
   }
 
   public static void givenTimes(int number, Closure closure) {
-    check(number >= 0);
-    check(closure != null);
-    for (int i = 0; i < number; i++) {
-      try {
-        closure.invoke();
-      } catch (Throwable throwable) {
-        throw gently(throwable);
-      }
-    }
+    getFacade().givenTimes(number, closure);
   }
 
   public static <T> T givenTimes(final int number, T object) {
-    check(number >= 0);
-    check(object != null);
-    check(isProxiable(object.getClass()));
-    Handler handler = new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        for (int i = 0; i < number; i++) {
-          invoke(invocation);
-        }
-        return null;
-      }
-    };
-    return proxyWrapping(object, handler);
+    return getFacade().givenTimes(number, object);
   }
 
   public static <T> T mock(Class<T> type) {
-    check(type != null);
-    check(isProxiable(type));
-    final T mock = rawMock(type);
-    String name = nameMock(mock, getHistory());
-    log(mocking(mock, name));
-    stubNice(mock);
-    stubObject(mock, name);
-    return mock;
+    return getFacade().mock(type);
   }
 
   public static <T> T spy(T real) {
-    check(real != null);
-    Class<T> type = (Class<T>) real.getClass();
-    T mock = mock(type);
-    given(willSpy(real), onInstance(mock));
-    return mock;
+    return getFacade().spy(real);
   }
 
-  private static <T> T rawMock(Class<T> type) {
-    check(isProxiable(type));
-    Typing typing = type.isInterface()
-        ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
-        : typing(type, new HashSet<Class<?>>());
-    Handler handler = new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        check(isMock(invocation.instance));
-        check(isStubbed(invocation));
-        log(calling(invocation));
-        Stubbing stubbing = findStubbing(invocation, getHistory()).get();
-        return stubbing.handler.handle(invocation);
-      }
-    };
-    return (T) proxy(typing, compatible(handler));
+  public static <T> T given(final Handler handler, T mock) {
+    return getFacade().given(handler, mock);
   }
 
-  private static Handler compatible(final Handler handler) {
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        Object returned;
-        try {
-          returned = handler.handle(invocation);
-        } catch (Throwable throwable) {
-          check(canThrow(throwable, invocation.method));
-          throw throwable;
-        }
-        check(canReturn(returned, invocation.method) || canReturnVoid(returned, invocation.method));
-        return returned;
-      }
-
-      private boolean canReturnVoid(Object returned, Method method) {
-        return method.getReturnType() == void.class && returned == null;
-      }
-    };
-  }
-
-  private static void stubNice(Object mock) {
-    given(new Handler() {
-      public Object handle(Invocation invocation) {
-        return defaultValue(invocation.method.getReturnType());
-      }
-    }, onInstance(mock));
-  }
-
-  private static void stubObject(final Object mock, final String name) {
-    final Object implementation = new Object() {
-      public String toString() {
-        return name;
-      }
-
-      public boolean equals(Object obj) {
-        return mock == obj;
-      }
-
-      public int hashCode() {
-        return name.hashCode();
-      }
-    };
-    given(willTarget(implementation), new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        return mock == invocation.instance
-            && hasMethod(invocation.method.getName(), invocation.method.getParameterTypes(),
-                implementation.getClass());
-      }
-    });
-  }
-
-  public static <T> T given(final Handler will, T mock) {
-    check(will != null);
-    check(mock != null);
-    check(isMock(mock));
-    Handler handler = new Handler() {
-      public Object handle(Invocation invocation) {
-        log(stubbing(capture(invocation), will));
-        return null;
-      }
-    };
-    return proxyWrapping(mock, handler);
-  }
-
-  public static void given(Handler will, InvocationMatcher invocationMatcher) {
-    check(will != null);
-    check(invocationMatcher != null);
-    log(stubbing(invocationMatcher, will));
+  public static void given(Handler handler, InvocationMatcher invocationMatcher) {
+    getFacade().given(handler, invocationMatcher);
   }
 
   public static Handler willReturn(@Nullable final Object object) {
-    return new Handler() {
-      public Object handle(Invocation invocation) {
-        return object;
-      }
-    };
+    return getFacade().willReturn(object);
   }
 
   public static Handler willThrow(final Throwable throwable) {
-    check(throwable != null);
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        throw throwable.fillInStackTrace();
-      }
-    };
+    return getFacade().willThrow(throwable);
   }
 
   public static Handler willRethrow(final Throwable throwable) {
-    check(throwable != null);
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        throw throwable;
-      }
-    };
+    return getFacade().willRethrow(throwable);
   }
 
   public static Handler willSpy(final Object real) {
-    check(real != null);
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        return invoke(invocation(invocation.method, real, invocation.arguments));
-      }
-    };
-  }
-
-  private static Handler willTarget(final Object target) {
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        String methodName = invocation.method.getName();
-        Class<?>[] parameters = invocation.method.getParameterTypes();
-        Method method = target.getClass().getDeclaredMethod(methodName, parameters);
-        return invoke(invocation(method, target, invocation.arguments));
-      }
-    };
+    return getFacade().willSpy(real);
   }
 
   public static <T> T any(Class<T> type) {
-    check(type != null);
-    return anyImpl(Any.any(type));
+    return getFacade().any(type);
   }
 
   public static <T> T any(Class<T> type, Object matcher) {
-    check(matcher != null);
-    check(isMatcher(matcher));
-    return anyImpl(Any.any(type, asMatcher(matcher)));
+    return getFacade().any(type, matcher);
   }
 
   public static boolean a(boolean value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static char a(char value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static byte a(byte value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static short a(short value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static int a(int value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static long a(long value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static float a(float value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static double a(double value) {
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static <T> T a(T value) {
-    check(value != null);
-    return anyImpl(Any.a(value));
+    return getFacade().a(value);
   }
 
   public static void the(boolean value) {
-    check(false);
+    getFacade().the(value);
   }
 
   public static void the(double value) {
-    check(false);
+    getFacade().the(value);
   }
 
   public static <T> T the(T instance) {
-    check(instance != null);
-    return anyImpl(Any.the(instance));
-  }
-
-  private static <T> T anyImpl(Any any) {
-    log(capturingAny(any));
-    return (T) any.token;
+    return getFacade().the(instance);
   }
 
   public static InvocationMatcher onInstance(final Object mock) {
-    check(mock != null);
-    check(isMock(mock));
-    return new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        return invocation.instance == mock;
-      }
-
-      public String toString() {
-        return "onInstance(" + mock + ")";
-      }
-    };
+    return getFacade().onInstance(mock);
   }
 
   public static InvocationMatcher onReturn(final Class<?> type) {
-    check(type != null);
-    return new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        return type == invocation.method.getReturnType();
-      }
-
-      public String toString() {
-        return "onReturn(" + type.getName() + ")";
-      }
-    };
+    return getFacade().onReturn(type);
   }
 
   public static InvocationMatcher onRequest(final Class<?> type, final Object... arguments) {
-    check(type != null);
-    check(arguments != null);
-    return new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        return type == invocation.method.getReturnType()
-            && deepEquals(arguments, invocation.arguments.toArray());
-      }
-
-      public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("onRequest(").append(type.getName());
-        for (Object argument : arguments) {
-          builder.append(", ").append(argument);
-        }
-        builder.append(")");
-        return builder.toString();
-      }
-    };
+    return getFacade().onRequest(type, arguments);
   }
 
   public static <T> T when(T object) {
-    setHistory(mark(purge(getHistory())));
-    log(inspecting(returned(object)));
-    boolean isProxiable = object != null && isProxiable(object.getClass());
-    if (isProxiable) {
-      Handler handler = new Handler() {
-        public Object handle(Invocation invocation) {
-          log(inspecting(effectOfInvoke(invocation)));
-          setHistory(mark(getHistory()));
-          return null;
-        }
-      };
-      return proxyWrapping(object, handler);
-    } else {
-      return null;
-    }
+    return getFacade().when(object);
   }
 
   public static void when(Closure closure) {
-    check(closure != null);
-    log(inspecting(effectOfInvoke(closure)));
-    setHistory(mark(purge(getHistory())));
-  }
-
-  private static Effect effectOfInvoke(Closure closure) {
-    Object object;
-    try {
-      object = closure.invoke();
-    } catch (Throwable throwable) {
-      return thrown(throwable);
-    }
-    return returned(object);
+    getFacade().when(closure);
   }
 
   public static void when(VoidClosure closure) {
-    check(closure != null);
-    log(inspecting(effectOfInvoke(closure)));
-    setHistory(mark(purge(getHistory())));
-  }
-
-  private static Effect effectOfInvoke(VoidClosure closure) {
-    try {
-      closure.invoke();
-    } catch (Throwable throwable) {
-      return thrown(throwable);
-    }
-    return returnedVoid();
-  }
-
-  private static Effect effectOfInvoke(Invocation invocation) {
-    Object object;
-    try {
-      object = invoke(invocation);
-    } catch (Throwable throwable) {
-      return thrown(throwable);
-    }
-    return invocation.method.getReturnType() == void.class
-        ? returnedVoid()
-        : returned(object);
+    getFacade().when(closure);
   }
 
   public static void when(boolean value) {
-    when((Object) value);
+    getFacade().when(value);
   }
 
   public static void when(char value) {
-    when((Object) value);
+    getFacade().when(value);
   }
 
   public static void when(byte value) {
-    when((Object) value);
+    getFacade().when(value);
   }
 
   public static void when(short value) {
-    when((Object) value);
+    getFacade().when(value);
   }
 
   public static void when(int value) {
-    when((Object) value);
+    getFacade().when(value);
   }
 
   public static void when(long value) {
-    when((Object) value);
+    getFacade().when(value);
   }
 
   public static void when(float value) {
-    when((Object) value);
+    getFacade().when(value);
   }
 
   public static void when(double value) {
-    when((Object) value);
+    getFacade().when(value);
   }
 
   public static void thenReturned(@Nullable Object objectOrMatcher) {
-    Effect effect = getLastEffect();
-    boolean expected = effect instanceof ReturnedObject
-        && (deepEquals(objectOrMatcher, ((ReturnedObject) effect).object) || objectOrMatcher != null
-            && isMatcher(objectOrMatcher)
-            && asMatcher(objectOrMatcher).matches(((ReturnedObject) effect).object));
-    if (!expected) {
-      String diagnosis = objectOrMatcher != null && isMatcher(objectOrMatcher)
-          && effect instanceof ReturnedObject
-              ? tryFormatDiagnosis(objectOrMatcher, ((ReturnedObject) effect).object)
-              : "";
-      throw assertionError("\n"
-          + formatSection("expected returned", objectOrMatcher)
-          + formatBut(effect)
-          + diagnosis);
-    }
+    getFacade().thenReturned(objectOrMatcher);
   }
 
   public static void thenReturned(boolean value) {
-    thenReturned((Object) value);
+    getFacade().thenReturned(value);
   }
 
   public static void thenReturned(char value) {
-    thenReturned((Object) value);
+    getFacade().thenReturned(value);
   }
 
   public static void thenReturned(byte value) {
-    thenReturned((Object) value);
+    getFacade().thenReturned(value);
   }
 
   public static void thenReturned(short value) {
-    thenReturned((Object) value);
+    getFacade().thenReturned(value);
   }
 
   public static void thenReturned(int value) {
-    thenReturned((Object) value);
+    getFacade().thenReturned(value);
   }
 
   public static void thenReturned(long value) {
-    thenReturned((Object) value);
+    getFacade().thenReturned(value);
   }
 
   public static void thenReturned(float value) {
-    thenReturned((Object) value);
+    getFacade().thenReturned(value);
   }
 
   public static void thenReturned(double value) {
-    thenReturned((Object) value);
+    getFacade().thenReturned(value);
   }
 
   public static void thenReturned() {
-    Effect effect = getLastEffect();
-    boolean expected = effect instanceof Returned;
-    if (!expected) {
-      throw assertionError("\n"
-          + formatSection("expected returned", "")
-          + formatBut(effect));
-    }
+    getFacade().thenReturned();
   }
 
   public static void thenThrown(Object matcher) {
-    check(matcher != null);
-    check(isMatcher(matcher));
-    Effect effect = getLastEffect();
-    boolean expected = effect instanceof Thrown
-        && asMatcher(matcher).matches(((Thrown) effect).throwable);
-    if (!expected) {
-      String diagnosis = effect instanceof Thrown
-          ? tryFormatDiagnosis(matcher, ((Thrown) effect).throwable)
-          : "";
-      throw assertionError("\n"
-          + formatSection("expected thrown", matcher)
-          + formatBut(effect)
-          + diagnosis);
-    }
+    getFacade().thenThrown(matcher);
   }
 
   public static void thenThrown(Throwable throwable) {
-    check(throwable != null);
-    Effect effect = getLastEffect();
-    boolean expected = effect instanceof Thrown
-        && deepEquals(throwable, ((Thrown) effect).throwable);
-    if (!expected) {
-      throw assertionError("\n"
-          + formatSection("expected thrown", throwable)
-          + formatBut(effect));
-    }
+    getFacade().thenThrown(throwable);
   }
 
   public static void thenThrown(Class<? extends Throwable> type) {
-    check(type != null);
-    Effect effect = getLastEffect();
-    boolean expected = effect instanceof Thrown && type.isInstance(((Thrown) effect).throwable);
-    if (!expected) {
-      throw assertionError("\n"
-          + formatSection("expected thrown", type.getName())
-          + formatBut(effect));
-    }
+    getFacade().thenThrown(type);
   }
 
   public static void thenThrown() {
-    Effect effect = getLastEffect();
-    boolean expected = effect instanceof Thrown;
-    if (!expected) {
-      throw assertionError("\n"
-          + formatSection("expected thrown", "")
-          + formatBut(effect));
-    }
-  }
-
-  private static Effect getLastEffect() {
-    Optional<Inspecting> inspecting = findLastInspecting(getHistory());
-    check(inspecting.isPresent());
-    return inspecting.get().effect;
-  }
-
-  private static String formatBut(Effect effect) {
-    return effect instanceof Returned
-        ? effect instanceof ReturnedObject
-            ? formatSection("but returned", ((ReturnedObject) effect).object)
-            : formatSection("but returned", "void")
-        : ""
-            + formatSection("but thrown", ((Thrown) effect).throwable)
-            + "\n"
-            + printStackTrace(((Thrown) effect).throwable);
+    getFacade().thenThrown();
   }
 
   public static void then(boolean condition) {
-    if (!condition) {
-      throw assertionError("\n"
-          + formatSection("expected", "true")
-          + formatSection("but was", "false"));
-    }
+    getFacade().then(condition);
   }
 
   public static void then(@Nullable Object object, Object matcher) {
-    check(matcher != null);
-    check(isMatcher(matcher));
-    if (!asMatcher(matcher).matches(object)) {
-      throw assertionError("\n"
-          + formatSection("expected", matcher)
-          + formatSection("but was", object)
-          + tryFormatDiagnosis(matcher, object));
-    }
+    getFacade().then(object, matcher);
   }
 
   public static void thenEqual(@Nullable Object object, @Nullable Object expected) {
-    if (!deepEquals(object, expected)) {
-      throw assertionError("\n"
-          + formatSection("expected", expected)
-          + formatSection("but was", object));
-    }
+    getFacade().thenEqual(object, expected);
   }
 
   public static <T> T thenCalled(T mock) {
-    check(mock != null);
-    check(isMock(mock));
-    return thenCalledTimes(exactly(1), mock);
+    return getFacade().thenCalled(mock);
   }
 
   public static void thenCalled(InvocationMatcher invocationMatcher) {
-    check(invocationMatcher != null);
-    thenCalledTimes(exactly(1), invocationMatcher);
+    getFacade().thenCalled(invocationMatcher);
   }
 
   public static <T> T thenCalledNever(T mock) {
-    check(mock != null);
-    check(isMock(mock));
-    return thenCalledTimes(exactly(0), mock);
+    return getFacade().thenCalledNever(mock);
   }
 
   public static void thenCalledNever(InvocationMatcher invocationMatcher) {
-    check(invocationMatcher != null);
-    thenCalledTimes(exactly(0), invocationMatcher);
+    getFacade().thenCalledNever(invocationMatcher);
   }
 
   public static <T> T thenCalledTimes(int number, T mock) {
-    check(number >= 0);
-    check(mock != null);
-    check(isMock(mock));
-    return thenCalledTimes(exactly(number), mock);
+    return getFacade().thenCalledTimes(number, mock);
   }
 
   public static void thenCalledTimes(int number, InvocationMatcher invocationMatcher) {
-    check(number >= 0);
-    check(invocationMatcher != null);
-    thenCalledTimes(exactly(number), invocationMatcher);
+    getFacade().thenCalledTimes(number, invocationMatcher);
   }
 
   public static <T> T thenCalledTimes(final Object numberMatcher, T mock) {
-    check(numberMatcher != null);
-    check(isMatcher(numberMatcher));
-    check(mock != null);
-    check(isMock(mock));
-    Handler handler = new Handler() {
-      public Object handle(Invocation invocation) {
-        thenCalledTimes(numberMatcher, capture(invocation));
-        return null;
-      }
-    };
-    return proxyWrapping(mock, handler);
+    return getFacade().thenCalledTimes(numberMatcher, mock);
   }
 
   public static void thenCalledTimes(Object numberMatcher, InvocationMatcher invocationMatcher) {
-    check(numberMatcher != null);
-    check(isMatcher(numberMatcher));
-    check(invocationMatcher != null);
-    int numberOfCalls = 0;
-    History history = getHistory();
-    for (Calling calling : callings(history)) {
-      if (invocationMatcher.matches(calling.invocation)) {
-        numberOfCalls++;
-      }
-    }
-    boolean expected = asMatcher(numberMatcher).matches(numberOfCalls);
-    if (!expected) {
-      throw assertionError("\n"
-          + formatSection("expected called times " + numberMatcher, invocationMatcher)
-          + formatSection("but called", "times " + numberOfCalls)
-          + formatCallings(history));
-    }
+    getFacade().thenCalledTimes(numberMatcher, invocationMatcher);
   }
 
   public static <T> T thenCalledInOrder(T mock) {
-    check(mock != null);
-    check(isMock(mock));
-    Handler handler = new Handler() {
-      public Object handle(Invocation invocation) {
-        thenCalledInOrder(capture(invocation));
-        return null;
-      }
-    };
-    return proxyWrapping(mock, handler);
+    return getFacade().thenCalledInOrder(mock);
   }
 
   public static void thenCalledInOrder(InvocationMatcher invocationMatcher) {
-    check(invocationMatcher != null);
-    History history = getHistory();
-    Optional<History> verified = verifyInOrder(invocationMatcher, history);
-    if (verified.isPresent()) {
-      setHistory(verified.get());
-    } else {
-      throw assertionError("\n"
-          + formatSection("expected called in order", invocationMatcher)
-          + "  but not called\n"
-          + formatCallings(history));
-    }
-  }
-
-  private static Matcher exactly(final int number) {
-    return new Matcher() {
-      public boolean matches(Object item) {
-        return item.equals(number);
-      }
-
-      public String toString() {
-        return "" + number;
-      }
-    };
-  }
-
-  public static void log(Object event) {
-    setHistory(add(event, getHistory()));
-  }
-
-  private static <T> boolean isMock(T mock) {
-    return Mocking.isMock(mock, getHistory());
-  }
-
-  private static boolean isStubbed(Invocation invocation) {
-    return findStubbing(invocation, getHistory()).isPresent();
-  }
-
-  private static String formatSection(String caption, @Nullable Object content) {
-    return ""
-        + "  " + caption + "\n"
-        + "    " + print(content) + "\n";
-  }
-
-  private static String tryFormatDiagnosis(Object matcher, Object item) {
-    Matcher asMatcher = asMatcher(matcher);
-    return asMatcher instanceof DiagnosticMatcher
-        ? formatSection("diagnosis", ((DiagnosticMatcher) asMatcher).diagnose(item))
-        : "";
-  }
-
-  private static String formatCallings(final History history) {
-    log(stubbing(new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        return invocation.method.getName().equals("toString")
-            && invocation.method.getParameterTypes().length == 0;
-      }
-    }, new Handler() {
-      public Object handle(Invocation invocation) {
-        for (Object event : history.events) {
-          if (event instanceof Mocking) {
-            Mocking mocking = (Mocking) event;
-            if (mocking.mock == invocation.instance) {
-              return mocking.name;
-            }
-          }
-        }
-        return "unknownMock";
-      }
-    }));
-
-    StringBuilder builder = new StringBuilder();
-    for (Object event : history.events.reverse()) {
-      if (event instanceof Calling) {
-        Calling calling = (Calling) event;
-        Invocation invocation = calling.invocation;
-        builder.append("    ").append(invocation.instance).append(".")
-            .append(invocation.method.getName()).append("(")
-            .append(join(",", invocation.arguments)).append(")").append("\n");
-      }
-    }
-    if (builder.length() > 0) {
-      builder.insert(0, "  actual invocations\n");
-    } else {
-      builder.insert(0, "  actual invocations\n    none\n");
-    }
-    setHistory(history);
-    return builder.toString();
-  }
-
-  private static <T> T proxyWrapping(final T wrapped, final Handler handler) {
-    Typing typing = typing(wrapped.getClass(), new HashSet<Class<?>>());
-    return (T) proxy(typing, new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        handler.handle(invocation(invocation.method, wrapped, invocation.arguments));
-        return defaultValue(invocation.method.getReturnType());
-      }
-    });
-  }
-
-  private static InvocationMatcher capture(Invocation invocation) {
-    List<Any> anys = capturedAnys(getHistory());
-    setHistory(consumeAnys(getHistory()));
-    Anyvocation anyvocation = anyvocation(invocation.method, invocation.instance,
-        invocation.arguments, anys);
-    check(canRepair(anyvocation));
-    return convert(matcherize(repair(anyvocation).get()));
-  }
-
-  private static boolean canRepair(Anyvocation anyvocation) {
-    return repair(anyvocation).isPresent();
-  }
-
-  private static InvocationMatcher convert(final Matcher invocationMatcher) {
-    return new InvocationMatcher() {
-      public boolean matches(Invocation invocation) {
-        return invocationMatcher.matches(invocation);
-      }
-
-      public String toString() {
-        return invocationMatcher.toString();
-      }
-    };
+    getFacade().thenCalledInOrder(invocationMatcher);
   }
 }

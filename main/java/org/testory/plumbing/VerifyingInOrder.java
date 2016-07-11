@@ -1,7 +1,6 @@
 package org.testory.plumbing;
 
 import static org.testory.common.Chain.chain;
-import static org.testory.plumbing.History.history;
 import static org.testory.plumbing.PlumbingException.check;
 
 import org.testory.common.Chain;
@@ -9,35 +8,34 @@ import org.testory.common.Optional;
 import org.testory.proxy.InvocationMatcher;
 
 public class VerifyingInOrder {
-  public final History unverified;
+  public final Chain<Object> unverified;
 
-  private VerifyingInOrder(History unverified) {
+  private VerifyingInOrder(Chain<Object> unverified) {
     this.unverified = unverified;
   }
 
-  public static VerifyingInOrder verifyingInOrder(History unverified) {
+  public static VerifyingInOrder verifyingInOrder(Chain<Object> unverified) {
     check(unverified != null);
     return new VerifyingInOrder(unverified);
   }
 
-  public static Optional<History> verifyInOrder(InvocationMatcher invocationMatcher, History history) {
+  public static Optional<VerifyingInOrder> verifyInOrder(InvocationMatcher invocationMatcher, Chain<Object> history) {
     Chain<Object> unverified = unverifiedReversed(history);
     while (unverified.size() > 0) {
       Object event = unverified.get();
       unverified = unverified.remove();
       if (event instanceof Calling && invocationMatcher.matches(((Calling) event).invocation)) {
-        VerifyingInOrder verifyingInOrder = verifyingInOrder(history(unverified.reverse()));
-        return Optional.of(history(history.events.add(verifyingInOrder)));
+        return Optional.of(verifyingInOrder(unverified.reverse()));
       }
     }
     return Optional.empty();
   }
 
-  private static Chain<Object> unverifiedReversed(History history) {
+  private static Chain<Object> unverifiedReversed(Chain<Object> history) {
     Chain<Object> unverified = chain();
-    for (Object event : history.events) {
+    for (Object event : history) {
       if (event instanceof VerifyingInOrder) {
-        for (Object oldEvent : ((VerifyingInOrder) event).unverified.events) {
+        for (Object oldEvent : ((VerifyingInOrder) event).unverified) {
           unverified = unverified.add(oldEvent);
         }
         break;

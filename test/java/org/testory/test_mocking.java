@@ -6,8 +6,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
-import static org.testory.Testory.when;
 import static org.testory.testing.Fakes.newObject;
+import static org.testory.testing.Purging.triggerPurge;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -65,12 +65,12 @@ public class test_mocking {
 
   @Test
   public void to_string_is_prestubbed_with_class_name_and_ordinal_counting_from_last_purging() {
-    when(0);
+    triggerPurge();
     mock = mock(ArrayList.class);
     assertEquals("mockArrayList0", mock.toString());
     mock = mock(ArrayList.class);
     assertEquals("mockArrayList1", mock.toString());
-    when(0);
+    triggerPurge();
     mock = mock(ArrayList.class);
     assertEquals("mockArrayList0", mock.toString());
     mock = mock(ArrayList.class);
@@ -86,7 +86,7 @@ public class test_mocking {
 
   @Test
   public void to_string_of_object_is_prestubbed() {
-    when(0);
+    triggerPurge();
     mock = mock(Object.class);
     assertEquals("mockObject0", mock.toString());
   }

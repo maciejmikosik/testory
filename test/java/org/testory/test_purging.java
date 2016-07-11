@@ -3,13 +3,13 @@ package org.testory;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.given;
-import static org.testory.Testory.givenTest;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.when;
 import static org.testory.Testory.willReturn;
 import static org.testory.testing.Fakes.newObject;
+import static org.testory.testing.Purging.triggerPurge;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,15 +55,17 @@ public class test_purging {
   }
 
   @Test
-  public void purge_requires_double_when() {
+  public void does_not_purge_single_when() {
     given(willReturn(object), onInstance(mock));
     when("");
     assertSame(object, mock.getObject());
-    when("");
-    try {
-      mock.getObject();
-      fail();
-    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void does_not_purge_single_chained_when() {
+    given(willReturn(object), onInstance(mock));
+    when(new Object()).toString();
+    assertSame(object, mock.getObject());
   }
 
   @Test
@@ -90,42 +92,6 @@ public class test_purging {
     when(mock).getObject();
     triggerPurge();
     thenCalledTimes(0, onInstance(mock));
-  }
-
-  private static void triggerPurge() {
-    when("");
-    when("");
-  }
-
-  @Test
-  public void purge_now_disables_invocation() {
-    triggerPurgeNow();
-    try {
-      mock.getObject();
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void purge_now_disables_stubbing() {
-    triggerPurgeNow();
-    try {
-      given(willReturn(object), mock);
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  @Test
-  public void purge_now_disables_verification() {
-    triggerPurgeNow();
-    try {
-      thenCalled(mock);
-      fail();
-    } catch (TestoryException e) {}
-  }
-
-  private static void triggerPurgeNow() {
-    givenTest(new Object());
   }
 
   private static InvocationMatcher onInstance(final Object mock) {

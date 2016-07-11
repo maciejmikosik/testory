@@ -7,13 +7,14 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
-import static org.testory.Testory.when;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 import static org.testory.testing.HamcrestMatchers.hasMessageMatching;
+import static org.testory.testing.Purging.triggerPurge;
 import static org.testory.testing.StackTraces.here;
 import static org.testory.testing.StackTraces.nextLine;
 
 import org.junit.Test;
+import org.testory.facade.Facade;
 
 public class test_TestoryException {
   private StackTraceElement line;
@@ -48,8 +49,7 @@ public class test_TestoryException {
   @Test
   public void message_explains_purged_mock() {
     mock = mock(Object.class);
-    when("");
-    when("");
+    triggerPurge();
     try {
       mock.toString();
       fail();
@@ -77,8 +77,9 @@ public class test_TestoryException {
       mock(null);
       fail();
     } catch (TestoryException e) {
+      e.printStackTrace();
       trace = e.getStackTrace()[0];
-      assertEquals(Testory.class.getName(), trace.getClassName());
+      assertEquals(Facade.class.getName(), trace.getClassName());
       assertEquals("mock", trace.getMethodName());
     }
   }

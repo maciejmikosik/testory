@@ -11,6 +11,7 @@ import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.when;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
+import static org.testory.testing.Purging.triggerPurge;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +26,7 @@ public class test_verifyings {
 
   @Before
   public void before() {
-    when("");
-    when("");
+    triggerPurge();
     object = newObject("object");
     mock = mock(Mockable.class);
   }

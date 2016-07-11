@@ -37,7 +37,6 @@ public class test_given {
     assertSame(object, given);
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void closure_is_forbidden() {
     try {
@@ -46,7 +45,6 @@ public class test_given {
     } catch (TestoryException e) {}
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void null_closure_is_forbidden() {
     try {
