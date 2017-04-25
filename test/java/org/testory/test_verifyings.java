@@ -109,6 +109,7 @@ public class test_verifyings {
   public void failure_prints_actual_invocations() {
     mock.invoke();
     mock.acceptObject(object);
+    mock.acceptObjects(object, object);
     try {
       thenCalled(onInstance(mock));
       fail();
@@ -116,7 +117,21 @@ public class test_verifyings {
       assertThat(e, hasMessageContaining(""
           + "  actual invocations\n"
           + "    " + mock + ".invoke()\n"
-          + "    " + mock + ".acceptObject(" + object + ")\n"));
+          + "    " + mock + ".acceptObject(" + object + ")\n"
+          + "    " + mock + ".acceptObjects(" + object + ", " + object + ")\n"));
+    }
+  }
+
+  @Test
+  public void failure_prints_actual_invocations_with_array_arguments() {
+    mock.invoke();
+    mock.acceptObject(new Object[][] { { object } });
+    try {
+      thenCalled(onInstance(mock));
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertThat(e, hasMessageContaining(""
+          + "    " + mock + ".acceptObject([[" + object + "]])\n"));
     }
   }
 
@@ -164,5 +179,7 @@ public class test_verifyings {
     abstract Object invoke();
 
     abstract void acceptObject(Object o);
+
+    abstract void acceptObjects(Object o, Object o2);
   }
 }
