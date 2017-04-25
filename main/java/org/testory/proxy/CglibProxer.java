@@ -45,9 +45,7 @@ public class CglibProxer implements Proxer {
     enhancer.setCallbackFilter(new CallbackFilter() {
       /** ignores bridge methods */
       public int accept(Method method) {
-        return method.isBridge()
-            ? 1
-            : 0;
+        return method.isBridge() ? 1 : 0;
       }
     });
     Class<?> proxyClass = enhancer.createClass();
