@@ -133,9 +133,7 @@ public class test_building {
   private static Set<Class<?>> filterNonJdk(Set<Class<?>> types) {
     Set<Class<?>> filtered = new HashSet<Class<?>>();
     for (Class<?> type : types) {
-      if (!type.isPrimitive() && !type.isArray()
-          && !type.getPackage().getName().startsWith("java.")
-          && !type.getPackage().getName().startsWith("sun.")) {
+      if (!type.isPrimitive() && !type.isArray() && type.getClassLoader() != null) {
         filtered.add(type);
       }
     }

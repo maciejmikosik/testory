@@ -75,8 +75,10 @@ public class CglibProxer implements Proxer {
   }
 
   private static boolean isContainer(Class<?> type) {
-    return Collection.class.isAssignableFrom(type) || Map.class.isAssignableFrom(type)
-        || Iterator.class.isAssignableFrom(type);
+    return Collection.class.isAssignableFrom(type)
+        || Map.class.isAssignableFrom(type)
+        || Iterator.class.isAssignableFrom(type)
+        || (type != null && isContainer(type.getDeclaringClass()));
   }
 
   private static Typing tryWithoutFactory(Typing typing) {

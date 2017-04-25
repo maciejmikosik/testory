@@ -77,7 +77,6 @@ public class test_TestoryException {
       mock(null);
       fail();
     } catch (TestoryException e) {
-      e.printStackTrace();
       trace = e.getStackTrace()[0];
       assertEquals(Facade.class.getName(), trace.getClassName());
       assertEquals("mock", trace.getMethodName());
