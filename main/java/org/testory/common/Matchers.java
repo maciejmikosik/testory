@@ -1,11 +1,12 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.deepEquals;
-import static org.testory.common.CharSequences.join;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.setAccessible;
+import static org.testory.common.Formatter.formatter;
 import static org.testory.common.Throwables.gently;
 
 import java.lang.reflect.Array;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Matchers {
+  private static final Formatter formatter = formatter();
+
   public static final Matcher anything = new Matcher() {
     public boolean matches(Object item) {
       return true;
@@ -32,7 +35,7 @@ public class Matchers {
       }
 
       public String toString() {
-        return "same(" + object + ")";
+        return format("same(%s)", formatter.format(object));
       }
     };
   }
@@ -44,7 +47,7 @@ public class Matchers {
       }
 
       public String toString() {
-        return "equalDeep(" + object + ")";
+        return format("equalDeep(%s)", formatter.format(object));
       }
     };
   }
@@ -70,7 +73,7 @@ public class Matchers {
       }
 
       public String toString() {
-        return "arrayOf(" + join(", ", matchers) + ")";
+        return format("arrayOf(%s)", formatter.formatSequence(matchers));
       }
     };
   }
@@ -96,7 +99,7 @@ public class Matchers {
       }
 
       public String toString() {
-        return "listOf(" + join(", ", matchers) + ")";
+        return format("listOf(%s)", formatter.formatSequence(matchers));
       }
     };
   }
