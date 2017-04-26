@@ -1,6 +1,6 @@
 package org.testory.testing;
 
-import static java.text.MessageFormat.format;
+import static java.lang.String.format;
 import static java.util.Objects.deepEquals;
 
 import java.util.Arrays;
@@ -14,7 +14,7 @@ public class DynamicMatchers {
       }
 
       public String toString() {
-        return format("same({0})", expected);
+        return format("same(%s)", expected);
       }
     };
   }
@@ -27,7 +27,7 @@ public class DynamicMatchers {
       }
 
       public String toString() {
-        return format("deepEqual({0})", object);
+        return format("deepEqual(%s)", object);
       }
     };
   }
@@ -40,7 +40,7 @@ public class DynamicMatchers {
       }
 
       public String toString() {
-        return format("number({0})", Arrays.toString(numbers));
+        return format("number(%s)", Arrays.toString(numbers));
       }
     };
   }
