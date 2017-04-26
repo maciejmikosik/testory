@@ -17,9 +17,11 @@ import static org.testory.plumbing.Formatter.formatter;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
-import static org.testory.plumbing.capture.AnySupport.anySupport;
-import static org.testory.plumbing.capture.Repairer.repairer;
 import static org.testory.plumbing.history.FilteredHistory.filter;
+import static org.testory.plumbing.im.wildcard.Repairer.repairer;
+import static org.testory.plumbing.im.wildcard.Tokenizer.tokenizer;
+import static org.testory.plumbing.im.wildcard.WildcardMatcherizer.wildcardMatcherizer;
+import static org.testory.plumbing.im.wildcard.WildcardSupport.wildcardSupport;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
@@ -54,11 +56,11 @@ import org.testory.plumbing.Formatter;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.VerifyingInOrder;
-import org.testory.plumbing.capture.AnyException;
-import org.testory.plumbing.capture.AnySupport;
-import org.testory.plumbing.capture.Capturer;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
+import org.testory.plumbing.im.Matcherizer;
+import org.testory.plumbing.im.wildcard.WildcardException;
+import org.testory.plumbing.im.wildcard.WildcardSupport;
 import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
 import org.testory.proxy.Handler;
@@ -75,8 +77,8 @@ public class Facade {
   private final Namer mockNamer;
   private final Maker mockMaker;
   private final Injector injector;
-  private final Capturer capturer;
-  private final AnySupport anySupport;
+  private final Matcherizer matcherizer;
+  private final WildcardSupport wildcardSupport;
   private final FilteredHistory<Inspecting> inspectingHistory;
   private final Checker checker;
 
@@ -88,8 +90,8 @@ public class Facade {
       Maker mockMaker,
       Injector injector,
       FilteredHistory<Inspecting> inspectingHistory,
-      AnySupport anySupport,
-      Capturer capturer,
+      WildcardSupport wildcardSupport,
+      Matcherizer matcherizer,
       Checker checker) {
     this.history = history;
     this.formatter = formatter;
@@ -98,8 +100,8 @@ public class Facade {
     this.mockMaker = mockMaker;
     this.injector = injector;
     this.inspectingHistory = inspectingHistory;
-    this.anySupport = anySupport;
-    this.capturer = capturer;
+    this.wildcardSupport = wildcardSupport;
+    this.matcherizer = matcherizer;
     this.checker = checker;
   }
 
@@ -113,10 +115,10 @@ public class Facade {
     Maker mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     Injector injector = injector(mockMaker);
     FilteredHistory<Inspecting> inspectingHistory = filter(Inspecting.class, history);
-    AnySupport anySupport = anySupport(history, repairer());
-    Capturer capturer = anySupport.getCapturer();
+    WildcardSupport wildcardSupport = wildcardSupport(history, tokenizer());
+    Matcherizer matcherizer = wildcardMatcherizer(history, repairer());
     return new Facade(history, formatter, proxer, mockNamer, mockMaker, injector,
-        inspectingHistory, anySupport, capturer, checker);
+        inspectingHistory, wildcardSupport, matcherizer, checker);
   }
 
   private static Maker mockMaker(History history, Proxer proxer) {
@@ -210,7 +212,7 @@ public class Facade {
     checker.mustBeMock(mock);
     return proxyWrapping(mock, new Handler() {
       public Object handle(Invocation invocation) {
-        history.add(stubbing(capture(invocation), handler));
+        history.add(stubbing(matcherize(invocation), handler));
         return null;
       }
     });
@@ -259,12 +261,12 @@ public class Facade {
 
   public <T> T any(Class<T> type) {
     checker.cannotBeNull(type);
-    return (T) anySupport.any(type);
+    return (T) wildcardSupport.any(type);
   }
 
   public <T> T any(Class<T> type, Object matcher) {
     checker.mustBeMatcher(matcher);
-    return (T) anySupport.any(type, matcher);
+    return (T) wildcardSupport.any(type, matcher);
   }
 
   public boolean a(boolean value) {
@@ -301,12 +303,12 @@ public class Facade {
 
   public <T> T a(T value) {
     checker.cannotBeNull(value);
-    return (T) anySupport.a(value);
+    return (T) wildcardSupport.a(value);
   }
 
   public <T> T the(T value) {
     checker.cannotBeNull(value);
-    return (T) anySupport.the(value);
+    return (T) wildcardSupport.the(value);
   }
 
   public void the(boolean value) {
@@ -623,7 +625,7 @@ public class Facade {
     checker.mustBeMock(mock);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
-        thenCalledTimes(numberMatcher, capture(invocation));
+        thenCalledTimes(numberMatcher, matcherize(invocation));
         return null;
       }
     };
@@ -652,7 +654,7 @@ public class Facade {
     checker.mustBeMock(mock);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
-        thenCalledInOrder(capture(invocation));
+        thenCalledInOrder(matcherize(invocation));
         return null;
       }
     };
@@ -672,10 +674,10 @@ public class Facade {
     }
   }
 
-  private InvocationMatcher capture(Invocation invocation) {
+  private InvocationMatcher matcherize(Invocation invocation) {
     try {
-      return capturer.capture(invocation);
-    } catch (AnyException e) {
+      return matcherizer.matcherize(invocation);
+    } catch (WildcardException e) {
       throw new TestoryException(e);
     }
   }

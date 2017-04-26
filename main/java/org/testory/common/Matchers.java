@@ -101,22 +101,6 @@ public class Matchers {
     };
   }
 
-  public static class MatcherDecorator implements Matcher {
-    private final Matcher decorated;
-
-    public MatcherDecorator(Matcher decorated) {
-      this.decorated = checkNotNull(decorated);
-    }
-
-    public boolean matches(Object item) {
-      return decorated.matches(item);
-    }
-
-    public String toString() {
-      return decorated.toString();
-    }
-  }
-
   public static boolean isMatcher(Object matcher) {
     return findMatchesMethod(matcher.getClass()).isPresent();
   }

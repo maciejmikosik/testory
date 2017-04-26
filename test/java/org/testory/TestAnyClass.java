@@ -68,7 +68,7 @@ public class TestAnyClass {
   }
 
   @Test
-  public void stubbing_supports_capturing_any() {
+  public void stubbing_supports_wildcards() {
     given(willReturn(object), mock).returnObject(any(Object.class));
     assertSame(object, mock.returnObject(object));
     assertSame(object, mock.returnObject(otherObject));
@@ -77,7 +77,7 @@ public class TestAnyClass {
   }
 
   @Test
-  public void verification_supports_capturing_any() {
+  public void verification_supports_wildcards() {
     mock.returnObject(object);
     thenCalled(mock).returnObject(any(Object.class));
     try {

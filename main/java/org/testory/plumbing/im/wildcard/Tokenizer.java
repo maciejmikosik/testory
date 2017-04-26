@@ -1,5 +1,6 @@
-package org.testory.plumbing.capture;
+package org.testory.plumbing.im.wildcard;
 
+import static org.testory.common.Classes.tryWrap;
 import static org.testory.plumbing.PlumbingException.check;
 
 import java.lang.reflect.Array;
@@ -13,20 +14,24 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.Factory;
 import net.sf.cglib.proxy.NoOp;
 
-public class Uniques {
-  public static boolean hasUniques(Class<?> type) {
-    check(type != null);
-    return !type.isPrimitive();
+public class Tokenizer {
+  private Tokenizer() {}
+
+  public static Tokenizer tokenizer() {
+    return new Tokenizer();
   }
 
-  public static <T> T unique(Class<T> type) {
+  public <T> T token(Class<T> type) {
     check(type != null);
-    check(hasUniques(type));
-    return type.isArray()
-        ? (T) Array.newInstance(type.getComponentType(), 0)
-        : !Modifier.isAbstract(type.getModifiers())
-            ? new ObjenesisStd().newInstance(type)
-            : newCglibProxy(type);
+    if (type.isArray()) {
+      return (T) Array.newInstance(type.getComponentType(), 0);
+    } else if (type.isPrimitive()) {
+      return (T) new ObjenesisStd().newInstance(tryWrap(type));
+    } else if (!Modifier.isAbstract(type.getModifiers())) {
+      return new ObjenesisStd().newInstance(type);
+    } else {
+      return newCglibProxy(type);
+    }
   }
 
   private static <T> T newCglibProxy(Class<T> type) {
