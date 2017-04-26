@@ -22,8 +22,8 @@ public class Formatter {
     }
   }
 
-  protected Iterable<String> formatSequence(final Iterable<?> iterable) {
-    return new Iterable<String>() {
+  public String formatSequence(final Iterable<?> iterable) {
+    Iterable<String> strings = new Iterable<String>() {
       public Iterator<String> iterator() {
         return new Iterator<String>() {
           Iterator<?> iterator = iterable.iterator();
@@ -38,10 +38,11 @@ public class Formatter {
         };
       }
     };
+    return join(", ", strings);
   }
 
   private String formatArray(Object array) {
-    return "[" + join(", ", formatSequence(arrayAsIterable(array))) + "]";
+    return "[" + formatSequence(arrayAsIterable(array)) + "]";
   }
 
   private Iterable<Object> arrayAsIterable(final Object array) {

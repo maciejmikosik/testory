@@ -1,11 +1,10 @@
 package org.testory.plumbing.im.wildcard;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static org.testory.common.CharSequences.join;
 import static org.testory.common.Collections.last;
 import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.listOf;
-import static org.testory.common.Objects.print;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.im.wildcard.WildcardInvocation.wildcardInvocation;
 import static org.testory.plumbing.im.wildcard.Wildcarded.wildcarded;
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.testory.common.DelegatingMatcher;
+import org.testory.common.Formatter;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
 import org.testory.plumbing.history.History;
@@ -25,16 +25,22 @@ import org.testory.proxy.InvocationMatcher;
 public class WildcardMatcherizer implements Matcherizer {
   private final Repairer repairer;
   private final History history;
+  private final Formatter formatter;
 
-  private WildcardMatcherizer(History history, Repairer repairer) {
+  private WildcardMatcherizer(History history, Repairer repairer, Formatter formatter) {
     this.history = history;
     this.repairer = repairer;
+    this.formatter = formatter;
   }
 
-  public static Matcherizer wildcardMatcherizer(History history, Repairer repairer) {
+  public static Matcherizer wildcardMatcherizer(
+      History history,
+      Repairer repairer,
+      Formatter formatter) {
     check(history != null);
     check(repairer != null);
-    return new WildcardMatcherizer(history, repairer);
+    check(formatter != null);
+    return new WildcardMatcherizer(history, repairer, formatter);
   }
 
   public InvocationMatcher matcherize(Invocation invocation) {
@@ -60,7 +66,7 @@ public class WildcardMatcherizer implements Matcherizer {
     return wildcards;
   }
 
-  public static InvocationMatcher matcherize(WildcardInvocation invocation) {
+  public InvocationMatcher matcherize(WildcardInvocation invocation) {
     List<Object> arguments = invocation.mayBeFolded()
         ? unfold(invocation.arguments)
         : invocation.arguments;
@@ -71,7 +77,7 @@ public class WildcardMatcherizer implements Matcherizer {
     return matcherize(invocation.method, invocation.instance, argumentsMatchers);
   }
 
-  private static List<Matcher> fold(int length, List<Matcher> unfolded) {
+  private List<Matcher> fold(int length, List<Matcher> unfolded) {
     List<Matcher> folded = new ArrayList<Matcher>();
     folded.addAll(unfolded.subList(0, length - 1));
     folded.add(arrayOf(unfolded.subList(length - 1, unfolded.size())));
@@ -85,7 +91,7 @@ public class WildcardMatcherizer implements Matcherizer {
     return unfolded;
   }
 
-  private static List<Matcher> matcherize(List<Wildcard> wildcards, List<Object> arguments) {
+  private List<Matcher> matcherize(List<Wildcard> wildcards, List<Object> arguments) {
     List<Wildcard> wildcardQueue = new ArrayList<Wildcard>(wildcards);
     List<Matcher> matchers = new ArrayList<Matcher>();
     for (int i = 0; i < arguments.size(); i++) {
@@ -97,15 +103,15 @@ public class WildcardMatcherizer implements Matcherizer {
     return matchers;
   }
 
-  private static Matcher matcherize(final Object argument) {
+  private Matcher matcherize(final Object argument) {
     return new DelegatingMatcher(equalDeep(argument)) {
       public String toString() {
-        return print(argument);
+        return formatter.format(argument);
       }
     };
   }
 
-  private static InvocationMatcher matcherize(final Method method, final Object instance,
+  private InvocationMatcher matcherize(final Method method, final Object instance,
       final List<Matcher> arguments) {
     return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
@@ -115,15 +121,15 @@ public class WildcardMatcherizer implements Matcherizer {
       }
 
       public String toString() {
-        return instance + "." + method.getName() + "(" + join(", ", arguments) + ")";
+        return format("%s.%s(%s)", instance, method.getName(), formatter.formatSequence(arguments));
       }
     };
   }
 
-  private static Matcher arrayOf(final List<Matcher> elements) {
+  private Matcher arrayOf(final List<Matcher> elements) {
     return new DelegatingMatcher(Matchers.arrayOf(elements)) {
       public String toString() {
-        return "[" + join(", ", elements) + "]";
+        return format("[%s]", formatter.formatSequence(elements));
       }
     };
   }

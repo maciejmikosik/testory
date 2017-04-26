@@ -117,7 +117,7 @@ public class Facade {
     Injector injector = injector(mockMaker);
     FilteredHistory<Inspecting> inspectingHistory = filter(Inspecting.class, history);
     WildcardSupport wildcardSupport = wildcardSupport(history, tokenizer(), formatter);
-    Matcherizer matcherizer = wildcardMatcherizer(history, repairer());
+    Matcherizer matcherizer = wildcardMatcherizer(history, repairer(), formatter);
     return new Facade(history, formatter, proxer, mockNamer, mockMaker, injector,
         inspectingHistory, wildcardSupport, matcherizer, checker);
   }
