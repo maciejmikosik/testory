@@ -61,7 +61,7 @@ public class Formatter {
 
   public History plug(final History history) {
     check(history != null);
-    final Object stubbingToString = stubbingToString(history);
+    final Stubbing stubbingToString = stubbingToString(history);
     return new History() {
       public Chain<Object> get() {
         return isFormatting()
@@ -78,7 +78,7 @@ public class Formatter {
     };
   }
 
-  private static Object stubbingToString(History history) {
+  private static Stubbing stubbingToString(History history) {
     final FilteredHistory<Mocking> mockingHistory = filter(Mocking.class, history);
     return stubbing(new InvocationMatcher() {
       public boolean matches(Invocation invocation) {

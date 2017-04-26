@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.testory.plumbing.PlumbingException;
 
 public class TestUniques {
   @Test
@@ -51,11 +52,11 @@ public class TestUniques {
     try {
       hasUniques(null);
       fail();
-    } catch (NullPointerException e) {}
+    } catch (PlumbingException e) {}
     try {
       unique(null);
       fail();
-    } catch (NullPointerException e) {}
+    } catch (PlumbingException e) {}
   }
 
   private static void assertSupports(Class<?> type) {
@@ -71,6 +72,6 @@ public class TestUniques {
     try {
       unique(type);
       fail(message);
-    } catch (IllegalArgumentException e) {}
+    } catch (PlumbingException e) {}
   }
 }

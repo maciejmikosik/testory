@@ -9,22 +9,28 @@ import java.util.List;
 
 import org.testory.plumbing.Maker;
 
-public class ChainedMaker {
-  public static Maker chain(final Maker... makers) {
+public class ChainedMaker implements Maker {
+  private final List<Maker> makersList;
+
+  private ChainedMaker(List<Maker> makersList) {
+    this.makersList = makersList;
+  }
+
+  public static Maker chain(Maker... makers) {
     check(makers != null);
     final List<Maker> makersList = new ArrayList<>(asList(makers));
     check(!makersList.contains(null));
-    return new Maker() {
-      public <T> T make(Class<T> type, String name) {
-        check(type != null);
-        check(name != null);
-        for (Maker maker : makersList) {
-          try {
-            return maker.make(type, name);
-          } catch (RuntimeException e) {}
-        }
-        throw new RuntimeException(format("cannot make %s of type %s", name, type.getName()));
-      }
-    };
+    return new ChainedMaker(makersList);
+  }
+
+  public <T> T make(Class<T> type, String name) {
+    check(type != null);
+    check(name != null);
+    for (Maker maker : makersList) {
+      try {
+        return maker.make(type, name);
+      } catch (RuntimeException e) {}
+    }
+    throw new RuntimeException(format("cannot make %s of type %s", name, type.getName()));
   }
 }

@@ -1,7 +1,6 @@
 package org.testory.plumbing.capture;
 
-import static org.testory.common.Checks.checkArgument;
-import static org.testory.common.Checks.checkNotNull;
+import static org.testory.plumbing.PlumbingException.check;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
@@ -16,13 +15,13 @@ import net.sf.cglib.proxy.NoOp;
 
 public class Uniques {
   public static boolean hasUniques(Class<?> type) {
-    checkNotNull(type);
+    check(type != null);
     return !type.isPrimitive();
   }
 
   public static <T> T unique(Class<T> type) {
-    checkNotNull(type);
-    checkArgument(hasUniques(type));
+    check(type != null);
+    check(hasUniques(type));
     return type.isArray()
         ? (T) Array.newInstance(type.getComponentType(), 0)
         : !Modifier.isAbstract(type.getModifiers())

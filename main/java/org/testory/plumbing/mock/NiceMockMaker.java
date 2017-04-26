@@ -11,20 +11,30 @@ import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class NiceMockMaker {
-  public static Maker nice(final Maker mockMaker, final History history) {
-    return new Maker() {
-      public <T> T make(Class<T> type, String name) {
-        check(type != null);
-        check(name != null);
-        T mock = mockMaker.make(type, name);
-        history.add(stubNice(mock));
-        return mock;
-      }
-    };
+public class NiceMockMaker implements Maker {
+  private final Maker mockMaker;
+  private final History history;
+
+  private NiceMockMaker(Maker mockMaker, History history) {
+    this.mockMaker = mockMaker;
+    this.history = history;
   }
 
-  private static Stubbing stubNice(Object mock) {
+  public static Maker nice(Maker mockMaker, History history) {
+    check(mockMaker != null);
+    check(history != null);
+    return new NiceMockMaker(mockMaker, history);
+  }
+
+  public <T> T make(Class<T> type, String name) {
+    check(type != null);
+    check(name != null);
+    T mock = mockMaker.make(type, name);
+    history.add(stubbingNice(mock));
+    return mock;
+  }
+
+  private static Stubbing stubbingNice(Object mock) {
     return stubbing(onInstance(mock), new Handler() {
       public Object handle(Invocation invocation) {
         return defaultValue(invocation.method.getReturnType());
