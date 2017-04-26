@@ -1,14 +1,11 @@
 package org.testory;
 
 import static java.util.Arrays.asList;
-import static java.util.concurrent.Executors.newFixedThreadPool;
 import static javax.xml.bind.DatatypeConverter.printHexBinary;
 import static org.junit.Assert.assertEquals;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.security.DigestInputStream;
@@ -16,12 +13,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestBuilding {
+  @Rule
+  public TemporaryFolder folder = new TemporaryFolder();
+
   private String hashA, hashB;
 
   @Test
@@ -34,29 +34,13 @@ public class TestBuilding {
     assertEquals(hashA, hashB);
   }
 
-  private static void exec(String command) {
-    try {
-      Process process = Runtime.getRuntime().exec(command);
-      ExecutorService executor = newFixedThreadPool(2);
-      executor.submit(forward(process.getInputStream(), System.out));
-      executor.submit(forward(process.getErrorStream(), System.err));
-      int exitCode = process.waitFor();
-      assume(exitCode == 0);
-    } catch (IOException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private static Callable<Void> forward(final InputStream input, final PrintStream output) {
-    return new Callable<Void>() {
-      public Void call() throws IOException {
-        int data;
-        while ((data = input.read()) != -1) {
-          output.write(data);
-        }
-        return null;
-      }
-    };
+  private void exec(String command) throws InterruptedException, IOException {
+    int exitCode = new ProcessBuilder(command)
+        .redirectOutput(folder.newFile())
+        .redirectError(folder.newFile())
+        .start()
+        .waitFor();
+    assume(exitCode == 0);
   }
 
   private static String sha1(String filename) {
