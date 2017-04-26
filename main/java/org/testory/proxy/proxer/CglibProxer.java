@@ -35,7 +35,7 @@ public class CglibProxer implements Proxer {
     return newProxyByCglib(tryAsProxiable(typing), handler);
   }
 
-  private static Object newProxyByCglib(Typing typing, final Handler handler) {
+  private static Object newProxyByCglib(Typing typing, Handler handler) {
     Enhancer enhancer = new Enhancer() {
       /** includes all constructors */
       protected void filterConstructors(Class sc, List constructors) {}

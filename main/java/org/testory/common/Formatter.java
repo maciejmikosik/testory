@@ -49,7 +49,7 @@ public class Formatter {
     return new Iterable<Object>() {
       public Iterator<Object> iterator() {
         return new Iterator<Object>() {
-          final int size = Array.getLength(array);
+          private final int size = Array.getLength(array);
           int index = 0;
 
           public boolean hasNext() {

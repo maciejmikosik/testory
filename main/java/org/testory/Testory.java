@@ -49,7 +49,7 @@ public class Testory {
     getFacade().givenTimes(number, closure);
   }
 
-  public static <T> T givenTimes(final int number, T object) {
+  public static <T> T givenTimes(int number, T object) {
     return getFacade().givenTimes(number, object);
   }
 
@@ -61,7 +61,7 @@ public class Testory {
     return getFacade().spy(real);
   }
 
-  public static <T> T given(final Handler handler, T mock) {
+  public static <T> T given(Handler handler, T mock) {
     return getFacade().given(handler, mock);
   }
 
@@ -69,19 +69,19 @@ public class Testory {
     getFacade().given(handler, invocationMatcher);
   }
 
-  public static Handler willReturn(@Nullable final Object object) {
+  public static Handler willReturn(@Nullable Object object) {
     return getFacade().willReturn(object);
   }
 
-  public static Handler willThrow(final Throwable throwable) {
+  public static Handler willThrow(Throwable throwable) {
     return getFacade().willThrow(throwable);
   }
 
-  public static Handler willRethrow(final Throwable throwable) {
+  public static Handler willRethrow(Throwable throwable) {
     return getFacade().willRethrow(throwable);
   }
 
-  public static Handler willSpy(final Object real) {
+  public static Handler willSpy(Object real) {
     return getFacade().willSpy(real);
   }
 
@@ -141,15 +141,15 @@ public class Testory {
     return getFacade().the(instance);
   }
 
-  public static InvocationMatcher onInstance(final Object mock) {
+  public static InvocationMatcher onInstance(Object mock) {
     return getFacade().onInstance(mock);
   }
 
-  public static InvocationMatcher onReturn(final Class<?> type) {
+  public static InvocationMatcher onReturn(Class<?> type) {
     return getFacade().onReturn(type);
   }
 
-  public static InvocationMatcher onRequest(final Class<?> type, final Object... arguments) {
+  public static InvocationMatcher onRequest(Class<?> type, final Object... arguments) {
     return getFacade().onRequest(type, arguments);
   }
 
@@ -289,7 +289,7 @@ public class Testory {
     getFacade().thenCalledTimes(number, invocationMatcher);
   }
 
-  public static <T> T thenCalledTimes(final Object numberMatcher, T mock) {
+  public static <T> T thenCalledTimes(Object numberMatcher, T mock) {
     return getFacade().thenCalledTimes(numberMatcher, mock);
   }
 

@@ -45,7 +45,7 @@ public class SaneMockMaker implements Maker {
     });
   }
 
-  private static Stubbing stubbingHashCode(final Object mock, final String name) {
+  private static Stubbing stubbingHashCode(Object mock, final String name) {
     return stubbing(onInvocation(mock, "hashCode"), new Handler() {
       public Object handle(Invocation invocation) {
         return name.hashCode();
@@ -53,7 +53,7 @@ public class SaneMockMaker implements Maker {
     });
   }
 
-  private static Stubbing stubbingToString(final Object mock, final String name) {
+  private static Stubbing stubbingToString(Object mock, final String name) {
     return stubbing(onInvocation(mock, "toString"), new Handler() {
       public Object handle(Invocation invocation) {
         return name;
