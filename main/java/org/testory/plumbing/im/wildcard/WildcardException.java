@@ -1,4 +1,4 @@
-package org.testory.plumbing.capture.wildcard;
+package org.testory.plumbing.im.wildcard;
 
 public class WildcardException extends RuntimeException {
   public WildcardException() {}

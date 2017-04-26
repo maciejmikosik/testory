@@ -1,11 +1,11 @@
-package org.testory.plumbing.capture.wildcard;
+package org.testory.plumbing.im.wildcard;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.testory.plumbing.capture.wildcard.Uniques.hasUniques;
-import static org.testory.plumbing.capture.wildcard.Uniques.unique;
+import static org.testory.plumbing.im.wildcard.Uniques.hasUniques;
+import static org.testory.plumbing.im.wildcard.Uniques.unique;
 
 import java.util.AbstractList;
 import java.util.ArrayList;

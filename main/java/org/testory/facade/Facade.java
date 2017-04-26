@@ -17,9 +17,9 @@ import static org.testory.plumbing.Formatter.formatter;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
-import static org.testory.plumbing.capture.wildcard.Repairer.repairer;
-import static org.testory.plumbing.capture.wildcard.WildcardSupport.wildcardSupport;
 import static org.testory.plumbing.history.FilteredHistory.filter;
+import static org.testory.plumbing.im.wildcard.Repairer.repairer;
+import static org.testory.plumbing.im.wildcard.WildcardSupport.wildcardSupport;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
@@ -54,11 +54,11 @@ import org.testory.plumbing.Formatter;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.VerifyingInOrder;
-import org.testory.plumbing.capture.Capturer;
-import org.testory.plumbing.capture.wildcard.WildcardException;
-import org.testory.plumbing.capture.wildcard.WildcardSupport;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
+import org.testory.plumbing.im.Matcherizer;
+import org.testory.plumbing.im.wildcard.WildcardException;
+import org.testory.plumbing.im.wildcard.WildcardSupport;
 import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
 import org.testory.proxy.Handler;
@@ -75,7 +75,7 @@ public class Facade {
   private final Namer mockNamer;
   private final Maker mockMaker;
   private final Injector injector;
-  private final Capturer capturer;
+  private final Matcherizer matcherizer;
   private final WildcardSupport wildcardSupport;
   private final FilteredHistory<Inspecting> inspectingHistory;
   private final Checker checker;
@@ -89,7 +89,7 @@ public class Facade {
       Injector injector,
       FilteredHistory<Inspecting> inspectingHistory,
       WildcardSupport wildcardSupport,
-      Capturer capturer,
+      Matcherizer matcherizer,
       Checker checker) {
     this.history = history;
     this.formatter = formatter;
@@ -99,7 +99,7 @@ public class Facade {
     this.injector = injector;
     this.inspectingHistory = inspectingHistory;
     this.wildcardSupport = wildcardSupport;
-    this.capturer = capturer;
+    this.matcherizer = matcherizer;
     this.checker = checker;
   }
 
@@ -114,9 +114,9 @@ public class Facade {
     Injector injector = injector(mockMaker);
     FilteredHistory<Inspecting> inspectingHistory = filter(Inspecting.class, history);
     WildcardSupport wildcardSupport = wildcardSupport(history, repairer());
-    Capturer capturer = wildcardSupport.getCapturer();
+    Matcherizer matcherizer = wildcardSupport.getMatcherizer();
     return new Facade(history, formatter, proxer, mockNamer, mockMaker, injector,
-        inspectingHistory, wildcardSupport, capturer, checker);
+        inspectingHistory, wildcardSupport, matcherizer, checker);
   }
 
   private static Maker mockMaker(History history, Proxer proxer) {
@@ -210,7 +210,7 @@ public class Facade {
     checker.mustBeMock(mock);
     return proxyWrapping(mock, new Handler() {
       public Object handle(Invocation invocation) {
-        history.add(stubbing(capture(invocation), handler));
+        history.add(stubbing(matcherize(invocation), handler));
         return null;
       }
     });
@@ -623,7 +623,7 @@ public class Facade {
     checker.mustBeMock(mock);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
-        thenCalledTimes(numberMatcher, capture(invocation));
+        thenCalledTimes(numberMatcher, matcherize(invocation));
         return null;
       }
     };
@@ -652,7 +652,7 @@ public class Facade {
     checker.mustBeMock(mock);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
-        thenCalledInOrder(capture(invocation));
+        thenCalledInOrder(matcherize(invocation));
         return null;
       }
     };
@@ -672,9 +672,9 @@ public class Facade {
     }
   }
 
-  private InvocationMatcher capture(Invocation invocation) {
+  private InvocationMatcher matcherize(Invocation invocation) {
     try {
-      return capturer.capture(invocation);
+      return matcherizer.matcherize(invocation);
     } catch (WildcardException e) {
       throw new TestoryException(e);
     }

@@ -1,4 +1,4 @@
-package org.testory.plumbing.capture.wildcard;
+package org.testory.plumbing.im.wildcard;
 
 import static java.lang.String.format;
 import static org.testory.common.Classes.tryWrap;
@@ -7,11 +7,10 @@ import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Matchers.same;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.capture.Capturing.capturing;
-import static org.testory.plumbing.capture.wildcard.MatcherizeWildcardInvocation.matcherize;
-import static org.testory.plumbing.capture.wildcard.Uniques.unique;
-import static org.testory.plumbing.capture.wildcard.Wildcard.wildcard;
-import static org.testory.plumbing.capture.wildcard.WildcardInvocation.wildcardInvocation;
+import static org.testory.plumbing.im.wildcard.Uniques.unique;
+import static org.testory.plumbing.im.wildcard.Wildcard.wildcard;
+import static org.testory.plumbing.im.wildcard.WildcardInvocation.wildcardInvocation;
+import static org.testory.plumbing.im.wildcard.Wildcarded.wildcarded;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +18,8 @@ import java.util.List;
 import org.testory.common.DelegatingMatcher;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
-import org.testory.plumbing.capture.Capturer;
-import org.testory.plumbing.capture.Capturing;
 import org.testory.plumbing.history.History;
+import org.testory.plumbing.im.Matcherizer;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
@@ -40,12 +38,12 @@ public class WildcardSupport {
     return new WildcardSupport(history, repairer);
   }
 
-  public Capturer getCapturer() {
-    return new Capturer() {
-      public InvocationMatcher capture(Invocation invocation) {
+  public Matcherizer getMatcherizer() {
+    return new Matcherizer() {
+      public InvocationMatcher matcherize(Invocation invocation) {
         check(invocation != null);
         List<Wildcard> wildcards = consumeWildcards();
-        return matcherize(repairer.repair(
+        return WildcardMatcherizer.matcherize(repairer.repair(
             wildcardInvocation(invocation.method, invocation.instance, invocation.arguments, wildcards)));
       }
     };
@@ -56,11 +54,11 @@ public class WildcardSupport {
     for (Object event : history.get()) {
       if (event instanceof Wildcard) {
         wildcards.add(0, (Wildcard) event);
-      } else if (event instanceof Capturing) {
+      } else if (event instanceof Wildcarded) {
         break;
       }
     }
-    history.add(capturing());
+    history.add(wildcarded());
     return wildcards;
   }
 

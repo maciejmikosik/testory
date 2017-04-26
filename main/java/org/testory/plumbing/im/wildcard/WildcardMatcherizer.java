@@ -1,4 +1,4 @@
-package org.testory.plumbing.capture.wildcard;
+package org.testory.plumbing.im.wildcard;
 
 import static java.util.Arrays.asList;
 import static org.testory.common.CharSequences.join;
@@ -17,7 +17,7 @@ import org.testory.common.Matchers;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class MatcherizeWildcardInvocation {
+public class WildcardMatcherizer {
   public static InvocationMatcher matcherize(WildcardInvocation invocation) {
     List<Object> arguments = invocation.mayBeFolded()
         ? unfold(invocation.arguments)
