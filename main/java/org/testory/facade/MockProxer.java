@@ -1,16 +1,7 @@
 package org.testory.facade;
 
-import static org.testory.TestoryException.check;
-import static org.testory.common.Classes.canReturn;
-import static org.testory.common.Classes.canThrow;
-import static org.testory.plumbing.history.FilteredHistory.filter;
-
-import java.lang.reflect.Method;
-
 import org.testory.TestoryException;
-import org.testory.plumbing.Mocking;
-import org.testory.plumbing.history.FilteredHistory;
-import org.testory.plumbing.history.History;
+import org.testory.plumbing.Checker;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.Proxer;
@@ -18,15 +9,15 @@ import org.testory.proxy.Typing;
 
 public class MockProxer implements Proxer {
   private final Proxer proxer;
-  private final FilteredHistory<Mocking> mockingHistory;
+  private final Checker checker;
 
-  private MockProxer(Proxer proxer, FilteredHistory<Mocking> mockingHistory) {
+  private MockProxer(Proxer proxer, Checker checker) {
     this.proxer = proxer;
-    this.mockingHistory = mockingHistory;
+    this.checker = checker;
   }
 
-  public static Proxer mockProxer(History history, Proxer proxer) {
-    return new MockProxer(proxer, filter(Mocking.class, history));
+  public static Proxer mockProxer(Proxer proxer, Checker checker) {
+    return new MockProxer(proxer, checker);
   }
 
   public Object proxy(Typing typing, Handler handler) {
@@ -41,30 +32,17 @@ public class MockProxer implements Proxer {
   private Handler mockHandler(final Handler handler) {
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        check(isMock(invocation.instance));
+        checker.mustBeMock(invocation.instance);
         Object returned;
         try {
           returned = handler.handle(invocation);
         } catch (Throwable throwable) {
-          check(canThrow(throwable, invocation.method));
+          checker.canThrow(throwable, invocation.method);
           throw throwable;
         }
-        check(canReturn(returned, invocation.method) || canReturnVoid(returned, invocation.method));
+        checker.canReturn(returned, invocation.method);
         return returned;
       }
-
-      private boolean canReturnVoid(Object returned, Method method) {
-        return method.getReturnType() == void.class && returned == null;
-      }
     };
-  }
-
-  private boolean isMock(Object instance) {
-    for (Mocking mocking : mockingHistory.get()) {
-      if (mocking.mock == instance) {
-        return true;
-      }
-    }
-    return false;
   }
 }

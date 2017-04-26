@@ -2,7 +2,6 @@ package org.testory.facade;
 
 import static java.util.Objects.deepEquals;
 import static org.testory.TestoryAssertionError.assertionError;
-import static org.testory.TestoryException.check;
 import static org.testory.common.Classes.defaultValue;
 import static org.testory.common.Effect.returned;
 import static org.testory.common.Effect.returnedVoid;
@@ -13,6 +12,7 @@ import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.facade.MockProxer.mockProxer;
 import static org.testory.plumbing.Calling.callings;
+import static org.testory.plumbing.Checker.checker;
 import static org.testory.plumbing.Formatter.formatter;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Stubbing.stubbing;
@@ -35,7 +35,6 @@ import static org.testory.proxy.Typing.typing;
 import java.util.HashSet;
 
 import org.testory.TestoryException;
-import org.testory.common.Chain;
 import org.testory.common.Closure;
 import org.testory.common.DiagnosticMatcher;
 import org.testory.common.Effect;
@@ -47,10 +46,10 @@ import org.testory.common.Nullable;
 import org.testory.common.Optional;
 import org.testory.common.VoidClosure;
 import org.testory.plumbing.Calling;
+import org.testory.plumbing.Checker;
 import org.testory.plumbing.Formatter;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Maker;
-import org.testory.plumbing.Mocking;
 import org.testory.plumbing.VerifyingInOrder;
 import org.testory.plumbing.capture.AnyException;
 import org.testory.plumbing.capture.AnySupport;
@@ -75,8 +74,8 @@ public class Facade {
   private final Injector injector;
   private final Capturer capturer;
   private final AnySupport anySupport;
-  private final FilteredHistory<Mocking> mockingHistory;
   private final FilteredHistory<Inspecting> inspectingHistory;
+  private final Checker checker;
 
   public Facade(
       History history,
@@ -85,20 +84,20 @@ public class Facade {
       Namer mockNamer,
       Maker mockMaker,
       Injector injector,
-      FilteredHistory<Mocking> mockingHistory,
       FilteredHistory<Inspecting> inspectingHistory,
       AnySupport anySupport,
-      Capturer capturer) {
+      Capturer capturer,
+      Checker checker) {
     this.history = history;
     this.formatter = formatter;
     this.proxer = proxer;
     this.mockNamer = mockNamer;
     this.mockMaker = mockMaker;
     this.injector = injector;
-    this.mockingHistory = mockingHistory;
     this.inspectingHistory = inspectingHistory;
     this.anySupport = anySupport;
     this.capturer = capturer;
+    this.checker = checker;
   }
 
   public static Facade newFacade(History mutableHistory) {
@@ -106,18 +105,18 @@ public class Facade {
     History history = formatter.plug(mutableHistory);
     Proxer proxer = new CglibProxer();
     Namer mockNamer = uniqueNamer(history);
-    Maker mockMaker = mockMaker(history, proxer);
+    Checker checker = checker(history, TestoryException.class);
+    Maker mockMaker = mockMaker(history, proxer, checker);
     Injector injector = injector(mockMaker);
-    FilteredHistory<Mocking> mockingHistory = filter(Mocking.class, history);
     FilteredHistory<Inspecting> inspectingHistory = filter(Inspecting.class, history);
     AnySupport anySupport = anySupport(history, repairer());
     Capturer capturer = anySupport.getCapturer();
     return new Facade(history, formatter, proxer, mockNamer, mockMaker, injector,
-        mockingHistory, inspectingHistory, anySupport, capturer);
+        inspectingHistory, anySupport, capturer, checker);
   }
 
-  private static Maker mockMaker(History history, Proxer proxer) {
-    Proxer mockProxer = mockProxer(history, proxer);
+  private static Maker mockMaker(History history, Proxer proxer, Checker checker) {
+    Proxer mockProxer = mockProxer(proxer, checker);
     Maker rawMockMaker = rawMockMaker(mockProxer, history);
     Maker niceMockMaker = nice(rawMockMaker, history);
     Maker saneNiceMockMaker = sane(niceMockMaker, history);
@@ -150,7 +149,7 @@ public class Facade {
   public void given(double primitive) {}
 
   public <T> T givenTry(T object) {
-    check(object != null);
+    checker.cannotBeNull(object);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         try {
@@ -164,8 +163,8 @@ public class Facade {
   }
 
   public void givenTimes(int number, Closure closure) {
-    check(number >= 0);
-    check(closure != null);
+    checker.cannotBeNegative(number);
+    checker.cannotBeNull(closure);
     for (int i = 0; i < number; i++) {
       try {
         closure.invoke();
@@ -176,8 +175,8 @@ public class Facade {
   }
 
   public <T> T givenTimes(final int number, T object) {
-    check(number >= 0);
-    check(object != null);
+    checker.cannotBeNegative(number);
+    checker.cannotBeNull(object);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         for (int i = 0; i < number; i++) {
@@ -190,13 +189,13 @@ public class Facade {
   }
 
   public <T> T mock(Class<T> type) {
-    check(type != null);
+    checker.cannotBeNull(type);
     String name = mockNamer.name(type);
     return mockMaker.make(type, name);
   }
 
   public <T> T spy(T real) {
-    check(real != null);
+    checker.cannotBeNull(real);
     Class<T> type = (Class<T>) real.getClass();
     T mock = mock(type);
     given(willSpy(real), onInstance(mock));
@@ -204,9 +203,8 @@ public class Facade {
   }
 
   public <T> T given(final Handler handler, T mock) {
-    check(handler != null);
-    check(mock != null);
-    check(isMock(mock));
+    checker.cannotBeNull(handler);
+    checker.mustBeMock(mock);
     return proxyWrapping(mock, new Handler() {
       public Object handle(Invocation invocation) {
         history.add(stubbing(capture(invocation), handler));
@@ -216,8 +214,8 @@ public class Facade {
   }
 
   public void given(Handler handler, InvocationMatcher invocationMatcher) {
-    check(handler != null);
-    check(invocationMatcher != null);
+    checker.cannotBeNull(handler);
+    checker.cannotBeNull(invocationMatcher);
     history.add(stubbing(invocationMatcher, handler));
   }
 
@@ -230,7 +228,7 @@ public class Facade {
   }
 
   public Handler willThrow(final Throwable throwable) {
-    check(throwable != null);
+    checker.cannotBeNull(throwable);
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         throw throwable.fillInStackTrace();
@@ -239,7 +237,7 @@ public class Facade {
   }
 
   public Handler willRethrow(final Throwable throwable) {
-    check(throwable != null);
+    checker.cannotBeNull(throwable);
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         throw throwable;
@@ -248,7 +246,7 @@ public class Facade {
   }
 
   public Handler willSpy(final Object real) {
-    check(real != null);
+    checker.cannotBeNull(real);
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         return invoke(invocation(invocation.method, real, invocation.arguments));
@@ -257,13 +255,12 @@ public class Facade {
   }
 
   public <T> T any(Class<T> type) {
-    check(type != null);
+    checker.cannotBeNull(type);
     return (T) anySupport.any(type);
   }
 
   public <T> T any(Class<T> type, Object matcher) {
-    check(matcher != null);
-    check(isMatcher(matcher));
+    checker.mustBeMatcher(matcher);
     return (T) anySupport.any(type, matcher);
   }
 
@@ -300,12 +297,12 @@ public class Facade {
   }
 
   public <T> T a(T value) {
-    check(value != null);
+    checker.cannotBeNull(value);
     return (T) anySupport.a(value);
   }
 
   public <T> T the(T value) {
-    check(value != null);
+    checker.cannotBeNull(value);
     return (T) anySupport.the(value);
   }
 
@@ -318,8 +315,7 @@ public class Facade {
   }
 
   public InvocationMatcher onInstance(final Object mock) {
-    check(mock != null);
-    check(isMock(mock));
+    checker.mustBeMock(mock);
     return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock;
@@ -332,7 +328,7 @@ public class Facade {
   }
 
   public InvocationMatcher onReturn(final Class<?> type) {
-    check(type != null);
+    checker.cannotBeNull(type);
     return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return type == invocation.method.getReturnType();
@@ -345,8 +341,8 @@ public class Facade {
   }
 
   public InvocationMatcher onRequest(final Class<?> type, final Object... arguments) {
-    check(type != null);
-    check(arguments != null);
+    checker.cannotBeNull(type);
+    checker.cannotBeNull(arguments);
     return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return type == invocation.method.getReturnType()
@@ -392,7 +388,7 @@ public class Facade {
   }
 
   public void when(Closure closure) {
-    check(closure != null);
+    checker.cannotBeNull(closure);
     history.add(inspecting(effectOf(closure)));
   }
 
@@ -407,7 +403,7 @@ public class Facade {
   }
 
   public void when(VoidClosure closure) {
-    check(closure != null);
+    checker.cannotBeNull(closure);
     history.add(inspecting(effectOf(closure)));
   }
 
@@ -513,8 +509,7 @@ public class Facade {
   }
 
   public void thenThrown(Object matcher) {
-    check(matcher != null);
-    check(isMatcher(matcher));
+    checker.mustBeMatcher(matcher);
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown
         && asMatcher(matcher).matches(((Thrown) effect).throwable);
@@ -530,7 +525,7 @@ public class Facade {
   }
 
   public void thenThrown(Throwable throwable) {
-    check(throwable != null);
+    checker.cannotBeNull(throwable);
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown
         && deepEquals(throwable, ((Thrown) effect).throwable);
@@ -542,7 +537,7 @@ public class Facade {
   }
 
   public void thenThrown(Class<? extends Throwable> type) {
-    check(type != null);
+    checker.cannotBeNull(type);
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown && type.isInstance(((Thrown) effect).throwable);
     if (!expected) {
@@ -571,8 +566,7 @@ public class Facade {
   }
 
   public void then(@Nullable Object object, Object matcher) {
-    check(matcher != null);
-    check(isMatcher(matcher));
+    checker.mustBeMatcher(matcher);
     if (!asMatcher(matcher).matches(object)) {
       throw assertionError("\n"
           + formatSection("expected", matcher)
@@ -590,45 +584,40 @@ public class Facade {
   }
 
   public <T> T thenCalled(T mock) {
-    check(mock != null);
-    check(isMock(mock));
+    checker.mustBeMock(mock);
     return thenCalledTimes(exactly(1), mock);
   }
 
   public void thenCalled(InvocationMatcher invocationMatcher) {
-    check(invocationMatcher != null);
+    checker.cannotBeNull(invocationMatcher);
     thenCalledTimes(exactly(1), invocationMatcher);
   }
 
   public <T> T thenCalledNever(T mock) {
-    check(mock != null);
-    check(isMock(mock));
+    checker.mustBeMock(mock);
     return thenCalledTimes(exactly(0), mock);
   }
 
   public void thenCalledNever(InvocationMatcher invocationMatcher) {
-    check(invocationMatcher != null);
+    checker.cannotBeNull(invocationMatcher);
     thenCalledTimes(exactly(0), invocationMatcher);
   }
 
   public <T> T thenCalledTimes(int number, T mock) {
-    check(number >= 0);
-    check(mock != null);
-    check(isMock(mock));
+    checker.cannotBeNegative(number);
+    checker.mustBeMock(mock);
     return thenCalledTimes(exactly(number), mock);
   }
 
   public void thenCalledTimes(int number, InvocationMatcher invocationMatcher) {
-    check(number >= 0);
-    check(invocationMatcher != null);
+    checker.cannotBeNegative(number);
+    checker.cannotBeNull(invocationMatcher);
     thenCalledTimes(exactly(number), invocationMatcher);
   }
 
   public <T> T thenCalledTimes(final Object numberMatcher, T mock) {
-    check(numberMatcher != null);
-    check(isMatcher(numberMatcher));
-    check(mock != null);
-    check(isMock(mock));
+    checker.mustBeMatcher(numberMatcher);
+    checker.mustBeMock(mock);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         thenCalledTimes(numberMatcher, capture(invocation));
@@ -639,9 +628,8 @@ public class Facade {
   }
 
   public void thenCalledTimes(Object numberMatcher, InvocationMatcher invocationMatcher) {
-    check(numberMatcher != null);
-    check(isMatcher(numberMatcher));
-    check(invocationMatcher != null);
+    checker.mustBeMatcher(numberMatcher);
+    checker.cannotBeNull(invocationMatcher);
     int numberOfCalls = 0;
     for (Calling calling : callings(history.get())) {
       if (invocationMatcher.matches(calling.invocation)) {
@@ -658,8 +646,7 @@ public class Facade {
   }
 
   public <T> T thenCalledInOrder(T mock) {
-    check(mock != null);
-    check(isMock(mock));
+    checker.mustBeMock(mock);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         thenCalledInOrder(capture(invocation));
@@ -670,7 +657,7 @@ public class Facade {
   }
 
   public void thenCalledInOrder(InvocationMatcher invocationMatcher) {
-    check(invocationMatcher != null);
+    checker.cannotBeNull(invocationMatcher);
     Optional<VerifyingInOrder> verified = verifyInOrder(invocationMatcher, history.get());
     if (verified.isPresent()) {
       history.add(verified.get());
@@ -682,15 +669,6 @@ public class Facade {
     }
   }
 
-  private boolean isMock(Object instance) {
-    for (Mocking mocking : mockingHistory.get()) {
-      if (mocking.mock == instance) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private InvocationMatcher capture(Invocation invocation) {
     try {
       return capturer.capture(invocation);
@@ -700,9 +678,8 @@ public class Facade {
   }
 
   private Effect getLastEffect() {
-    Chain<Inspecting> inspectings = inspectingHistory.get();
-    check(inspectings.size() > 0);
-    return inspectings.get().effect;
+    checker.mustCallWhen();
+    return inspectingHistory.get().get().effect;
   }
 
   private String formatSection(String caption, @Nullable Object content) {
