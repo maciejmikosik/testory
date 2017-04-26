@@ -21,8 +21,8 @@ public class TestClassesCanReturn {
 
   @Before
   public void before() {
-    objects = new ArrayList<Object>();
-    methods = new ArrayList<Method>();
+    objects = new ArrayList<>();
+    methods = new ArrayList<>();
   }
 
   @Test

@@ -20,7 +20,7 @@ public class Chain<E> implements Iterable<E> {
   }
 
   public static <E> Chain<E> chain() {
-    return new Chain<E>(0, null, null);
+    return new Chain<>(0, null, null);
   }
 
   public int size() {
@@ -33,7 +33,7 @@ public class Chain<E> implements Iterable<E> {
   }
 
   public Chain<E> add(E newElement) {
-    return new Chain<E>(size + 1, requireNonNull(newElement), this);
+    return new Chain<>(size + 1, requireNonNull(newElement), this);
   }
 
   public Chain<E> remove() {
@@ -104,7 +104,7 @@ public class Chain<E> implements Iterable<E> {
   }
 
   public String toString() {
-    List<E> elements = new LinkedList<E>();
+    List<E> elements = new LinkedList<>();
     Chain<E> chain = this;
     while (chain.size > 0) {
       elements.add(chain.element);

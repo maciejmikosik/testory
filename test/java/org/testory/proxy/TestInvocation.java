@@ -55,7 +55,7 @@ public class TestInvocation {
     method = Methods.withParameters(Object.class);
     instance = new Methods();
     arguments = asList(argumentA);
-    original = new ArrayList<Object>(arguments);
+    original = new ArrayList<>(arguments);
     invocation = invocation(method, instance, arguments);
     ((List<Object>) arguments).set(0, argumentB);
     assertEquals(original, invocation.arguments);

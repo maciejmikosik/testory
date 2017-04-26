@@ -72,8 +72,8 @@ public class TestBuilding {
   }
 
   private static Set<Class<?>> allDependencies(Set<Class<?>> classes) {
-    Set<Class<?>> dependencies = new HashSet<Class<?>>();
-    Set<Class<?>> remaining = new HashSet<Class<?>>();
+    Set<Class<?>> dependencies = new HashSet<>();
+    Set<Class<?>> remaining = new HashSet<>();
     remaining.addAll(classes);
 
     while (!remaining.isEmpty()) {
@@ -86,7 +86,7 @@ public class TestBuilding {
   }
 
   private static Set<Class<?>> directDependencies(Class<?> type) {
-    Set<Class<?>> dependencies = new HashSet<Class<?>>();
+    Set<Class<?>> dependencies = new HashSet<>();
     for (Method method : type.getMethods()) {
       dependencies.add(method.getReturnType());
       dependencies.addAll(asList(method.getParameterTypes()));
@@ -106,7 +106,7 @@ public class TestBuilding {
   }
 
   private static Set<Class<?>> filterNonJdk(Set<Class<?>> types) {
-    Set<Class<?>> filtered = new HashSet<Class<?>>();
+    Set<Class<?>> filtered = new HashSet<>();
     for (Class<?> type : types) {
       if (!type.isPrimitive() && !type.isArray() && type.getClassLoader() != null) {
         filtered.add(type);

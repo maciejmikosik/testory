@@ -46,7 +46,7 @@ public class TestTyping {
 
   @Test
   public void should_get_no_interfaces() {
-    interfaces = new HashSet<Class<?>>();
+    interfaces = new HashSet<>();
     typing = typing(superclass, interfaces);
     assertEquals(interfaces, typing.interfaces);
   }
@@ -151,7 +151,7 @@ public class TestTyping {
   }
 
   private static Set<Class<?>> classes(Class<?>... classes) {
-    return new HashSet<Class<?>>(Arrays.asList(classes));
+    return new HashSet<>(Arrays.asList(classes));
   }
 
   private interface Interface {}

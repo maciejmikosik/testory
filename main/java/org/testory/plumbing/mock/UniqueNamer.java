@@ -34,7 +34,7 @@ public class UniqueNamer implements Namer {
   }
 
   private List<String> usedNames() {
-    List<String> usedNames = new ArrayList<String>();
+    List<String> usedNames = new ArrayList<>();
     for (Mocking mocking : mockingHistory.get()) {
       usedNames.add(mocking.name);
     }

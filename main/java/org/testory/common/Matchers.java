@@ -56,7 +56,7 @@ public class Matchers {
     for (Matcher matcher : elementsMatchers) {
       checkNotNull(matcher);
     }
-    final List<Matcher> matchers = new ArrayList<Matcher>(elementsMatchers);
+    final List<Matcher> matchers = new ArrayList<>(elementsMatchers);
     return new Matcher() {
       public boolean matches(Object item) {
         return item != null && item.getClass().isArray()
@@ -82,7 +82,7 @@ public class Matchers {
     for (Matcher matcher : elementsMatchers) {
       checkNotNull(matcher);
     }
-    final List<Matcher> matchers = new ArrayList<Matcher>(elementsMatchers);
+    final List<Matcher> matchers = new ArrayList<>(elementsMatchers);
     return new Matcher() {
       public boolean matches(Object item) {
         return item instanceof List<?> && matchers.size() == ((List<?>) item).size()

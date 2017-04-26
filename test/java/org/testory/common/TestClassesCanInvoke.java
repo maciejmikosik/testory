@@ -182,7 +182,7 @@ public class TestClassesCanInvoke {
     public void nonStaticMethod() {}
 
     public static List<Method> withOneParameter() {
-      List<Method> methods = new ArrayList<Method>();
+      List<Method> methods = new ArrayList<>();
       for (Method method : Methods.class.getDeclaredMethods()) {
         if (method.getName().equals("invoke") && hasOneParameter(method)) {
           methods.add(method);
@@ -197,7 +197,7 @@ public class TestClassesCanInvoke {
     }
 
     public static List<Method> withObjectParameters() {
-      List<Method> methods = new ArrayList<Method>();
+      List<Method> methods = new ArrayList<>();
       for (Method method : Methods.class.getDeclaredMethods()) {
         if (method.getName().equals("invoke") && hasObjectParameters(method)) {
           methods.add(method);

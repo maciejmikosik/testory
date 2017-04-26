@@ -50,8 +50,8 @@ public class Repairer {
         trySolveEager(flip(invocation.wildcards), flip(parameters), flip(arguments)))) {
       throw new WildcardException("found more than one solution");
     }
-    List<Wildcard> wildcards = new ArrayList<Wildcard>(invocation.wildcards);
-    List<Object> repaired = new ArrayList<Object>();
+    List<Wildcard> wildcards = new ArrayList<>(invocation.wildcards);
+    List<Object> repaired = new ArrayList<>();
     for (int i = 0; i < solution.size(); i++) {
       repaired.add(solution.get(i)
           ? wildcards.remove(0).token
@@ -64,7 +64,7 @@ public class Repairer {
       List<Wildcard> wildcards,
       List<Class<?>> parameters,
       List<Object> arguments) {
-    List<Boolean> solution = new ArrayList<Boolean>(nCopies(arguments.size(), false));
+    List<Boolean> solution = new ArrayList<>(nCopies(arguments.size(), false));
     int nextIndex = 0;
     nextWildcard: for (Wildcard wildcard : wildcards) {
       for (int i = nextIndex; i < arguments.size(); i++) {
@@ -87,21 +87,21 @@ public class Repairer {
   }
 
   private static List<Class<?>> unfoldParameters(int size, List<Class<?>> parameters) {
-    List<Class<?>> unfolded = new ArrayList<Class<?>>();
+    List<Class<?>> unfolded = new ArrayList<>();
     unfolded.addAll(parameters.subList(0, parameters.size() - 1));
     unfolded.addAll(nCopies(size - (parameters.size() - 1), last(parameters).getComponentType()));
     return unfolded;
   }
 
   private static List<Object> unfoldArguments(List<?> folded) {
-    ArrayList<Object> unfolded = new ArrayList<Object>();
+    ArrayList<Object> unfolded = new ArrayList<>();
     unfolded.addAll(folded.subList(0, folded.size() - 1));
     unfolded.addAll(asBoxingList(last(folded)));
     return unfolded;
   }
 
   private static List<Object> asBoxingList(Object array) {
-    List<Object> list = new ArrayList<Object>();
+    List<Object> list = new ArrayList<>();
     for (int i = 0; i < Array.getLength(array); i++) {
       list.add(Array.get(array, i));
     }
@@ -109,7 +109,7 @@ public class Repairer {
   }
 
   private static List<Object> foldArguments(int length, List<Object> arguments) {
-    List<Object> folded = new ArrayList<Object>();
+    List<Object> folded = new ArrayList<>();
     folded.addAll(arguments.subList(0, length - 1));
     folded.add(asArray(arguments.subList(length - 1, arguments.size())));
     return folded;

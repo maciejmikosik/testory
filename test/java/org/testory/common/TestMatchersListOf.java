@@ -82,7 +82,7 @@ public class TestMatchersListOf {
 
   @Test
   public void defensive_copy_matchers() {
-    elements = new ArrayList<Matcher>(asList(m, m, m));
+    elements = new ArrayList<>(asList(m, m, m));
     matcher = listOf(elements);
     elements.clear();
     assertTrue(matcher.matches(asList(a, a, a)));

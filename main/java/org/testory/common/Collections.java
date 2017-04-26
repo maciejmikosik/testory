@@ -11,21 +11,21 @@ public class Collections {
   }
 
   public static <E> List<E> flip(List<E> list) {
-    List<E> newList = new ArrayList<E>(list);
+    List<E> newList = new ArrayList<>(list);
     java.util.Collections.reverse(newList);
     return newList;
   }
 
   public static <E> List<E> immutable(List<? extends E> list) {
-    return java.util.Collections.unmodifiableList(new ArrayList<E>(list));
+    return java.util.Collections.unmodifiableList(new ArrayList<>(list));
   }
 
   public static <E> Set<E> immutable(Set<? extends E> set) {
-    return java.util.Collections.unmodifiableSet(new HashSet<E>(set));
+    return java.util.Collections.unmodifiableSet(new HashSet<>(set));
   }
 
   public static <T> List<T> reverse(List<T> list) {
-    ArrayList<T> result = new ArrayList<T>(list);
+    ArrayList<T> result = new ArrayList<>(list);
     java.util.Collections.reverse(result);
     return result;
   }

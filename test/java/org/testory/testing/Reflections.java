@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Reflections {
   public static List<Object> readDeclaredFields(Object instance) {
-    List<Object> values = new ArrayList<Object>();
+    List<Object> values = new ArrayList<>();
     try {
       for (final Field field : instance.getClass().getDeclaredFields()) {
         if (!field.isSynthetic()) {

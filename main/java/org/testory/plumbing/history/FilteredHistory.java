@@ -19,7 +19,7 @@ public class FilteredHistory<T> {
   public static <T> FilteredHistory<T> filter(Class<T> type, History history) {
     check(type != null);
     check(history != null);
-    return new FilteredHistory<T>(type, history);
+    return new FilteredHistory<>(type, history);
   }
 
   public Chain<T> get() {
