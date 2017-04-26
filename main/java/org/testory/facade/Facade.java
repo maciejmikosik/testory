@@ -19,6 +19,7 @@ import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 import static org.testory.plumbing.im.wildcard.Repairer.repairer;
+import static org.testory.plumbing.im.wildcard.Tokenizer.tokenizer;
 import static org.testory.plumbing.im.wildcard.WildcardMatcherizer.wildcardMatcherizer;
 import static org.testory.plumbing.im.wildcard.WildcardSupport.wildcardSupport;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
@@ -114,7 +115,7 @@ public class Facade {
     Maker mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     Injector injector = injector(mockMaker);
     FilteredHistory<Inspecting> inspectingHistory = filter(Inspecting.class, history);
-    WildcardSupport wildcardSupport = wildcardSupport(history);
+    WildcardSupport wildcardSupport = wildcardSupport(history, tokenizer());
     Matcherizer matcherizer = wildcardMatcherizer(history, repairer());
     return new Facade(history, formatter, proxer, mockNamer, mockMaker, injector,
         inspectingHistory, wildcardSupport, matcherizer, checker);

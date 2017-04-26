@@ -1,13 +1,11 @@
 package org.testory.plumbing.im.wildcard;
 
 import static java.lang.String.format;
-import static org.testory.common.Classes.tryWrap;
 import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Matchers.same;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.im.wildcard.Uniques.unique;
 import static org.testory.plumbing.im.wildcard.Wildcard.wildcard;
 
 import org.testory.common.DelegatingMatcher;
@@ -17,14 +15,17 @@ import org.testory.plumbing.history.History;
 
 public class WildcardSupport {
   private final History history;
+  private final Tokenizer tokenizer;
 
-  private WildcardSupport(History history) {
+  private WildcardSupport(History history, Tokenizer tokenizer) {
     this.history = history;
+    this.tokenizer = tokenizer;
   }
 
-  public static WildcardSupport wildcardSupport(History history) {
+  public static WildcardSupport wildcardSupport(History history, Tokenizer tokenizer) {
     check(history != null);
-    return new WildcardSupport(history);
+    check(tokenizer != null);
+    return new WildcardSupport(history, tokenizer);
   }
 
   public Object any(final Class<?> type) {
@@ -71,7 +72,7 @@ public class WildcardSupport {
   }
 
   private Object anyImpl(Matcher matcher, Class<?> type) {
-    Object token = unique(tryWrap(type));
+    Object token = tokenizer.token(type);
     history.add(wildcard(matcher, token));
     return token;
   }

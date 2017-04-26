@@ -1,20 +1,26 @@
 package org.testory.plumbing.im.wildcard;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.testory.plumbing.im.wildcard.Uniques.hasUniques;
-import static org.testory.plumbing.im.wildcard.Uniques.unique;
+import static org.testory.plumbing.im.wildcard.Tokenizer.tokenizer;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.testory.plumbing.PlumbingException;
 
-public class TestUniques {
+public class TestTokenizer {
+  private Tokenizer tokenizer;
+
+  @Before
+  public void before() {
+    tokenizer = tokenizer();
+  }
+
   @Test
   public void supports_normal_classes() {
     assertSupports(List.class);
@@ -41,36 +47,25 @@ public class TestUniques {
   }
 
   @Test
-  public void does_not_support_primitives() {
-    assertNotSupports(int.class);
-    assertNotSupports(void.class);
+  public void support_primitives_by_boxing() {
+    assertTrue(Integer.class.isInstance(tokenizer.token(int.class)));
+    assertNotSame(tokenizer.token(int.class), tokenizer.token(int.class));
+
+    assertTrue(Void.class.isInstance(tokenizer.token(void.class)));
+    assertNotSame(tokenizer.token(void.class), tokenizer.token(void.class));
   }
 
   @Test
   public void null_cannot_be_type() {
     try {
-      hasUniques(null);
-      fail();
-    } catch (PlumbingException e) {}
-    try {
-      unique(null);
+      tokenizer.token(null);
       fail();
     } catch (PlumbingException e) {}
   }
 
-  private static void assertSupports(Class<?> type) {
+  private void assertSupports(Class<?> type) {
     String message = type.toString();
-    assertTrue(message, hasUniques(type));
-    assertTrue(message, type.isInstance(unique(type)));
-    assertNotSame(message, unique(type), unique(type));
-  }
-
-  private static void assertNotSupports(Class<?> type) {
-    String message = type.toString();
-    assertFalse(message, hasUniques(type));
-    try {
-      unique(type);
-      fail(message);
-    } catch (PlumbingException e) {}
+    assertTrue(message, type.isInstance(tokenizer.token(type)));
+    assertNotSame(message, tokenizer.token(type), tokenizer.token(type));
   }
 }
