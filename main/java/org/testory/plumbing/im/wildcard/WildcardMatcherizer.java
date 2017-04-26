@@ -6,6 +6,9 @@ import static org.testory.common.Collections.last;
 import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.listOf;
 import static org.testory.common.Objects.print;
+import static org.testory.plumbing.PlumbingException.check;
+import static org.testory.plumbing.im.wildcard.WildcardInvocation.wildcardInvocation;
+import static org.testory.plumbing.im.wildcard.Wildcarded.wildcarded;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -14,10 +17,49 @@ import java.util.List;
 import org.testory.common.DelegatingMatcher;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
+import org.testory.plumbing.history.History;
+import org.testory.plumbing.im.Matcherizer;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class WildcardMatcherizer {
+public class WildcardMatcherizer implements Matcherizer {
+  private final Repairer repairer;
+  private final History history;
+
+  private WildcardMatcherizer(History history, Repairer repairer) {
+    this.history = history;
+    this.repairer = repairer;
+  }
+
+  public static Matcherizer wildcardMatcherizer(History history, Repairer repairer) {
+    check(history != null);
+    check(repairer != null);
+    return new WildcardMatcherizer(history, repairer);
+  }
+
+  public InvocationMatcher matcherize(Invocation invocation) {
+    List<Wildcard> wildcards = consumeWildcards();
+    WildcardInvocation wildcardInvocation = wildcardInvocation(
+        invocation.method,
+        invocation.instance,
+        invocation.arguments,
+        wildcards);
+    return matcherize(repairer.repair(wildcardInvocation));
+  }
+
+  private List<Wildcard> consumeWildcards() {
+    List<Wildcard> wildcards = new ArrayList<Wildcard>();
+    for (Object event : history.get()) {
+      if (event instanceof Wildcard) {
+        wildcards.add(0, (Wildcard) event);
+      } else if (event instanceof Wildcarded) {
+        break;
+      }
+    }
+    history.add(wildcarded());
+    return wildcards;
+  }
+
   public static InvocationMatcher matcherize(WildcardInvocation invocation) {
     List<Object> arguments = invocation.mayBeFolded()
         ? unfold(invocation.arguments)

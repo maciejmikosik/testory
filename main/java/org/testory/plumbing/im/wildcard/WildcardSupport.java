@@ -9,57 +9,22 @@ import static org.testory.common.Matchers.same;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.im.wildcard.Uniques.unique;
 import static org.testory.plumbing.im.wildcard.Wildcard.wildcard;
-import static org.testory.plumbing.im.wildcard.WildcardInvocation.wildcardInvocation;
-import static org.testory.plumbing.im.wildcard.Wildcarded.wildcarded;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.testory.common.DelegatingMatcher;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
 import org.testory.plumbing.history.History;
-import org.testory.plumbing.im.Matcherizer;
-import org.testory.proxy.Invocation;
-import org.testory.proxy.InvocationMatcher;
 
 public class WildcardSupport {
   private final History history;
-  private final Repairer repairer;
 
-  private WildcardSupport(History history, Repairer repairer) {
+  private WildcardSupport(History history) {
     this.history = history;
-    this.repairer = repairer;
   }
 
-  public static WildcardSupport wildcardSupport(History history, Repairer repairer) {
+  public static WildcardSupport wildcardSupport(History history) {
     check(history != null);
-    check(repairer != null);
-    return new WildcardSupport(history, repairer);
-  }
-
-  public Matcherizer getMatcherizer() {
-    return new Matcherizer() {
-      public InvocationMatcher matcherize(Invocation invocation) {
-        check(invocation != null);
-        List<Wildcard> wildcards = consumeWildcards();
-        return WildcardMatcherizer.matcherize(repairer.repair(
-            wildcardInvocation(invocation.method, invocation.instance, invocation.arguments, wildcards)));
-      }
-    };
-  }
-
-  private List<Wildcard> consumeWildcards() {
-    List<Wildcard> wildcards = new ArrayList<Wildcard>();
-    for (Object event : history.get()) {
-      if (event instanceof Wildcard) {
-        wildcards.add(0, (Wildcard) event);
-      } else if (event instanceof Wildcarded) {
-        break;
-      }
-    }
-    history.add(wildcarded());
-    return wildcards;
+    return new WildcardSupport(history);
   }
 
   public Object any(final Class<?> type) {
