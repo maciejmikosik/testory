@@ -13,8 +13,8 @@ import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Calling.callings;
 import static org.testory.plumbing.Checker.checker;
 import static org.testory.plumbing.CheckingProxer.checkingProxer;
-import static org.testory.plumbing.Formatter.formatter;
 import static org.testory.plumbing.Inspecting.inspecting;
+import static org.testory.plumbing.QuietFormatter.quietFormatter;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
 import static org.testory.plumbing.history.FilteredHistory.filter;
@@ -46,15 +46,16 @@ import org.testory.common.Effect;
 import org.testory.common.Effect.Returned;
 import org.testory.common.Effect.ReturnedObject;
 import org.testory.common.Effect.Thrown;
+import org.testory.common.Formatter;
 import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.common.Optional;
 import org.testory.common.VoidClosure;
 import org.testory.plumbing.Calling;
 import org.testory.plumbing.Checker;
-import org.testory.plumbing.Formatter;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Maker;
+import org.testory.plumbing.QuietFormatter;
 import org.testory.plumbing.VerifyingInOrder;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
@@ -107,16 +108,16 @@ public class Facade {
 
   public static Facade newFacade(History mutableHistory) {
     Class<TestoryException> exception = TestoryException.class;
-    Formatter formatter = formatter();
-    History history = formatter.plug(mutableHistory);
+    QuietFormatter formatter = quietFormatter();
+    History history = formatter.quiet(mutableHistory);
     Proxer proxer = wrapping(exception, nonFinal(typeSafe(wrapping(exception, new CglibProxer()))));
     Namer mockNamer = uniqueNamer(history);
     Checker checker = checker(history, exception);
     Maker mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     Injector injector = injector(mockMaker);
     FilteredHistory<Inspecting> inspectingHistory = filter(Inspecting.class, history);
-    WildcardSupport wildcardSupport = wildcardSupport(history, tokenizer());
-    Matcherizer matcherizer = wildcardMatcherizer(history, repairer());
+    WildcardSupport wildcardSupport = wildcardSupport(history, tokenizer(), formatter);
+    Matcherizer matcherizer = wildcardMatcherizer(history, repairer(), formatter);
     return new Facade(history, formatter, proxer, mockNamer, mockMaker, injector,
         inspectingHistory, wildcardSupport, matcherizer, checker);
   }

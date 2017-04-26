@@ -96,6 +96,12 @@ public class TestAnyThe {
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(".invoke(the(" + object + "))"));
     }
+    try {
+      thenCalled(mock).invoke(the(new Object[] { object }));
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertThat(e, hasMessageContaining(".invoke(the([" + object + "]))"));
+    }
   }
 
   private static abstract class Mockable {
