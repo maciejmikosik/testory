@@ -10,30 +10,32 @@ import java.util.Random;
 
 import org.testory.plumbing.Maker;
 
-public class FinalMaker {
+public class FinalMaker implements Maker {
+  private FinalMaker() {}
+
   public static Maker finalMaker() {
-    return new Maker() {
-      public <T> T make(Class<T> type, String name) {
-        check(type != null);
-        check(name != null);
-        if (type == Void.class) {
-          return null;
-        } else if (type == String.class) {
-          return (T) name;
-        } else if (type == Class.class) {
-          return (T) SampleClass.class;
-        } else if (type == Method.class) {
-          return (T) SampleClass.class.getDeclaredMethods()[0];
-        } else if (type == Constructor.class) {
-          return (T) SampleClass.class.getDeclaredConstructors()[0];
-        } else if (type == Field.class) {
-          return (T) SampleClass.class.getDeclaredFields()[0];
-        } else if (Enum.class.isAssignableFrom(type)) {
-          return (T) randomEnum((Class<? extends Enum<?>>) type, name);
-        }
-        throw new RuntimeException(format("cannot make %s of type %s", name, type.getName()));
-      }
-    };
+    return new FinalMaker();
+  }
+
+  public <T> T make(Class<T> type, String name) {
+    check(type != null);
+    check(name != null);
+    if (type == Void.class) {
+      return null;
+    } else if (type == String.class) {
+      return (T) name;
+    } else if (type == Class.class) {
+      return (T) SampleClass.class;
+    } else if (type == Method.class) {
+      return (T) SampleClass.class.getDeclaredMethods()[0];
+    } else if (type == Constructor.class) {
+      return (T) SampleClass.class.getDeclaredConstructors()[0];
+    } else if (type == Field.class) {
+      return (T) SampleClass.class.getDeclaredFields()[0];
+    } else if (Enum.class.isAssignableFrom(type)) {
+      return (T) randomEnum((Class<? extends Enum<?>>) type, name);
+    }
+    throw new RuntimeException(format("cannot make %s of type %s", name, type.getName()));
   }
 
   @SuppressWarnings("unused")

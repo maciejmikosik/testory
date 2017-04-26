@@ -23,7 +23,7 @@ import static org.testory.plumbing.history.FilteredHistory.filter;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
-import static org.testory.plumbing.inject.PrimitiveMaker.randomPrimitiveMaker;
+import static org.testory.plumbing.inject.RandomPrimitiveMaker.randomPrimitiveMaker;
 import static org.testory.plumbing.mock.NiceMockMaker.nice;
 import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
 import static org.testory.plumbing.mock.SaneMockMaker.sane;

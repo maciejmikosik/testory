@@ -11,20 +11,30 @@ import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class SaneMockMaker {
-  public static Maker sane(final Maker mockMaker, final History history) {
-    return new Maker() {
-      public <T> T make(Class<T> type, String name) {
-        check(type != null);
-        check(name != null);
-        T mock = mockMaker.make(type, name);
-        history
-            .add(stubbingEquals(mock, name))
-            .add(stubbingHashCode(mock, name))
-            .add(stubbingToString(mock, name));
-        return mock;
-      }
-    };
+public class SaneMockMaker implements Maker {
+  private final Maker mockMaker;
+  private final History history;
+
+  private SaneMockMaker(Maker mockMaker, History history) {
+    this.mockMaker = mockMaker;
+    this.history = history;
+  }
+
+  public static Maker sane(Maker mockMaker, History history) {
+    check(mockMaker != null);
+    check(history != null);
+    return new SaneMockMaker(mockMaker, history);
+  }
+
+  public <T> T make(Class<T> type, String name) {
+    check(type != null);
+    check(name != null);
+    T mock = mockMaker.make(type, name);
+    history
+        .add(stubbingEquals(mock, name))
+        .add(stubbingHashCode(mock, name))
+        .add(stubbingToString(mock, name));
+    return mock;
   }
 
   private static Stubbing stubbingEquals(final Object mock, String name) {

@@ -5,7 +5,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.everyItem;
 import static org.junit.Assert.assertThat;
-import static org.testory.plumbing.inject.PrimitiveMaker.randomPrimitiveMaker;
+import static org.testory.plumbing.inject.RandomPrimitiveMaker.randomPrimitiveMaker;
 import static org.testory.plumbing.inject.TestingMakers.assertFairDistribution;
 import static org.testory.plumbing.inject.TestingMakers.population;
 import static org.testory.plumbing.inject.TestingMakers.withinRange;

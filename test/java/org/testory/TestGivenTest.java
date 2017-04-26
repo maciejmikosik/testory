@@ -16,7 +16,7 @@ import static org.testory.Testory.willReturn;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
-import static org.testory.plumbing.inject.PrimitiveMaker.randomPrimitiveMaker;
+import static org.testory.plumbing.inject.RandomPrimitiveMaker.randomPrimitiveMaker;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 import static org.testory.testing.Reflections.readDeclaredFields;
 
