@@ -48,7 +48,7 @@ public class MatcherizeAnyvocation {
     List<Matcher> matchers = new ArrayList<Matcher>();
     for (int i = 0; i < arguments.size(); i++) {
       Matcher matcher = !anysQueue.isEmpty() && anysQueue.get(0).token == arguments.get(i)
-          ? matcherize(anysQueue.remove(0))
+          ? anysQueue.remove(0).matcher
           : matcherize(arguments.get(i));
       matchers.add(matcher);
     }
@@ -59,14 +59,6 @@ public class MatcherizeAnyvocation {
     return new DelegatingMatcher(equalDeep(argument)) {
       public String toString() {
         return print(argument);
-      }
-    };
-  }
-
-  private static Matcher matcherize(final CollectingAny any) {
-    return new DelegatingMatcher(any.matcher) {
-      public String toString() {
-        return any.printable.toString();
       }
     };
   }

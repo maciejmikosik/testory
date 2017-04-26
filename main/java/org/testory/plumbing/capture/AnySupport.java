@@ -16,6 +16,7 @@ import static org.testory.plumbing.capture.Uniques.unique;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.testory.common.DelegatingMatcher;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
 import org.testory.plumbing.history.History;
@@ -63,11 +64,12 @@ public class AnySupport {
 
   public Object any(final Class<?> type) {
     check(type != null);
-    return anyImpl(Matchers.anything, type, new Object() {
+    DelegatingMatcher printableMatcher = new DelegatingMatcher(Matchers.anything) {
       public String toString() {
         return format("any(%s)", type.getName());
       }
-    });
+    };
+    return anyImpl(printableMatcher, type);
   }
 
   public Object any(final Class<?> type, Object matcher) {
@@ -75,34 +77,37 @@ public class AnySupport {
     check(matcher != null);
     check(isMatcher(matcher));
     final Matcher asMatcher = asMatcher(matcher);
-    return anyImpl(asMatcher, type, new Object() {
+    DelegatingMatcher printableMatcher = new DelegatingMatcher(asMatcher) {
       public String toString() {
         return format("any(%s, %s)", type.getName(), asMatcher);
       }
-    });
+    };
+    return anyImpl(printableMatcher, type);
   }
 
   public Object a(final Object value) {
     check(value != null);
-    return anyImpl(equalDeep(value), value.getClass(), new Object() {
+    DelegatingMatcher printableMatcher = new DelegatingMatcher(equalDeep(value)) {
       public String toString() {
         return format("a(%s)", value);
       }
-    });
+    };
+    return anyImpl(printableMatcher, value.getClass());
   }
 
   public Object the(final Object value) {
     check(value != null);
-    return anyImpl(same(value), value.getClass(), new Object() {
+    DelegatingMatcher printableMatcher = new DelegatingMatcher(same(value)) {
       public String toString() {
         return format("the(%s)", value);
       }
-    });
+    };
+    return anyImpl(printableMatcher, value.getClass());
   }
 
-  private Object anyImpl(Matcher matcher, Class<?> type, Object printable) {
+  private Object anyImpl(Matcher matcher, Class<?> type) {
     Object token = unique(tryWrap(type));
-    history.add(collectingAny(matcher, token, printable));
+    history.add(collectingAny(matcher, token));
     return token;
   }
 }
