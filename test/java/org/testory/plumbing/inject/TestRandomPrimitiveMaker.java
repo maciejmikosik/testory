@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.testory.plumbing.Maker;
 
-public class TestPrimitiveMaker {
+public class TestRandomPrimitiveMaker {
   private String namePrefix;
   private int count;
   private Maker maker;
