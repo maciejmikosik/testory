@@ -1,4 +1,4 @@
-package org.testory.proxy;
+package org.testory.proxy.proxer;
 
 import static java.lang.reflect.Modifier.isPublic;
 import static org.testory.proxy.Invocation.invocation;
@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.objenesis.ObjenesisStd;
+import org.testory.proxy.Handler;
+import org.testory.proxy.Proxer;
+import org.testory.proxy.Typing;
 
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.CallbackFilter;

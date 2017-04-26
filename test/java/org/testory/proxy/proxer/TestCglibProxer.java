@@ -1,4 +1,4 @@
-package org.testory.proxy;
+package org.testory.proxy.proxer;
 
 import static java.util.Collections.unmodifiableCollection;
 import static java.util.Collections.unmodifiableList;
@@ -44,6 +44,11 @@ import java.util.TreeSet;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.testory.proxy.Handler;
+import org.testory.proxy.Invocation;
+import org.testory.proxy.Proxer;
+import org.testory.proxy.ProxyException;
+import org.testory.proxy.Typing;
 import org.testory.proxy.testing.AbstractClassWithAbstractMethod;
 import org.testory.proxy.testing.AbstractClassWithProtectedAbstractMethod;
 import org.testory.proxy.testing.ConcreteClass;

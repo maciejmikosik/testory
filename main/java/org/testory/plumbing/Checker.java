@@ -1,12 +1,9 @@
 package org.testory.plumbing;
 
-import static java.lang.String.format;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
-import org.testory.common.Classes;
 import org.testory.common.Matchers;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
@@ -69,23 +66,6 @@ public class Checker {
     if (inspectingHistory.get().size() == 0) {
       fail("must call when");
     }
-  }
-
-  public void canThrow(Throwable throwable, Method method) {
-    if (!Classes.canThrow(throwable, method)) {
-      fail(format("method %s cannot throw %s", method.getName(), throwable));
-    }
-  }
-
-  public void canReturn(Object object, Method method) {
-    if (!canReturnIncludingVoid(object, method)) {
-      fail(format("method %s cannot return %s", method.getName(), object));
-    }
-  }
-
-  private boolean canReturnIncludingVoid(Object object, Method method) {
-    return Classes.canReturn(object, method)
-        || method.getReturnType() == void.class && object == null;
   }
 
   private void fail(String string) {

@@ -1,6 +1,6 @@
 package org.testory;
 
-import org.testory.proxy.CglibProxer;
+import org.testory.proxy.proxer.CglibProxer;
 
 public class TestoryAssertionError extends AssertionError {
   public TestoryAssertionError() {}

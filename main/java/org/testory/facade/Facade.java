@@ -10,9 +10,9 @@ import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
-import static org.testory.facade.MockProxer.mockProxer;
 import static org.testory.plumbing.Calling.callings;
 import static org.testory.plumbing.Checker.checker;
+import static org.testory.plumbing.CheckingProxer.checkingProxer;
 import static org.testory.plumbing.Formatter.formatter;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Stubbing.stubbing;
@@ -31,6 +31,9 @@ import static org.testory.plumbing.mock.UniqueNamer.uniqueNamer;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Typing.typing;
+import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
+import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
+import static org.testory.proxy.proxer.WrappingProxer.wrapping;
 
 import java.util.HashSet;
 
@@ -58,12 +61,12 @@ import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
 import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
-import org.testory.proxy.CglibProxer;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 import org.testory.proxy.Proxer;
 import org.testory.proxy.Typing;
+import org.testory.proxy.proxer.CglibProxer;
 
 public class Facade {
   private final Formatter formatter;
@@ -101,12 +104,13 @@ public class Facade {
   }
 
   public static Facade newFacade(History mutableHistory) {
+    Class<TestoryException> exception = TestoryException.class;
     Formatter formatter = formatter();
     History history = formatter.plug(mutableHistory);
-    Proxer proxer = new CglibProxer();
+    Proxer proxer = wrapping(exception, nonFinal(typeSafe(wrapping(exception, new CglibProxer()))));
     Namer mockNamer = uniqueNamer(history);
-    Checker checker = checker(history, TestoryException.class);
-    Maker mockMaker = mockMaker(history, proxer, checker);
+    Checker checker = checker(history, exception);
+    Maker mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     Injector injector = injector(mockMaker);
     FilteredHistory<Inspecting> inspectingHistory = filter(Inspecting.class, history);
     AnySupport anySupport = anySupport(history, repairer());
@@ -115,9 +119,8 @@ public class Facade {
         inspectingHistory, anySupport, capturer, checker);
   }
 
-  private static Maker mockMaker(History history, Proxer proxer, Checker checker) {
-    Proxer mockProxer = mockProxer(proxer, checker);
-    Maker rawMockMaker = rawMockMaker(mockProxer, history);
+  private static Maker mockMaker(History history, Proxer proxer) {
+    Maker rawMockMaker = rawMockMaker(proxer, history);
     Maker niceMockMaker = nice(rawMockMaker, history);
     Maker saneNiceMockMaker = sane(niceMockMaker, history);
     return saneNiceMockMaker;
