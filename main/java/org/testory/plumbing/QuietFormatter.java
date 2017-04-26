@@ -1,14 +1,12 @@
 package org.testory.plumbing;
 
-import static org.testory.common.CharSequences.join;
-import static org.testory.common.Objects.print;
+import static java.lang.String.join;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 
-import java.util.List;
-
 import org.testory.common.Chain;
+import org.testory.common.Formatter;
 import org.testory.common.Nullable;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
@@ -16,61 +14,47 @@ import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class Formatter {
+public class QuietFormatter extends Formatter {
   private int isFormatting = 0;
 
-  private Formatter() {}
+  private QuietFormatter() {}
 
-  public static Formatter formatter() {
-    return new Formatter();
+  public static QuietFormatter quietFormatter() {
+    return new QuietFormatter();
   }
 
   public String format(@Nullable Object object) {
     isFormatting++;
     try {
-      return print(object);
+      if (object instanceof Invocation) {
+        return format((Invocation) object);
+      } else {
+        return super.format(object);
+      }
     } finally {
       isFormatting--;
     }
   }
 
-  public String formatJoin(CharSequence separator, List<?> iterable) {
-    isFormatting++;
-    try {
-      return join(separator, iterable).toString();
-    } finally {
-      isFormatting--;
-    }
+  private String format(Invocation invocation) {
+    return String.format("%s.%s(%s)",
+        format(invocation.instance),
+        invocation.method.getName(),
+        join(", ", formatSequence(invocation.arguments)));
   }
 
-  public String format(Invocation invocation) {
-    isFormatting++;
-    try {
-      return String.format("%s.%s(%s)",
-          format(invocation.instance),
-          invocation.method.getName(),
-          formatJoin(", ", invocation.arguments));
-    } finally {
-      isFormatting--;
-    }
-  }
-
-  private boolean isFormatting() {
-    return isFormatting > 0;
-  }
-
-  public History plug(final History history) {
+  public History quiet(final History history) {
     check(history != null);
     final Stubbing stubbingToString = stubbingToString(history);
     return new History() {
       public Chain<Object> get() {
-        return isFormatting()
-            ? history.get().add(stubbingToString)
-            : history.get();
+        return isFormatting == 0
+            ? history.get()
+            : history.get().add(stubbingToString);
       }
 
       public History add(Object event) {
-        if (!isFormatting()) {
+        if (isFormatting == 0) {
           history.add(event);
         }
         return this;
