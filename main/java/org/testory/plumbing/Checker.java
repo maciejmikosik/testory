@@ -33,38 +33,38 @@ public class Checker {
     }
   }
 
-  public void cannotBeNull(Object object) {
+  public void notNull(Object object) {
     if (object == null) {
-      fail("cannot be null");
+      fail("expected not null");
     }
   }
 
-  public void mustBeMatcher(Object matcher) {
-    cannotBeNull(matcher);
+  public void matcher(Object matcher) {
+    notNull(matcher);
     if (!Matchers.isMatcher(matcher)) {
-      fail("cannot be matcher");
+      fail("expected matcher");
     }
   }
 
-  public void mustBeMock(Object mock) {
-    cannotBeNull(mock);
+  public void mock(Object mock) {
+    notNull(mock);
     for (Mocking mocking : mockingHistory.get()) {
       if (mocking.mock == mock) {
         return;
       }
     }
-    fail("must be mock");
+    fail("expected mock");
   }
 
-  public void cannotBeNegative(int number) {
+  public void notNegative(int number) {
     if (number < 0) {
-      fail("cannot be negative");
+      fail("expected not negative number");
     }
   }
 
   public void mustCallWhen() {
     if (inspectingHistory.get().size() == 0) {
-      fail("must call when");
+      fail("expected call to when");
     }
   }
 

@@ -155,7 +155,7 @@ public class Facade {
   public void given(double primitive) {}
 
   public <T> T givenTry(T object) {
-    checker.cannotBeNull(object);
+    checker.notNull(object);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         try {
@@ -169,8 +169,8 @@ public class Facade {
   }
 
   public void givenTimes(int number, Closure closure) {
-    checker.cannotBeNegative(number);
-    checker.cannotBeNull(closure);
+    checker.notNegative(number);
+    checker.notNull(closure);
     for (int i = 0; i < number; i++) {
       try {
         closure.invoke();
@@ -181,8 +181,8 @@ public class Facade {
   }
 
   public <T> T givenTimes(final int number, T object) {
-    checker.cannotBeNegative(number);
-    checker.cannotBeNull(object);
+    checker.notNegative(number);
+    checker.notNull(object);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         for (int i = 0; i < number; i++) {
@@ -195,13 +195,13 @@ public class Facade {
   }
 
   public <T> T mock(Class<T> type) {
-    checker.cannotBeNull(type);
+    checker.notNull(type);
     String name = mockNamer.name(type);
     return mockMaker.make(type, name);
   }
 
   public <T> T spy(T real) {
-    checker.cannotBeNull(real);
+    checker.notNull(real);
     Class<T> type = (Class<T>) real.getClass();
     T mock = mock(type);
     given(willSpy(real), onInstance(mock));
@@ -209,8 +209,8 @@ public class Facade {
   }
 
   public <T> T given(final Handler handler, T mock) {
-    checker.cannotBeNull(handler);
-    checker.mustBeMock(mock);
+    checker.notNull(handler);
+    checker.mock(mock);
     return proxyWrapping(mock, new Handler() {
       public Object handle(Invocation invocation) {
         history.add(stubbing(matcherize(invocation), handler));
@@ -220,8 +220,8 @@ public class Facade {
   }
 
   public void given(Handler handler, InvocationMatcher invocationMatcher) {
-    checker.cannotBeNull(handler);
-    checker.cannotBeNull(invocationMatcher);
+    checker.notNull(handler);
+    checker.notNull(invocationMatcher);
     history.add(stubbing(invocationMatcher, handler));
   }
 
@@ -234,7 +234,7 @@ public class Facade {
   }
 
   public Handler willThrow(final Throwable throwable) {
-    checker.cannotBeNull(throwable);
+    checker.notNull(throwable);
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         throw throwable.fillInStackTrace();
@@ -243,7 +243,7 @@ public class Facade {
   }
 
   public Handler willRethrow(final Throwable throwable) {
-    checker.cannotBeNull(throwable);
+    checker.notNull(throwable);
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         throw throwable;
@@ -252,7 +252,7 @@ public class Facade {
   }
 
   public Handler willSpy(final Object real) {
-    checker.cannotBeNull(real);
+    checker.notNull(real);
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         return invoke(invocation(invocation.method, real, invocation.arguments));
@@ -261,12 +261,12 @@ public class Facade {
   }
 
   public <T> T any(Class<T> type) {
-    checker.cannotBeNull(type);
+    checker.notNull(type);
     return (T) wildcardSupport.any(type);
   }
 
   public <T> T any(Class<T> type, Object matcher) {
-    checker.mustBeMatcher(matcher);
+    checker.matcher(matcher);
     return (T) wildcardSupport.any(type, matcher);
   }
 
@@ -303,12 +303,12 @@ public class Facade {
   }
 
   public <T> T a(T value) {
-    checker.cannotBeNull(value);
+    checker.notNull(value);
     return (T) wildcardSupport.a(value);
   }
 
   public <T> T the(T value) {
-    checker.cannotBeNull(value);
+    checker.notNull(value);
     return (T) wildcardSupport.the(value);
   }
 
@@ -321,7 +321,7 @@ public class Facade {
   }
 
   public InvocationMatcher onInstance(final Object mock) {
-    checker.mustBeMock(mock);
+    checker.mock(mock);
     return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock;
@@ -334,7 +334,7 @@ public class Facade {
   }
 
   public InvocationMatcher onReturn(final Class<?> type) {
-    checker.cannotBeNull(type);
+    checker.notNull(type);
     return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return type == invocation.method.getReturnType();
@@ -347,8 +347,8 @@ public class Facade {
   }
 
   public InvocationMatcher onRequest(final Class<?> type, final Object... arguments) {
-    checker.cannotBeNull(type);
-    checker.cannotBeNull(arguments);
+    checker.notNull(type);
+    checker.notNull(arguments);
     return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return type == invocation.method.getReturnType()
@@ -394,7 +394,7 @@ public class Facade {
   }
 
   public void when(Closure closure) {
-    checker.cannotBeNull(closure);
+    checker.notNull(closure);
     history.add(inspecting(effectOf(closure)));
   }
 
@@ -409,7 +409,7 @@ public class Facade {
   }
 
   public void when(VoidClosure closure) {
-    checker.cannotBeNull(closure);
+    checker.notNull(closure);
     history.add(inspecting(effectOf(closure)));
   }
 
@@ -515,7 +515,7 @@ public class Facade {
   }
 
   public void thenThrown(Object matcher) {
-    checker.mustBeMatcher(matcher);
+    checker.matcher(matcher);
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown
         && asMatcher(matcher).matches(((Thrown) effect).throwable);
@@ -531,7 +531,7 @@ public class Facade {
   }
 
   public void thenThrown(Throwable throwable) {
-    checker.cannotBeNull(throwable);
+    checker.notNull(throwable);
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown
         && deepEquals(throwable, ((Thrown) effect).throwable);
@@ -543,7 +543,7 @@ public class Facade {
   }
 
   public void thenThrown(Class<? extends Throwable> type) {
-    checker.cannotBeNull(type);
+    checker.notNull(type);
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown && type.isInstance(((Thrown) effect).throwable);
     if (!expected) {
@@ -572,7 +572,7 @@ public class Facade {
   }
 
   public void then(@Nullable Object object, Object matcher) {
-    checker.mustBeMatcher(matcher);
+    checker.matcher(matcher);
     if (!asMatcher(matcher).matches(object)) {
       throw assertionError("\n"
           + formatSection("expected", matcher)
@@ -590,40 +590,40 @@ public class Facade {
   }
 
   public <T> T thenCalled(T mock) {
-    checker.mustBeMock(mock);
+    checker.mock(mock);
     return thenCalledTimes(exactly(1), mock);
   }
 
   public void thenCalled(InvocationMatcher invocationMatcher) {
-    checker.cannotBeNull(invocationMatcher);
+    checker.notNull(invocationMatcher);
     thenCalledTimes(exactly(1), invocationMatcher);
   }
 
   public <T> T thenCalledNever(T mock) {
-    checker.mustBeMock(mock);
+    checker.mock(mock);
     return thenCalledTimes(exactly(0), mock);
   }
 
   public void thenCalledNever(InvocationMatcher invocationMatcher) {
-    checker.cannotBeNull(invocationMatcher);
+    checker.notNull(invocationMatcher);
     thenCalledTimes(exactly(0), invocationMatcher);
   }
 
   public <T> T thenCalledTimes(int number, T mock) {
-    checker.cannotBeNegative(number);
-    checker.mustBeMock(mock);
+    checker.notNegative(number);
+    checker.mock(mock);
     return thenCalledTimes(exactly(number), mock);
   }
 
   public void thenCalledTimes(int number, InvocationMatcher invocationMatcher) {
-    checker.cannotBeNegative(number);
-    checker.cannotBeNull(invocationMatcher);
+    checker.notNegative(number);
+    checker.notNull(invocationMatcher);
     thenCalledTimes(exactly(number), invocationMatcher);
   }
 
   public <T> T thenCalledTimes(final Object numberMatcher, T mock) {
-    checker.mustBeMatcher(numberMatcher);
-    checker.mustBeMock(mock);
+    checker.matcher(numberMatcher);
+    checker.mock(mock);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         thenCalledTimes(numberMatcher, matcherize(invocation));
@@ -634,8 +634,8 @@ public class Facade {
   }
 
   public void thenCalledTimes(Object numberMatcher, InvocationMatcher invocationMatcher) {
-    checker.mustBeMatcher(numberMatcher);
-    checker.cannotBeNull(invocationMatcher);
+    checker.matcher(numberMatcher);
+    checker.notNull(invocationMatcher);
     int numberOfCalls = 0;
     for (Calling calling : callings(history.get())) {
       if (invocationMatcher.matches(calling.invocation)) {
@@ -652,7 +652,7 @@ public class Facade {
   }
 
   public <T> T thenCalledInOrder(T mock) {
-    checker.mustBeMock(mock);
+    checker.mock(mock);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         thenCalledInOrder(matcherize(invocation));
@@ -663,7 +663,7 @@ public class Facade {
   }
 
   public void thenCalledInOrder(InvocationMatcher invocationMatcher) {
-    checker.cannotBeNull(invocationMatcher);
+    checker.notNull(invocationMatcher);
     Optional<VerifyingInOrder> verified = verifyInOrder(invocationMatcher, history.get());
     if (verified.isPresent()) {
       history.add(verified.get());

@@ -91,7 +91,7 @@ public class TestInvocationMatchers {
       onInstance(new Object());
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("must be mock"));
+      assertThat(e, hasMessage("expected mock"));
     }
     try {
       onReturn(null);

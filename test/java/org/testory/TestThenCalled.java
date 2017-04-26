@@ -86,7 +86,7 @@ public class TestThenCalled {
       thenCalled((InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("cannot be null"));
+      assertThat(e, hasMessage("expected not null"));
     }
   }
 
@@ -96,7 +96,7 @@ public class TestThenCalled {
       thenCalled((Object) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("cannot be null"));
+      assertThat(e, hasMessage("expected not null"));
     }
   }
 
@@ -106,7 +106,7 @@ public class TestThenCalled {
       thenCalled(new Object());
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("must be mock"));
+      assertThat(e, hasMessage("expected mock"));
     }
   }
 

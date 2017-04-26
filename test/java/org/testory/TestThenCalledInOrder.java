@@ -125,7 +125,7 @@ public class TestThenCalledInOrder {
       thenCalledInOrder((InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("cannot be null"));
+      assertThat(e, hasMessage("expected not null"));
     }
   }
 
@@ -135,7 +135,7 @@ public class TestThenCalledInOrder {
       thenCalledInOrder((Object) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("cannot be null"));
+      assertThat(e, hasMessage("expected not null"));
     }
   }
 
@@ -145,7 +145,7 @@ public class TestThenCalledInOrder {
       thenCalledInOrder(new Object());
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("must be mock"));
+      assertThat(e, hasMessage("expected mock"));
     }
   }
 
