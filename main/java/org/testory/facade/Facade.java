@@ -17,8 +17,8 @@ import static org.testory.plumbing.Formatter.formatter;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
-import static org.testory.plumbing.capture.AnySupport.anySupport;
-import static org.testory.plumbing.capture.Repairer.repairer;
+import static org.testory.plumbing.capture.wildcard.Repairer.repairer;
+import static org.testory.plumbing.capture.wildcard.WildcardSupport.wildcardSupport;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
@@ -54,9 +54,9 @@ import org.testory.plumbing.Formatter;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.VerifyingInOrder;
-import org.testory.plumbing.capture.AnyException;
-import org.testory.plumbing.capture.AnySupport;
 import org.testory.plumbing.capture.Capturer;
+import org.testory.plumbing.capture.wildcard.WildcardException;
+import org.testory.plumbing.capture.wildcard.WildcardSupport;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
 import org.testory.plumbing.inject.Injector;
@@ -76,7 +76,7 @@ public class Facade {
   private final Maker mockMaker;
   private final Injector injector;
   private final Capturer capturer;
-  private final AnySupport anySupport;
+  private final WildcardSupport wildcardSupport;
   private final FilteredHistory<Inspecting> inspectingHistory;
   private final Checker checker;
 
@@ -88,7 +88,7 @@ public class Facade {
       Maker mockMaker,
       Injector injector,
       FilteredHistory<Inspecting> inspectingHistory,
-      AnySupport anySupport,
+      WildcardSupport wildcardSupport,
       Capturer capturer,
       Checker checker) {
     this.history = history;
@@ -98,7 +98,7 @@ public class Facade {
     this.mockMaker = mockMaker;
     this.injector = injector;
     this.inspectingHistory = inspectingHistory;
-    this.anySupport = anySupport;
+    this.wildcardSupport = wildcardSupport;
     this.capturer = capturer;
     this.checker = checker;
   }
@@ -113,10 +113,10 @@ public class Facade {
     Maker mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     Injector injector = injector(mockMaker);
     FilteredHistory<Inspecting> inspectingHistory = filter(Inspecting.class, history);
-    AnySupport anySupport = anySupport(history, repairer());
-    Capturer capturer = anySupport.getCapturer();
+    WildcardSupport wildcardSupport = wildcardSupport(history, repairer());
+    Capturer capturer = wildcardSupport.getCapturer();
     return new Facade(history, formatter, proxer, mockNamer, mockMaker, injector,
-        inspectingHistory, anySupport, capturer, checker);
+        inspectingHistory, wildcardSupport, capturer, checker);
   }
 
   private static Maker mockMaker(History history, Proxer proxer) {
@@ -259,12 +259,12 @@ public class Facade {
 
   public <T> T any(Class<T> type) {
     checker.cannotBeNull(type);
-    return (T) anySupport.any(type);
+    return (T) wildcardSupport.any(type);
   }
 
   public <T> T any(Class<T> type, Object matcher) {
     checker.mustBeMatcher(matcher);
-    return (T) anySupport.any(type, matcher);
+    return (T) wildcardSupport.any(type, matcher);
   }
 
   public boolean a(boolean value) {
@@ -301,12 +301,12 @@ public class Facade {
 
   public <T> T a(T value) {
     checker.cannotBeNull(value);
-    return (T) anySupport.a(value);
+    return (T) wildcardSupport.a(value);
   }
 
   public <T> T the(T value) {
     checker.cannotBeNull(value);
-    return (T) anySupport.the(value);
+    return (T) wildcardSupport.the(value);
   }
 
   public void the(boolean value) {
@@ -675,7 +675,7 @@ public class Facade {
   private InvocationMatcher capture(Invocation invocation) {
     try {
       return capturer.capture(invocation);
-    } catch (AnyException e) {
+    } catch (WildcardException e) {
       throw new TestoryException(e);
     }
   }

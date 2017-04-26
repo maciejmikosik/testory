@@ -1,4 +1,4 @@
-package org.testory.plumbing.capture;
+package org.testory.plumbing.capture.wildcard;
 
 import static java.util.Arrays.asList;
 import static org.testory.common.CharSequences.join;
@@ -17,16 +17,16 @@ import org.testory.common.Matchers;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class MatcherizeAnyvocation {
-  public static InvocationMatcher matcherize(Anyvocation anyvocation) {
-    List<Object> arguments = anyvocation.mayBeFolded()
-        ? unfold(anyvocation.arguments)
-        : anyvocation.arguments;
-    List<Matcher> matchers = matcherize(anyvocation.anys, arguments);
-    List<Matcher> argumentsMatchers = anyvocation.mayBeFolded()
-        ? fold(anyvocation.method.getParameterTypes().length, matchers)
+public class MatcherizeWildcardInvocation {
+  public static InvocationMatcher matcherize(WildcardInvocation invocation) {
+    List<Object> arguments = invocation.mayBeFolded()
+        ? unfold(invocation.arguments)
+        : invocation.arguments;
+    List<Matcher> matchers = matcherize(invocation.wildcards, arguments);
+    List<Matcher> argumentsMatchers = invocation.mayBeFolded()
+        ? fold(invocation.method.getParameterTypes().length, matchers)
         : matchers;
-    return matcherize(anyvocation.method, anyvocation.instance, argumentsMatchers);
+    return matcherize(invocation.method, invocation.instance, argumentsMatchers);
   }
 
   private static List<Matcher> fold(int length, List<Matcher> unfolded) {
@@ -43,12 +43,12 @@ public class MatcherizeAnyvocation {
     return unfolded;
   }
 
-  private static List<Matcher> matcherize(List<CollectingAny> anys, List<Object> arguments) {
-    List<CollectingAny> anysQueue = new ArrayList<CollectingAny>(anys);
+  private static List<Matcher> matcherize(List<Wildcard> wildcards, List<Object> arguments) {
+    List<Wildcard> wildcardQueue = new ArrayList<Wildcard>(wildcards);
     List<Matcher> matchers = new ArrayList<Matcher>();
     for (int i = 0; i < arguments.size(); i++) {
-      Matcher matcher = !anysQueue.isEmpty() && anysQueue.get(0).token == arguments.get(i)
-          ? anysQueue.remove(0).matcher
+      Matcher matcher = !wildcardQueue.isEmpty() && wildcardQueue.get(0).token == arguments.get(i)
+          ? wildcardQueue.remove(0).matcher
           : matcherize(arguments.get(i));
       matchers.add(matcher);
     }

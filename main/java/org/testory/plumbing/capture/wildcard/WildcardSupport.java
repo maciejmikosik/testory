@@ -1,4 +1,4 @@
-package org.testory.plumbing.capture;
+package org.testory.plumbing.capture.wildcard;
 
 import static java.lang.String.format;
 import static org.testory.common.Classes.tryWrap;
@@ -7,11 +7,11 @@ import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Matchers.same;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.capture.Anyvocation.anyvocation;
-import static org.testory.plumbing.capture.CollectingAny.collectingAny;
-import static org.testory.plumbing.capture.ConsumingAny.consumingAny;
-import static org.testory.plumbing.capture.MatcherizeAnyvocation.matcherize;
-import static org.testory.plumbing.capture.Uniques.unique;
+import static org.testory.plumbing.capture.Capturing.capturing;
+import static org.testory.plumbing.capture.wildcard.MatcherizeWildcardInvocation.matcherize;
+import static org.testory.plumbing.capture.wildcard.Uniques.unique;
+import static org.testory.plumbing.capture.wildcard.Wildcard.wildcard;
+import static org.testory.plumbing.capture.wildcard.WildcardInvocation.wildcardInvocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,47 +19,49 @@ import java.util.List;
 import org.testory.common.DelegatingMatcher;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
+import org.testory.plumbing.capture.Capturer;
+import org.testory.plumbing.capture.Capturing;
 import org.testory.plumbing.history.History;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class AnySupport {
+public class WildcardSupport {
   private final History history;
   private final Repairer repairer;
 
-  private AnySupport(History history, Repairer repairer) {
+  private WildcardSupport(History history, Repairer repairer) {
     this.history = history;
     this.repairer = repairer;
   }
 
-  public static AnySupport anySupport(History history, Repairer repairer) {
+  public static WildcardSupport wildcardSupport(History history, Repairer repairer) {
     check(history != null);
     check(repairer != null);
-    return new AnySupport(history, repairer);
+    return new WildcardSupport(history, repairer);
   }
 
   public Capturer getCapturer() {
     return new Capturer() {
       public InvocationMatcher capture(Invocation invocation) {
         check(invocation != null);
-        List<CollectingAny> anys = consumeAnys();
+        List<Wildcard> wildcards = consumeWildcards();
         return matcherize(repairer.repair(
-            anyvocation(invocation.method, invocation.instance, invocation.arguments, anys)));
+            wildcardInvocation(invocation.method, invocation.instance, invocation.arguments, wildcards)));
       }
     };
   }
 
-  private List<CollectingAny> consumeAnys() {
-    List<CollectingAny> anys = new ArrayList<CollectingAny>();
+  private List<Wildcard> consumeWildcards() {
+    List<Wildcard> wildcards = new ArrayList<Wildcard>();
     for (Object event : history.get()) {
-      if (event instanceof CollectingAny) {
-        anys.add(0, (CollectingAny) event);
-      } else if (event instanceof ConsumingAny) {
+      if (event instanceof Wildcard) {
+        wildcards.add(0, (Wildcard) event);
+      } else if (event instanceof Capturing) {
         break;
       }
     }
-    history.add(consumingAny());
-    return anys;
+    history.add(capturing());
+    return wildcards;
   }
 
   public Object any(final Class<?> type) {
@@ -107,7 +109,7 @@ public class AnySupport {
 
   private Object anyImpl(Matcher matcher, Class<?> type) {
     Object token = unique(tryWrap(type));
-    history.add(collectingAny(matcher, token));
+    history.add(wildcard(matcher, token));
     return token;
   }
 }

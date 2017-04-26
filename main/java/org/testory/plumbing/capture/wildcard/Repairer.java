@@ -1,4 +1,4 @@
-package org.testory.plumbing.capture;
+package org.testory.plumbing.capture.wildcard;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.nCopies;
@@ -6,7 +6,7 @@ import static java.util.Objects.deepEquals;
 import static org.testory.common.Collections.flip;
 import static org.testory.common.Collections.last;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.capture.Anyvocation.anyvocation;
+import static org.testory.plumbing.capture.wildcard.WildcardInvocation.wildcardInvocation;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -19,60 +19,69 @@ public class Repairer {
     return new Repairer();
   }
 
-  public Anyvocation repair(Anyvocation anyvocation) {
-    check(anyvocation != null);
-    List<Class<?>> parameters = asList(anyvocation.method.getParameterTypes());
-    boolean mayBeFolded = anyvocation.mayBeFolded();
+  public WildcardInvocation repair(WildcardInvocation invocation) {
+    check(invocation != null);
+    List<Class<?>> parameters = asList(invocation.method.getParameterTypes());
+    boolean mayBeFolded = invocation.mayBeFolded();
     List<Object> unfolded = mayBeFolded
-        ? unfoldArguments(anyvocation.arguments)
-        : anyvocation.arguments;
+        ? unfoldArguments(invocation.arguments)
+        : invocation.arguments;
     List<Class<?>> unfoldedParameters = mayBeFolded
         ? unfoldParameters(unfolded.size(), parameters)
         : parameters;
-    List<Object> repairedUnfolded = repair(unfoldedParameters, unfolded, anyvocation);
+    List<Object> repairedUnfolded = repair(unfoldedParameters, unfolded, invocation);
     List<Object> repaired = mayBeFolded
         ? foldArguments(parameters.size(), repairedUnfolded)
         : repairedUnfolded;
-    return anyvocation(anyvocation.method, anyvocation.instance, repaired, anyvocation.anys);
+    return wildcardInvocation(
+        invocation.method,
+        invocation.instance,
+        repaired,
+        invocation.wildcards);
   }
 
-  private static List<Object> repair(List<Class<?>> parameters, List<Object> arguments,
-      Anyvocation anyvocation) {
-    List<Boolean> solution = trySolveEager(anyvocation.anys, parameters, arguments);
-    if (!deepEquals(flip(solution),
-        trySolveEager(flip(anyvocation.anys), flip(parameters), flip(arguments)))) {
-      throw new AnyException("found more than one solution");
+  private static List<Object> repair(
+      List<Class<?>> parameters,
+      List<Object> arguments,
+      WildcardInvocation invocation) {
+    List<Boolean> solution = trySolveEager(invocation.wildcards, parameters, arguments);
+    if (!deepEquals(
+        flip(solution),
+        trySolveEager(flip(invocation.wildcards), flip(parameters), flip(arguments)))) {
+      throw new WildcardException("found more than one solution");
     }
-    List<CollectingAny> anysQueue = new ArrayList<CollectingAny>(anyvocation.anys);
+    List<Wildcard> wildcards = new ArrayList<Wildcard>(invocation.wildcards);
     List<Object> repaired = new ArrayList<Object>();
     for (int i = 0; i < solution.size(); i++) {
       repaired.add(solution.get(i)
-          ? anysQueue.remove(0).token
+          ? wildcards.remove(0).token
           : arguments.get(i));
     }
     return repaired;
   }
 
-  private static List<Boolean> trySolveEager(List<CollectingAny> anys, List<Class<?>> parameters,
+  private static List<Boolean> trySolveEager(
+      List<Wildcard> wildcards,
+      List<Class<?>> parameters,
       List<Object> arguments) {
     List<Boolean> solution = new ArrayList<Boolean>(nCopies(arguments.size(), false));
     int nextIndex = 0;
-    nextAny: for (CollectingAny any : anys) {
+    nextWildcard: for (Wildcard wildcard : wildcards) {
       for (int i = nextIndex; i < arguments.size(); i++) {
-        if (any.token == arguments.get(i)) {
+        if (wildcard.token == arguments.get(i)) {
           solution.set(i, true);
           nextIndex = i + 1;
-          continue nextAny;
+          continue nextWildcard;
         }
       }
       for (int i = nextIndex; i < arguments.size(); i++) {
         if (parameters.get(i).isPrimitive()) {
           solution.set(i, true);
           nextIndex = i + 1;
-          continue nextAny;
+          continue nextWildcard;
         }
       }
-      throw new AnyException("cannot find any solution");
+      throw new WildcardException("cannot find any solution");
     }
     return solution;
   }

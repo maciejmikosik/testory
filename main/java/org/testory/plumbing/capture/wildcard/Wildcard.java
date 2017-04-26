@@ -1,21 +1,21 @@
-package org.testory.plumbing.capture;
+package org.testory.plumbing.capture.wildcard;
 
 import static org.testory.plumbing.PlumbingException.check;
 
 import org.testory.common.Matcher;
 
-public class CollectingAny {
+public class Wildcard {
   public final Matcher matcher;
   public final Object token;
 
-  private CollectingAny(Matcher matcher, Object token) {
+  private Wildcard(Matcher matcher, Object token) {
     this.matcher = matcher;
     this.token = token;
   }
 
-  public static CollectingAny collectingAny(Matcher matcher, Object token) {
+  public static Wildcard wildcard(Matcher matcher, Object token) {
     check(matcher != null);
     check(token != null);
-    return new CollectingAny(matcher, token);
+    return new Wildcard(matcher, token);
   }
 }
