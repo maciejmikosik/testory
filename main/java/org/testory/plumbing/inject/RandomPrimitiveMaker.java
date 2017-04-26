@@ -1,7 +1,7 @@
 package org.testory.plumbing.inject;
 
 import static java.lang.String.format;
-import static org.testory.common.Checks.checkNotNull;
+import static org.testory.plumbing.PlumbingException.check;
 
 import java.util.Random;
 
@@ -15,8 +15,8 @@ public class RandomPrimitiveMaker implements Maker {
   }
 
   public <T> T make(Class<T> type, String name) {
-    checkNotNull(type);
-    checkNotNull(name);
+    check(type != null);
+    check(name != null);
     Random random = newRandom(name);
     if (type == Boolean.class || type == boolean.class) {
       return (T) (Boolean) random.nextBoolean();
