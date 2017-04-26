@@ -2,12 +2,26 @@ package org.testory.testing;
 
 import static java.text.MessageFormat.format;
 
+import java.util.Objects;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 public class HamcrestMatchers {
+  public static Matcher<Throwable> hasMessage(final String message) {
+    return new TypeSafeMatcher<Throwable>() {
+      protected boolean matchesSafely(Throwable throwable) {
+        return Objects.equals(message, throwable.getMessage());
+      }
+
+      public void describeTo(Description description) {
+        description.appendText("hasMessageContaining(" + message + ")");
+      }
+    };
+  }
+
   public static Matcher<Throwable> hasMessageContaining(final String substring) {
     return new TypeSafeMatcher<Throwable>() {
       protected boolean matchesSafely(Throwable throwable) {

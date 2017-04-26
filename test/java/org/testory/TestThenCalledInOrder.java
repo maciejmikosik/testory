@@ -7,6 +7,7 @@ import static org.testory.Testory.onInstance;
 import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenCalledInOrder;
 import static org.testory.Testory.when;
+import static org.testory.testing.HamcrestMatchers.hasMessage;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
@@ -124,7 +125,7 @@ public class TestThenCalledInOrder {
       thenCalledInOrder((InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessageContaining("invocationMatcher != null"));
+      assertThat(e, hasMessage("cannot be null"));
     }
   }
 
@@ -134,7 +135,7 @@ public class TestThenCalledInOrder {
       thenCalledInOrder((Object) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessageContaining("mock != null"));
+      assertThat(e, hasMessage("cannot be null"));
     }
   }
 
@@ -144,7 +145,7 @@ public class TestThenCalledInOrder {
       thenCalledInOrder(new Object());
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessageContaining("isMock(mock)"));
+      assertThat(e, hasMessage("must be mock"));
     }
   }
 

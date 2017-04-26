@@ -8,6 +8,7 @@ import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
+import static org.testory.testing.HamcrestMatchers.hasMessage;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -98,6 +99,6 @@ public class TestWhen {
     thread.join();
 
     assertThat(throwable, instanceOf(TestoryException.class));
-    assertThat(throwable, hasMessageContaining("inspecting"));
+    assertThat(throwable, hasMessage("must call when"));
   }
 }

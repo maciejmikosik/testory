@@ -4,7 +4,6 @@ import static java.util.Arrays.asList;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static javax.xml.bind.DatatypeConverter.printHexBinary;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,14 +23,6 @@ import org.junit.Test;
 
 public class TestBuilding {
   private String hashA, hashB;
-
-  @Test
-  public void source_code_is_available_at_runtime() throws IOException {
-    String sourceFile = Testory.class.getSimpleName() + ".java";
-    InputStream stream = Testory.class.getResourceAsStream(sourceFile);
-    assertNotNull(stream);
-    stream.close();
-  }
 
   @Test
   public void build_is_deterministic() throws Exception {

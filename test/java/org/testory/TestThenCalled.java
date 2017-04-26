@@ -4,6 +4,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalled;
+import static org.testory.testing.HamcrestMatchers.hasMessage;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
@@ -85,7 +86,7 @@ public class TestThenCalled {
       thenCalled((InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessageContaining("invocationMatcher != null"));
+      assertThat(e, hasMessage("cannot be null"));
     }
   }
 
@@ -95,7 +96,7 @@ public class TestThenCalled {
       thenCalled((Object) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessageContaining("mock != null"));
+      assertThat(e, hasMessage("cannot be null"));
     }
   }
 
@@ -105,7 +106,7 @@ public class TestThenCalled {
       thenCalled(new Object());
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessageContaining("isMock(mock)"));
+      assertThat(e, hasMessage("must be mock"));
     }
   }
 

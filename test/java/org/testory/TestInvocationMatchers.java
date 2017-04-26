@@ -12,7 +12,7 @@ import static org.testory.Testory.onRequest;
 import static org.testory.Testory.onReturn;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.testing.Fakes.newObject;
-import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
+import static org.testory.testing.HamcrestMatchers.hasMessage;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -91,7 +91,7 @@ public class TestInvocationMatchers {
       onInstance(new Object());
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessageContaining("isMock"));
+      assertThat(e, hasMessage("must be mock"));
     }
     try {
       onReturn(null);
