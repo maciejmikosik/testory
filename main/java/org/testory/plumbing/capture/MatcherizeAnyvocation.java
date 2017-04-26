@@ -11,9 +11,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.testory.common.DelegatingMatcher;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
-import org.testory.common.Matchers.MatcherDecorator;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
@@ -56,7 +56,7 @@ public class MatcherizeAnyvocation {
   }
 
   private static Matcher matcherize(final Object argument) {
-    return new MatcherDecorator(equalDeep(argument)) {
+    return new DelegatingMatcher(equalDeep(argument)) {
       public String toString() {
         return print(argument);
       }
@@ -64,7 +64,7 @@ public class MatcherizeAnyvocation {
   }
 
   private static Matcher matcherize(final CollectingAny any) {
-    return new MatcherDecorator(any.matcher) {
+    return new DelegatingMatcher(any.matcher) {
       public String toString() {
         return any.printable.toString();
       }
@@ -87,7 +87,7 @@ public class MatcherizeAnyvocation {
   }
 
   private static Matcher arrayOf(final List<Matcher> elements) {
-    return new MatcherDecorator(Matchers.arrayOf(elements)) {
+    return new DelegatingMatcher(Matchers.arrayOf(elements)) {
       public String toString() {
         return "[" + join(", ", elements) + "]";
       }

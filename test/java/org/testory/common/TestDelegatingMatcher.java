@@ -8,9 +8,8 @@ import static org.testory.testing.Fakes.newObject;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testory.common.Matchers.MatcherDecorator;
 
-public class TestMatchersMatcherDecorator {
+public class TestDelegatingMatcher {
   private Matcher matcher, decorated;
   private Object object, other;
   private String string;
@@ -24,7 +23,7 @@ public class TestMatchersMatcherDecorator {
 
   @Test
   public void delegates_matching() {
-    matcher = new MatcherDecorator(same(object));
+    matcher = new DelegatingMatcher(same(object));
     assertTrue(matcher.matches(object));
     assertFalse(matcher.matches(other));
   }
@@ -40,14 +39,14 @@ public class TestMatchersMatcherDecorator {
         return string;
       }
     };
-    matcher = new MatcherDecorator(decorated);
+    matcher = new DelegatingMatcher(decorated);
     assertEquals(decorated.toString(), matcher.toString());
   }
 
   @Test
   public void fails_for_null_matcher() {
     try {
-      new MatcherDecorator(null);
+      new DelegatingMatcher(null);
       fail();
     } catch (NullPointerException e) {}
   }
