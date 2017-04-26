@@ -9,6 +9,7 @@ import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.im.wildcard.Wildcard.wildcard;
 
 import org.testory.common.DelegatingMatcher;
+import org.testory.common.Formatter;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
 import org.testory.plumbing.history.History;
@@ -16,16 +17,25 @@ import org.testory.plumbing.history.History;
 public class WildcardSupport {
   private final History history;
   private final Tokenizer tokenizer;
+  private final Formatter formatter;
 
-  private WildcardSupport(History history, Tokenizer tokenizer) {
+  private WildcardSupport(
+      History history,
+      Tokenizer tokenizer,
+      Formatter formatter) {
     this.history = history;
     this.tokenizer = tokenizer;
+    this.formatter = formatter;
   }
 
-  public static WildcardSupport wildcardSupport(History history, Tokenizer tokenizer) {
+  public static WildcardSupport wildcardSupport(
+      History history,
+      Tokenizer tokenizer,
+      Formatter formatter) {
     check(history != null);
     check(tokenizer != null);
-    return new WildcardSupport(history, tokenizer);
+    check(formatter != null);
+    return new WildcardSupport(history, tokenizer, formatter);
   }
 
   public Object any(final Class<?> type) {
@@ -55,7 +65,7 @@ public class WildcardSupport {
     check(value != null);
     DelegatingMatcher printableMatcher = new DelegatingMatcher(equalDeep(value)) {
       public String toString() {
-        return format("a(%s)", value);
+        return format("a(%s)", formatter.format(value));
       }
     };
     return anyImpl(printableMatcher, value.getClass());
@@ -65,7 +75,7 @@ public class WildcardSupport {
     check(value != null);
     DelegatingMatcher printableMatcher = new DelegatingMatcher(same(value)) {
       public String toString() {
-        return format("the(%s)", value);
+        return format("the(%s)", formatter.format(value));
       }
     };
     return anyImpl(printableMatcher, value.getClass());

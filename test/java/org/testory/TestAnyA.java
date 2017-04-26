@@ -120,6 +120,12 @@ public class TestAnyA {
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(".invoke(a(" + object + "))"));
     }
+    try {
+      thenCalled(mock).invoke(a(new Object[] { object }));
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertThat(e, hasMessageContaining(".invoke(a([" + object + "]))"));
+    }
   }
 
   private static abstract class Mockable {
