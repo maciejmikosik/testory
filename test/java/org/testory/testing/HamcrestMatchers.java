@@ -1,6 +1,6 @@
 package org.testory.testing;
 
-import static java.text.MessageFormat.format;
+import static java.lang.String.format;
 
 import java.util.Objects;
 
@@ -63,6 +63,6 @@ public class HamcrestMatchers {
   }
 
   public static String diagnosed(Object item) {
-    return format("diagnosed({0})", item);
+    return format("diagnosed(%s)", item);
   }
 }
