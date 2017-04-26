@@ -76,10 +76,10 @@ public class TestCollectionsImmutable {
   }
 
   private static <E> List<E> list(Collection<E> elements) {
-    return new ArrayList<E>(elements);
+    return new ArrayList<>(elements);
   }
 
   private static <E> Set<E> set(Collection<E> elements) {
-    return new HashSet<E>(elements);
+    return new HashSet<>(elements);
   }
 }

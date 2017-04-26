@@ -25,7 +25,7 @@ public class CheckingProxer implements Proxer {
   private Handler mockHandler(final Handler handler) {
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        checker.mustBeMock(invocation.instance);
+        checker.mock(invocation.instance);
         return handler.handle(invocation);
       }
     };

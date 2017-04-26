@@ -121,7 +121,7 @@ public class Classes {
   private static final Map<Class<?>, Object> defaultValues = defaultValues();
 
   private static Map<Class<?>, Object> defaultValues() {
-    Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+    Map<Class<?>, Object> map = new HashMap<>();
     map.put(boolean.class, false);
     map.put(char.class, '\0');
     map.put(byte.class, (byte) 0);
@@ -143,7 +143,7 @@ public class Classes {
   private static final Map<Class<?>, Class<?>> wrapping = wrapping();
 
   private static Map<Class<?>, Class<?>> wrapping() {
-    Map<Class<?>, Class<?>> map = new HashMap<Class<?>, Class<?>>();
+    Map<Class<?>, Class<?>> map = new HashMap<>();
     map.put(void.class, Void.class);
     map.put(boolean.class, Boolean.class);
     map.put(char.class, Character.class);

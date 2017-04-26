@@ -99,6 +99,6 @@ public class TestWhen {
     thread.join();
 
     assertThat(throwable, instanceOf(TestoryException.class));
-    assertThat(throwable, hasMessage("must call when"));
+    assertThat(throwable, hasMessage("expected call to when"));
   }
 }

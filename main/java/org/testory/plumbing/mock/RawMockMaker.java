@@ -47,7 +47,7 @@ public class RawMockMaker implements Maker {
 
   private static <T> Typing typingFor(Class<T> type) {
     return type.isInterface()
-        ? typing(Object.class, new HashSet<Class<?>>(Arrays.asList(type)))
+        ? typing(Object.class, new HashSet<>(Arrays.asList(type)))
         : typing(type, new HashSet<Class<?>>());
   }
 

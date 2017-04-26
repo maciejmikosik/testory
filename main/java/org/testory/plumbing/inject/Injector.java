@@ -22,7 +22,7 @@ public class Injector {
   public void inject(Object test) {
     check(test != null);
     try {
-      for (final Field field : test.getClass().getDeclaredFields()) {
+      for (Field field : test.getClass().getDeclaredFields()) {
         if (!isStatic(field.getModifiers()) && !isFinal(field.getModifiers())) {
           setAccessible(field);
           if (deepEquals(defaultValue(field.getType()), field.get(test))) {

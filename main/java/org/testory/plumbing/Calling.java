@@ -25,7 +25,7 @@ public class Calling {
   }
 
   public static List<Calling> callings(Chain<Object> history) {
-    List<Calling> callings = new ArrayList<Calling>();
+    List<Calling> callings = new ArrayList<>();
     for (Object event : history) {
       if (event instanceof Calling) {
         callings.add((Calling) event);

@@ -65,7 +65,7 @@ public class TestThenCalledNever {
       thenCalledNever((InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("cannot be null"));
+      assertThat(e, hasMessage("expected not null"));
     }
   }
 
@@ -75,7 +75,7 @@ public class TestThenCalledNever {
       thenCalledNever((Object) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("cannot be null"));
+      assertThat(e, hasMessage("expected not null"));
     }
   }
 
@@ -85,7 +85,7 @@ public class TestThenCalledNever {
       thenCalledNever(new Object());
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("must be mock"));
+      assertThat(e, hasMessage("expected mock"));
     }
   }
 

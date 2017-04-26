@@ -54,7 +54,7 @@ public class WildcardMatcherizer implements Matcherizer {
   }
 
   private List<Wildcard> consumeWildcards() {
-    List<Wildcard> wildcards = new ArrayList<Wildcard>();
+    List<Wildcard> wildcards = new ArrayList<>();
     for (Object event : history.get()) {
       if (event instanceof Wildcard) {
         wildcards.add(0, (Wildcard) event);
@@ -78,22 +78,22 @@ public class WildcardMatcherizer implements Matcherizer {
   }
 
   private List<Matcher> fold(int length, List<Matcher> unfolded) {
-    List<Matcher> folded = new ArrayList<Matcher>();
+    List<Matcher> folded = new ArrayList<>();
     folded.addAll(unfolded.subList(0, length - 1));
     folded.add(arrayOf(unfolded.subList(length - 1, unfolded.size())));
     return folded;
   }
 
   private static List<Object> unfold(List<?> folded) {
-    ArrayList<Object> unfolded = new ArrayList<Object>();
+    ArrayList<Object> unfolded = new ArrayList<>();
     unfolded.addAll(folded.subList(0, folded.size() - 1));
     unfolded.addAll(asList((Object[]) last(folded)));
     return unfolded;
   }
 
   private List<Matcher> matcherize(List<Wildcard> wildcards, List<Object> arguments) {
-    List<Wildcard> wildcardQueue = new ArrayList<Wildcard>(wildcards);
-    List<Matcher> matchers = new ArrayList<Matcher>();
+    List<Wildcard> wildcardQueue = new ArrayList<>(wildcards);
+    List<Matcher> matchers = new ArrayList<>();
     for (int i = 0; i < arguments.size(); i++) {
       Matcher matcher = !wildcardQueue.isEmpty() && wildcardQueue.get(0).token == arguments.get(i)
           ? wildcardQueue.remove(0).matcher

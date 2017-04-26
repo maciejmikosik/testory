@@ -35,7 +35,7 @@ public class CglibProxer implements Proxer {
     return newProxyByCglib(tryAsProxiable(typing), handler);
   }
 
-  private static Object newProxyByCglib(Typing typing, final Handler handler) {
+  private static Object newProxyByCglib(Typing typing, Handler handler) {
     Enhancer enhancer = new Enhancer() {
       /** includes all constructors */
       protected void filterConstructors(Class sc, List constructors) {}
@@ -91,14 +91,14 @@ public class CglibProxer implements Proxer {
   private static Typing withoutFactory(Typing typing) {
     Typing peeled = peel(typing);
     Class<?> superclass = peeled.superclass;
-    Set<Class<?>> interfaces = new HashSet<Class<?>>(peeled.interfaces);
+    Set<Class<?>> interfaces = new HashSet<>(peeled.interfaces);
     interfaces.remove(Factory.class);
     return typing(superclass, interfaces);
   }
 
   private static Typing peel(Typing typing) {
     Class<?> superclass = typing.superclass.getSuperclass();
-    Set<Class<?>> interfaces = new HashSet<Class<?>>(typing.interfaces);
+    Set<Class<?>> interfaces = new HashSet<>(typing.interfaces);
     interfaces.addAll(Arrays.asList(typing.superclass.getInterfaces()));
     return typing(superclass, interfaces);
 

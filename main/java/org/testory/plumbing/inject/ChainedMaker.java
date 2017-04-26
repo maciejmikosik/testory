@@ -18,7 +18,7 @@ public class ChainedMaker implements Maker {
 
   public static Maker chain(Maker... makers) {
     check(makers != null);
-    final List<Maker> makersList = new ArrayList<>(asList(makers));
+    List<Maker> makersList = new ArrayList<>(asList(makers));
     check(!makersList.contains(null));
     return new ChainedMaker(makersList);
   }

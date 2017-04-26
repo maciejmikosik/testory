@@ -198,12 +198,12 @@ public class TestCglibProxer {
 
   @Test
   public void can_proxy_jdk_collections() {
-    ArrayList<Object> arrayList = new ArrayList<Object>();
-    LinkedList<Object> linkedList = new LinkedList<Object>();
-    HashMap<Object, Object> hashMap = new HashMap<Object, Object>();
-    TreeMap<Object, Object> treeMap = new TreeMap<Object, Object>();
-    HashSet<Object> hashSet = new HashSet<Object>();
-    TreeSet<Object> treeSet = new TreeSet<Object>();
+    ArrayList<Object> arrayList = new ArrayList<>();
+    LinkedList<Object> linkedList = new LinkedList<>();
+    HashMap<Object, Object> hashMap = new HashMap<>();
+    TreeMap<Object, Object> treeMap = new TreeMap<>();
+    HashSet<Object> hashSet = new HashSet<>();
+    TreeSet<Object> treeSet = new TreeSet<>();
 
     new TestProxer(proxer)
         .canProxy(arrayList)
@@ -253,13 +253,13 @@ public class TestCglibProxer {
 
   @Test
   public void can_proxy_unmodifiable_collections() {
-    Collection<Object> collection = unmodifiableCollection(new ArrayList<Object>());
-    List<Object> list = unmodifiableList(new LinkedList<Object>());
-    List<Object> randomAccessList = unmodifiableList(new ArrayList<Object>());
-    Set<Object> set = unmodifiableSet(new HashSet<Object>());
-    SortedSet<Object> sortedSet = unmodifiableSortedSet(new TreeSet<Object>());
-    Map<Object, Object> map = unmodifiableMap(new HashMap<Object, Object>());
-    SortedMap<Object, Object> sortedMap = unmodifiableSortedMap(new TreeMap<Object, Object>());
+    Collection<Object> collection = unmodifiableCollection(new ArrayList<>());
+    List<Object> list = unmodifiableList(new LinkedList<>());
+    List<Object> randomAccessList = unmodifiableList(new ArrayList<>());
+    Set<Object> set = unmodifiableSet(new HashSet<>());
+    SortedSet<Object> sortedSet = unmodifiableSortedSet(new TreeSet<>());
+    Map<Object, Object> map = unmodifiableMap(new HashMap<>());
+    SortedMap<Object, Object> sortedMap = unmodifiableSortedMap(new TreeMap<>());
 
     new TestProxer(proxer)
         .canProxy(collection, typing(Collection.class, Serializable.class))
@@ -583,8 +583,8 @@ public class TestCglibProxer {
   }
 
   private static Typing typing(Class<?>... types) {
-    Set<Class<?>> superclasses = new HashSet<Class<?>>();
-    Set<Class<?>> interfaces = new HashSet<Class<?>>();
+    Set<Class<?>> superclasses = new HashSet<>();
+    Set<Class<?>> interfaces = new HashSet<>();
     for (Class<?> type : types) {
       Set<Class<?>> typeCollection = type.isInterface()
           ? interfaces

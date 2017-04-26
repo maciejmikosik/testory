@@ -41,7 +41,7 @@ public class TestCollectionsFlip {
   @Test
   public void does_not_change_original_list() {
     list = asList(a, b, c);
-    original = new ArrayList<Object>(list);
+    original = new ArrayList<>(list);
     flip(list);
     assertEquals(original, list);
   }

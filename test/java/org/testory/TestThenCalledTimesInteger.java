@@ -81,7 +81,7 @@ public class TestThenCalledTimesInteger {
       thenCalledTimes(1, (InvocationMatcher) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("cannot be null"));
+      assertThat(e, hasMessage("expected not null"));
     }
   }
 
@@ -91,7 +91,7 @@ public class TestThenCalledTimesInteger {
       thenCalledTimes(1, (Object) null);
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("cannot be null"));
+      assertThat(e, hasMessage("expected not null"));
     }
   }
 
@@ -101,7 +101,7 @@ public class TestThenCalledTimesInteger {
       thenCalledTimes(1, new Object());
       fail();
     } catch (TestoryException e) {
-      assertThat(e, hasMessage("must be mock"));
+      assertThat(e, hasMessage("expected mock"));
     }
   }
 
