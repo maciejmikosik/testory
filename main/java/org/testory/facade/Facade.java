@@ -30,7 +30,6 @@ import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
 import static org.testory.plumbing.mock.SaneMockMaker.sane;
 import static org.testory.plumbing.mock.UniqueNamer.uniqueNamer;
 import static org.testory.proxy.Invocation.invocation;
-import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Typing.typing;
 import static org.testory.proxy.handler.DelegatingHandler.delegatingTo;
 import static org.testory.proxy.handler.ReturningDefaultValueHandler.returningDefaultValue;
@@ -160,7 +159,7 @@ public class Facade {
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         try {
-          return invoke(invocation);
+          return invocation.invoke();
         } catch (Throwable e) {
           return null;
         }
@@ -187,7 +186,7 @@ public class Facade {
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         for (int i = 0; i < number; i++) {
-          invoke(invocation);
+          invocation.invoke();
         }
         return null;
       }
@@ -256,7 +255,7 @@ public class Facade {
     checker.notNull(real);
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        return invoke(invocation(invocation.method, real, invocation.arguments));
+        return invocation(invocation.method, real, invocation.arguments).invoke();
       }
     };
   }
@@ -385,7 +384,7 @@ public class Facade {
   private static Effect effectOf(Invocation invocation) {
     Object object;
     try {
-      object = invoke(invocation);
+      object = invocation.invoke();
     } catch (Throwable throwable) {
       return thrown(throwable);
     }

@@ -2,9 +2,11 @@ package org.testory.proxy;
 
 import static java.util.Objects.deepEquals;
 import static org.testory.common.Classes.canInvoke;
+import static org.testory.common.Classes.setAccessible;
 import static org.testory.common.Collections.immutable;
 import static org.testory.proxy.ProxyException.check;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -26,6 +28,17 @@ public class Invocation {
     check(arguments != null);
     check(canInvoke(method, instance, arguments.toArray()));
     return new Invocation(method, instance, immutable(arguments));
+  }
+
+  public Object invoke() throws Throwable {
+    setAccessible(method);
+    try {
+      return method.invoke(instance, arguments.toArray());
+    } catch (InvocationTargetException e) {
+      throw e.getCause();
+    } catch (ReflectiveOperationException e) {
+      throw new Error(e);
+    }
   }
 
   public boolean equals(Object object) {

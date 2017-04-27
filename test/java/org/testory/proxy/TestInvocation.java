@@ -17,11 +17,15 @@ import org.junit.Test;
 
 public class TestInvocation {
   private Object instance, otherInstance;
-  private Object argument, argumentA, argumentB;
-  private Object original;
-  private List<?> arguments;
   private Method method, otherMethod;
+  private Object argument, argumentA, argumentB;
+  private List<?> arguments;
+  private Object result;
+  private Throwable throwable;
+  private Object original;
   private Invocation invocation, otherInvocation;
+  private Methods methods;
+  private int counter;
 
   @Before
   public void before() throws NoSuchMethodException {
@@ -32,6 +36,8 @@ public class TestInvocation {
     argumentB = newObject("argumentB");
     method = Object.class.getDeclaredMethod("equals", Object.class);
     arguments = asList(argument);
+    result = newObject("object");
+    throwable = new RuntimeException("throwable");
   }
 
   @Test
@@ -183,6 +189,49 @@ public class TestInvocation {
   }
 
   @Test
+  public void invokes_invocation() throws Throwable {
+    method = Methods.returningArgument();
+    methods = new Methods() {
+      Object returningArgument(Object arg) {
+        assertEquals(argument, arg);
+        return counter++;
+      }
+    };
+    invocation = invocation(method, methods, Arrays.asList(argument));
+    invocation.invoke();
+    assertEquals(1, counter);
+  }
+
+  @Test
+  public void invoke_returns_result() throws Throwable {
+    method = Methods.returningArgument();
+    methods = new Methods() {
+      Object returningArgument(Object arg) {
+        return result;
+      }
+    };
+    invocation = invocation(method, methods, Arrays.asList(argument));
+    assertEquals(result, invocation.invoke());
+  }
+
+  @Test
+  public void invoke_throws_throwable() throws Throwable {
+    method = Methods.returningArgument();
+    methods = new Methods() {
+      Object returningArgument(Object arg) throws Throwable {
+        throw throwable;
+      }
+    };
+    invocation = invocation(method, methods, Arrays.asList(argument));
+    try {
+      invocation.invoke();
+      fail();
+    } catch (Exception e) {
+      assertEquals(throwable, e);
+    }
+  }
+
+  @Test
   public void is_equal_to_itself() {
     invocation = invocation(method, instance, arguments);
     assertEquals(invocation, invocation);
@@ -294,6 +343,10 @@ public class TestInvocation {
 
   @SuppressWarnings("unused")
   private static class Methods {
+    Object returningArgument(Object arg) throws Throwable {
+      return arg;
+    }
+
     public void invoke() {}
 
     public void invoke(Object o) {}
@@ -309,6 +362,14 @@ public class TestInvocation {
     public void invoke(Object[] o) {}
 
     public void varargs(Object... o) {}
+
+    public static Method returningArgument() {
+      try {
+        return Methods.class.getDeclaredMethod("returningArgument", Object.class);
+      } catch (NoSuchMethodException e) {
+        throw new RuntimeException(e);
+      }
+    }
 
     public static Method withParameters(Class<?>... parameters) {
       try {
