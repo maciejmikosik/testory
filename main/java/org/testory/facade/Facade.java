@@ -745,11 +745,7 @@ public class Facade {
   private <T> T proxyWrapping(T wrapped, Handler handler) {
     Typing typing = typing(wrapped.getClass(), new HashSet<Class<?>>());
     Handler proxyHandler = returningDefaultValue(delegatingTo(wrapped, handler));
-    try {
-      return (T) proxer.proxy(typing, proxyHandler);
-    } catch (RuntimeException e) {
-      throw new TestoryException(e);
-    }
+    return (T) proxer.proxy(typing, proxyHandler);
   }
 
   private static Handler returningDefaultValue(final Handler handler) {
