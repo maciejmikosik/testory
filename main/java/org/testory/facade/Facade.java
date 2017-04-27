@@ -32,6 +32,7 @@ import static org.testory.plumbing.mock.UniqueNamer.uniqueNamer;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Invocations.invoke;
 import static org.testory.proxy.Typing.typing;
+import static org.testory.proxy.handler.DelegatingHandler.delegatingTo;
 import static org.testory.proxy.handler.ReturningDefaultValueHandler.returningDefaultValue;
 import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
 import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
@@ -746,13 +747,5 @@ public class Facade {
     Typing typing = typing(wrapped.getClass(), new HashSet<Class<?>>());
     Handler proxyHandler = returningDefaultValue(delegatingTo(wrapped, handler));
     return (T) proxer.proxy(typing, proxyHandler);
-  }
-
-  private static Handler delegatingTo(final Object instance, final Handler handler) {
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        return handler.handle(invocation(invocation.method, instance, invocation.arguments));
-      }
-    };
   }
 }
