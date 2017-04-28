@@ -181,6 +181,11 @@ You can restub already stubbed invocation, because most recent stubbing takes pr
 Newly created mock is already stubbed for convenience.
 `equals`/`hashCode` is stubbed, so mock is equal only to itself.
 `toString` is stubbed to contain class name and unique ordinal.
+
+If mock is instance of `Throwable` then additional methods are stubbed.
+`fillInStackTrace` is stubbed to return `this` instance.
+All overloadings of `printStackTrace` are stubbed to print mock's name.
+
 All other methods are stubbed to return `null` (or binary zero for primitive types).
 Those default stubbings can be restubbed as any other stubbing.
 
@@ -374,9 +379,13 @@ Initialization depends on type of field.
 Field of array type is initialized to array of size 1. Array's cell is initialized recursively.
 
 Field of non-final type is assigned to mock. Mock is conveniently prestubbed
- - `toString` is stubbed to return name of field
- - `equals` is stubbed so mock is equal only to itself
- - `hashCode` is stubbed to obey contract
+ - instance of `Object` is prestubbed.
+    - `toString` is stubbed to return name of field
+    - `equals` is stubbed so mock is equal only to itself
+    - `hashCode` is stubbed to obey contract
+ - instance of `Throwable` is additionally prestubbed
+    - `fillInStackTrace` is stubbed to return `this` instance
+    - `printStackTrace` is stubbed to print mock's name to relevant stream
 
 Field of final type is assigned to sample data
 
