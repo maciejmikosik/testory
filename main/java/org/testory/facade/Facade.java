@@ -2,7 +2,6 @@ package org.testory.facade;
 
 import static java.util.Objects.deepEquals;
 import static org.testory.TestoryAssertionError.assertionError;
-import static org.testory.common.Classes.defaultValue;
 import static org.testory.common.Effect.returned;
 import static org.testory.common.Effect.returnedVoid;
 import static org.testory.common.Effect.thrown;
@@ -31,13 +30,12 @@ import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
 import static org.testory.plumbing.mock.SaneMockMaker.sane;
 import static org.testory.plumbing.mock.UniqueNamer.uniqueNamer;
 import static org.testory.proxy.Invocation.invocation;
-import static org.testory.proxy.Invocations.invoke;
-import static org.testory.proxy.Typing.typing;
+import static org.testory.proxy.Typing.subclassing;
+import static org.testory.proxy.handler.DelegatingHandler.delegatingTo;
+import static org.testory.proxy.handler.ReturningDefaultValueHandler.returningDefaultValue;
 import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
 import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
 import static org.testory.proxy.proxer.WrappingProxer.wrapping;
-
-import java.util.HashSet;
 
 import org.testory.TestoryException;
 import org.testory.common.Closure;
@@ -68,7 +66,6 @@ import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 import org.testory.proxy.Proxer;
-import org.testory.proxy.Typing;
 import org.testory.proxy.proxer.CglibProxer;
 
 public class Facade {
@@ -159,7 +156,7 @@ public class Facade {
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         try {
-          return invoke(invocation);
+          return invocation.invoke();
         } catch (Throwable e) {
           return null;
         }
@@ -186,7 +183,7 @@ public class Facade {
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         for (int i = 0; i < number; i++) {
-          invoke(invocation);
+          invocation.invoke();
         }
         return null;
       }
@@ -255,7 +252,7 @@ public class Facade {
     checker.notNull(real);
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        return invoke(invocation(invocation.method, real, invocation.arguments));
+        return invocation(invocation.method, real, invocation.arguments).invoke();
       }
     };
   }
@@ -384,7 +381,7 @@ public class Facade {
   private static Effect effectOf(Invocation invocation) {
     Object object;
     try {
-      object = invoke(invocation);
+      object = invocation.invoke();
     } catch (Throwable throwable) {
       return thrown(throwable);
     }
@@ -743,29 +740,8 @@ public class Facade {
   }
 
   private <T> T proxyWrapping(T wrapped, Handler handler) {
-    Typing typing = typing(wrapped.getClass(), new HashSet<Class<?>>());
-    Handler proxyHandler = returningDefaultValue(delegatingTo(wrapped, handler));
-    try {
-      return (T) proxer.proxy(typing, proxyHandler);
-    } catch (RuntimeException e) {
-      throw new TestoryException(e);
-    }
-  }
-
-  private static Handler returningDefaultValue(final Handler handler) {
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        handler.handle(invocation);
-        return defaultValue(invocation.method.getReturnType());
-      }
-    };
-  }
-
-  private static Handler delegatingTo(final Object instance, final Handler handler) {
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        return handler.handle(invocation(invocation.method, instance, invocation.arguments));
-      }
-    };
+    return (T) proxer.proxy(
+        subclassing(wrapped.getClass()),
+        returningDefaultValue(delegatingTo(wrapped, handler)));
   }
 }

@@ -4,10 +4,7 @@ import static org.testory.plumbing.Calling.calling;
 import static org.testory.plumbing.Mocking.mocking;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.history.FilteredHistory.filter;
-import static org.testory.proxy.Typing.typing;
-
-import java.util.Arrays;
-import java.util.HashSet;
+import static org.testory.proxy.Typing.subclassing;
 
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.PlumbingException;
@@ -17,7 +14,6 @@ import org.testory.plumbing.history.History;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.Proxer;
-import org.testory.proxy.Typing;
 
 public class RawMockMaker implements Maker {
   private final Proxer proxer;
@@ -40,15 +36,9 @@ public class RawMockMaker implements Maker {
   public <T> T make(Class<T> type, String name) {
     check(type != null);
     check(name != null);
-    Object mock = proxer.proxy(typingFor(type), handler());
+    Object mock = proxer.proxy(subclassing(type), handler());
     history.add(mocking(mock, name));
     return (T) mock;
-  }
-
-  private static <T> Typing typingFor(Class<T> type) {
-    return type.isInterface()
-        ? typing(Object.class, new HashSet<>(Arrays.asList(type)))
-        : typing(type, new HashSet<Class<?>>());
   }
 
   private Handler handler() {

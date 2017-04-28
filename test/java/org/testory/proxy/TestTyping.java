@@ -2,6 +2,9 @@ package org.testory.proxy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.testory.proxy.Typing.extending;
+import static org.testory.proxy.Typing.implementing;
+import static org.testory.proxy.Typing.subclassing;
 import static org.testory.proxy.Typing.typing;
 
 import java.util.Arrays;
@@ -23,37 +26,35 @@ public class TestTyping {
   }
 
   @Test
-  public void should_get_concrete_superclass() {
-    class ConcreteClass {}
-    superclass = ConcreteClass.class;
-    typing = typing(superclass, interfaces);
-    assertEquals(superclass, typing.superclass);
+  public void creates_legal_typing() {
+    assertFactory(ConcreteClass.class, interfaces);
+    assertFactory(AbstractClass.class, interfaces);
+    assertFactory(ConcreteClass.class, classes());
+    assertFactory(Object.class, interfaces);
   }
 
-  @Test
-  public void should_get_abstract_superclass() {
-    abstract class AbstractClass {}
-    superclass = AbstractClass.class;
-    typing = typing(superclass, interfaces);
+  private static void assertFactory(Class<?> superclass, Set<? extends Class<?>> interfaces) {
+    Typing typing = typing(superclass, interfaces);
     assertEquals(superclass, typing.superclass);
-  }
-
-  @Test
-  public void should_get_interfaces() {
-    typing = typing(superclass, interfaces);
     assertEquals(interfaces, typing.interfaces);
   }
 
   @Test
-  public void should_get_no_interfaces() {
-    interfaces = new HashSet<>();
-    typing = typing(superclass, interfaces);
-    assertEquals(interfaces, typing.interfaces);
+  public void fails_for_illegal_typing() {
+    assertFactoryFails(Interface.class, interfaces);
+    assertFactoryFails(AnnotationClass.class, interfaces);
+    assertFactoryFails(int.class, interfaces);
+    assertFactoryFails(Object[].class, interfaces);
+    assertFactoryFails(superclass, classes(ConcreteClass.class));
+    assertFactoryFails(superclass, classes(AbstractClass.class));
+    assertFactoryFails(superclass, classes(AnnotationClass.class));
+    assertFactoryFails(superclass, classes(int.class));
+    assertFactoryFails(superclass, classes(Object[].class));
+    assertFactoryFails(null, interfaces);
+    assertFactoryFails(superclass, null);
   }
 
-  @Test
-  public void should_fail_for_interface_as_superclass() {
-    superclass = Interface.class;
+  private static void assertFactoryFails(Class<?> superclass, Set<? extends Class<?>> interfaces) {
     try {
       typing(superclass, interfaces);
       fail();
@@ -61,104 +62,60 @@ public class TestTyping {
   }
 
   @Test
-  public void should_fail_for_annotation_as_superclass() {
-    superclass = AnnotationClass.class;
-    try {
-      typing(superclass, interfaces);
-      fail();
-    } catch (ProxyException e) {}
+  public void extends_type() {
+    typing = extending(ConcreteClass.class);
+    assertEquals(ConcreteClass.class, typing.superclass);
+    assertEquals(classes(), typing.interfaces);
   }
 
   @Test
-  public void should_fail_for_primitive_type_as_superclass() {
-    superclass = int.class;
-    try {
-      typing(superclass, interfaces);
-      fail();
-    } catch (ProxyException e) {}
+  public void implements_type() {
+    typing = implementing(Interface.class);
+    assertEquals(Object.class, typing.superclass);
+    assertEquals(classes(Interface.class), typing.interfaces);
   }
 
   @Test
-  public void should_fail_for_array_as_superclass() {
-    superclass = Object[].class;
-    try {
-      typing(superclass, interfaces);
-      fail();
-    } catch (ProxyException e) {}
+  public void implements_types() {
+    typing = implementing(InterfaceA.class, InterfaceB.class);
+    assertEquals(Object.class, typing.superclass);
+    assertEquals(classes(InterfaceA.class, InterfaceB.class), typing.interfaces);
   }
 
   @Test
-  public void should_fail_for_concrete_class_as_interface() {
-    class ConcreteClass {}
-    interfaces = classes(ConcreteClass.class);
-    try {
-      typing(superclass, interfaces);
-      fail();
-    } catch (ProxyException e) {}
+  public void subclasses_concrete_class() {
+    typing = subclassing(ConcreteClass.class);
+    assertEquals(ConcreteClass.class, typing.superclass);
+    assertEquals(classes(), typing.interfaces);
   }
 
   @Test
-  public void should_fail_for_abstract_class_as_interface() {
-    abstract class AbstractClass {}
-    interfaces = classes(AbstractClass.class);
-    try {
-      typing(superclass, interfaces);
-      fail();
-    } catch (ProxyException e) {}
+  public void subclasses_abstract_class() {
+    typing = subclassing(AbstractClass.class);
+    assertEquals(AbstractClass.class, typing.superclass);
+    assertEquals(classes(), typing.interfaces);
   }
 
   @Test
-  public void should_fail_for_annotation_as_interface() {
-    interfaces = classes(AnnotationClass.class);
-    try {
-      typing(superclass, interfaces);
-      fail();
-    } catch (ProxyException e) {}
-  }
-
-  @Test
-  public void should_fail_for_primitive_type_as_interface() {
-    interfaces = classes(int.class);
-    try {
-      typing(superclass, interfaces);
-      fail();
-    } catch (ProxyException e) {}
-  }
-
-  @Test
-  public void should_fail_for_array_as_interface() {
-    interfaces = classes(Object[].class);
-    try {
-      typing(superclass, interfaces);
-      fail();
-    } catch (ProxyException e) {}
-  }
-
-  @Test
-  public void should_fail_for_null_superclass() {
-    try {
-      typing(null, interfaces);
-      fail();
-    } catch (ProxyException e) {}
-  }
-
-  @Test
-  public void should_fail_for_null_interfaces() {
-    try {
-      typing(superclass, null);
-      fail();
-    } catch (ProxyException e) {}
+  public void subclasses_interface() {
+    typing = subclassing(Interface.class);
+    assertEquals(Object.class, typing.superclass);
+    assertEquals(classes(Interface.class), typing.interfaces);
   }
 
   private static Set<Class<?>> classes(Class<?>... classes) {
     return new HashSet<>(Arrays.asList(classes));
   }
 
-  private interface Interface {}
+  private static class ConcreteClass {}
 
-  private interface InterfaceA {}
+  private static abstract class AbstractClass {}
 
-  private interface InterfaceB {}
+  private static interface Interface {}
 
-  private @interface AnnotationClass {}
+  private static interface InterfaceA {}
+
+  private static interface InterfaceB {}
+
+  private static @interface AnnotationClass {}
 }
