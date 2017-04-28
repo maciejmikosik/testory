@@ -263,7 +263,7 @@ For example, you want to assert that there were no interactions on mock, meaning
 Asserting that there were no invocations on each method one by one would be tedious.
 You can achieve it using `onInstance` invocation matcher in combination with `thenCalledNever` assertion.
 
-    `thenCalledNever(onInstance(mock))`
+    thenCalledNever(onInstance(mock));
 
 There are times when tested object has many collaborators and they are subjects to constant change.
 You want to write test in manner that would not require to correct stubbings every time a method is moved from one collaborator to another.
