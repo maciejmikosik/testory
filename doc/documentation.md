@@ -396,7 +396,7 @@ Field of final type is assigned to sample data
 Random sample data is deterministically generated using field type and field name as a seed.
 
 # Fine Points
-[arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging) | [api](#api) | [class loader](#classloader)
+[arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [concurrency](#concurrency) |[purging](#purging) | [api](#api) | [class loader](#classloader)
 
 ### Arrays
 
@@ -447,6 +447,20 @@ Any of the following invokes real method on unreal (mocked/proxied) object causi
  - `when(instance).finalMethod()`
  - `givenTry(instance).finalMethod()`
  - `givenTimes(n, instance).finalMethod()`
+
+### Concurrency
+
+Testory api is accessed through static methods.
+To make it thread-safe, testory maintains `ThreadLocal` state that contains all stubbings and invocations on mocks.
+This way you can execute tests in parallel and state visible by one thread is separated from other threads.
+
+Traditionally tests are executed using single thread (let's call it main thread).
+For example, junit relies on assertions being called in main thread.
+Testory similarly assumes that mocking, stubbing and verification is done in main thread.
+However, once mock is created, it can be shared and accessed concurrently from any thread.
+Other threads will see stubbed behavior and interactions on mocks done from other threads will be verifiable by main thread.
+But to make it work you need to ensure happens-before relationship between stubbing, other thread code and verification.
+If you stubbed mock with custom `Handler`, then you are responsible to make that handler thread-safe.
 
 ### Purging
 (this feature is in beta)
