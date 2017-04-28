@@ -3,12 +3,17 @@ package org.testory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Purging.triggerPurge;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +23,7 @@ import org.junit.Test;
 
 public class TestMocking {
   private Object mock, object;
+  private Throwable throwable;
 
   @Before
   public void before() {
@@ -140,6 +146,42 @@ public class TestMocking {
     }
     Foo foo = mock(Foo.class);
     assertNull(foo.hashCode(new Foo()));
+  }
+
+  @Test
+  public void throwable_fill_in_stack_trace_is_prestubbed_to_return_this() {
+    throwable = mock(Throwable.class);
+    assertSame(throwable, throwable.fillInStackTrace());
+  }
+
+  @Test
+  public void throwable_print_stack_trace_is_prestubbed_to_return_mock_name() {
+    PrintStream backup = System.err;
+    try {
+      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+      System.setErr(new PrintStream(buffer));
+      throwable = mock(Throwable.class);
+      throwable.printStackTrace();
+      assertEquals(throwable.toString(), new String(buffer.toByteArray()));
+    } finally {
+      System.setErr(backup);
+    }
+  }
+
+  @Test
+  public void throwable_print_stack_trace_to_print_stream_is_prestubbed_to_return_mock_name() {
+    throwable = mock(Throwable.class);
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    throwable.printStackTrace(new PrintStream(buffer));
+    assertEquals(throwable.toString(), new String(buffer.toByteArray()));
+  }
+
+  @Test
+  public void throwable_print_stack_trace_to_print_writer_is_prestubbed_to_return_mock_name() {
+    throwable = mock(Throwable.class);
+    StringWriter writer = new StringWriter();
+    throwable.printStackTrace(new PrintWriter(writer));
+    assertEquals(throwable.toString(), writer.toString());
   }
 
   @Test

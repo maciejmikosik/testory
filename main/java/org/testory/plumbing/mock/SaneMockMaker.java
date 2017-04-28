@@ -4,6 +4,10 @@ import static java.util.Objects.deepEquals;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.Stubbing.stubbing;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.Stubbing;
 import org.testory.plumbing.history.History;
@@ -34,6 +38,12 @@ public class SaneMockMaker implements Maker {
         .add(stubbingEquals(mock, name))
         .add(stubbingHashCode(mock, name))
         .add(stubbingToString(mock, name));
+    if (Throwable.class.isAssignableFrom(type)) {
+      history.add(stubbingFillInStackTrace(mock));
+      history.add(stubbingPrintStackTrace(mock));
+      history.add(stubbingPrintStackTracePrintStream(mock));
+      history.add(stubbingPrintStackTracePrintWriter(mock));
+    }
     return mock;
   }
 
@@ -57,6 +67,43 @@ public class SaneMockMaker implements Maker {
     return stubbing(onInvocation(mock, "toString"), new Handler() {
       public Object handle(Invocation invocation) {
         return name;
+      }
+    });
+  }
+
+  private static Stubbing stubbingFillInStackTrace(Object mock) {
+    return stubbing(onInvocation(mock, "fillInStackTrace"), new Handler() {
+      public Object handle(Invocation invocation) {
+        return invocation.instance;
+      }
+    });
+  }
+
+  private static Stubbing stubbingPrintStackTrace(Object mock) {
+    return stubbing(onInvocation(mock, "printStackTrace"), new Handler() {
+      public Object handle(Invocation invocation) throws IOException {
+        System.err.write(invocation.instance.toString().getBytes());
+        return null;
+      }
+    });
+  }
+
+  private static Stubbing stubbingPrintStackTracePrintStream(Object mock) {
+    return stubbing(onInvocation(mock, "printStackTrace", PrintStream.class), new Handler() {
+      public Object handle(Invocation invocation) throws IOException {
+        PrintStream printStream = (PrintStream) invocation.arguments.get(0);
+        printStream.write(invocation.instance.toString().getBytes());
+        return null;
+      }
+    });
+  }
+
+  private static Stubbing stubbingPrintStackTracePrintWriter(Object mock) {
+    return stubbing(onInvocation(mock, "printStackTrace", PrintWriter.class), new Handler() {
+      public Object handle(Invocation invocation) {
+        PrintWriter printWriter = (PrintWriter) invocation.arguments.get(0);
+        printWriter.write(invocation.instance.toString());
+        return null;
       }
     });
   }
