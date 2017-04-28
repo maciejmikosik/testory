@@ -1,6 +1,5 @@
 package org.testory.plumbing.mock;
 
-import static org.testory.plumbing.Calling.calling;
 import static org.testory.plumbing.Mocking.mocking;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.history.FilteredHistory.filter;
@@ -44,14 +43,14 @@ public class RawMockMaker implements Maker {
   private Handler handler() {
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
-        history.add(calling(invocation));
-        Stubbing stubbing = stubbingFor(invocation);
+        history.add(invocation);
+        Stubbing stubbing = findStubbingFor(invocation);
         return stubbing.handler.handle(invocation);
       }
     };
   }
 
-  public Stubbing stubbingFor(Invocation invocation) {
+  public Stubbing findStubbingFor(Invocation invocation) {
     for (Stubbing stubbing : stubbingHistory.get()) {
       if (stubbing.invocationMatcher.matches(invocation)) {
         return stubbing;
