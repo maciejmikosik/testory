@@ -230,8 +230,11 @@ If you don't want to specify exact argument, but still care about its value, you
 
     thenCalled(list).add(any(Object.class, startsWith("prefix")));
 
-`Class` passed to `any` is just for inferring purpose.
+`Class` passed to `any` is just for type inferring.
 Argument can be instance of any type and still can match.
+If you want to match arguments that can be assigned to specific type, use `anyInstanceOf`.
+
+    thenCalled(list).add(anyInstanceOf(Runnable.class));
 
 In most cases you can mix `any` with real arguments.
 
