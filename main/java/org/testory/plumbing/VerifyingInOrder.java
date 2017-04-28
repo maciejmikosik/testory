@@ -5,6 +5,7 @@ import static org.testory.plumbing.PlumbingException.check;
 
 import org.testory.common.Chain;
 import org.testory.common.Optional;
+import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
 public class VerifyingInOrder {
@@ -24,7 +25,7 @@ public class VerifyingInOrder {
     while (unverified.size() > 0) {
       Object event = unverified.get();
       unverified = unverified.remove();
-      if (event instanceof Calling && invocationMatcher.matches(((Calling) event).invocation)) {
+      if (event instanceof Invocation && invocationMatcher.matches((Invocation) event)) {
         return Optional.of(verifyingInOrder(unverified.reverse()));
       }
     }

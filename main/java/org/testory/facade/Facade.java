@@ -9,7 +9,6 @@ import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
-import static org.testory.plumbing.Calling.callings;
 import static org.testory.plumbing.Checker.checker;
 import static org.testory.plumbing.CheckingProxer.checkingProxer;
 import static org.testory.plumbing.Inspecting.inspecting;
@@ -49,7 +48,6 @@ import org.testory.common.Matcher;
 import org.testory.common.Nullable;
 import org.testory.common.Optional;
 import org.testory.common.VoidClosure;
-import org.testory.plumbing.Calling;
 import org.testory.plumbing.Checker;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Maker;
@@ -78,6 +76,7 @@ public class Facade {
   private final Matcherizer matcherizer;
   private final WildcardSupport wildcardSupport;
   private final FilteredHistory<Inspecting> inspectingHistory;
+  private final FilteredHistory<Invocation> invocationHistory;
   private final Checker checker;
 
   public Facade(
@@ -88,6 +87,7 @@ public class Facade {
       Maker mockMaker,
       Injector injector,
       FilteredHistory<Inspecting> inspectingHistory,
+      FilteredHistory<Invocation> invocationHistory,
       WildcardSupport wildcardSupport,
       Matcherizer matcherizer,
       Checker checker) {
@@ -98,6 +98,7 @@ public class Facade {
     this.mockMaker = mockMaker;
     this.injector = injector;
     this.inspectingHistory = inspectingHistory;
+    this.invocationHistory = invocationHistory;
     this.wildcardSupport = wildcardSupport;
     this.matcherizer = matcherizer;
     this.checker = checker;
@@ -113,10 +114,21 @@ public class Facade {
     Maker mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     Injector injector = injector(mockMaker);
     FilteredHistory<Inspecting> inspectingHistory = filter(Inspecting.class, history);
+    FilteredHistory<Invocation> invocationHistory = filter(Invocation.class, history);
     WildcardSupport wildcardSupport = wildcardSupport(history, tokenizer(), formatter);
     Matcherizer matcherizer = wildcardMatcherizer(history, repairer(), formatter);
-    return new Facade(history, formatter, proxer, mockNamer, mockMaker, injector,
-        inspectingHistory, wildcardSupport, matcherizer, checker);
+    return new Facade(
+        history,
+        formatter,
+        proxer,
+        mockNamer,
+        mockMaker,
+        injector,
+        inspectingHistory,
+        invocationHistory,
+        wildcardSupport,
+        matcherizer,
+        checker);
   }
 
   private static Maker mockMaker(History history, Proxer proxer) {
@@ -634,8 +646,8 @@ public class Facade {
     checker.matcher(numberMatcher);
     checker.notNull(invocationMatcher);
     int numberOfCalls = 0;
-    for (Calling calling : callings(history.get())) {
-      if (invocationMatcher.matches(calling.invocation)) {
+    for (Invocation invocation : invocationHistory.get()) {
+      if (invocationMatcher.matches(invocation)) {
         numberOfCalls++;
       }
     }
@@ -644,7 +656,7 @@ public class Facade {
       throw assertionError("\n"
           + formatSection("expected called times " + numberMatcher, invocationMatcher)
           + formatSection("but called", "times " + numberOfCalls)
-          + formatCallings());
+          + formatInvocations());
     }
   }
 
@@ -668,7 +680,7 @@ public class Facade {
       throw assertionError("\n"
           + formatSection("expected called in order", invocationMatcher)
           + "  but not called\n"
-          + formatCallings());
+          + formatInvocations());
     }
   }
 
@@ -702,13 +714,12 @@ public class Facade {
             + printStackTrace(((Thrown) effect).throwable);
   }
 
-  private String formatCallings() {
+  private String formatInvocations() {
     StringBuilder builder = new StringBuilder();
 
     for (Object event : history.get().reverse()) {
-      if (event instanceof Calling) {
-        Calling calling = (Calling) event;
-        Invocation invocation = calling.invocation;
+      if (event instanceof Invocation) {
+        Invocation invocation = (Invocation) event;
         builder.append("    ").append(formatter.format(invocation)).append("\n");
       }
     }
