@@ -120,7 +120,17 @@ public class DefaultFacade implements Facade {
   }
 
   public void given(Closure closure) {
-    throw new TestoryException("\n\tgiven(Closure) is confusing, do not use it\n");
+    checker.notNull(closure);
+    try {
+      closure.invoke();
+    } catch (Throwable e) {
+      throw new TestoryException(e);
+    }
+  }
+
+  public void given(VoidClosure closure) {
+    checker.notNull(closure);
+    given(asClosure(closure));
   }
 
   public <T> T given(T object) {
@@ -155,6 +165,11 @@ public class DefaultFacade implements Facade {
         throw gently(throwable);
       }
     }
+  }
+
+  public void givenTimes(int number, VoidClosure closure) {
+    checker.notNull(closure);
+    givenTimes(number, asClosure(closure));
   }
 
   public <T> T givenTimes(final int number, T object) {
@@ -245,6 +260,11 @@ public class DefaultFacade implements Facade {
   public <T> T any(Class<T> type, Object matcher) {
     checker.matcher(matcher);
     return (T) wildcardSupport.any(type, matcher);
+  }
+
+  public <T> T anyInstanceOf(Class<T> type) {
+    checker.notNull(type);
+    return (T) wildcardSupport.anyInstanceOf(type);
   }
 
   public boolean a(boolean value) {
@@ -704,6 +724,15 @@ public class DefaultFacade implements Facade {
     return asMatcher instanceof DiagnosticMatcher
         ? formatSection("diagnosis", ((DiagnosticMatcher) asMatcher).diagnose(item))
         : "";
+  }
+
+  private static Closure asClosure(final VoidClosure closure) {
+    return new Closure() {
+      public Object invoke() throws Throwable {
+        closure.invoke();
+        return null;
+      }
+    };
   }
 
   private static Matcher exactly(final int number) {

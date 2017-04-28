@@ -31,6 +31,10 @@ public class Testory {
     getFacade().given(closure);
   }
 
+  public static void given(VoidClosure closure) {
+    getFacade().given(closure);
+  }
+
   public static <T> T given(T object) {
     return getFacade().given(object);
   }
@@ -48,6 +52,10 @@ public class Testory {
   }
 
   public static void givenTimes(int number, Closure closure) {
+    getFacade().givenTimes(number, closure);
+  }
+
+  public static void givenTimes(int number, VoidClosure closure) {
     getFacade().givenTimes(number, closure);
   }
 
@@ -93,6 +101,10 @@ public class Testory {
 
   public static <T> T any(Class<T> type, Object matcher) {
     return getFacade().any(type, matcher);
+  }
+
+  public static <T> T anyInstanceOf(Class<T> type) {
+    return getFacade().anyInstanceOf(type);
   }
 
   public static boolean a(boolean value) {

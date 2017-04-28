@@ -10,6 +10,8 @@ public interface Facade {
 
   void given(Closure closure);
 
+  void given(VoidClosure closure);
+
   <T> T given(T object);
 
   void given(boolean primitive);
@@ -19,6 +21,8 @@ public interface Facade {
   <T> T givenTry(T object);
 
   void givenTimes(int number, Closure closure);
+
+  void givenTimes(int number, VoidClosure closure);
 
   <T> T givenTimes(int number, T object);
 
@@ -41,6 +45,8 @@ public interface Facade {
   <T> T any(Class<T> type);
 
   <T> T any(Class<T> type, Object matcher);
+
+  <T> T anyInstanceOf(Class<T> type);
 
   boolean a(boolean value);
 

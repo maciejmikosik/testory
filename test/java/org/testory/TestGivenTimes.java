@@ -6,12 +6,14 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.givenTimes;
 import static org.testory.testing.Closures.returning;
+import static org.testory.testing.Closures.voidReturning;
 
 import java.util.concurrent.Callable;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.common.Closure;
+import org.testory.common.VoidClosure;
 
 public class TestGivenTimes {
   private int times, counter, failTime;
@@ -25,7 +27,7 @@ public class TestGivenTimes {
   }
 
   @Test
-  public void calls_closure_many_times() {
+  public void closure_is_called_many_times() {
     givenTimes(times, new Closure() {
       public Void invoke() {
         counter++;
@@ -36,7 +38,7 @@ public class TestGivenTimes {
   }
 
   @Test
-  public void calls_closure_zero_times() {
+  public void closure_is_called_zero_times() {
     givenTimes(0, new Closure() {
       public Void invoke() {
         counter++;
@@ -47,7 +49,7 @@ public class TestGivenTimes {
   }
 
   @Test
-  public void gently_propagates_throwable_thrown_by_closure() {
+  public void closure_can_throw_throwable() {
     times = 5;
     failTime = 3;
     try {
@@ -70,7 +72,7 @@ public class TestGivenTimes {
   }
 
   @Test
-  public void cannot_call_closure_negative_number_of_times() {
+  public void closure_cannot_be_called_negative_number_of_times() {
     try {
       givenTimes(-1, returning(null));
       fail();
@@ -86,7 +88,65 @@ public class TestGivenTimes {
   }
 
   @Test
-  public void calls_invocation_many_times() {
+  public void void_closure_is_called_many_times() {
+    givenTimes(times, new VoidClosure() {
+      public void invoke() {
+        counter++;
+      }
+    });
+    assertEquals(times, counter);
+  }
+
+  @Test
+  public void void_closure_is_called_zero_times() {
+    givenTimes(0, new VoidClosure() {
+      public void invoke() {
+        counter++;
+      }
+    });
+    assertEquals(0, counter);
+  }
+
+  @Test
+  public void void_closure_can_throw_throwable() {
+    times = 5;
+    failTime = 3;
+    try {
+      givenTimes(times, new VoidClosure() {
+        public void invoke() throws Throwable {
+          counter++;
+          if (counter == failTime) {
+            throw exception;
+          }
+        }
+      });
+    } catch (Throwable throwable) {
+      assertTrue(throwable instanceof RuntimeException);
+      assertSame(exception, throwable.getCause());
+      assertEquals(failTime, counter);
+      return;
+    }
+    fail();
+  }
+
+  @Test
+  public void void_closure_cannot_be_called_negative_number_of_times() {
+    try {
+      givenTimes(-1, voidReturning());
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void void_closure_cannot_be_null() {
+    try {
+      givenTimes(times, (VoidClosure) null);
+      fail();
+    } catch (TestoryException e) {}
+  }
+
+  @Test
+  public void invocation_is_called_many_times() {
     givenTimes(times, new Runnable() {
       public void run() {
         counter++;
@@ -96,7 +156,7 @@ public class TestGivenTimes {
   }
 
   @Test
-  public void calls_invocation_zero_times() {
+  public void invocation_is_called_zero_times() {
     times = 0;
     givenTimes(0, new Runnable() {
       public void run() {
@@ -107,7 +167,7 @@ public class TestGivenTimes {
   }
 
   @Test
-  public void gently_propagates_throwable_thrown_by_invocation() {
+  public void invocation_can_throw_throwable() {
     times = 5;
     failTime = 3;
     try {
@@ -129,7 +189,7 @@ public class TestGivenTimes {
   }
 
   @Test
-  public void cannot_call_invocation_negative_number_of_times() {
+  public void invocation_cannot_be_called_negative_number_of_times() {
     try {
       givenTimes(-1, new Runnable() {
         public void run() {}

@@ -61,6 +61,20 @@ public class WildcardSupport {
     return anyImpl(printableMatcher, type);
   }
 
+  public Object anyInstanceOf(final Class<?> type) {
+    check(type != null);
+    Matcher matcher = new Matcher() {
+      public boolean matches(Object item) {
+        return type.isInstance(item);
+      }
+
+      public String toString() {
+        return format("anyInstanceOf(%s)", type.getName());
+      }
+    };
+    return anyImpl(matcher, type);
+  }
+
   public Object a(final Object value) {
     check(value != null);
     DelegatingMatcher printableMatcher = new DelegatingMatcher(equalDeep(value)) {
