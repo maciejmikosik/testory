@@ -66,6 +66,7 @@ If you need more complicated logic than `equals` you can use [Matchers](#matcher
 
     given(list = asList("element"));
     when(list.clone());
+    thenReturned(equalTo(list));
     thenReturned(not(sameInstance(list)));
 
 ### thenThrown
