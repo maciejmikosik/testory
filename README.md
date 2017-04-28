@@ -46,6 +46,4 @@ or handy macros.
         when(list.size());
         thenReturned(5);
 
-See [Tutorial](doc/tutorial.md) for complete list of features.
-
-[Download release](https://github.com/testory/testory/releases).
+See [Documentation](doc/documentation.md) for complete list of features.

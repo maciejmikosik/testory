@@ -66,6 +66,7 @@ If you need more complicated logic than `equals` you can use [Matchers](#matcher
 
     given(list = asList("element"));
     when(list.clone());
+    thenReturned(equalTo(list));
     thenReturned(not(sameInstance(list)));
 
 ### thenThrown
@@ -181,6 +182,11 @@ You can restub already stubbed invocation, because most recent stubbing takes pr
 Newly created mock is already stubbed for convenience.
 `equals`/`hashCode` is stubbed, so mock is equal only to itself.
 `toString` is stubbed to contain class name and unique ordinal.
+
+If mock is instance of `Throwable` then additional methods are stubbed.
+`fillInStackTrace` is stubbed to return `this` instance.
+All overloadings of `printStackTrace` are stubbed to print mock's name.
+
 All other methods are stubbed to return `null` (or binary zero for primitive types).
 Those default stubbings can be restubbed as any other stubbing.
 
@@ -225,8 +231,11 @@ If you don't want to specify exact argument, but still care about its value, you
 
     thenCalled(list).add(any(Object.class, startsWith("prefix")));
 
-`Class` passed to `any` is just for inferring purpose.
+`Class` passed to `any` is just for type inferring.
 Argument can be instance of any type and still can match.
+If you want to match arguments that can be assigned to specific type, use `anyInstanceOf`.
+
+    thenCalled(list).add(anyInstanceOf(Runnable.class));
 
 In most cases you can mix `any` with real arguments.
 
@@ -245,7 +254,7 @@ Use `the` shortcut if you expect exactly same instance
 
     given(willReturn(true), mock).someMethod(the(instance));
 
-Above examples work well if you known exact mock and method of invocation.
+Above examples work well if you know exact mock and method of invocation.
 Sometimes you want to be less specific than that.
 You can take full control of matching invocations by implementing your own `InvocationMatcher`.
 It is functional interface that answers, whether particular invocation is one you are interested about.
@@ -263,7 +272,7 @@ For example, you want to assert that there were no interactions on mock, meaning
 Asserting that there were no invocations on each method one by one would be tedious.
 You can achieve it using `onInstance` invocation matcher in combination with `thenCalledNever` assertion.
 
-    `thenCalledNever(onInstance(mock))`
+    thenCalledNever(onInstance(mock));
 
 There are times when tested object has many collaborators and they are subjects to constant change.
 You want to write test in manner that would not require to correct stubbings every time a method is moved from one collaborator to another.
@@ -374,9 +383,13 @@ Initialization depends on type of field.
 Field of array type is initialized to array of size 1. Array's cell is initialized recursively.
 
 Field of non-final type is assigned to mock. Mock is conveniently prestubbed
- - `toString` is stubbed to return name of field
- - `equals` is stubbed so mock is equal only to itself
- - `hashCode` is stubbed to obey contract
+ - instance of `Object` is prestubbed.
+    - `toString` is stubbed to return name of field
+    - `equals` is stubbed so mock is equal only to itself
+    - `hashCode` is stubbed to obey contract
+ - instance of `Throwable` is additionally prestubbed
+    - `fillInStackTrace` is stubbed to return `this` instance
+    - `printStackTrace` is stubbed to print mock's name to relevant stream
 
 Field of final type is assigned to sample data
 
@@ -396,7 +409,7 @@ Field of final type is assigned to sample data
 Random sample data is deterministically generated using field type and field name as a seed.
 
 # Fine Points
-[arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [purging](#purging) | [api](#api) | [class loader](#classloader)
+[arrays](#arrays) | [primitives](#primitives) | [finals](#finals) | [concurrency](#concurrency) |[purging](#purging) | [api](#api) | [class loader](#classloader)
 
 ### Arrays
 
@@ -447,6 +460,20 @@ Any of the following invokes real method on unreal (mocked/proxied) object causi
  - `when(instance).finalMethod()`
  - `givenTry(instance).finalMethod()`
  - `givenTimes(n, instance).finalMethod()`
+
+### Concurrency
+
+Testory api is accessed through static methods.
+To make it thread-safe, testory maintains `ThreadLocal` state that contains all stubbings and invocations on mocks.
+This way you can execute tests in parallel and state visible by one thread is separated from other threads.
+
+Traditionally tests are executed using single thread (let's call it main thread).
+For example, junit relies on assertions being called in main thread.
+Testory similarly assumes that mocking, stubbing and verification is done in main thread.
+However, once mock is created, it can be shared and accessed concurrently from any thread.
+Other threads will see stubbed behavior and interactions on mocks done from other threads will be verifiable by main thread.
+But to make it work you need to ensure happens-before relationship between stubbing, other thread code and verification.
+If you stubbed mock with custom `Handler`, then you are responsible to make that handler thread-safe.
 
 ### Purging
 (this feature is in beta)
