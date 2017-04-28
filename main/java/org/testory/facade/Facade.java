@@ -46,6 +46,8 @@ public interface Facade {
 
   <T> T any(Class<T> type, Object matcher);
 
+  <T> T anyInstanceOf(Class<T> type);
+
   boolean a(boolean value);
 
   char a(char value);

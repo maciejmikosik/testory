@@ -103,6 +103,10 @@ public class Testory {
     return getFacade().any(type, matcher);
   }
 
+  public static <T> T anyInstanceOf(Class<T> type) {
+    return getFacade().anyInstanceOf(type);
+  }
+
   public static boolean a(boolean value) {
     return getFacade().a(value);
   }

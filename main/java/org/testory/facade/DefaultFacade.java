@@ -262,6 +262,11 @@ public class DefaultFacade implements Facade {
     return (T) wildcardSupport.any(type, matcher);
   }
 
+  public <T> T anyInstanceOf(Class<T> type) {
+    checker.notNull(type);
+    return (T) wildcardSupport.anyInstanceOf(type);
+  }
+
   public boolean a(boolean value) {
     return a((Boolean) value);
   }
