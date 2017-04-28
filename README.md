@@ -47,5 +47,3 @@ or handy macros.
         thenReturned(5);
 
 See [Documentation](doc/documentation.md) for complete list of features.
-
-[Download release](https://github.com/testory/testory/releases).
