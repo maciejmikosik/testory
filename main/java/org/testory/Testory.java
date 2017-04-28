@@ -2,6 +2,7 @@ package org.testory;
 
 import static org.testory.facade.DefaultFacade.defaultFacade;
 import static org.testory.plumbing.history.PurgedHistory.newPurgedHistory;
+import static org.testory.plumbing.history.SynchronizedHistory.synchronize;
 
 import org.testory.common.Closure;
 import org.testory.common.Nullable;
@@ -14,7 +15,7 @@ import org.testory.proxy.InvocationMatcher;
 public class Testory {
   private static final ThreadLocal<DefaultFacade> localFacade = new ThreadLocal<DefaultFacade>() {
     protected DefaultFacade initialValue() {
-      return defaultFacade(newPurgedHistory());
+      return defaultFacade(synchronize(newPurgedHistory()));
     }
   };
 
