@@ -67,68 +67,36 @@ import org.testory.proxy.Proxer;
 import org.testory.proxy.proxer.CglibProxer;
 
 public class DefaultFacade implements Facade {
-  private final Formatter formatter;
   private final History history;
+  private final FilteredHistory<Inspecting> inspectingHistory;
+  private final FilteredHistory<Invocation> invocationHistory;
+  private final Formatter formatter;
+  private final Checker checker;
   private final Proxer proxer;
   private final Namer mockNamer;
   private final Maker mockMaker;
   private final Injector injector;
-  private final Matcherizer matcherizer;
   private final WildcardSupport wildcardSupport;
-  private final FilteredHistory<Inspecting> inspectingHistory;
-  private final FilteredHistory<Invocation> invocationHistory;
-  private final Checker checker;
+  private final Matcherizer matcherizer;
 
-  private DefaultFacade(
-      History history,
-      Formatter formatter,
-      Proxer proxer,
-      Namer mockNamer,
-      Maker mockMaker,
-      Injector injector,
-      FilteredHistory<Inspecting> inspectingHistory,
-      FilteredHistory<Invocation> invocationHistory,
-      WildcardSupport wildcardSupport,
-      Matcherizer matcherizer,
-      Checker checker) {
-    this.history = history;
-    this.formatter = formatter;
-    this.proxer = proxer;
-    this.mockNamer = mockNamer;
-    this.mockMaker = mockMaker;
-    this.injector = injector;
-    this.inspectingHistory = inspectingHistory;
-    this.invocationHistory = invocationHistory;
-    this.wildcardSupport = wildcardSupport;
-    this.matcherizer = matcherizer;
-    this.checker = checker;
+  private DefaultFacade(History mutableHistory) {
+    Class<TestoryException> exception = TestoryException.class;
+    QuietFormatter quietFormatter = quietFormatter();
+    formatter = quietFormatter;
+    history = quietFormatter.quiet(mutableHistory);
+    inspectingHistory = filter(Inspecting.class, history);
+    invocationHistory = filter(Invocation.class, history);
+    checker = checker(history, exception);
+    proxer = wrapping(exception, nonFinal(typeSafe(wrapping(exception, new CglibProxer()))));
+    mockNamer = uniqueNamer(history);
+    mockMaker = mockMaker(history, checkingProxer(checker, proxer));
+    injector = injector(mockMaker);
+    wildcardSupport = wildcardSupport(history, tokenizer(), formatter);
+    matcherizer = wildcardMatcherizer(history, repairer(), formatter);
   }
 
   public static DefaultFacade defaultFacade(History mutableHistory) {
-    Class<TestoryException> exception = TestoryException.class;
-    QuietFormatter formatter = quietFormatter();
-    History history = formatter.quiet(mutableHistory);
-    Proxer proxer = wrapping(exception, nonFinal(typeSafe(wrapping(exception, new CglibProxer()))));
-    Namer mockNamer = uniqueNamer(history);
-    Checker checker = checker(history, exception);
-    Maker mockMaker = mockMaker(history, checkingProxer(checker, proxer));
-    Injector injector = injector(mockMaker);
-    FilteredHistory<Inspecting> inspectingHistory = filter(Inspecting.class, history);
-    FilteredHistory<Invocation> invocationHistory = filter(Invocation.class, history);
-    WildcardSupport wildcardSupport = wildcardSupport(history, tokenizer(), formatter);
-    Matcherizer matcherizer = wildcardMatcherizer(history, repairer(), formatter);
-    return new DefaultFacade(
-        history,
-        formatter,
-        proxer,
-        mockNamer,
-        mockMaker,
-        injector,
-        inspectingHistory,
-        invocationHistory,
-        wildcardSupport,
-        matcherizer,
-        checker);
+    return new DefaultFacade(mutableHistory);
   }
 
   private static Maker mockMaker(History history, Proxer proxer) {
