@@ -254,7 +254,7 @@ Use `the` shortcut if you expect exactly same instance
 
     given(willReturn(true), mock).someMethod(the(instance));
 
-Above examples work well if you known exact mock and method of invocation.
+Above examples work well if you know exact mock and method of invocation.
 Sometimes you want to be less specific than that.
 You can take full control of matching invocations by implementing your own `InvocationMatcher`.
 It is functional interface that answers, whether particular invocation is one you are interested about.
