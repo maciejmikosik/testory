@@ -2,6 +2,9 @@ package org.testory.proxy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.testory.proxy.Typing.extending;
+import static org.testory.proxy.Typing.implementing;
+import static org.testory.proxy.Typing.subclassing;
 import static org.testory.proxy.Typing.typing;
 
 import java.util.Arrays;
@@ -14,6 +17,7 @@ import org.junit.Test;
 public class TestTyping {
   private Class<?> superclass;
   private Set<? extends Class<?>> interfaces;
+  private Typing typing;
 
   @Before
   public void before() {
@@ -55,6 +59,48 @@ public class TestTyping {
       typing(superclass, interfaces);
       fail();
     } catch (ProxyException e) {}
+  }
+
+  @Test
+  public void extends_type() {
+    typing = extending(ConcreteClass.class);
+    assertEquals(ConcreteClass.class, typing.superclass);
+    assertEquals(classes(), typing.interfaces);
+  }
+
+  @Test
+  public void implements_type() {
+    typing = implementing(Interface.class);
+    assertEquals(Object.class, typing.superclass);
+    assertEquals(classes(Interface.class), typing.interfaces);
+  }
+
+  @Test
+  public void implements_types() {
+    typing = implementing(InterfaceA.class, InterfaceB.class);
+    assertEquals(Object.class, typing.superclass);
+    assertEquals(classes(InterfaceA.class, InterfaceB.class), typing.interfaces);
+  }
+
+  @Test
+  public void subclasses_concrete_class() {
+    typing = subclassing(ConcreteClass.class);
+    assertEquals(ConcreteClass.class, typing.superclass);
+    assertEquals(classes(), typing.interfaces);
+  }
+
+  @Test
+  public void subclasses_abstract_class() {
+    typing = subclassing(AbstractClass.class);
+    assertEquals(AbstractClass.class, typing.superclass);
+    assertEquals(classes(), typing.interfaces);
+  }
+
+  @Test
+  public void subclasses_interface() {
+    typing = subclassing(Interface.class);
+    assertEquals(Object.class, typing.superclass);
+    assertEquals(classes(Interface.class), typing.interfaces);
   }
 
   private static Set<Class<?>> classes(Class<?>... classes) {

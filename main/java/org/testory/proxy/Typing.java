@@ -1,8 +1,10 @@
 package org.testory.proxy;
 
+import static java.util.Arrays.asList;
 import static org.testory.common.Collections.immutable;
 import static org.testory.proxy.ProxyException.check;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -30,6 +32,20 @@ public class Typing {
       check(interfacee.isInterface() && !interfacee.isAnnotation());
     }
     return new Typing(superclass, interfacesCopy);
+  }
+
+  public static Typing extending(Class<?> type) {
+    return typing(type, new HashSet<Class<?>>());
+  }
+
+  public static Typing implementing(Class<?>... type) {
+    return typing(Object.class, new HashSet<Class<?>>(asList(type)));
+  }
+
+  public static Typing subclassing(Class<?> type) {
+    return type.isInterface()
+        ? implementing(type)
+        : extending(type);
   }
 
   public boolean equals(Object object) {
