@@ -31,6 +31,10 @@ public class Testory {
     getFacade().given(closure);
   }
 
+  public static void given(VoidClosure closure) {
+    getFacade().given(closure);
+  }
+
   public static <T> T given(T object) {
     return getFacade().given(object);
   }

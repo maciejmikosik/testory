@@ -10,6 +10,8 @@ public interface Facade {
 
   void given(Closure closure);
 
+  void given(VoidClosure closure);
+
   <T> T given(T object);
 
   void given(boolean primitive);

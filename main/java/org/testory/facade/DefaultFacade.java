@@ -120,7 +120,17 @@ public class DefaultFacade implements Facade {
   }
 
   public void given(Closure closure) {
-    throw new TestoryException("\n\tgiven(Closure) is confusing, do not use it\n");
+    checker.notNull(closure);
+    try {
+      closure.invoke();
+    } catch (Throwable e) {
+      throw new TestoryException(e);
+    }
+  }
+
+  public void given(VoidClosure closure) {
+    checker.notNull(closure);
+    given(asClosure(closure));
   }
 
   public <T> T given(T object) {
