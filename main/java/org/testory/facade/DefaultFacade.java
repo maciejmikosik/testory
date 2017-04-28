@@ -157,6 +157,11 @@ public class DefaultFacade implements Facade {
     }
   }
 
+  public void givenTimes(int number, VoidClosure closure) {
+    checker.notNull(closure);
+    givenTimes(number, asClosure(closure));
+  }
+
   public <T> T givenTimes(final int number, T object) {
     checker.notNegative(number);
     checker.notNull(object);
@@ -704,6 +709,15 @@ public class DefaultFacade implements Facade {
     return asMatcher instanceof DiagnosticMatcher
         ? formatSection("diagnosis", ((DiagnosticMatcher) asMatcher).diagnose(item))
         : "";
+  }
+
+  private static Closure asClosure(final VoidClosure closure) {
+    return new Closure() {
+      public Object invoke() throws Throwable {
+        closure.invoke();
+        return null;
+      }
+    };
   }
 
   private static Matcher exactly(final int number) {

@@ -20,6 +20,8 @@ public interface Facade {
 
   void givenTimes(int number, Closure closure);
 
+  void givenTimes(int number, VoidClosure closure);
+
   <T> T givenTimes(int number, T object);
 
   <T> T mock(Class<T> type);

@@ -51,6 +51,10 @@ public class Testory {
     getFacade().givenTimes(number, closure);
   }
 
+  public static void givenTimes(int number, VoidClosure closure) {
+    getFacade().givenTimes(number, closure);
+  }
+
   public static <T> T givenTimes(int number, T object) {
     return getFacade().givenTimes(number, object);
   }
