@@ -16,12 +16,11 @@ public class SynchronizedHistory implements History {
     return new SynchronizedHistory(history);
   }
 
-  public Chain<Object> get() {
+  public synchronized Chain<Object> get() {
     return history.get();
   }
 
-  public History add(Object event) {
+  public synchronized History add(Object event) {
     return history.add(event);
   }
-
 }
