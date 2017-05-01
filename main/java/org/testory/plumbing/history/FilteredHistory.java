@@ -22,7 +22,7 @@ public class FilteredHistory<T> {
     return new FilteredHistory<>(type, history);
   }
 
-  public Chain<T> get() {
+  public synchronized Chain<T> get() {
     update();
     return filtered;
   }
