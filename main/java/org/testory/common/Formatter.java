@@ -1,6 +1,6 @@
 package org.testory.common;
 
-import static java.lang.String.join;
+import static org.testory.common.Strings.join;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
@@ -35,6 +35,10 @@ public class Formatter {
           public String next() {
             return format(iterator.next());
           }
+
+          public void remove() {
+            throw new UnsupportedOperationException();
+          }
         };
       }
     };
@@ -58,6 +62,10 @@ public class Formatter {
 
           public Object next() {
             return Array.get(array, index++);
+          }
+
+          public void remove() {
+            throw new UnsupportedOperationException();
           }
         };
       }

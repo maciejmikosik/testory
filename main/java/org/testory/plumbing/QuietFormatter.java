@@ -1,6 +1,6 @@
 package org.testory.plumbing;
 
-import static java.lang.String.join;
+import static org.testory.common.Strings.join;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.history.FilteredHistory.filter;
