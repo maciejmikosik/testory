@@ -27,9 +27,9 @@ public class TestBuilding {
   @Test
   public void build_is_deterministic() throws Exception {
     exec("./run/build");
-    hashA = sha1("/tmp/testory.jar");
+    hashA = sha1("/tmp/build_testory/testory.jar");
     exec("./run/build");
-    hashB = sha1("/tmp/testory.jar");
+    hashB = sha1("/tmp/build_testory/testory.jar");
 
     assertEquals(hashA, hashB);
   }
