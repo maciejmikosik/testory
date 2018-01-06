@@ -95,7 +95,7 @@ public class DefaultFacade implements Facade {
     matcherizer = wildcardMatcherizer(history, repairer(), formatter);
   }
 
-  public static DefaultFacade defaultFacade(History mutableHistory) {
+  public static Facade defaultFacade(History mutableHistory) {
     return new DefaultFacade(mutableHistory);
   }
 
