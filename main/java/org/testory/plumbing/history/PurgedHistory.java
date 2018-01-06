@@ -29,6 +29,16 @@ public class PurgedHistory implements History {
     purge();
   }
 
+  public void cut(Chain<Object> tail) {
+    Chain<Object> iterating = events;
+    Chain<Object> iterated = chain();
+    while (iterating != tail) {
+      iterated = iterated.add(iterating.get());
+      iterating = iterating.remove();
+    }
+    events = iterated.reverse();
+  }
+
   /* 2 inspections happen for chained invocation of when */
   private void purge() {
     if (numberOfInspections > 2) {

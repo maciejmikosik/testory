@@ -23,4 +23,8 @@ public class SynchronizedHistory implements History {
   public synchronized void add(Object event) {
     history.add(event);
   }
+
+  public synchronized void cut(Chain<Object> tail) {
+    history.cut(tail);
+  }
 }

@@ -6,4 +6,6 @@ public interface History {
   Chain<Object> get();
 
   void add(Object event);
+
+  void cut(Chain<Object> tail);
 }

@@ -58,6 +58,12 @@ public class QuietFormatter extends Formatter {
           history.add(event);
         }
       }
+
+      public void cut(Chain<Object> tail) {
+        if (isFormatting == 0) {
+          history.cut(tail);
+        }
+      }
     };
   }
 
