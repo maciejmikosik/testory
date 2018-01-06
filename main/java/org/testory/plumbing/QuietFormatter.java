@@ -53,11 +53,10 @@ public class QuietFormatter extends Formatter {
             : history.get().add(stubbingToString);
       }
 
-      public History add(Object event) {
+      public void add(Object event) {
         if (isFormatting == 0) {
           history.add(event);
         }
-        return this;
       }
     };
   }

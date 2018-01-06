@@ -20,14 +20,13 @@ public class PurgedHistory implements History {
     return events;
   }
 
-  public History add(Object event) {
+  public void add(Object event) {
     check(event != null);
     events = events.add(event);
     if (event instanceof Inspecting) {
       numberOfInspections++;
     }
     purge();
-    return this;
   }
 
   /* 2 inspections happen for chained invocation of when */

@@ -34,10 +34,9 @@ public class SaneMockMaker implements Maker {
     check(type != null);
     check(name != null);
     T mock = mockMaker.make(type, name);
-    history
-        .add(stubbingEquals(mock, name))
-        .add(stubbingHashCode(mock, name))
-        .add(stubbingToString(mock, name));
+    history.add(stubbingEquals(mock, name));
+    history.add(stubbingHashCode(mock, name));
+    history.add(stubbingToString(mock, name));
     if (Throwable.class.isAssignableFrom(type)) {
       history.add(stubbingFillInStackTrace(mock));
       history.add(stubbingPrintStackTrace(mock));

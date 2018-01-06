@@ -5,5 +5,5 @@ import org.testory.common.Chain;
 public interface History {
   Chain<Object> get();
 
-  History add(Object event);
+  void add(Object event);
 }
