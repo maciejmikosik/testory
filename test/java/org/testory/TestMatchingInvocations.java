@@ -15,6 +15,7 @@ import static org.testory.Testory.willReturn;
 import static org.testory.testing.DynamicMatchers.number;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
+import static org.testory.testing.Purging.triggerPurge;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,7 @@ public class TestMatchingInvocations {
 
   @Before
   public void before() {
+    triggerPurge();
     object = newObject("object");
     otherObject = newObject("otherObject");
     value = 123;

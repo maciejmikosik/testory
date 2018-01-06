@@ -35,13 +35,16 @@ public class TestSpying {
   public void returns_from_real_object_method() {
     spy = spy(real);
     assertEquals(object, spy.doReturn(object));
+  }
 
+  @Test
+  public void returns_from_real_object_method_will() {
     given(willSpy(real), onInstance(mock));
     assertEquals(object, mock.doReturn(object));
   }
 
   @Test
-  public void throws_from_real_object_method() throws Throwable {
+  public void throws_from_real_object_method() {
     spy = spy(real);
     try {
       spy.doThrow(throwable);
@@ -49,7 +52,10 @@ public class TestSpying {
     } catch (Throwable e) {
       assertSame(e, throwable);
     }
+  }
 
+  @Test
+  public void throws_from_real_object_method_will() {
     given(willSpy(real), onInstance(mock));
     try {
       mock.doThrow(throwable);
@@ -64,7 +70,10 @@ public class TestSpying {
     spy = spy(real);
     given(willReturn(object), onInstance(mock));
     assertSame(object, mock.doReturn(null));
+  }
 
+  @Test
+  public void can_be_stubbed_will() {
     given(willSpy(real), onInstance(mock));
     given(willReturn(object), onInstance(mock));
     assertSame(object, mock.doReturn(null));
@@ -75,7 +84,10 @@ public class TestSpying {
     spy = spy(real);
     spy.doReturn(object);
     thenCalled(onInstance(spy));
+  }
 
+  @Test
+  public void can_be_verified_will() {
     given(willSpy(real), onInstance(mock));
     mock.doReturn(object);
     thenCalled(onInstance(mock));
@@ -86,7 +98,10 @@ public class TestSpying {
     spy = spy(otherMock);
     given(willReturn(object), onInstance(otherMock));
     assertEquals(object, spy.doReturn(null));
+  }
 
+  @Test
+  public void can_spy_another_mock_will() {
     given(willSpy(otherMock), onInstance(mock));
     given(willReturn(object), onInstance(otherMock));
     assertEquals(object, mock.doReturn(null));
@@ -95,12 +110,15 @@ public class TestSpying {
   @Test
   public void cannot_spy_null() {
     try {
-      willSpy(null);
+      spy(null);
       fail();
     } catch (TestoryException e) {}
+  }
 
+  @Test
+  public void cannot_spy_null_will() {
     try {
-      spy(null);
+      willSpy(null);
       fail();
     } catch (TestoryException e) {}
   }
