@@ -363,7 +363,6 @@ Catches possible `Throwable` thrown by chained method allowing test to run forwa
 (this feature is in beta)
 
 Initializes each field of `this` test and fails if initialization of any field fails.
-Also purges testory internal state (see [purging](#purging)).
 
     @Before
     public void before() {
@@ -478,22 +477,11 @@ If you stubbed mock with custom `Handler`, then you are responsible to make that
 ### Purging
 (this feature is in beta)
 
-Testory maintains global state that holds information about every mock, stubbing and invocation.
-This data needs to be periodically released to prevent running out of memory.
-Since testory has no foolproof way to tell whether one test ended and another started, it relies on some simplistic assumptions
+Testory maintains global state that holds information about every mock, stubbing and invocation. This data needs to be periodically freed up. One reason is to prevent running out of memory. Other is to prevent invocations from previous tests to pollute verification and error messages of next test.
 
- - Only one `when` is used per one test. Thus calling `when`, makes testory to forget about all events that happened before previous `when`.
- - Initialization using `givenTest` is done only once at the very beginning of each test. This makes testory to forget about all events that happened before.
+Since testory has no foolproof way to tell whether one test ended and another started, it relies on some simplistic assumption. Test should contain any number of `given` methods followed by single `when` method followed by any number of `then` methods. Thus calling `given`/`when` will purge last occurrence of `when`/`then` and everything before.
 
-Purging has following consequences
-
- - calling any method on purged mock throws `TestoryException`
- - purged stubbing is no longer in effect
- - purged invocation is not included during verification
- - purged mock is no longer considered to be a mock, so
-  - calling it causes `TestoryException`
-  - stubbing it causes `TestoryException`
-  - verifying it causes `TestoryException`
+Purging has consequences. If purge was triggered by `given`, then there is no result to assert and calling `thenReturned`/`thenThrown` will throw an exception. Any mock created before purge becomes unusable. You will get an exception if you try to stub, verify, or call any method. Purged stubbing is no longer in effect even if it applies to mocks that were not purged. Purged invocations are not included during verification and are not included in error messages.
 
 ### API
 
