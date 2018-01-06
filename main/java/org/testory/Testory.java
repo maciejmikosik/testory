@@ -12,12 +12,13 @@ import org.testory.facade.Facade;
 import org.testory.plumbing.history.History;
 import org.testory.proxy.Handler;
 import org.testory.proxy.InvocationMatcher;
+import org.testory.proxy.proxer.CglibProxer;
 
 public class Testory {
   private static final ThreadLocal<Facade> localFacade = new ThreadLocal<Facade>() {
     protected Facade initialValue() {
       History history = synchronize(newRawHistory());
-      return purging(history, defaultFacade(history));
+      return purging(history, new CglibProxer(), defaultFacade(history));
     }
   };
 
