@@ -2,7 +2,7 @@ package org.testory;
 
 import static org.testory.Testory.mock;
 import static org.testory.Testory.thenCalledTimes;
-import static org.testory.Testory.when;
+import static org.testory.testing.Purging.triggerPurge;
 
 import org.junit.After;
 import org.junit.Before;
@@ -12,8 +12,7 @@ public class TestPerformance {
   @Before
   @After
   public void purge_history() {
-    when("");
-    when("");
+    triggerPurge();
   }
 
   @Test(timeout = 2000)

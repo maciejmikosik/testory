@@ -20,7 +20,11 @@ public class SynchronizedHistory implements History {
     return history.get();
   }
 
-  public synchronized History add(Object event) {
-    return history.add(event);
+  public synchronized void add(Object event) {
+    history.add(event);
+  }
+
+  public synchronized void cut(Chain<Object> tail) {
+    history.cut(tail);
   }
 }
