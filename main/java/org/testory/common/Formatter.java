@@ -1,6 +1,6 @@
 package org.testory.common;
 
-import static org.testory.common.Strings.join;
+import static org.testory.common.SequenceFormatter.sequence;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
@@ -22,31 +22,8 @@ public class Formatter {
     }
   }
 
-  public String formatSequence(final Iterable<?> iterable) {
-    Iterable<String> strings = new Iterable<String>() {
-      public Iterator<String> iterator() {
-        return new Iterator<String>() {
-          Iterator<?> iterator = iterable.iterator();
-
-          public boolean hasNext() {
-            return iterator.hasNext();
-          }
-
-          public String next() {
-            return format(iterator.next());
-          }
-
-          public void remove() {
-            throw new UnsupportedOperationException();
-          }
-        };
-      }
-    };
-    return join(", ", strings);
-  }
-
   private String formatArray(Object array) {
-    return "[" + formatSequence(arrayAsIterable(array)) + "]";
+    return "[" + sequence(", ", this).format(arrayAsIterable(array)) + "]";
   }
 
   private Iterable<Object> arrayAsIterable(final Object array) {

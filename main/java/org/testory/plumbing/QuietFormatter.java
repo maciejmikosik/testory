@@ -1,6 +1,6 @@
 package org.testory.plumbing;
 
-import static org.testory.common.Strings.join;
+import static org.testory.common.SequenceFormatter.sequence;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.history.FilteredHistory.filter;
@@ -40,7 +40,7 @@ public class QuietFormatter extends Formatter {
     return String.format("%s.%s(%s)",
         format(invocation.instance),
         invocation.method.getName(),
-        join(", ", formatSequence(invocation.arguments)));
+        sequence(", ", this).format(invocation.arguments));
   }
 
   public History quiet(final History history) {
