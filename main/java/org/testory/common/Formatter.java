@@ -1,51 +1,5 @@
 package org.testory.common;
 
-import static org.testory.common.SequenceFormatter.sequence;
-
-import java.lang.reflect.Array;
-import java.util.Iterator;
-
-public class Formatter {
-  protected Formatter() {}
-
-  public static Formatter formatter() {
-    return new Formatter();
-  }
-
-  public String format(@Nullable Object object) {
-    if (object == null) {
-      return "null";
-    } else if (object.getClass().isArray()) {
-      return formatArray(object);
-    } else {
-      return String.valueOf(object);
-    }
-  }
-
-  private String formatArray(Object array) {
-    return "[" + sequence(", ", this).format(arrayAsIterable(array)) + "]";
-  }
-
-  private Iterable<Object> arrayAsIterable(final Object array) {
-    return new Iterable<Object>() {
-      public Iterator<Object> iterator() {
-        return new Iterator<Object>() {
-          private final int size = Array.getLength(array);
-          int index = 0;
-
-          public boolean hasNext() {
-            return index < size;
-          }
-
-          public Object next() {
-            return Array.get(array, index++);
-          }
-
-          public void remove() {
-            throw new UnsupportedOperationException();
-          }
-        };
-      }
-    };
-  }
+public interface Formatter {
+  String format(@Nullable Object object);
 }

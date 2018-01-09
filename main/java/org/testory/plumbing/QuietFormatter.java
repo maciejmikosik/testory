@@ -6,15 +6,15 @@ import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 
 import org.testory.common.Chain;
-import org.testory.common.Formatter;
 import org.testory.common.Nullable;
+import org.testory.common.ObjectFormatter;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class QuietFormatter extends Formatter {
+public class QuietFormatter extends ObjectFormatter {
   private int isFormatting = 0;
 
   private QuietFormatter() {}

@@ -6,7 +6,7 @@ import static java.util.Objects.deepEquals;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.setAccessible;
-import static org.testory.common.Formatter.formatter;
+import static org.testory.common.ObjectFormatter.objectFormatter;
 import static org.testory.common.SequenceFormatter.sequence;
 import static org.testory.common.Throwables.gently;
 
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Matchers {
-  private static final Formatter formatter = formatter();
+  private static final Formatter formatter = objectFormatter();
   private static final SequenceFormatter sequenceFormatter = sequence(", ", formatter);
 
   public static final Matcher anything = new Matcher() {

@@ -1,19 +1,19 @@
 package org.testory.common;
 
 import static org.junit.Assert.assertEquals;
-import static org.testory.common.Formatter.formatter;
+import static org.testory.common.ObjectFormatter.objectFormatter;
 import static org.testory.testing.Fakes.newObject;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestFormatter {
+public class TestObjectFormatter {
   private Object a, b, c, d;
   private Formatter formatter;
 
   @Before
   public void before() {
-    formatter = formatter();
+    formatter = objectFormatter();
     a = newObject("a");
     b = newObject("b");
     c = newObject("c");
