@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 import static org.testory.common.Collections.last;
 import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.listOf;
+import static org.testory.common.SequenceFormatter.sequence;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.im.wildcard.WildcardInvocation.wildcardInvocation;
 import static org.testory.plumbing.im.wildcard.Wildcarded.wildcarded;
@@ -17,6 +18,7 @@ import org.testory.common.DelegatingMatcher;
 import org.testory.common.Formatter;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
+import org.testory.common.SequenceFormatter;
 import org.testory.plumbing.history.History;
 import org.testory.plumbing.im.Matcherizer;
 import org.testory.proxy.Invocation;
@@ -26,11 +28,13 @@ public class WildcardMatcherizer implements Matcherizer {
   private final Repairer repairer;
   private final History history;
   private final Formatter formatter;
+  private final SequenceFormatter sequenceFormatter;
 
   private WildcardMatcherizer(History history, Repairer repairer, Formatter formatter) {
     this.history = history;
     this.repairer = repairer;
     this.formatter = formatter;
+    this.sequenceFormatter = sequence(", ", formatter);
   }
 
   public static Matcherizer wildcardMatcherizer(
@@ -121,7 +125,7 @@ public class WildcardMatcherizer implements Matcherizer {
       }
 
       public String toString() {
-        return format("%s.%s(%s)", instance, method.getName(), formatter.formatSequence(arguments));
+        return format("%s.%s(%s)", instance, method.getName(), sequenceFormatter.format(arguments));
       }
     };
   }
@@ -129,7 +133,7 @@ public class WildcardMatcherizer implements Matcherizer {
   private Matcher arrayOf(final List<Matcher> elements) {
     return new DelegatingMatcher(Matchers.arrayOf(elements)) {
       public String toString() {
-        return format("[%s]", formatter.formatSequence(elements));
+        return format("[%s]", sequenceFormatter.format(elements));
       }
     };
   }

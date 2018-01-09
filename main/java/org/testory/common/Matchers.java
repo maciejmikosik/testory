@@ -6,7 +6,8 @@ import static java.util.Objects.deepEquals;
 import static org.testory.common.Checks.checkArgument;
 import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.setAccessible;
-import static org.testory.common.Formatter.formatter;
+import static org.testory.common.ObjectFormatter.objectFormatter;
+import static org.testory.common.SequenceFormatter.sequence;
 import static org.testory.common.Throwables.gently;
 
 import java.lang.reflect.Array;
@@ -16,7 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Matchers {
-  private static final Formatter formatter = formatter();
+  private static final Formatter formatter = objectFormatter();
+  private static final SequenceFormatter sequenceFormatter = sequence(", ", formatter);
 
   public static final Matcher anything = new Matcher() {
     public boolean matches(Object item) {
@@ -73,7 +75,7 @@ public class Matchers {
       }
 
       public String toString() {
-        return format("arrayOf(%s)", formatter.formatSequence(matchers));
+        return format("arrayOf(%s)", sequenceFormatter.format(matchers));
       }
     };
   }
@@ -99,7 +101,7 @@ public class Matchers {
       }
 
       public String toString() {
-        return format("listOf(%s)", formatter.formatSequence(matchers));
+        return format("listOf(%s)", sequenceFormatter.format(matchers));
       }
     };
   }
