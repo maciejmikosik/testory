@@ -12,9 +12,10 @@ import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Checker.checker;
 import static org.testory.plumbing.CheckingProxer.checkingProxer;
 import static org.testory.plumbing.Inspecting.inspecting;
-import static org.testory.plumbing.QuietFormatter.quietFormatter;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
+import static org.testory.plumbing.format.MessageFormatter.messageFormatter;
+import static org.testory.plumbing.format.QuietFormatter.quiet;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 import static org.testory.plumbing.im.wildcard.Repairer.repairer;
 import static org.testory.plumbing.im.wildcard.Tokenizer.tokenizer;
@@ -51,8 +52,8 @@ import org.testory.common.VoidClosure;
 import org.testory.plumbing.Checker;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Maker;
-import org.testory.plumbing.QuietFormatter;
 import org.testory.plumbing.VerifyingInOrder;
+import org.testory.plumbing.format.QuietFormatter;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
 import org.testory.plumbing.im.Matcherizer;
@@ -81,7 +82,7 @@ public class DefaultFacade implements Facade {
 
   private DefaultFacade(History mutableHistory) {
     Class<TestoryException> exception = TestoryException.class;
-    QuietFormatter quietFormatter = quietFormatter();
+    QuietFormatter quietFormatter = quiet(messageFormatter());
     formatter = quietFormatter;
     history = quietFormatter.quiet(mutableHistory);
     inspectingHistory = filter(Inspecting.class, history);
