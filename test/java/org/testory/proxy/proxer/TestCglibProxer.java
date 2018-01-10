@@ -77,7 +77,7 @@ public class TestCglibProxer {
   private Method method;
   private Throwable throwable;
   private int counter;
-  public boolean invoked;
+  private boolean invoked;
 
   @Before
   public void before() throws NoSuchMethodException {
