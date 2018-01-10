@@ -30,6 +30,8 @@ public class WrappingProxer implements Proxer {
   }
 
   public Object proxy(Typing typing, Handler handler) {
+    check(typing != null);
+    check(handler != null);
     try {
       return proxer.proxy(typing, wrapping(handler));
     } catch (ProxyException e) {

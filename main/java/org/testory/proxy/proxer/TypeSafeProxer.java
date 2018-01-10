@@ -19,6 +19,7 @@ public class TypeSafeProxer implements Proxer {
   }
 
   public static Proxer typeSafe(Proxer proxer) {
+    check(proxer != null);
     return new TypeSafeProxer(proxer);
   }
 
