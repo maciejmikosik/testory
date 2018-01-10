@@ -36,6 +36,7 @@ import static org.testory.proxy.handler.ReturningDefaultValueHandler.returningDe
 import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.proxy.handler.ThrowingHandler.throwing;
 import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
+import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
 import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
 import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
 import static org.testory.proxy.proxer.WrappingProxer.wrapping;
@@ -91,12 +92,16 @@ public class DefaultFacade implements Facade {
     inspectingHistory = filter(Inspecting.class, history);
     invocationHistory = filter(Invocation.class, history);
     checker = checker(history, exception);
-    proxer = wrapping(exception, nonFinal(typeSafe(fixObjectBug(wrapping(exception, new CglibProxer())))));
+    proxer = wrapping(exception, rich(wrapping(exception, new CglibProxer())));
     mockNamer = uniqueNamer(history);
     mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     injector = injector(mockMaker);
     wildcardSupport = wildcardSupport(history, tokenizer(), formatter);
     matcherizer = wildcardMatcherizer(history, repairer(), formatter);
+  }
+
+  private static Proxer rich(Proxer proxer) {
+    return nonFinal(typeSafe(jdkCollections(fixObjectBug(proxer))));
   }
 
   public static Facade defaultFacade(History mutableHistory) {
