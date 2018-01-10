@@ -22,6 +22,12 @@ import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
 
 public class CglibProxer implements Proxer {
+  private CglibProxer() {}
+
+  public static Proxer cglibProxer() {
+    return new CglibProxer();
+  }
+
   public Object proxy(Typing typing, Handler handler) {
     check(typing != null);
     check(handler != null);

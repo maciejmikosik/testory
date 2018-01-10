@@ -4,6 +4,7 @@ import static org.testory.facade.DefaultFacade.defaultFacade;
 import static org.testory.facade.PurgingFacade.purging;
 import static org.testory.plumbing.history.RawHistory.newRawHistory;
 import static org.testory.plumbing.history.SynchronizedHistory.synchronize;
+import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
 
 import org.testory.common.Closure;
 import org.testory.common.Nullable;
@@ -12,13 +13,12 @@ import org.testory.facade.Facade;
 import org.testory.plumbing.history.History;
 import org.testory.proxy.Handler;
 import org.testory.proxy.InvocationMatcher;
-import org.testory.proxy.proxer.CglibProxer;
 
 public class Testory {
   private static final ThreadLocal<Facade> localFacade = new ThreadLocal<Facade>() {
     protected Facade initialValue() {
       History history = synchronize(newRawHistory());
-      return purging(history, new CglibProxer(), defaultFacade(history));
+      return purging(history, cglibProxer(), defaultFacade(history));
     }
   };
 
