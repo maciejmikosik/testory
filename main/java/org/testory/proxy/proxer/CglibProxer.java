@@ -58,7 +58,7 @@ public class CglibProxer implements Proxer {
   }
 
   private static Typing tryAsProxiable(Typing typing) {
-    return tryPeel(tryWithoutFactory(tryWithoutObjectBecauseOfCglibBug(typing)));
+    return tryPeel(tryWithoutFactory(typing));
   }
 
   private static Typing tryPeel(Typing typing) {
@@ -102,14 +102,6 @@ public class CglibProxer implements Proxer {
     interfaces.addAll(Arrays.asList(typing.superclass.getInterfaces()));
     return typing(superclass, interfaces);
 
-  }
-
-  public static class ProxiableObject {}
-
-  private static Typing tryWithoutObjectBecauseOfCglibBug(Typing typing) {
-    return typing.superclass == Object.class
-        ? typing(ProxiableObject.class, typing.interfaces)
-        : typing;
   }
 
   private static MethodInterceptor asMethodInterceptor(final Handler handler) {
