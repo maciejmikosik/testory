@@ -69,6 +69,14 @@ public class TestTyping {
   }
 
   @Test
+  public void extending_fails_for_concrete_class() {
+    try {
+      extending(Interface.class);
+      fail();
+    } catch (ProxyException e) {}
+  }
+
+  @Test
   public void implements_type() {
     typing = implementing(Interface.class);
     assertEquals(Object.class, typing.superclass);
@@ -80,6 +88,14 @@ public class TestTyping {
     typing = implementing(InterfaceA.class, InterfaceB.class);
     assertEquals(Object.class, typing.superclass);
     assertEquals(classes(InterfaceA.class, InterfaceB.class), typing.interfaces);
+  }
+
+  @Test
+  public void implementing_fails_for_concrete_class() {
+    try {
+      implementing(ConcreteClass.class);
+      fail();
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -103,11 +119,53 @@ public class TestTyping {
     assertEquals(classes(Interface.class), typing.interfaces);
   }
 
+  @Test
+  public void subclasses_class_and_interfaces() {
+    typing = subclassing(InterfaceA.class, ConcreteClass.class, InterfaceB.class);
+    assertEquals(ConcreteClass.class, typing.superclass);
+    assertEquals(classes(InterfaceA.class, InterfaceB.class), typing.interfaces);
+  }
+
+  @Test
+  public void subclasses_nothing() {
+    typing = subclassing();
+    assertEquals(Object.class, typing.superclass);
+    assertEquals(classes(), typing.interfaces);
+  }
+
+  @Test
+  public void sublcassing_fails_for_more_than_one_concrete_class() {
+    try {
+      subclassing(ConcreteClassA.class, ConcreteClassB.class);
+      fail();
+    } catch (ProxyException e) {}
+  }
+
+  @Test
+  public void sublcassing_fails_for_null_type() {
+    try {
+      subclassing((Class<?>) null);
+      fail();
+    } catch (ProxyException e) {}
+  }
+
+  @Test
+  public void sublcassing_fails_for_null_array() {
+    try {
+      subclassing((Class<?>[]) null);
+      fail();
+    } catch (ProxyException e) {}
+  }
+
   private static Set<Class<?>> classes(Class<?>... classes) {
     return new HashSet<>(Arrays.asList(classes));
   }
 
   private static class ConcreteClass {}
+
+  private static class ConcreteClassA {}
+
+  private static class ConcreteClassB {}
 
   private static abstract class AbstractClass {}
 

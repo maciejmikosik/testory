@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.common.Classes.defaultValue;
 import static org.testory.proxy.Invocation.invocation;
+import static org.testory.proxy.Typing.subclassing;
 import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.proxy.handler.ThrowingHandler.throwing;
 import static org.testory.testing.Fakes.newObject;
@@ -78,7 +79,7 @@ public class TestCglibProxer {
   @Before
   public void before() throws NoSuchMethodException {
     proxer = new CglibProxer();
-    typing = typing(Foo.class);
+    typing = subclassing(Foo.class);
     method = Foo.class.getDeclaredMethod("getObject");
     handler = returning(null);
     object = newObject("object");
@@ -154,13 +155,13 @@ public class TestCglibProxer {
   @Test
   public void can_proxy_public_interfaces() {
     new TestProxer(proxer)
-        .canProxy(typing(InterfaceA.class, InterfaceB.class, InterfaceC.class));
+        .canProxy(subclassing(InterfaceA.class, InterfaceB.class, InterfaceC.class));
   }
 
   @Test
   public void cannot_proxy_package_private_interfaces() {
     try {
-      proxer.proxy(typing(PackagePrivate.interfaceClass), handler);
+      proxer.proxy(subclassing(PackagePrivate.interfaceClass), handler);
       fail();
     } catch (CodeGenerationException e) {}
   }
@@ -169,31 +170,31 @@ public class TestCglibProxer {
   public void can_proxy_duplicated_interfaces() {
     class Superclass implements InterfaceA {}
     new TestProxer(proxer)
-        .canProxy(typing(Superclass.class, InterfaceA.class));
+        .canProxy(subclassing(Superclass.class, InterfaceA.class));
   }
 
   @Test
   public void can_proxy_other_proxy_types() {
     new TestProxer(proxer)
         .canProxy(
-            typing(
-                proxer.proxy(typing(ConcreteClass.class, InterfaceA.class), handler).getClass(),
+            subclassing(
+                proxer.proxy(subclassing(ConcreteClass.class, InterfaceA.class), handler).getClass(),
                 InterfaceB.class),
-            typing(
+            subclassing(
                 ConcreteClass.class,
                 InterfaceA.class,
                 InterfaceB.class))
         .canProxy(
-            typing(
-                proxer.proxy(typing(), handler).getClass(),
+            subclassing(
+                proxer.proxy(subclassing(), handler).getClass(),
                 InterfaceA.class),
-            typing(
+            subclassing(
                 InterfaceA.class))
         .canProxy(
-            typing(
-                proxer.proxy(typing(ConcreteClass.class, InterfaceA.class), handler).getClass(),
+            subclassing(
+                proxer.proxy(subclassing(ConcreteClass.class, InterfaceA.class), handler).getClass(),
                 InterfaceA.class),
-            typing(
+            subclassing(
                 ConcreteClass.class,
                 InterfaceA.class));
   }
@@ -209,35 +210,35 @@ public class TestCglibProxer {
 
     new TestProxer(proxer)
         .canProxy(arrayList)
-        .canProxy(arrayList.iterator(), typing(Iterator.class))
-        .canProxy(arrayList.listIterator(), typing(ListIterator.class))
-        .canProxy(arrayList.subList(0, 0), typing(AbstractList.class, RandomAccess.class))
-        .canProxy(arrayList.subList(0, 0).iterator(), typing(Iterator.class))
-        .canProxy(arrayList.subList(0, 0).listIterator(), typing(ListIterator.class))
+        .canProxy(arrayList.iterator(), subclassing(Iterator.class))
+        .canProxy(arrayList.listIterator(), subclassing(ListIterator.class))
+        .canProxy(arrayList.subList(0, 0), subclassing(AbstractList.class, RandomAccess.class))
+        .canProxy(arrayList.subList(0, 0).iterator(), subclassing(Iterator.class))
+        .canProxy(arrayList.subList(0, 0).listIterator(), subclassing(ListIterator.class))
         .canProxy(linkedList)
-        .canProxy(linkedList.iterator(), typing(Iterator.class))
-        .canProxy(linkedList.listIterator(), typing(ListIterator.class))
-        .canProxy(linkedList.subList(0, 0), typing(AbstractList.class))
-        .canProxy(linkedList.subList(0, 0).iterator(), typing(Iterator.class))
-        .canProxy(linkedList.subList(0, 0).listIterator(), typing(ListIterator.class))
+        .canProxy(linkedList.iterator(), subclassing(Iterator.class))
+        .canProxy(linkedList.listIterator(), subclassing(ListIterator.class))
+        .canProxy(linkedList.subList(0, 0), subclassing(AbstractList.class))
+        .canProxy(linkedList.subList(0, 0).iterator(), subclassing(Iterator.class))
+        .canProxy(linkedList.subList(0, 0).listIterator(), subclassing(ListIterator.class))
         .canProxy(hashMap)
-        .canProxy(hashMap.keySet(), typing(AbstractSet.class))
-        .canProxy(hashMap.keySet().iterator(), typing(Iterator.class))
-        .canProxy(hashMap.values(), typing(AbstractCollection.class))
-        .canProxy(hashMap.values().iterator(), typing(Iterator.class))
-        .canProxy(hashMap.entrySet(), typing(AbstractSet.class))
-        .canProxy(hashMap.entrySet().iterator(), typing(Iterator.class))
+        .canProxy(hashMap.keySet(), subclassing(AbstractSet.class))
+        .canProxy(hashMap.keySet().iterator(), subclassing(Iterator.class))
+        .canProxy(hashMap.values(), subclassing(AbstractCollection.class))
+        .canProxy(hashMap.values().iterator(), subclassing(Iterator.class))
+        .canProxy(hashMap.entrySet(), subclassing(AbstractSet.class))
+        .canProxy(hashMap.entrySet().iterator(), subclassing(Iterator.class))
         .canProxy(treeMap)
-        .canProxy(treeMap.keySet(), typing(AbstractSet.class, NavigableSet.class))
-        .canProxy(treeMap.keySet().iterator(), typing(Iterator.class))
-        .canProxy(treeMap.values(), typing(AbstractCollection.class))
-        .canProxy(treeMap.values().iterator(), typing(Iterator.class))
-        .canProxy(treeMap.entrySet(), typing(AbstractSet.class))
-        .canProxy(treeMap.entrySet().iterator(), typing(Iterator.class))
+        .canProxy(treeMap.keySet(), subclassing(AbstractSet.class, NavigableSet.class))
+        .canProxy(treeMap.keySet().iterator(), subclassing(Iterator.class))
+        .canProxy(treeMap.values(), subclassing(AbstractCollection.class))
+        .canProxy(treeMap.values().iterator(), subclassing(Iterator.class))
+        .canProxy(treeMap.entrySet(), subclassing(AbstractSet.class))
+        .canProxy(treeMap.entrySet().iterator(), subclassing(Iterator.class))
         .canProxy(hashSet)
-        .canProxy(hashSet.iterator(), typing(Iterator.class))
+        .canProxy(hashSet.iterator(), subclassing(Iterator.class))
         .canProxy(treeSet)
-        .canProxy(treeSet.iterator(), typing(Iterator.class));
+        .canProxy(treeSet.iterator(), subclassing(Iterator.class));
   }
 
   @Test
@@ -245,12 +246,12 @@ public class TestCglibProxer {
     List<Object> list = Arrays.asList();
 
     new TestProxer(proxer)
-        .canProxy(list, typing(AbstractList.class, RandomAccess.class, Serializable.class))
-        .canProxy(list.iterator(), typing(Iterator.class))
-        .canProxy(list.listIterator(), typing(ListIterator.class))
-        .canProxy(list.subList(0, 0), typing(AbstractList.class, RandomAccess.class))
-        .canProxy(list.subList(0, 0).iterator(), typing(Iterator.class))
-        .canProxy(list.subList(0, 0).listIterator(), typing(ListIterator.class));
+        .canProxy(list, subclassing(AbstractList.class, RandomAccess.class, Serializable.class))
+        .canProxy(list.iterator(), subclassing(Iterator.class))
+        .canProxy(list.listIterator(), subclassing(ListIterator.class))
+        .canProxy(list.subList(0, 0), subclassing(AbstractList.class, RandomAccess.class))
+        .canProxy(list.subList(0, 0).iterator(), subclassing(Iterator.class))
+        .canProxy(list.subList(0, 0).listIterator(), subclassing(ListIterator.class));
   }
 
   @Test
@@ -264,45 +265,45 @@ public class TestCglibProxer {
     SortedMap<Object, Object> sortedMap = unmodifiableSortedMap(new TreeMap<>());
 
     new TestProxer(proxer)
-        .canProxy(collection, typing(Collection.class, Serializable.class))
-        .canProxy(collection.iterator(), typing(Iterator.class))
-        .canProxy(list, typing(List.class, Serializable.class))
-        .canProxy(list.iterator(), typing(Iterator.class))
-        .canProxy(list.listIterator(), typing(ListIterator.class))
-        .canProxy(list.subList(0, 0), typing(List.class))
-        .canProxy(list.subList(0, 0).iterator(), typing(Iterator.class))
-        .canProxy(list.subList(0, 0).listIterator(), typing(ListIterator.class))
-        .canProxy(randomAccessList, typing(List.class, Serializable.class, RandomAccess.class))
-        .canProxy(randomAccessList.iterator(), typing(Iterator.class))
-        .canProxy(randomAccessList.listIterator(), typing(ListIterator.class))
-        .canProxy(randomAccessList.subList(0, 0), typing(List.class, RandomAccess.class))
-        .canProxy(randomAccessList.subList(0, 0).iterator(), typing(Iterator.class))
-        .canProxy(randomAccessList.subList(0, 0).listIterator(), typing(ListIterator.class))
-        .canProxy(set, typing(Set.class, Serializable.class))
-        .canProxy(set.iterator(), typing(Iterator.class))
-        .canProxy(sortedSet, typing(SortedSet.class, Serializable.class))
-        .canProxy(sortedSet.iterator(), typing(Iterator.class))
-        .canProxy(map, typing(Map.class, Serializable.class))
-        .canProxy(map.keySet(), typing(Set.class, Serializable.class))
-        .canProxy(map.keySet().iterator(), typing(Iterator.class))
-        .canProxy(map.values(), typing(Collection.class, Serializable.class))
-        .canProxy(map.values().iterator(), typing(Iterator.class))
-        .canProxy(map.entrySet(), typing(Set.class, Serializable.class))
-        .canProxy(map.entrySet().iterator(), typing(Iterator.class))
-        .canProxy(sortedMap, typing(SortedMap.class, Serializable.class))
-        .canProxy(sortedMap.keySet(), typing(Set.class, Serializable.class))
-        .canProxy(sortedMap.keySet().iterator(), typing(Iterator.class))
-        .canProxy(sortedMap.values(), typing(Collection.class, Serializable.class))
-        .canProxy(sortedMap.values().iterator(), typing(Iterator.class))
-        .canProxy(sortedMap.entrySet(), typing(Set.class, Serializable.class))
-        .canProxy(sortedMap.entrySet().iterator(), typing(Iterator.class));
+        .canProxy(collection, subclassing(Collection.class, Serializable.class))
+        .canProxy(collection.iterator(), subclassing(Iterator.class))
+        .canProxy(list, subclassing(List.class, Serializable.class))
+        .canProxy(list.iterator(), subclassing(Iterator.class))
+        .canProxy(list.listIterator(), subclassing(ListIterator.class))
+        .canProxy(list.subList(0, 0), subclassing(List.class))
+        .canProxy(list.subList(0, 0).iterator(), subclassing(Iterator.class))
+        .canProxy(list.subList(0, 0).listIterator(), subclassing(ListIterator.class))
+        .canProxy(randomAccessList, subclassing(List.class, Serializable.class, RandomAccess.class))
+        .canProxy(randomAccessList.iterator(), subclassing(Iterator.class))
+        .canProxy(randomAccessList.listIterator(), subclassing(ListIterator.class))
+        .canProxy(randomAccessList.subList(0, 0), subclassing(List.class, RandomAccess.class))
+        .canProxy(randomAccessList.subList(0, 0).iterator(), subclassing(Iterator.class))
+        .canProxy(randomAccessList.subList(0, 0).listIterator(), subclassing(ListIterator.class))
+        .canProxy(set, subclassing(Set.class, Serializable.class))
+        .canProxy(set.iterator(), subclassing(Iterator.class))
+        .canProxy(sortedSet, subclassing(SortedSet.class, Serializable.class))
+        .canProxy(sortedSet.iterator(), subclassing(Iterator.class))
+        .canProxy(map, subclassing(Map.class, Serializable.class))
+        .canProxy(map.keySet(), subclassing(Set.class, Serializable.class))
+        .canProxy(map.keySet().iterator(), subclassing(Iterator.class))
+        .canProxy(map.values(), subclassing(Collection.class, Serializable.class))
+        .canProxy(map.values().iterator(), subclassing(Iterator.class))
+        .canProxy(map.entrySet(), subclassing(Set.class, Serializable.class))
+        .canProxy(map.entrySet().iterator(), subclassing(Iterator.class))
+        .canProxy(sortedMap, subclassing(SortedMap.class, Serializable.class))
+        .canProxy(sortedMap.keySet(), subclassing(Set.class, Serializable.class))
+        .canProxy(sortedMap.keySet().iterator(), subclassing(Iterator.class))
+        .canProxy(sortedMap.values(), subclassing(Collection.class, Serializable.class))
+        .canProxy(sortedMap.values().iterator(), subclassing(Iterator.class))
+        .canProxy(sortedMap.entrySet(), subclassing(Set.class, Serializable.class))
+        .canProxy(sortedMap.entrySet().iterator(), subclassing(Iterator.class));
   }
 
   @Test
   public void cannot_proxy_final_classes() {
     final class FinalClass {}
     try {
-      proxer.proxy(typing(FinalClass.class), handler);
+      proxer.proxy(subclassing(FinalClass.class), handler);
       fail();
     } catch (IllegalArgumentException e) {}
   }
@@ -504,7 +505,7 @@ public class TestCglibProxer {
         invoked = true;
       }
     }
-    proxer.proxy(typing(Proxiable.class), handler);
+    proxer.proxy(subclassing(Proxiable.class), handler);
     assertFalse(invoked);
   }
 
@@ -519,7 +520,7 @@ public class TestCglibProxer {
     assertSame(original, PublicFoo.class.getClassLoader());
     try {
       thread.setContextClassLoader(context);
-      proxy = (Foo) proxer.proxy(typing(PublicFoo.class), handler);
+      proxy = (Foo) proxer.proxy(subclassing(PublicFoo.class), handler);
       assertSame(context, proxy.getClass().getClassLoader());
     } finally {
       thread.setContextClassLoader(original);
@@ -568,23 +569,6 @@ public class TestCglibProxer {
     };
   }
 
-  private static Typing typing(Class<?>... types) {
-    Set<Class<?>> superclasses = new HashSet<>();
-    Set<Class<?>> interfaces = new HashSet<>();
-    for (Class<?> type : types) {
-      Set<Class<?>> typeCollection = type.isInterface()
-          ? interfaces
-          : superclasses;
-      typeCollection.add(type);
-    }
-    if (superclasses.size() > 1) {
-      throw new IllegalArgumentException();
-    } else if (superclasses.size() == 0) {
-      superclasses.add(Object.class);
-    }
-    return Typing.typing(superclasses.iterator().next(), interfaces);
-  }
-
   private static class TestProxer {
     private final Proxer proxer;
 
@@ -593,12 +577,12 @@ public class TestCglibProxer {
     }
 
     public TestProxer canProxy(Object object) {
-      Typing typing = typing(object.getClass());
+      Typing typing = subclassing(object.getClass());
       return canProxy(typing, typing);
     }
 
     public TestProxer canProxy(Class<?> type) {
-      Typing typing = typing(type);
+      Typing typing = subclassing(type);
       return canProxy(typing, typing);
     }
 
@@ -607,7 +591,7 @@ public class TestCglibProxer {
     }
 
     public TestProxer canProxy(Object object, Typing outgoing) {
-      return canProxy(typing(object.getClass()), outgoing);
+      return canProxy(subclassing(object.getClass()), outgoing);
     }
 
     public TestProxer canProxy(Typing incoming, Typing outgoing) {
