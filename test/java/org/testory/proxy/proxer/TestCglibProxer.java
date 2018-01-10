@@ -13,6 +13,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.common.Classes.defaultValue;
 import static org.testory.proxy.Invocation.invocation;
+import static org.testory.proxy.handler.ReturningHandler.returning;
+import static org.testory.proxy.handler.ThrowingHandler.throwing;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
 
@@ -78,7 +80,7 @@ public class TestCglibProxer {
     proxer = new CglibProxer();
     typing = typing(Foo.class);
     method = Foo.class.getDeclaredMethod("getObject");
-    handler = handlerReturning(null);
+    handler = returning(null);
     object = newObject("object");
     throwable = newThrowable("throwable");
   }
@@ -367,55 +369,55 @@ public class TestCglibProxer {
 
   @Test
   public void returns_object() {
-    proxy = (Foo) proxer.proxy(typing, handlerReturning(object));
+    proxy = (Foo) proxer.proxy(typing, returning(object));
     assertSame(object, proxy.getObject());
   }
 
   @Test
   public void returned_object_is_ignored_for_void_method() {
-    proxy = (Foo) proxer.proxy(typing, handlerReturning(object));
+    proxy = (Foo) proxer.proxy(typing, returning(object));
     proxy.getVoid();
   }
 
   @Test
   public void returns_primitive() {
-    proxy = (Foo) proxer.proxy(typing, handlerReturning(3));
+    proxy = (Foo) proxer.proxy(typing, returning(3));
     assertEquals(3, proxy.getInt());
   }
 
   @Test
   public void returned_primitive_is_wide_converted() {
-    proxy = (Foo) proxer.proxy(typing, handlerReturning(3));
+    proxy = (Foo) proxer.proxy(typing, returning(3));
     assertEquals(3f, proxy.getFloat(), 0f);
   }
 
   @Test
   public void returned_primitive_is_narrow_converted() {
-    proxy = (Foo) proxer.proxy(typing, handlerReturning(3f));
+    proxy = (Foo) proxer.proxy(typing, returning(3f));
     assertEquals(3, proxy.getInt());
   }
 
   @Test
   public void returns_null() {
-    proxy = (Foo) proxer.proxy(typing, handlerReturning(null));
+    proxy = (Foo) proxer.proxy(typing, returning(null));
     assertEquals(null, proxy.getObject());
   }
 
   @Test
   public void returned_null_is_converted_to_void() {
-    proxy = (Foo) proxer.proxy(typing, handlerReturning(null));
+    proxy = (Foo) proxer.proxy(typing, returning(null));
     proxy.getVoid();
   }
 
   @Test
   public void returned_null_is_converted_to_primitive_zero() {
-    proxy = (Foo) proxer.proxy(typing, handlerReturning(null));
+    proxy = (Foo) proxer.proxy(typing, returning(null));
     assertEquals(0, proxy.getInt());
   }
 
   @Test
   public void does_not_return_incompatible_type() {
-    proxy = (Foo) proxer.proxy(typing, handlerReturning(object));
+    proxy = (Foo) proxer.proxy(typing, returning(object));
     try {
       proxy.getString();
       fail();
@@ -425,7 +427,7 @@ public class TestCglibProxer {
   @Test
   public void throws_error() {
     throwable = new Error();
-    proxy = (Foo) proxer.proxy(typing, handlerThrowing(throwable));
+    proxy = (Foo) proxer.proxy(typing, throwing(throwable));
     try {
       proxy.getObject();
       fail();
@@ -437,7 +439,7 @@ public class TestCglibProxer {
   @Test
   public void throws_runtime_exception() {
     throwable = new RuntimeException();
-    proxy = (Foo) proxer.proxy(typing, handlerThrowing(throwable));
+    proxy = (Foo) proxer.proxy(typing, throwing(throwable));
     try {
       proxy.getObject();
       fail();
@@ -449,7 +451,7 @@ public class TestCglibProxer {
   @Test
   public void throws_declared_exception() {
     throwable = new IOException();
-    proxy = (Foo) proxer.proxy(typing, handlerThrowing(throwable));
+    proxy = (Foo) proxer.proxy(typing, throwing(throwable));
     try {
       proxy.throwsIOException();
       fail();
@@ -461,7 +463,7 @@ public class TestCglibProxer {
   @Test
   public void throws_subclass_of_declared_exception() {
     throwable = new FileNotFoundException();
-    proxy = (Foo) proxer.proxy(typing, handlerThrowing(throwable));
+    proxy = (Foo) proxer.proxy(typing, throwing(throwable));
     try {
       proxy.throwsIOException();
       fail();
@@ -473,7 +475,7 @@ public class TestCglibProxer {
   @Test
   public void throws_undeclared_exception() {
     throwable = new IOException();
-    proxy = (Foo) proxer.proxy(typing, handlerThrowing(throwable));
+    proxy = (Foo) proxer.proxy(typing, throwing(throwable));
     try {
       proxy.getObject();
       fail();
@@ -485,7 +487,7 @@ public class TestCglibProxer {
   @Test
   public void throws_superclass_of_declared_exception() throws IOException {
     throwable = new Exception();
-    proxy = (Foo) proxer.proxy(typing, handlerThrowing(throwable));
+    proxy = (Foo) proxer.proxy(typing, throwing(throwable));
     try {
       proxy.throwsIOException();
       fail();
@@ -557,22 +559,6 @@ public class TestCglibProxer {
     } catch (ProxyException e) {}
   }
 
-  private static Handler handlerReturning(final Object object) {
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        return object;
-      }
-    };
-  }
-
-  private static Handler handlerThrowing(final Throwable throwable) {
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        throw throwable;
-      }
-    };
-  }
-
   private Handler handlerSavingInvocation() {
     return new Handler() {
       public Object handle(Invocation invocation) {
@@ -626,7 +612,7 @@ public class TestCglibProxer {
 
     public TestProxer canProxy(Typing incoming, Typing outgoing) {
       String message = incoming + " " + outgoing;
-      Object proxy = proxer.proxy(incoming, handlerReturning(null));
+      Object proxy = proxer.proxy(incoming, returning(null));
       assertTrue(message, outgoing.superclass.isInstance(proxy));
       for (Class<?> type : outgoing.interfaces) {
         assertTrue(message, type.isInstance(proxy));

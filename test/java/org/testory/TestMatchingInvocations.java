@@ -12,6 +12,7 @@ import static org.testory.Testory.thenCalled;
 import static org.testory.Testory.thenCalledInOrder;
 import static org.testory.Testory.thenCalledTimes;
 import static org.testory.Testory.willReturn;
+import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.testing.DynamicMatchers.number;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
@@ -20,7 +21,6 @@ import static org.testory.testing.Purging.triggerPurge;
 import org.junit.Before;
 import org.junit.Test;
 import org.testory.proxy.Handler;
-import org.testory.proxy.Invocation;
 
 public class TestMatchingInvocations {
   private Object object, otherObject;
@@ -38,11 +38,7 @@ public class TestMatchingInvocations {
     otherValue = 456;
     mock = mock(Mockable.class);
     otherMock = mock(Mockable.class);
-    handler = new Handler() {
-      public Object handle(Invocation invocation) {
-        return null;
-      }
-    };
+    handler = returning(null);
   }
 
   @Test

@@ -3,6 +3,7 @@ package org.testory.plumbing.mock;
 import static java.util.Objects.deepEquals;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.Stubbing.stubbing;
+import static org.testory.proxy.handler.ReturningHandler.returning;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -54,28 +55,16 @@ public class SaneMockMaker implements Maker {
     });
   }
 
-  private static Stubbing stubbingHashCode(Object mock, final String name) {
-    return stubbing(onInvocation(mock, "hashCode"), new Handler() {
-      public Object handle(Invocation invocation) {
-        return name.hashCode();
-      }
-    });
+  private static Stubbing stubbingHashCode(Object mock, String name) {
+    return stubbing(onInvocation(mock, "hashCode"), returning(name.hashCode()));
   }
 
-  private static Stubbing stubbingToString(Object mock, final String name) {
-    return stubbing(onInvocation(mock, "toString"), new Handler() {
-      public Object handle(Invocation invocation) {
-        return name;
-      }
-    });
+  private static Stubbing stubbingToString(Object mock, String name) {
+    return stubbing(onInvocation(mock, "toString"), returning(name));
   }
 
   private static Stubbing stubbingFillInStackTrace(Object mock) {
-    return stubbing(onInvocation(mock, "fillInStackTrace"), new Handler() {
-      public Object handle(Invocation invocation) {
-        return invocation.instance;
-      }
-    });
+    return stubbing(onInvocation(mock, "fillInStackTrace"), returning(mock));
   }
 
   private static Stubbing stubbingPrintStackTrace(Object mock) {

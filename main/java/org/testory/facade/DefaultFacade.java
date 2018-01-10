@@ -33,6 +33,8 @@ import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Typing.subclassing;
 import static org.testory.proxy.handler.DelegatingHandler.delegatingTo;
 import static org.testory.proxy.handler.ReturningDefaultValueHandler.returningDefaultValue;
+import static org.testory.proxy.handler.ReturningHandler.returning;
+import static org.testory.proxy.handler.ThrowingHandler.throwing;
 import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
 import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
 import static org.testory.proxy.proxer.WrappingProxer.wrapping;
@@ -219,11 +221,7 @@ public class DefaultFacade implements Facade {
   }
 
   public Handler willReturn(@Nullable final Object object) {
-    return new Handler() {
-      public Object handle(Invocation invocation) {
-        return object;
-      }
-    };
+    return returning(object);
   }
 
   public Handler willThrow(final Throwable throwable) {
@@ -237,11 +235,7 @@ public class DefaultFacade implements Facade {
 
   public Handler willRethrow(final Throwable throwable) {
     checker.notNull(throwable);
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        throw throwable;
-      }
-    };
+    return throwing(throwable);
   }
 
   public Handler willSpy(final Object real) {
