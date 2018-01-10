@@ -19,6 +19,7 @@ public class TypeSafeProxer implements Proxer {
   }
 
   public static Proxer typeSafe(Proxer proxer) {
+    check(proxer != null);
     return new TypeSafeProxer(proxer);
   }
 
@@ -28,7 +29,7 @@ public class TypeSafeProxer implements Proxer {
     return proxer.proxy(typing, typeSafe(handler));
   }
 
-  private Handler typeSafe(final Handler handler) {
+  private static Handler typeSafe(final Handler handler) {
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         Method method = invocation.method;

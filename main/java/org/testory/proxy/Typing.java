@@ -42,10 +42,33 @@ public class Typing {
     return typing(Object.class, new HashSet<Class<?>>(asList(type)));
   }
 
-  public static Typing subclassing(Class<?> type) {
-    return type.isInterface()
-        ? implementing(type)
-        : extending(type);
+  public static Typing subclassing(Class<?>... types) {
+    check(types != null);
+    Set<Class<?>> superclasses = new HashSet<>();
+    Set<Class<?>> interfaces = new HashSet<>();
+    for (Class<?> type : types) {
+      check(type != null);
+      if (type.isInterface()) {
+        interfaces.add(type);
+      } else {
+        superclasses.add(type);
+      }
+    }
+    if (superclasses.size() > 1) {
+      throw new ProxyException();
+    } else if (superclasses.size() == 0) {
+      superclasses.add(Object.class);
+    }
+    return typing(superclasses.iterator().next(), interfaces);
+  }
+
+  public Typing peel() {
+    check(superclass != Object.class);
+    Class<?> peeledSuperclass = superclass.getSuperclass();
+    Set<Class<?>> peeledInterfaces = new HashSet<>(interfaces);
+    peeledInterfaces.addAll(asList(superclass.getInterfaces()));
+    return typing(peeledSuperclass, peeledInterfaces);
+
   }
 
   public boolean equals(Object object) {

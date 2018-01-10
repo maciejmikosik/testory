@@ -1,19 +1,12 @@
 package org.testory.proxy.proxer;
 
-import static java.lang.reflect.Modifier.isPublic;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.ProxyException.check;
-import static org.testory.proxy.Typing.typing;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.objenesis.ObjenesisStd;
 import org.testory.proxy.Handler;
@@ -29,10 +22,16 @@ import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
 
 public class CglibProxer implements Proxer {
+  private CglibProxer() {}
+
+  public static Proxer cglibProxer() {
+    return new CglibProxer();
+  }
+
   public Object proxy(Typing typing, Handler handler) {
     check(typing != null);
     check(handler != null);
-    return newProxyByCglib(tryAsProxiable(typing), handler);
+    return newProxyByCglib(typing, handler);
   }
 
   private static Object newProxyByCglib(Typing typing, Handler handler) {
@@ -55,61 +54,6 @@ public class CglibProxer implements Proxer {
     Factory proxy = (Factory) new ObjenesisStd().newInstance(proxyClass);
     proxy.setCallbacks(new Callback[] { asMethodInterceptor(handler), new SerializableNoOp() });
     return proxy;
-  }
-
-  private static Typing tryAsProxiable(Typing typing) {
-    return tryPeel(tryWithoutFactory(tryWithoutObjectBecauseOfCglibBug(typing)));
-  }
-
-  private static Typing tryPeel(Typing typing) {
-    return isPeelable(typing.superclass)
-        ? tryPeel(peel(typing))
-        : typing;
-  }
-
-  private static boolean isPeelable(Class<?> type) {
-    return !isPublic(type.getModifiers()) && isFromJdk(type) && isContainer(type);
-  }
-
-  private static boolean isFromJdk(Class<?> type) {
-    return type.getPackage() == Package.getPackage("java.util");
-  }
-
-  private static boolean isContainer(Class<?> type) {
-    return Collection.class.isAssignableFrom(type)
-        || Map.class.isAssignableFrom(type)
-        || Iterator.class.isAssignableFrom(type)
-        || (type != null && isContainer(type.getDeclaringClass()));
-  }
-
-  private static Typing tryWithoutFactory(Typing typing) {
-    return Arrays.asList(typing.superclass.getInterfaces()).contains(Factory.class)
-        ? withoutFactory(typing)
-        : typing;
-  }
-
-  private static Typing withoutFactory(Typing typing) {
-    Typing peeled = peel(typing);
-    Class<?> superclass = peeled.superclass;
-    Set<Class<?>> interfaces = new HashSet<>(peeled.interfaces);
-    interfaces.remove(Factory.class);
-    return typing(superclass, interfaces);
-  }
-
-  private static Typing peel(Typing typing) {
-    Class<?> superclass = typing.superclass.getSuperclass();
-    Set<Class<?>> interfaces = new HashSet<>(typing.interfaces);
-    interfaces.addAll(Arrays.asList(typing.superclass.getInterfaces()));
-    return typing(superclass, interfaces);
-
-  }
-
-  public static class ProxiableObject {}
-
-  private static Typing tryWithoutObjectBecauseOfCglibBug(Typing typing) {
-    return typing.superclass == Object.class
-        ? typing(ProxiableObject.class, typing.interfaces)
-        : typing;
   }
 
   private static MethodInterceptor asMethodInterceptor(final Handler handler) {

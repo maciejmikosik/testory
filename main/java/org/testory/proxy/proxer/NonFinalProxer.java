@@ -21,6 +21,8 @@ public class NonFinalProxer implements Proxer {
   }
 
   public Object proxy(Typing typing, Handler handler) {
+    check(typing != null);
+    check(handler != null);
     check(!Modifier.isFinal(typing.superclass.getModifiers()));
     return proxer.proxy(typing, handler);
   }

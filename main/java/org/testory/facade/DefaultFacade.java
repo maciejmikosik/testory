@@ -33,7 +33,13 @@ import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Typing.subclassing;
 import static org.testory.proxy.handler.DelegatingHandler.delegatingTo;
 import static org.testory.proxy.handler.ReturningDefaultValueHandler.returningDefaultValue;
+import static org.testory.proxy.handler.ReturningHandler.returning;
+import static org.testory.proxy.handler.ThrowingHandler.throwing;
+import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
+import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
+import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
 import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
+import static org.testory.proxy.proxer.RepeatableProxy.repeatable;
 import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
 import static org.testory.proxy.proxer.WrappingProxer.wrapping;
 
@@ -65,7 +71,6 @@ import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 import org.testory.proxy.Proxer;
-import org.testory.proxy.proxer.CglibProxer;
 
 public class DefaultFacade implements Facade {
   private final History history;
@@ -88,12 +93,16 @@ public class DefaultFacade implements Facade {
     inspectingHistory = filter(Inspecting.class, history);
     invocationHistory = filter(Invocation.class, history);
     checker = checker(history, exception);
-    proxer = wrapping(exception, nonFinal(typeSafe(wrapping(exception, new CglibProxer()))));
+    proxer = wrapping(exception, rich(wrapping(exception, cglibProxer())));
     mockNamer = uniqueNamer(history);
     mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     injector = injector(mockMaker);
-    wildcardSupport = wildcardSupport(history, tokenizer(), formatter);
+    wildcardSupport = wildcardSupport(history, tokenizer(proxer), formatter);
     matcherizer = wildcardMatcherizer(history, repairer(), formatter);
+  }
+
+  private static Proxer rich(Proxer proxer) {
+    return nonFinal(typeSafe(jdkCollections(fixObjectBug(repeatable(proxer)))));
   }
 
   public static Facade defaultFacade(History mutableHistory) {
@@ -219,11 +228,7 @@ public class DefaultFacade implements Facade {
   }
 
   public Handler willReturn(@Nullable final Object object) {
-    return new Handler() {
-      public Object handle(Invocation invocation) {
-        return object;
-      }
-    };
+    return returning(object);
   }
 
   public Handler willThrow(final Throwable throwable) {
@@ -237,11 +242,7 @@ public class DefaultFacade implements Facade {
 
   public Handler willRethrow(final Throwable throwable) {
     checker.notNull(throwable);
-    return new Handler() {
-      public Object handle(Invocation invocation) throws Throwable {
-        throw throwable;
-      }
-    };
+    return throwing(throwable);
   }
 
   public Handler willSpy(final Object real) {
