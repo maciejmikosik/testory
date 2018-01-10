@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.plumbing.im.wildcard.Tokenizer.tokenizer;
+import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class TestTokenizer {
 
   @Before
   public void before() {
-    tokenizer = tokenizer();
+    tokenizer = tokenizer(cglibProxer());
   }
 
   @Test

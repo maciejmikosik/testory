@@ -97,7 +97,7 @@ public class DefaultFacade implements Facade {
     mockNamer = uniqueNamer(history);
     mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     injector = injector(mockMaker);
-    wildcardSupport = wildcardSupport(history, tokenizer(), formatter);
+    wildcardSupport = wildcardSupport(history, tokenizer(proxer), formatter);
     matcherizer = wildcardMatcherizer(history, repairer(), formatter);
   }
 
