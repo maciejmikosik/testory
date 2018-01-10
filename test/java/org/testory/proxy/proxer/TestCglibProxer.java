@@ -9,13 +9,13 @@ import static java.util.Collections.unmodifiableSortedSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.testory.common.Classes.defaultValue;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Typing.subclassing;
 import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.proxy.handler.ThrowingHandler.throwing;
+import static org.testory.proxy.proxer.Tester.tester;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
 
@@ -136,7 +136,7 @@ public class TestCglibProxer {
   public void can_proxy_concrete_classes() {
     class NestedConcreteClass {}
 
-    new TestProxer(proxer)
+    tester(proxer)
         .canProxy(Object.class)
         .canProxy(ConcreteClass.class)
         .canProxy(PackagePrivate.concreteClass)
@@ -147,14 +147,14 @@ public class TestCglibProxer {
 
   @Test
   public void can_proxy_abstract_classes() {
-    new TestProxer(proxer)
+    tester(proxer)
         .canProxy(AbstractClassWithAbstractMethod.class)
         .canProxy(AbstractClassWithProtectedAbstractMethod.class);
   }
 
   @Test
   public void can_proxy_public_interfaces() {
-    new TestProxer(proxer)
+    tester(proxer)
         .canProxy(subclassing(InterfaceA.class, InterfaceB.class, InterfaceC.class));
   }
 
@@ -169,13 +169,13 @@ public class TestCglibProxer {
   @Test
   public void can_proxy_duplicated_interfaces() {
     class Superclass implements InterfaceA {}
-    new TestProxer(proxer)
+    tester(proxer)
         .canProxy(subclassing(Superclass.class, InterfaceA.class));
   }
 
   @Test
   public void can_proxy_other_proxy_types() {
-    new TestProxer(proxer)
+    tester(proxer)
         .canProxy(
             subclassing(
                 proxer.proxy(subclassing(ConcreteClass.class, InterfaceA.class), handler).getClass(),
@@ -208,7 +208,7 @@ public class TestCglibProxer {
     HashSet<Object> hashSet = new HashSet<>();
     TreeSet<Object> treeSet = new TreeSet<>();
 
-    new TestProxer(proxer)
+    tester(proxer)
         .canProxy(arrayList)
         .canProxy(arrayList.iterator(), subclassing(Iterator.class))
         .canProxy(arrayList.listIterator(), subclassing(ListIterator.class))
@@ -245,7 +245,7 @@ public class TestCglibProxer {
   public void can_proxy_arrays_as_list() {
     List<Object> list = Arrays.asList();
 
-    new TestProxer(proxer)
+    tester(proxer)
         .canProxy(list, subclassing(AbstractList.class, RandomAccess.class, Serializable.class))
         .canProxy(list.iterator(), subclassing(Iterator.class))
         .canProxy(list.listIterator(), subclassing(ListIterator.class))
@@ -264,7 +264,7 @@ public class TestCglibProxer {
     Map<Object, Object> map = unmodifiableMap(new HashMap<>());
     SortedMap<Object, Object> sortedMap = unmodifiableSortedMap(new TreeMap<>());
 
-    new TestProxer(proxer)
+    tester(proxer)
         .canProxy(collection, subclassing(Collection.class, Serializable.class))
         .canProxy(collection.iterator(), subclassing(Iterator.class))
         .canProxy(list, subclassing(List.class, Serializable.class))
@@ -567,41 +567,5 @@ public class TestCglibProxer {
         return defaultValue(invocation.method.getReturnType());
       }
     };
-  }
-
-  private static class TestProxer {
-    private final Proxer proxer;
-
-    public TestProxer(Proxer proxer) {
-      this.proxer = proxer;
-    }
-
-    public TestProxer canProxy(Object object) {
-      Typing typing = subclassing(object.getClass());
-      return canProxy(typing, typing);
-    }
-
-    public TestProxer canProxy(Class<?> type) {
-      Typing typing = subclassing(type);
-      return canProxy(typing, typing);
-    }
-
-    public TestProxer canProxy(Typing typing) {
-      return canProxy(typing, typing);
-    }
-
-    public TestProxer canProxy(Object object, Typing outgoing) {
-      return canProxy(subclassing(object.getClass()), outgoing);
-    }
-
-    public TestProxer canProxy(Typing incoming, Typing outgoing) {
-      String message = incoming + " " + outgoing;
-      Object proxy = proxer.proxy(incoming, returning(null));
-      assertTrue(message, outgoing.superclass.isInstance(proxy));
-      for (Class<?> type : outgoing.interfaces) {
-        assertTrue(message, type.isInstance(proxy));
-      }
-      return this;
-    }
   }
 }
