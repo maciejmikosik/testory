@@ -38,6 +38,7 @@ import static org.testory.proxy.handler.ThrowingHandler.throwing;
 import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
 import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
 import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
+import static org.testory.proxy.proxer.RepeatableProxy.repeatable;
 import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
 import static org.testory.proxy.proxer.WrappingProxer.wrapping;
 
@@ -101,7 +102,7 @@ public class DefaultFacade implements Facade {
   }
 
   private static Proxer rich(Proxer proxer) {
-    return nonFinal(typeSafe(jdkCollections(fixObjectBug(proxer))));
+    return nonFinal(typeSafe(jdkCollections(fixObjectBug(repeatable(proxer)))));
   }
 
   public static Facade defaultFacade(History mutableHistory) {

@@ -17,6 +17,7 @@ import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.proxy.handler.ThrowingHandler.throwing;
 import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
 import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
+import static org.testory.proxy.proxer.RepeatableProxy.repeatable;
 import static org.testory.proxy.proxer.Tester.tester;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
@@ -80,7 +81,7 @@ public class TestCglibProxer {
 
   @Before
   public void before() throws NoSuchMethodException {
-    proxer = fixObjectBug(jdkCollections(new CglibProxer()));
+    proxer = repeatable(fixObjectBug(jdkCollections(new CglibProxer())));
     typing = subclassing(Foo.class);
     method = Foo.class.getDeclaredMethod("getObject");
     handler = returning(null);

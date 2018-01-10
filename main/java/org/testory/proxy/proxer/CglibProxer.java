@@ -2,14 +2,11 @@ package org.testory.proxy.proxer;
 
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.ProxyException.check;
-import static org.testory.proxy.Typing.typing;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.objenesis.ObjenesisStd;
 import org.testory.proxy.Handler;
@@ -28,7 +25,7 @@ public class CglibProxer implements Proxer {
   public Object proxy(Typing typing, Handler handler) {
     check(typing != null);
     check(handler != null);
-    return newProxyByCglib(tryWithoutFactory(typing), handler);
+    return newProxyByCglib(typing, handler);
   }
 
   private static Object newProxyByCglib(Typing typing, Handler handler) {
@@ -51,20 +48,6 @@ public class CglibProxer implements Proxer {
     Factory proxy = (Factory) new ObjenesisStd().newInstance(proxyClass);
     proxy.setCallbacks(new Callback[] { asMethodInterceptor(handler), new SerializableNoOp() });
     return proxy;
-  }
-
-  private static Typing tryWithoutFactory(Typing typing) {
-    return Arrays.asList(typing.superclass.getInterfaces()).contains(Factory.class)
-        ? withoutFactory(typing)
-        : typing;
-  }
-
-  private static Typing withoutFactory(Typing typing) {
-    Typing peeled = typing.peel();
-    Class<?> superclass = peeled.superclass;
-    Set<Class<?>> interfaces = new HashSet<>(peeled.interfaces);
-    interfaces.remove(Factory.class);
-    return typing(superclass, interfaces);
   }
 
   private static MethodInterceptor asMethodInterceptor(final Handler handler) {
