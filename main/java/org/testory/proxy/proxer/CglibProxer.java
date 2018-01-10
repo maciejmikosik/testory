@@ -63,7 +63,7 @@ public class CglibProxer implements Proxer {
 
   private static Typing tryPeel(Typing typing) {
     return isPeelable(typing.superclass)
-        ? tryPeel(peel(typing))
+        ? tryPeel(typing.peel())
         : typing;
   }
 
@@ -89,19 +89,11 @@ public class CglibProxer implements Proxer {
   }
 
   private static Typing withoutFactory(Typing typing) {
-    Typing peeled = peel(typing);
+    Typing peeled = typing.peel();
     Class<?> superclass = peeled.superclass;
     Set<Class<?>> interfaces = new HashSet<>(peeled.interfaces);
     interfaces.remove(Factory.class);
     return typing(superclass, interfaces);
-  }
-
-  private static Typing peel(Typing typing) {
-    Class<?> superclass = typing.superclass.getSuperclass();
-    Set<Class<?>> interfaces = new HashSet<>(typing.interfaces);
-    interfaces.addAll(Arrays.asList(typing.superclass.getInterfaces()));
-    return typing(superclass, interfaces);
-
   }
 
   private static MethodInterceptor asMethodInterceptor(final Handler handler) {

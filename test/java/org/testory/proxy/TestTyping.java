@@ -134,6 +134,23 @@ public class TestTyping {
   }
 
   @Test
+  public void peels_class() {
+    class Subclass extends ConcreteClass implements Interface {}
+    typing = typing(Subclass.class, classes(InterfaceA.class, InterfaceB.class)).peel();
+    assertEquals(ConcreteClass.class, typing.superclass);
+    assertEquals(classes(Interface.class, InterfaceA.class, InterfaceB.class), typing.interfaces);
+  }
+
+  @Test
+  public void peel_fails_for_object_superclass() {
+    typing = typing(Object.class, classes());
+    try {
+      typing.peel();
+      fail();
+    } catch (ProxyException e) {}
+  }
+
+  @Test
   public void sublcassing_fails_for_more_than_one_concrete_class() {
     try {
       subclassing(ConcreteClassA.class, ConcreteClassB.class);

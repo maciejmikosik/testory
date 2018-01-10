@@ -62,6 +62,15 @@ public class Typing {
     return typing(superclasses.iterator().next(), interfaces);
   }
 
+  public Typing peel() {
+    check(superclass != Object.class);
+    Class<?> peeledSuperclass = superclass.getSuperclass();
+    Set<Class<?>> peeledInterfaces = new HashSet<>(interfaces);
+    peeledInterfaces.addAll(asList(superclass.getInterfaces()));
+    return typing(peeledSuperclass, peeledInterfaces);
+
+  }
+
   public boolean equals(Object object) {
     return this == object || object instanceof Typing && equalsTyping((Typing) object);
   }
