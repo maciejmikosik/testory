@@ -20,11 +20,10 @@ import org.testory.common.Matcher;
 import org.testory.common.Matchers;
 import org.testory.common.SequenceFormatter;
 import org.testory.plumbing.history.History;
-import org.testory.plumbing.im.Matcherizer;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class WildcardMatcherizer implements Matcherizer {
+public class WildcardMatcherizer {
   private final Repairer repairer;
   private final History history;
   private final Formatter formatter;
@@ -37,7 +36,7 @@ public class WildcardMatcherizer implements Matcherizer {
     this.sequenceFormatter = sequence(", ", formatter);
   }
 
-  public static Matcherizer wildcardMatcherizer(
+  public static WildcardMatcherizer wildcardMatcherizer(
       History history,
       Repairer repairer,
       Formatter formatter) {

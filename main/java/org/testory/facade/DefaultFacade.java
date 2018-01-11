@@ -62,8 +62,8 @@ import org.testory.plumbing.VerifyingInOrder;
 import org.testory.plumbing.format.QuietFormatter;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
-import org.testory.plumbing.im.Matcherizer;
 import org.testory.plumbing.im.wildcard.WildcardException;
+import org.testory.plumbing.im.wildcard.WildcardMatcherizer;
 import org.testory.plumbing.im.wildcard.WildcardSupport;
 import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
@@ -83,7 +83,7 @@ public class DefaultFacade implements Facade {
   private final Maker mockMaker;
   private final Injector injector;
   private final WildcardSupport wildcardSupport;
-  private final Matcherizer matcherizer;
+  private final WildcardMatcherizer wildcardMatcherizer;
 
   private DefaultFacade(History mutableHistory) {
     Class<TestoryException> exception = TestoryException.class;
@@ -98,7 +98,7 @@ public class DefaultFacade implements Facade {
     mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     injector = injector(mockMaker);
     wildcardSupport = wildcardSupport(history, tokenizer(proxer), formatter);
-    matcherizer = wildcardMatcherizer(history, repairer(), formatter);
+    wildcardMatcherizer = wildcardMatcherizer(history, repairer(), formatter);
   }
 
   private static Proxer rich(Proxer proxer) {
@@ -676,7 +676,7 @@ public class DefaultFacade implements Facade {
 
   private InvocationMatcher matcherize(Invocation invocation) {
     try {
-      return matcherizer.matcherize(invocation);
+      return wildcardMatcherizer.matcherize(invocation);
     } catch (WildcardException e) {
       throw new TestoryException(e);
     }
