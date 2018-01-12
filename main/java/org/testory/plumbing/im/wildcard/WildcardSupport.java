@@ -13,29 +13,36 @@ import org.testory.common.Formatter;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
 import org.testory.plumbing.history.History;
+import org.testory.proxy.Invocation;
+import org.testory.proxy.InvocationMatcher;
 
 public class WildcardSupport {
   private final History history;
   private final Tokenizer tokenizer;
+  private final WildcardMatcherizer matcherizer;
   private final Formatter formatter;
 
   private WildcardSupport(
       History history,
       Tokenizer tokenizer,
+      WildcardMatcherizer matcherizer,
       Formatter formatter) {
     this.history = history;
     this.tokenizer = tokenizer;
+    this.matcherizer = matcherizer;
     this.formatter = formatter;
   }
 
   public static WildcardSupport wildcardSupport(
       History history,
       Tokenizer tokenizer,
+      WildcardMatcherizer matcherizer,
       Formatter formatter) {
     check(history != null);
     check(tokenizer != null);
+    check(matcherizer != null);
     check(formatter != null);
-    return new WildcardSupport(history, tokenizer, formatter);
+    return new WildcardSupport(history, tokenizer, matcherizer, formatter);
   }
 
   public Object any(final Class<?> type) {
@@ -99,5 +106,10 @@ public class WildcardSupport {
     Object token = tokenizer.token(type);
     history.add(wildcard(matcher, token));
     return token;
+  }
+
+  public InvocationMatcher matcherize(Invocation invocation) {
+    check(invocation != null);
+    return matcherizer.matcherize(invocation);
   }
 }

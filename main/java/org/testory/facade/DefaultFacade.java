@@ -83,7 +83,6 @@ public class DefaultFacade implements Facade {
   private final Maker mockMaker;
   private final Injector injector;
   private final WildcardSupport wildcardSupport;
-  private final WildcardMatcherizer wildcardMatcherizer;
 
   private DefaultFacade(History mutableHistory) {
     Class<TestoryException> exception = TestoryException.class;
@@ -97,8 +96,8 @@ public class DefaultFacade implements Facade {
     mockNamer = uniqueNamer(history);
     mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     injector = injector(mockMaker);
-    wildcardSupport = wildcardSupport(history, tokenizer(proxer), formatter);
-    wildcardMatcherizer = wildcardMatcherizer(history, repairer(), formatter);
+    WildcardMatcherizer wildcardMatcherizer = wildcardMatcherizer(history, repairer(), formatter);
+    wildcardSupport = wildcardSupport(history, tokenizer(proxer), wildcardMatcherizer, formatter);
   }
 
   private static Proxer rich(Proxer proxer) {
@@ -676,7 +675,7 @@ public class DefaultFacade implements Facade {
 
   private InvocationMatcher matcherize(Invocation invocation) {
     try {
-      return wildcardMatcherizer.matcherize(invocation);
+      return wildcardSupport.matcherize(invocation);
     } catch (WildcardException e) {
       throw new TestoryException(e);
     }
