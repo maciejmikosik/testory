@@ -7,8 +7,6 @@ import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.listOf;
 import static org.testory.common.SequenceFormatter.sequence;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.im.wildcard.WildcardInvocation.wildcardInvocation;
-import static org.testory.plumbing.im.wildcard.Wildcarded.wildcarded;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -19,54 +17,22 @@ import org.testory.common.Formatter;
 import org.testory.common.Matcher;
 import org.testory.common.Matchers;
 import org.testory.common.SequenceFormatter;
-import org.testory.plumbing.history.History;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
 public class WildcardMatcherizer {
-  private final Repairer repairer;
-  private final History history;
   private final Formatter formatter;
   private final SequenceFormatter sequenceFormatter;
 
-  private WildcardMatcherizer(History history, Repairer repairer, Formatter formatter) {
-    this.history = history;
-    this.repairer = repairer;
+  private WildcardMatcherizer(Formatter formatter) {
     this.formatter = formatter;
     this.sequenceFormatter = sequence(", ", formatter);
   }
 
   public static WildcardMatcherizer wildcardMatcherizer(
-      History history,
-      Repairer repairer,
       Formatter formatter) {
-    check(history != null);
-    check(repairer != null);
     check(formatter != null);
-    return new WildcardMatcherizer(history, repairer, formatter);
-  }
-
-  public InvocationMatcher matcherize(Invocation invocation) {
-    List<Wildcard> wildcards = consumeWildcards();
-    WildcardInvocation wildcardInvocation = wildcardInvocation(
-        invocation.method,
-        invocation.instance,
-        invocation.arguments,
-        wildcards);
-    return matcherize(repairer.repair(wildcardInvocation));
-  }
-
-  private List<Wildcard> consumeWildcards() {
-    List<Wildcard> wildcards = new ArrayList<>();
-    for (Object event : history.get()) {
-      if (event instanceof Wildcard) {
-        wildcards.add(0, (Wildcard) event);
-      } else if (event instanceof Wildcarded) {
-        break;
-      }
-    }
-    history.add(wildcarded());
-    return wildcards;
+    return new WildcardMatcherizer(formatter);
   }
 
   public InvocationMatcher matcherize(WildcardInvocation invocation) {

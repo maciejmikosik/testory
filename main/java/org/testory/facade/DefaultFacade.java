@@ -63,7 +63,6 @@ import org.testory.plumbing.format.QuietFormatter;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
 import org.testory.plumbing.im.wildcard.WildcardException;
-import org.testory.plumbing.im.wildcard.WildcardMatcherizer;
 import org.testory.plumbing.im.wildcard.WildcardSupport;
 import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
@@ -96,8 +95,12 @@ public class DefaultFacade implements Facade {
     mockNamer = uniqueNamer(history);
     mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     injector = injector(mockMaker);
-    WildcardMatcherizer wildcardMatcherizer = wildcardMatcherizer(history, repairer(), formatter);
-    wildcardSupport = wildcardSupport(history, tokenizer(proxer), wildcardMatcherizer, formatter);
+    wildcardSupport = wildcardSupport(
+        history,
+        tokenizer(proxer),
+        repairer(),
+        wildcardMatcherizer(formatter),
+        formatter);
   }
 
   private static Proxer rich(Proxer proxer) {

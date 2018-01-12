@@ -7,6 +7,11 @@ import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Matchers.same;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.im.wildcard.Wildcard.wildcard;
+import static org.testory.plumbing.im.wildcard.WildcardInvocation.wildcardInvocation;
+import static org.testory.plumbing.im.wildcard.Wildcarded.wildcarded;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.testory.common.DelegatingMatcher;
 import org.testory.common.Formatter;
@@ -19,16 +24,19 @@ import org.testory.proxy.InvocationMatcher;
 public class WildcardSupport {
   private final History history;
   private final Tokenizer tokenizer;
+  private final Repairer repairer;
   private final WildcardMatcherizer matcherizer;
   private final Formatter formatter;
 
   private WildcardSupport(
       History history,
       Tokenizer tokenizer,
+      Repairer repairer,
       WildcardMatcherizer matcherizer,
       Formatter formatter) {
     this.history = history;
     this.tokenizer = tokenizer;
+    this.repairer = repairer;
     this.matcherizer = matcherizer;
     this.formatter = formatter;
   }
@@ -36,13 +44,15 @@ public class WildcardSupport {
   public static WildcardSupport wildcardSupport(
       History history,
       Tokenizer tokenizer,
+      Repairer repairer,
       WildcardMatcherizer matcherizer,
       Formatter formatter) {
     check(history != null);
     check(tokenizer != null);
+    check(repairer != null);
     check(matcherizer != null);
     check(formatter != null);
-    return new WildcardSupport(history, tokenizer, matcherizer, formatter);
+    return new WildcardSupport(history, tokenizer, repairer, matcherizer, formatter);
   }
 
   public Object any(final Class<?> type) {
@@ -110,6 +120,25 @@ public class WildcardSupport {
 
   public InvocationMatcher matcherize(Invocation invocation) {
     check(invocation != null);
-    return matcherizer.matcherize(invocation);
+    List<Wildcard> wildcards = consumeWildcards();
+    WildcardInvocation wildcardInvocation = wildcardInvocation(
+        invocation.method,
+        invocation.instance,
+        invocation.arguments,
+        wildcards);
+    return matcherizer.matcherize(repairer.repair(wildcardInvocation));
+  }
+
+  private List<Wildcard> consumeWildcards() {
+    List<Wildcard> wildcards = new ArrayList<>();
+    for (Object event : history.get()) {
+      if (event instanceof Wildcard) {
+        wildcards.add(0, (Wildcard) event);
+      } else if (event instanceof Wildcarded) {
+        break;
+      }
+    }
+    history.add(wildcarded());
+    return wildcards;
   }
 }
