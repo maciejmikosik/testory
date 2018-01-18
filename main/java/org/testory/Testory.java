@@ -1,7 +1,7 @@
 package org.testory;
 
+import static org.testory.facade.ConfigurableFacade.configurableFacade;
 import static org.testory.facade.Configuration.configuration;
-import static org.testory.facade.DefaultFacade.defaultFacade;
 import static org.testory.facade.PurgingFacade.purging;
 import static org.testory.plumbing.Checker.checker;
 import static org.testory.plumbing.CheckingProxer.checkingProxer;
@@ -77,7 +77,7 @@ public class Testory {
           .injector(injector)
           .wildcardSupport(wildcardSupport)
           .validate();
-      return purging(history, cglibProxer(), defaultFacade(configuration));
+      return purging(history, cglibProxer(), configurableFacade(configuration));
     }
   };
 
