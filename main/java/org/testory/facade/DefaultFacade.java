@@ -14,8 +14,6 @@ import static org.testory.plumbing.CheckingProxer.checkingProxer;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
-import static org.testory.plumbing.format.MessageFormatter.messageFormatter;
-import static org.testory.plumbing.format.QuietFormatter.quiet;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 import static org.testory.plumbing.im.wildcard.Repairer.repairer;
 import static org.testory.plumbing.im.wildcard.Tokenizer.tokenizer;
@@ -59,7 +57,6 @@ import org.testory.plumbing.Checker;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.VerifyingInOrder;
-import org.testory.plumbing.format.QuietFormatter;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
 import org.testory.plumbing.im.wildcard.WildcardException;
@@ -83,11 +80,10 @@ public class DefaultFacade implements Facade {
   private final Injector injector;
   private final WildcardSupport wildcardSupport;
 
-  private DefaultFacade(History mutableHistory) {
+  private DefaultFacade(Configuration configuration) {
     Class<TestoryException> exception = TestoryException.class;
-    QuietFormatter quietFormatter = quiet(messageFormatter());
-    formatter = quietFormatter;
-    history = quietFormatter.quiet(mutableHistory);
+    formatter = configuration.formatter;
+    history = configuration.history;
     inspectingHistory = filter(Inspecting.class, history);
     invocationHistory = filter(Invocation.class, history);
     checker = checker(history, exception);
@@ -107,8 +103,8 @@ public class DefaultFacade implements Facade {
     return nonFinal(typeSafe(jdkCollections(fixObjectBug(repeatable(proxer)))));
   }
 
-  public static Facade defaultFacade(History mutableHistory) {
-    return new DefaultFacade(mutableHistory);
+  public static Facade defaultFacade(Configuration configuration) {
+    return new DefaultFacade(configuration);
   }
 
   private static Maker mockMaker(History history, Proxer proxer) {
