@@ -1,10 +1,10 @@
 package org.testory;
 
-import static org.testory.facade.ConfigurableFacade.configurableFacade;
-import static org.testory.facade.Configuration.configuration;
-import static org.testory.facade.PurgingFacade.purging;
 import static org.testory.plumbing.Checker.checker;
 import static org.testory.plumbing.CheckingProxer.checkingProxer;
+import static org.testory.plumbing.facade.ConfigurableFacade.configurableFacade;
+import static org.testory.plumbing.facade.Configuration.configuration;
+import static org.testory.plumbing.facade.PurgingFacade.purging;
 import static org.testory.plumbing.format.MessageFormatter.messageFormatter;
 import static org.testory.plumbing.format.QuietFormatter.quiet;
 import static org.testory.plumbing.history.RawHistory.newRawHistory;
@@ -33,10 +33,10 @@ import static org.testory.proxy.proxer.WrappingProxer.wrapping;
 import org.testory.common.Closure;
 import org.testory.common.Nullable;
 import org.testory.common.VoidClosure;
-import org.testory.facade.Configuration;
-import org.testory.facade.Facade;
 import org.testory.plumbing.Checker;
 import org.testory.plumbing.Maker;
+import org.testory.plumbing.facade.Configuration;
+import org.testory.plumbing.facade.Facade;
 import org.testory.plumbing.format.QuietFormatter;
 import org.testory.plumbing.history.History;
 import org.testory.plumbing.im.wildcard.WildcardSupport;

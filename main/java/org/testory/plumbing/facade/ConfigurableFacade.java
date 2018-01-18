@@ -1,4 +1,4 @@
-package org.testory.facade;
+package org.testory.plumbing.facade;
 
 import static java.util.Objects.deepEquals;
 import static org.testory.TestoryAssertionError.assertionError;

@@ -1,4 +1,4 @@
-package org.testory.facade;
+package org.testory.plumbing.facade;
 
 import org.testory.common.Closure;
 import org.testory.common.VoidClosure;
