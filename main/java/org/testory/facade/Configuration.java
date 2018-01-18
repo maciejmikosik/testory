@@ -6,6 +6,7 @@ import org.testory.common.Formatter;
 import org.testory.plumbing.Checker;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.history.History;
+import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
 import org.testory.proxy.Proxer;
 
@@ -18,6 +19,7 @@ public class Configuration {
   public final Proxer proxer;
   public final Namer mockNamer;
   public final Maker mockMaker;
+  public final Injector injector;
 
   private Configuration(
       History history,
@@ -26,7 +28,8 @@ public class Configuration {
       Checker checker,
       Proxer proxer,
       Namer mockNamer,
-      Maker mockMaker) {
+      Maker mockMaker,
+      Injector injector) {
     this.history = history;
     this.formatter = formatter;
     this.exception = exception;
@@ -34,10 +37,12 @@ public class Configuration {
     this.proxer = proxer;
     this.mockNamer = mockNamer;
     this.mockMaker = mockMaker;
+    this.injector = injector;
   }
 
   public static Configuration configuration() {
     return new Configuration(
+        null,
         null,
         null,
         null,
@@ -55,7 +60,8 @@ public class Configuration {
         checker,
         proxer,
         mockNamer,
-        mockMaker);
+        mockMaker,
+        injector);
   }
 
   public Configuration formatter(Formatter formatter) {
@@ -66,7 +72,8 @@ public class Configuration {
         checker,
         proxer,
         mockNamer,
-        mockMaker);
+        mockMaker,
+        injector);
   }
 
   public Configuration exception(Class<? extends RuntimeException> exception) {
@@ -77,7 +84,8 @@ public class Configuration {
         checker,
         proxer,
         mockNamer,
-        mockMaker);
+        mockMaker,
+        injector);
   }
 
   public Configuration checker(Checker checker) {
@@ -88,7 +96,8 @@ public class Configuration {
         requireNonNull(checker),
         proxer,
         mockNamer,
-        mockMaker);
+        mockMaker,
+        injector);
   }
 
   public Configuration proxer(Proxer proxer) {
@@ -99,7 +108,8 @@ public class Configuration {
         checker,
         requireNonNull(proxer),
         mockNamer,
-        mockMaker);
+        mockMaker,
+        injector);
   }
 
   public Configuration mockNamer(Namer mockNamer) {
@@ -110,7 +120,8 @@ public class Configuration {
         checker,
         proxer,
         requireNonNull(mockNamer),
-        mockMaker);
+        mockMaker,
+        injector);
   }
 
   public Configuration mockMaker(Maker mockMaker) {
@@ -121,7 +132,20 @@ public class Configuration {
         checker,
         proxer,
         mockNamer,
-        requireNonNull(mockMaker));
+        requireNonNull(mockMaker),
+        injector);
+  }
+
+  public Configuration injector(Injector injector) {
+    return new Configuration(
+        history,
+        formatter,
+        exception,
+        checker,
+        proxer,
+        mockNamer,
+        mockMaker,
+        requireNonNull(injector));
   }
 
   public Configuration validate() {
@@ -131,6 +155,7 @@ public class Configuration {
     requireNonNull(proxer);
     requireNonNull(mockNamer);
     requireNonNull(mockMaker);
+    requireNonNull(injector);
     return this;
   }
 }

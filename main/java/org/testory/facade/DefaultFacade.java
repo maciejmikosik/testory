@@ -17,10 +17,6 @@ import static org.testory.plumbing.im.wildcard.Repairer.repairer;
 import static org.testory.plumbing.im.wildcard.Tokenizer.tokenizer;
 import static org.testory.plumbing.im.wildcard.WildcardMatcherizer.wildcardMatcherizer;
 import static org.testory.plumbing.im.wildcard.WildcardSupport.wildcardSupport;
-import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
-import static org.testory.plumbing.inject.ChainedMaker.chain;
-import static org.testory.plumbing.inject.FinalMaker.finalMaker;
-import static org.testory.plumbing.inject.RandomPrimitiveMaker.randomPrimitiveMaker;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Typing.subclassing;
 import static org.testory.proxy.handler.DelegatingHandler.delegatingTo;
@@ -76,7 +72,7 @@ public class DefaultFacade implements Facade {
     proxer = configuration.proxer;
     mockNamer = configuration.mockNamer;
     mockMaker = configuration.mockMaker;
-    injector = injector(mockMaker);
+    injector = configuration.injector;
     wildcardSupport = wildcardSupport(
         history,
         tokenizer(proxer),
@@ -87,11 +83,6 @@ public class DefaultFacade implements Facade {
 
   public static Facade defaultFacade(Configuration configuration) {
     return new DefaultFacade(configuration);
-  }
-
-  private static Injector injector(Maker mockMaker) {
-    Maker fieldMaker = singletonArray(chain(randomPrimitiveMaker(), finalMaker(), mockMaker));
-    return new Injector(fieldMaker);
   }
 
   public void givenTest(Object test) {
