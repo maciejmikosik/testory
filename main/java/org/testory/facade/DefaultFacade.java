@@ -81,7 +81,7 @@ public class DefaultFacade implements Facade {
   private final WildcardSupport wildcardSupport;
 
   private DefaultFacade(Configuration configuration) {
-    Class<TestoryException> exception = TestoryException.class;
+    Class<? extends RuntimeException> exception = configuration.exception;
     formatter = configuration.formatter;
     history = configuration.history;
     inspectingHistory = filter(Inspecting.class, history);

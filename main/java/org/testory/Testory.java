@@ -28,6 +28,7 @@ public class Testory {
       Configuration configuration = configuration()
           .history(history)
           .formatter(formatter)
+          .exception(TestoryException.class)
           .validate();
       return purging(history, cglibProxer(), defaultFacade(configuration));
     }
