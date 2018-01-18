@@ -13,10 +13,6 @@ import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
 import static org.testory.plumbing.history.FilteredHistory.filter;
-import static org.testory.plumbing.im.wildcard.Repairer.repairer;
-import static org.testory.plumbing.im.wildcard.Tokenizer.tokenizer;
-import static org.testory.plumbing.im.wildcard.WildcardMatcherizer.wildcardMatcherizer;
-import static org.testory.plumbing.im.wildcard.WildcardSupport.wildcardSupport;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Typing.subclassing;
 import static org.testory.proxy.handler.DelegatingHandler.delegatingTo;
@@ -73,12 +69,7 @@ public class DefaultFacade implements Facade {
     mockNamer = configuration.mockNamer;
     mockMaker = configuration.mockMaker;
     injector = configuration.injector;
-    wildcardSupport = wildcardSupport(
-        history,
-        tokenizer(proxer),
-        repairer(),
-        wildcardMatcherizer(formatter),
-        formatter);
+    wildcardSupport = configuration.wildcardSupport;
   }
 
   public static Facade defaultFacade(Configuration configuration) {

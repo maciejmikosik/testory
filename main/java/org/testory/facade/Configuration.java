@@ -6,6 +6,7 @@ import org.testory.common.Formatter;
 import org.testory.plumbing.Checker;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.history.History;
+import org.testory.plumbing.im.wildcard.WildcardSupport;
 import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
 import org.testory.proxy.Proxer;
@@ -20,6 +21,7 @@ public class Configuration {
   public final Namer mockNamer;
   public final Maker mockMaker;
   public final Injector injector;
+  public final WildcardSupport wildcardSupport;
 
   private Configuration(
       History history,
@@ -29,7 +31,8 @@ public class Configuration {
       Proxer proxer,
       Namer mockNamer,
       Maker mockMaker,
-      Injector injector) {
+      Injector injector,
+      WildcardSupport wildcardSupport) {
     this.history = history;
     this.formatter = formatter;
     this.exception = exception;
@@ -38,10 +41,12 @@ public class Configuration {
     this.mockNamer = mockNamer;
     this.mockMaker = mockMaker;
     this.injector = injector;
+    this.wildcardSupport = wildcardSupport;
   }
 
   public static Configuration configuration() {
     return new Configuration(
+        null,
         null,
         null,
         null,
@@ -61,7 +66,8 @@ public class Configuration {
         proxer,
         mockNamer,
         mockMaker,
-        injector);
+        injector,
+        wildcardSupport);
   }
 
   public Configuration formatter(Formatter formatter) {
@@ -73,7 +79,8 @@ public class Configuration {
         proxer,
         mockNamer,
         mockMaker,
-        injector);
+        injector,
+        wildcardSupport);
   }
 
   public Configuration exception(Class<? extends RuntimeException> exception) {
@@ -85,7 +92,8 @@ public class Configuration {
         proxer,
         mockNamer,
         mockMaker,
-        injector);
+        injector,
+        wildcardSupport);
   }
 
   public Configuration checker(Checker checker) {
@@ -97,7 +105,8 @@ public class Configuration {
         proxer,
         mockNamer,
         mockMaker,
-        injector);
+        injector,
+        wildcardSupport);
   }
 
   public Configuration proxer(Proxer proxer) {
@@ -109,7 +118,8 @@ public class Configuration {
         requireNonNull(proxer),
         mockNamer,
         mockMaker,
-        injector);
+        injector,
+        wildcardSupport);
   }
 
   public Configuration mockNamer(Namer mockNamer) {
@@ -121,7 +131,8 @@ public class Configuration {
         proxer,
         requireNonNull(mockNamer),
         mockMaker,
-        injector);
+        injector,
+        wildcardSupport);
   }
 
   public Configuration mockMaker(Maker mockMaker) {
@@ -133,7 +144,8 @@ public class Configuration {
         proxer,
         mockNamer,
         requireNonNull(mockMaker),
-        injector);
+        injector,
+        wildcardSupport);
   }
 
   public Configuration injector(Injector injector) {
@@ -145,7 +157,21 @@ public class Configuration {
         proxer,
         mockNamer,
         mockMaker,
-        requireNonNull(injector));
+        requireNonNull(injector),
+        wildcardSupport);
+  }
+
+  public Configuration wildcardSupport(WildcardSupport wildcardSupport) {
+    return new Configuration(
+        history,
+        formatter,
+        exception,
+        checker,
+        proxer,
+        mockNamer,
+        mockMaker,
+        injector,
+        requireNonNull(wildcardSupport));
   }
 
   public Configuration validate() {
@@ -156,6 +182,7 @@ public class Configuration {
     requireNonNull(mockNamer);
     requireNonNull(mockMaker);
     requireNonNull(injector);
+    requireNonNull(wildcardSupport);
     return this;
   }
 }

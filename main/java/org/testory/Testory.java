@@ -9,6 +9,10 @@ import static org.testory.plumbing.format.MessageFormatter.messageFormatter;
 import static org.testory.plumbing.format.QuietFormatter.quiet;
 import static org.testory.plumbing.history.RawHistory.newRawHistory;
 import static org.testory.plumbing.history.SynchronizedHistory.synchronize;
+import static org.testory.plumbing.im.wildcard.Repairer.repairer;
+import static org.testory.plumbing.im.wildcard.Tokenizer.tokenizer;
+import static org.testory.plumbing.im.wildcard.WildcardMatcherizer.wildcardMatcherizer;
+import static org.testory.plumbing.im.wildcard.WildcardSupport.wildcardSupport;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
@@ -35,6 +39,7 @@ import org.testory.plumbing.Checker;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.format.QuietFormatter;
 import org.testory.plumbing.history.History;
+import org.testory.plumbing.im.wildcard.WildcardSupport;
 import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
 import org.testory.proxy.Handler;
@@ -55,6 +60,12 @@ public class Testory {
       Namer mockNamer = uniqueNamer(history);
       Maker mockMaker = sane(history, nice(history, rawMockMaker(history, checkingProxer(checker, proxer))));
       Injector injector = injector(singletonArray(chain(randomPrimitiveMaker(), finalMaker(), mockMaker)));
+      WildcardSupport wildcardSupport = wildcardSupport(
+          history,
+          tokenizer(proxer),
+          repairer(),
+          wildcardMatcherizer(formatter),
+          formatter);
       Configuration configuration = configuration()
           .history(history)
           .formatter(formatter)
@@ -64,6 +75,7 @@ public class Testory {
           .mockNamer(mockNamer)
           .mockMaker(mockMaker)
           .injector(injector)
+          .wildcardSupport(wildcardSupport)
           .validate();
       return purging(history, cglibProxer(), defaultFacade(configuration));
     }
