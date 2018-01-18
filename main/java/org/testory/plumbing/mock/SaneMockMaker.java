@@ -17,18 +17,18 @@ import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
 public class SaneMockMaker implements Maker {
-  private final Maker mockMaker;
   private final History history;
+  private final Maker mockMaker;
 
-  private SaneMockMaker(Maker mockMaker, History history) {
-    this.mockMaker = mockMaker;
+  private SaneMockMaker(History history, Maker mockMaker) {
     this.history = history;
+    this.mockMaker = mockMaker;
   }
 
-  public static Maker sane(Maker mockMaker, History history) {
-    check(mockMaker != null);
+  public static Maker sane(History history, Maker mockMaker) {
     check(history != null);
-    return new SaneMockMaker(mockMaker, history);
+    check(mockMaker != null);
+    return new SaneMockMaker(history, mockMaker);
   }
 
   public <T> T make(Class<T> type, String name) {

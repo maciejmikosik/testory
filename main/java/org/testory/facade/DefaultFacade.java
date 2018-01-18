@@ -9,7 +9,6 @@ import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
-import static org.testory.plumbing.CheckingProxer.checkingProxer;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
@@ -22,9 +21,6 @@ import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
 import static org.testory.plumbing.inject.RandomPrimitiveMaker.randomPrimitiveMaker;
-import static org.testory.plumbing.mock.NiceMockMaker.nice;
-import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
-import static org.testory.plumbing.mock.SaneMockMaker.sane;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Typing.subclassing;
 import static org.testory.proxy.handler.DelegatingHandler.delegatingTo;
@@ -79,7 +75,7 @@ public class DefaultFacade implements Facade {
     checker = configuration.checker;
     proxer = configuration.proxer;
     mockNamer = configuration.mockNamer;
-    mockMaker = mockMaker(history, checkingProxer(checker, proxer));
+    mockMaker = configuration.mockMaker;
     injector = injector(mockMaker);
     wildcardSupport = wildcardSupport(
         history,
@@ -91,13 +87,6 @@ public class DefaultFacade implements Facade {
 
   public static Facade defaultFacade(Configuration configuration) {
     return new DefaultFacade(configuration);
-  }
-
-  private static Maker mockMaker(History history, Proxer proxer) {
-    Maker rawMockMaker = rawMockMaker(proxer, history);
-    Maker niceMockMaker = nice(rawMockMaker, history);
-    Maker saneNiceMockMaker = sane(niceMockMaker, history);
-    return saneNiceMockMaker;
   }
 
   private static Injector injector(Maker mockMaker) {

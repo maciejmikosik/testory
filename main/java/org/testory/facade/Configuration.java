@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import org.testory.common.Formatter;
 import org.testory.plumbing.Checker;
+import org.testory.plumbing.Maker;
 import org.testory.plumbing.history.History;
 import org.testory.plumbing.mock.Namer;
 import org.testory.proxy.Proxer;
@@ -16,6 +17,7 @@ public class Configuration {
   public final Checker checker;
   public final Proxer proxer;
   public final Namer mockNamer;
+  public final Maker mockMaker;
 
   private Configuration(
       History history,
@@ -23,17 +25,20 @@ public class Configuration {
       Class<? extends RuntimeException> exception,
       Checker checker,
       Proxer proxer,
-      Namer mockNamer) {
+      Namer mockNamer,
+      Maker mockMaker) {
     this.history = history;
     this.formatter = formatter;
     this.exception = exception;
     this.checker = checker;
     this.proxer = proxer;
     this.mockNamer = mockNamer;
+    this.mockMaker = mockMaker;
   }
 
   public static Configuration configuration() {
     return new Configuration(
+        null,
         null,
         null,
         null,
@@ -49,7 +54,8 @@ public class Configuration {
         exception,
         checker,
         proxer,
-        mockNamer);
+        mockNamer,
+        mockMaker);
   }
 
   public Configuration formatter(Formatter formatter) {
@@ -59,7 +65,8 @@ public class Configuration {
         exception,
         checker,
         proxer,
-        mockNamer);
+        mockNamer,
+        mockMaker);
   }
 
   public Configuration exception(Class<? extends RuntimeException> exception) {
@@ -69,7 +76,8 @@ public class Configuration {
         requireNonNull(exception),
         checker,
         proxer,
-        mockNamer);
+        mockNamer,
+        mockMaker);
   }
 
   public Configuration checker(Checker checker) {
@@ -79,7 +87,8 @@ public class Configuration {
         exception,
         requireNonNull(checker),
         proxer,
-        mockNamer);
+        mockNamer,
+        mockMaker);
   }
 
   public Configuration proxer(Proxer proxer) {
@@ -89,7 +98,8 @@ public class Configuration {
         exception,
         checker,
         requireNonNull(proxer),
-        mockNamer);
+        mockNamer,
+        mockMaker);
   }
 
   public Configuration mockNamer(Namer mockNamer) {
@@ -99,7 +109,19 @@ public class Configuration {
         exception,
         checker,
         proxer,
-        requireNonNull(mockNamer));
+        requireNonNull(mockNamer),
+        mockMaker);
+  }
+
+  public Configuration mockMaker(Maker mockMaker) {
+    return new Configuration(
+        history,
+        formatter,
+        exception,
+        checker,
+        proxer,
+        mockNamer,
+        requireNonNull(mockMaker));
   }
 
   public Configuration validate() {
@@ -108,6 +130,7 @@ public class Configuration {
     requireNonNull(exception);
     requireNonNull(proxer);
     requireNonNull(mockNamer);
+    requireNonNull(mockMaker);
     return this;
   }
 }

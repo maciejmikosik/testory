@@ -4,10 +4,14 @@ import static org.testory.facade.Configuration.configuration;
 import static org.testory.facade.DefaultFacade.defaultFacade;
 import static org.testory.facade.PurgingFacade.purging;
 import static org.testory.plumbing.Checker.checker;
+import static org.testory.plumbing.CheckingProxer.checkingProxer;
 import static org.testory.plumbing.format.MessageFormatter.messageFormatter;
 import static org.testory.plumbing.format.QuietFormatter.quiet;
 import static org.testory.plumbing.history.RawHistory.newRawHistory;
 import static org.testory.plumbing.history.SynchronizedHistory.synchronize;
+import static org.testory.plumbing.mock.NiceMockMaker.nice;
+import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
+import static org.testory.plumbing.mock.SaneMockMaker.sane;
 import static org.testory.plumbing.mock.UniqueNamer.uniqueNamer;
 import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
 import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
@@ -23,6 +27,7 @@ import org.testory.common.VoidClosure;
 import org.testory.facade.Configuration;
 import org.testory.facade.Facade;
 import org.testory.plumbing.Checker;
+import org.testory.plumbing.Maker;
 import org.testory.plumbing.format.QuietFormatter;
 import org.testory.plumbing.history.History;
 import org.testory.plumbing.mock.Namer;
@@ -42,6 +47,7 @@ public class Testory {
           nonFinal(typeSafe(jdkCollections(fixObjectBug(repeatable(
               wrapping(exception, cglibProxer())))))));
       Namer mockNamer = uniqueNamer(history);
+      Maker mockMaker = sane(history, nice(history, rawMockMaker(history, checkingProxer(checker, proxer))));
       Configuration configuration = configuration()
           .history(history)
           .formatter(formatter)
@@ -49,6 +55,7 @@ public class Testory {
           .checker(checker)
           .proxer(proxer)
           .mockNamer(mockNamer)
+          .mockMaker(mockMaker)
           .validate();
       return purging(history, cglibProxer(), defaultFacade(configuration));
     }
