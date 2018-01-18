@@ -1,6 +1,6 @@
 package org.testory.facade;
 
-import static java.util.Objects.requireNonNull;
+import static org.testory.plumbing.PlumbingException.check;
 
 import org.testory.common.Formatter;
 import org.testory.plumbing.Checker;
@@ -58,8 +58,9 @@ public class Configuration {
   }
 
   public Configuration history(History history) {
+    check(history != null);
     return new Configuration(
-        requireNonNull(history),
+        history,
         formatter,
         exception,
         checker,
@@ -71,9 +72,10 @@ public class Configuration {
   }
 
   public Configuration formatter(Formatter formatter) {
+    check(formatter != null);
     return new Configuration(
         history,
-        requireNonNull(formatter),
+        formatter,
         exception,
         checker,
         proxer,
@@ -84,10 +86,11 @@ public class Configuration {
   }
 
   public Configuration exception(Class<? extends RuntimeException> exception) {
+    check(exception != null);
     return new Configuration(
         history,
         formatter,
-        requireNonNull(exception),
+        exception,
         checker,
         proxer,
         mockNamer,
@@ -97,11 +100,12 @@ public class Configuration {
   }
 
   public Configuration checker(Checker checker) {
+    check(checker != null);
     return new Configuration(
         history,
         formatter,
         exception,
-        requireNonNull(checker),
+        checker,
         proxer,
         mockNamer,
         mockMaker,
@@ -110,12 +114,13 @@ public class Configuration {
   }
 
   public Configuration proxer(Proxer proxer) {
+    check(proxer != null);
     return new Configuration(
         history,
         formatter,
         exception,
         checker,
-        requireNonNull(proxer),
+        proxer,
         mockNamer,
         mockMaker,
         injector,
@@ -123,19 +128,21 @@ public class Configuration {
   }
 
   public Configuration mockNamer(Namer mockNamer) {
+    check(mockNamer != null);
     return new Configuration(
         history,
         formatter,
         exception,
         checker,
         proxer,
-        requireNonNull(mockNamer),
+        mockNamer,
         mockMaker,
         injector,
         wildcardSupport);
   }
 
   public Configuration mockMaker(Maker mockMaker) {
+    check(mockMaker != null);
     return new Configuration(
         history,
         formatter,
@@ -143,25 +150,13 @@ public class Configuration {
         checker,
         proxer,
         mockNamer,
-        requireNonNull(mockMaker),
+        mockMaker,
         injector,
         wildcardSupport);
   }
 
   public Configuration injector(Injector injector) {
-    return new Configuration(
-        history,
-        formatter,
-        exception,
-        checker,
-        proxer,
-        mockNamer,
-        mockMaker,
-        requireNonNull(injector),
-        wildcardSupport);
-  }
-
-  public Configuration wildcardSupport(WildcardSupport wildcardSupport) {
+    check(injector != null);
     return new Configuration(
         history,
         formatter,
@@ -171,18 +166,32 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        requireNonNull(wildcardSupport));
+        wildcardSupport);
+  }
+
+  public Configuration wildcardSupport(WildcardSupport wildcardSupport) {
+    check(wildcardSupport != null);
+    return new Configuration(
+        history,
+        formatter,
+        exception,
+        checker,
+        proxer,
+        mockNamer,
+        mockMaker,
+        injector,
+        wildcardSupport);
   }
 
   public Configuration validate() {
-    requireNonNull(history);
-    requireNonNull(formatter);
-    requireNonNull(exception);
-    requireNonNull(proxer);
-    requireNonNull(mockNamer);
-    requireNonNull(mockMaker);
-    requireNonNull(injector);
-    requireNonNull(wildcardSupport);
+    check(history != null);
+    check(formatter != null);
+    check(exception != null);
+    check(proxer != null);
+    check(mockNamer != null);
+    check(mockMaker != null);
+    check(injector != null);
+    check(wildcardSupport != null);
     return this;
   }
 }
