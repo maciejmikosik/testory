@@ -8,6 +8,12 @@ import static org.testory.plumbing.format.QuietFormatter.quiet;
 import static org.testory.plumbing.history.RawHistory.newRawHistory;
 import static org.testory.plumbing.history.SynchronizedHistory.synchronize;
 import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
+import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
+import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
+import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
+import static org.testory.proxy.proxer.RepeatableProxy.repeatable;
+import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
+import static org.testory.proxy.proxer.WrappingProxer.wrapping;
 
 import org.testory.common.Closure;
 import org.testory.common.Nullable;
@@ -18,17 +24,23 @@ import org.testory.plumbing.format.QuietFormatter;
 import org.testory.plumbing.history.History;
 import org.testory.proxy.Handler;
 import org.testory.proxy.InvocationMatcher;
+import org.testory.proxy.Proxer;
 
 public class Testory {
   private static final ThreadLocal<Facade> localFacade = new ThreadLocal<Facade>() {
     protected Facade initialValue() {
+      Class<TestoryException> exception = TestoryException.class;
       History loudHistory = synchronize(newRawHistory());
       QuietFormatter formatter = quiet(messageFormatter());
       History history = formatter.quiet(loudHistory);
+      Proxer proxer = wrapping(exception,
+          nonFinal(typeSafe(jdkCollections(fixObjectBug(repeatable(
+              wrapping(exception, cglibProxer())))))));
       Configuration configuration = configuration()
           .history(history)
           .formatter(formatter)
-          .exception(TestoryException.class)
+          .exception(exception)
+          .proxer(proxer)
           .validate();
       return purging(history, cglibProxer(), defaultFacade(configuration));
     }

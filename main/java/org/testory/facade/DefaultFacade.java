@@ -33,13 +33,6 @@ import static org.testory.proxy.handler.DelegatingHandler.delegatingTo;
 import static org.testory.proxy.handler.ReturningDefaultValueHandler.returningDefaultValue;
 import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.proxy.handler.ThrowingHandler.throwing;
-import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
-import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
-import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
-import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
-import static org.testory.proxy.proxer.RepeatableProxy.repeatable;
-import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
-import static org.testory.proxy.proxer.WrappingProxer.wrapping;
 
 import org.testory.TestoryException;
 import org.testory.common.Closure;
@@ -87,7 +80,7 @@ public class DefaultFacade implements Facade {
     inspectingHistory = filter(Inspecting.class, history);
     invocationHistory = filter(Invocation.class, history);
     checker = checker(history, exception);
-    proxer = wrapping(exception, rich(wrapping(exception, cglibProxer())));
+    proxer = configuration.proxer;
     mockNamer = uniqueNamer(history);
     mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     injector = injector(mockMaker);
@@ -97,10 +90,6 @@ public class DefaultFacade implements Facade {
         repairer(),
         wildcardMatcherizer(formatter),
         formatter);
-  }
-
-  private static Proxer rich(Proxer proxer) {
-    return nonFinal(typeSafe(jdkCollections(fixObjectBug(repeatable(proxer)))));
   }
 
   public static Facade defaultFacade(Configuration configuration) {
