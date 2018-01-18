@@ -14,9 +14,13 @@ import org.testory.plumbing.Maker;
 public class Injector {
   private final Maker maker;
 
-  public Injector(Maker maker) {
-    check(maker != null);
+  private Injector(Maker maker) {
     this.maker = maker;
+  }
+
+  public static Injector injector(Maker maker) {
+    check(maker != null);
+    return new Injector(maker);
   }
 
   public void inject(Object test) {

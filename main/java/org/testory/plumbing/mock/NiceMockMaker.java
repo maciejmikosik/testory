@@ -12,18 +12,18 @@ import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
 public class NiceMockMaker implements Maker {
-  private final Maker mockMaker;
   private final History history;
+  private final Maker mockMaker;
 
-  private NiceMockMaker(Maker mockMaker, History history) {
-    this.mockMaker = mockMaker;
+  private NiceMockMaker(History history, Maker mockMaker) {
     this.history = history;
+    this.mockMaker = mockMaker;
   }
 
-  public static Maker nice(Maker mockMaker, History history) {
-    check(mockMaker != null);
+  public static Maker nice(History history, Maker mockMaker) {
     check(history != null);
-    return new NiceMockMaker(mockMaker, history);
+    check(mockMaker != null);
+    return new NiceMockMaker(history, mockMaker);
   }
 
   public <T> T make(Class<T> type, String name) {

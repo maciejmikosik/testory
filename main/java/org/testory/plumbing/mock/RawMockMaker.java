@@ -15,21 +15,21 @@ import org.testory.proxy.Invocation;
 import org.testory.proxy.Proxer;
 
 public class RawMockMaker implements Maker {
-  private final Proxer proxer;
   private final History history;
   private final FilteredHistory<Stubbing> stubbingHistory;
+  private final Proxer proxer;
 
-  private RawMockMaker(Proxer proxer, History history, FilteredHistory<Stubbing> stubbingHistory) {
-    this.proxer = proxer;
+  private RawMockMaker(History history, FilteredHistory<Stubbing> stubbingHistory, Proxer proxer) {
     this.history = history;
     this.stubbingHistory = stubbingHistory;
+    this.proxer = proxer;
   }
 
-  public static Maker rawMockMaker(Proxer proxer, History history) {
-    check(proxer != null);
+  public static Maker rawMockMaker(History history, Proxer proxer) {
     check(history != null);
+    check(proxer != null);
     FilteredHistory<Stubbing> stubbingHistory = filter(Stubbing.class, history);
-    return new RawMockMaker(proxer, history, stubbingHistory);
+    return new RawMockMaker(history, stubbingHistory, proxer);
   }
 
   public <T> T make(Class<T> type, String name) {
