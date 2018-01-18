@@ -9,7 +9,6 @@ import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
-import static org.testory.plumbing.Checker.checker;
 import static org.testory.plumbing.CheckingProxer.checkingProxer;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.Stubbing.stubbing;
@@ -74,12 +73,11 @@ public class DefaultFacade implements Facade {
   private final WildcardSupport wildcardSupport;
 
   private DefaultFacade(Configuration configuration) {
-    Class<? extends RuntimeException> exception = configuration.exception;
     formatter = configuration.formatter;
     history = configuration.history;
     inspectingHistory = filter(Inspecting.class, history);
     invocationHistory = filter(Invocation.class, history);
-    checker = checker(history, exception);
+    checker = configuration.checker;
     proxer = configuration.proxer;
     mockNamer = uniqueNamer(history);
     mockMaker = mockMaker(history, checkingProxer(checker, proxer));

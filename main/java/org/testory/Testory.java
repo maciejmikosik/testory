@@ -3,6 +3,7 @@ package org.testory;
 import static org.testory.facade.Configuration.configuration;
 import static org.testory.facade.DefaultFacade.defaultFacade;
 import static org.testory.facade.PurgingFacade.purging;
+import static org.testory.plumbing.Checker.checker;
 import static org.testory.plumbing.format.MessageFormatter.messageFormatter;
 import static org.testory.plumbing.format.QuietFormatter.quiet;
 import static org.testory.plumbing.history.RawHistory.newRawHistory;
@@ -20,6 +21,7 @@ import org.testory.common.Nullable;
 import org.testory.common.VoidClosure;
 import org.testory.facade.Configuration;
 import org.testory.facade.Facade;
+import org.testory.plumbing.Checker;
 import org.testory.plumbing.format.QuietFormatter;
 import org.testory.plumbing.history.History;
 import org.testory.proxy.Handler;
@@ -33,6 +35,7 @@ public class Testory {
       History loudHistory = synchronize(newRawHistory());
       QuietFormatter formatter = quiet(messageFormatter());
       History history = formatter.quiet(loudHistory);
+      Checker checker = checker(history, exception);
       Proxer proxer = wrapping(exception,
           nonFinal(typeSafe(jdkCollections(fixObjectBug(repeatable(
               wrapping(exception, cglibProxer())))))));
@@ -40,6 +43,7 @@ public class Testory {
           .history(history)
           .formatter(formatter)
           .exception(exception)
+          .checker(checker)
           .proxer(proxer)
           .validate();
       return purging(history, cglibProxer(), defaultFacade(configuration));
