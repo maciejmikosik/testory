@@ -8,6 +8,7 @@ import static org.testory.plumbing.format.MessageFormatter.messageFormatter;
 import static org.testory.plumbing.format.QuietFormatter.quiet;
 import static org.testory.plumbing.history.RawHistory.newRawHistory;
 import static org.testory.plumbing.history.SynchronizedHistory.synchronize;
+import static org.testory.plumbing.mock.UniqueNamer.uniqueNamer;
 import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
 import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
 import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
@@ -24,6 +25,7 @@ import org.testory.facade.Facade;
 import org.testory.plumbing.Checker;
 import org.testory.plumbing.format.QuietFormatter;
 import org.testory.plumbing.history.History;
+import org.testory.plumbing.mock.Namer;
 import org.testory.proxy.Handler;
 import org.testory.proxy.InvocationMatcher;
 import org.testory.proxy.Proxer;
@@ -39,12 +41,14 @@ public class Testory {
       Proxer proxer = wrapping(exception,
           nonFinal(typeSafe(jdkCollections(fixObjectBug(repeatable(
               wrapping(exception, cglibProxer())))))));
+      Namer mockNamer = uniqueNamer(history);
       Configuration configuration = configuration()
           .history(history)
           .formatter(formatter)
           .exception(exception)
           .checker(checker)
           .proxer(proxer)
+          .mockNamer(mockNamer)
           .validate();
       return purging(history, cglibProxer(), defaultFacade(configuration));
     }

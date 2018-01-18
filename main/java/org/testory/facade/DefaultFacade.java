@@ -25,7 +25,6 @@ import static org.testory.plumbing.inject.RandomPrimitiveMaker.randomPrimitiveMa
 import static org.testory.plumbing.mock.NiceMockMaker.nice;
 import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
 import static org.testory.plumbing.mock.SaneMockMaker.sane;
-import static org.testory.plumbing.mock.UniqueNamer.uniqueNamer;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.Typing.subclassing;
 import static org.testory.proxy.handler.DelegatingHandler.delegatingTo;
@@ -79,7 +78,7 @@ public class DefaultFacade implements Facade {
     invocationHistory = filter(Invocation.class, history);
     checker = configuration.checker;
     proxer = configuration.proxer;
-    mockNamer = uniqueNamer(history);
+    mockNamer = configuration.mockNamer;
     mockMaker = mockMaker(history, checkingProxer(checker, proxer));
     injector = injector(mockMaker);
     wildcardSupport = wildcardSupport(
