@@ -29,7 +29,6 @@ import org.testory.common.Effect.Returned;
 import org.testory.common.Effect.ReturnedObject;
 import org.testory.common.Effect.Thrown;
 import org.testory.common.Matcher;
-import org.testory.common.Nullable;
 import org.testory.common.Optional;
 import org.testory.common.VoidClosure;
 import org.testory.plumbing.Inspecting;
@@ -65,7 +64,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void given(Closure closure) {
-    configuration.checker.notNull(closure);
     try {
       closure.invoke();
     } catch (Throwable e) {
@@ -74,7 +72,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void given(VoidClosure closure) {
-    configuration.checker.notNull(closure);
     given(asClosure(closure));
   }
 
@@ -87,7 +84,6 @@ public class ConfigurableFacade implements Facade {
   public void given(double primitive) {}
 
   public <T> T givenTry(T object) {
-    configuration.checker.notNull(object);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         try {
@@ -101,8 +97,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void givenTimes(int number, Closure closure) {
-    configuration.checker.notNegative(number);
-    configuration.checker.notNull(closure);
     for (int i = 0; i < number; i++) {
       try {
         closure.invoke();
@@ -113,13 +107,10 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void givenTimes(int number, VoidClosure closure) {
-    configuration.checker.notNull(closure);
     givenTimes(number, asClosure(closure));
   }
 
   public <T> T givenTimes(final int number, T object) {
-    configuration.checker.notNegative(number);
-    configuration.checker.notNull(object);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         for (int i = 0; i < number; i++) {
@@ -132,13 +123,11 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T mock(Class<T> type) {
-    configuration.checker.notNull(type);
     String name = configuration.mockNamer.name(type);
     return configuration.mockMaker.make(type, name);
   }
 
   public <T> T spy(T real) {
-    configuration.checker.notNull(real);
     Class<T> type = (Class<T>) real.getClass();
     T mock = mock(type);
     given(willSpy(real), onInstance(mock));
@@ -146,8 +135,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T given(final Handler handler, T mock) {
-    configuration.checker.notNull(handler);
-    configuration.checker.mock(mock);
     return proxyWrapping(mock, new Handler() {
       public Object handle(Invocation invocation) {
         configuration.history.add(stubbing(matcherize(invocation), handler));
@@ -157,17 +144,14 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void given(Handler handler, InvocationMatcher invocationMatcher) {
-    configuration.checker.notNull(handler);
-    configuration.checker.notNull(invocationMatcher);
     configuration.history.add(stubbing(invocationMatcher, handler));
   }
 
-  public Handler willReturn(@Nullable final Object object) {
+  public Handler willReturn(final Object object) {
     return returning(object);
   }
 
   public Handler willThrow(final Throwable throwable) {
-    configuration.checker.notNull(throwable);
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         throw throwable.fillInStackTrace();
@@ -176,12 +160,10 @@ public class ConfigurableFacade implements Facade {
   }
 
   public Handler willRethrow(final Throwable throwable) {
-    configuration.checker.notNull(throwable);
     return throwing(throwable);
   }
 
   public Handler willSpy(final Object real) {
-    configuration.checker.notNull(real);
     return new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         return invocation(invocation.method, real, invocation.arguments).invoke();
@@ -190,17 +172,14 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T any(Class<T> type) {
-    configuration.checker.notNull(type);
     return (T) configuration.wildcardSupport.any(type);
   }
 
   public <T> T any(Class<T> type, Object matcher) {
-    configuration.checker.matcher(matcher);
     return (T) configuration.wildcardSupport.any(type, matcher);
   }
 
   public <T> T anyInstanceOf(Class<T> type) {
-    configuration.checker.notNull(type);
     return (T) configuration.wildcardSupport.anyInstanceOf(type);
   }
 
@@ -237,12 +216,10 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T a(T value) {
-    configuration.checker.notNull(value);
     return (T) configuration.wildcardSupport.a(value);
   }
 
   public <T> T the(T value) {
-    configuration.checker.notNull(value);
     return (T) configuration.wildcardSupport.the(value);
   }
 
@@ -255,7 +232,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public InvocationMatcher onInstance(final Object mock) {
-    configuration.checker.mock(mock);
     return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return invocation.instance == mock;
@@ -268,7 +244,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public InvocationMatcher onReturn(final Class<?> type) {
-    configuration.checker.notNull(type);
     return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return type == invocation.method.getReturnType();
@@ -281,8 +256,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public InvocationMatcher onRequest(final Class<?> type, final Object... arguments) {
-    configuration.checker.notNull(type);
-    configuration.checker.notNull(arguments);
     return new InvocationMatcher() {
       public boolean matches(Invocation invocation) {
         return type == invocation.method.getReturnType()
@@ -328,7 +301,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void when(Closure closure) {
-    configuration.checker.notNull(closure);
     configuration.history.add(inspecting(effectOf(closure)));
   }
 
@@ -343,7 +315,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void when(VoidClosure closure) {
-    configuration.checker.notNull(closure);
     configuration.history.add(inspecting(effectOf(closure)));
   }
 
@@ -388,7 +359,7 @@ public class ConfigurableFacade implements Facade {
     when((Object) value);
   }
 
-  public void thenReturned(@Nullable Object objectOrMatcher) {
+  public void thenReturned(Object objectOrMatcher) {
     Effect effect = getLastEffect();
     boolean expected = effect instanceof ReturnedObject
         && (deepEquals(objectOrMatcher, ((ReturnedObject) effect).object) || objectOrMatcher != null
@@ -449,7 +420,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void thenThrown(Object matcher) {
-    configuration.checker.matcher(matcher);
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown
         && asMatcher(matcher).matches(((Thrown) effect).throwable);
@@ -465,7 +435,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void thenThrown(Throwable throwable) {
-    configuration.checker.notNull(throwable);
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown
         && deepEquals(throwable, ((Thrown) effect).throwable);
@@ -477,7 +446,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void thenThrown(Class<? extends Throwable> type) {
-    configuration.checker.notNull(type);
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown && type.isInstance(((Thrown) effect).throwable);
     if (!expected) {
@@ -505,8 +473,7 @@ public class ConfigurableFacade implements Facade {
     }
   }
 
-  public void then(@Nullable Object object, Object matcher) {
-    configuration.checker.matcher(matcher);
+  public void then(Object object, Object matcher) {
     if (!asMatcher(matcher).matches(object)) {
       throw assertionError("\n"
           + formatSection("expected", matcher)
@@ -515,7 +482,7 @@ public class ConfigurableFacade implements Facade {
     }
   }
 
-  public void thenEqual(@Nullable Object object, @Nullable Object expected) {
+  public void thenEqual(Object object, Object expected) {
     if (!deepEquals(object, expected)) {
       throw assertionError("\n"
           + formatSection("expected", expected)
@@ -524,40 +491,30 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T thenCalled(T mock) {
-    configuration.checker.mock(mock);
     return thenCalledTimes(exactly(1), mock);
   }
 
   public void thenCalled(InvocationMatcher invocationMatcher) {
-    configuration.checker.notNull(invocationMatcher);
     thenCalledTimes(exactly(1), invocationMatcher);
   }
 
   public <T> T thenCalledNever(T mock) {
-    configuration.checker.mock(mock);
     return thenCalledTimes(exactly(0), mock);
   }
 
   public void thenCalledNever(InvocationMatcher invocationMatcher) {
-    configuration.checker.notNull(invocationMatcher);
     thenCalledTimes(exactly(0), invocationMatcher);
   }
 
   public <T> T thenCalledTimes(int number, T mock) {
-    configuration.checker.notNegative(number);
-    configuration.checker.mock(mock);
     return thenCalledTimes(exactly(number), mock);
   }
 
   public void thenCalledTimes(int number, InvocationMatcher invocationMatcher) {
-    configuration.checker.notNegative(number);
-    configuration.checker.notNull(invocationMatcher);
     thenCalledTimes(exactly(number), invocationMatcher);
   }
 
   public <T> T thenCalledTimes(final Object numberMatcher, T mock) {
-    configuration.checker.matcher(numberMatcher);
-    configuration.checker.mock(mock);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         thenCalledTimes(numberMatcher, matcherize(invocation));
@@ -568,8 +525,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void thenCalledTimes(Object numberMatcher, InvocationMatcher invocationMatcher) {
-    configuration.checker.matcher(numberMatcher);
-    configuration.checker.notNull(invocationMatcher);
     int numberOfCalls = 0;
     for (Invocation invocation : invocationHistory.get()) {
       if (invocationMatcher.matches(invocation)) {
@@ -586,7 +541,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T thenCalledInOrder(T mock) {
-    configuration.checker.mock(mock);
     Handler handler = new Handler() {
       public Object handle(Invocation invocation) {
         thenCalledInOrder(matcherize(invocation));
@@ -597,7 +551,6 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void thenCalledInOrder(InvocationMatcher invocationMatcher) {
-    configuration.checker.notNull(invocationMatcher);
     Optional<VerifyingInOrder> verified = verifyInOrder(invocationMatcher, configuration.history.get());
     if (verified.isPresent()) {
       configuration.history.add(verified.get());
@@ -618,11 +571,10 @@ public class ConfigurableFacade implements Facade {
   }
 
   private Effect getLastEffect() {
-    configuration.checker.mustCallWhen();
     return inspectingHistory.get().get().effect;
   }
 
-  private String formatSection(String caption, @Nullable Object content) {
+  private String formatSection(String caption, Object content) {
     return ""
         + "  " + caption + "\n"
         + "    " + configuration.formatter.format(content) + "\n";
