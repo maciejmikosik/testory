@@ -54,7 +54,6 @@ public class TestoryFacade {
         .history(history)
         .formatter(formatter)
         .exception(exception)
-        .checker(checker)
         .proxer(proxer)
         .mockNamer(uniqueNamer(history))
         .mockMaker(mockMaker)

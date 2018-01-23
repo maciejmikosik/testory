@@ -3,7 +3,6 @@ package org.testory.plumbing.facade;
 import static org.testory.plumbing.PlumbingException.check;
 
 import org.testory.common.Formatter;
-import org.testory.plumbing.Checker;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.history.History;
 import org.testory.plumbing.im.wildcard.WildcardSupport;
@@ -16,7 +15,6 @@ public class Configuration {
   public final History history;
   public final Formatter formatter;
   public final Class<? extends RuntimeException> exception;
-  public final Checker checker;
   public final Proxer proxer;
   public final Namer mockNamer;
   public final Maker mockMaker;
@@ -27,7 +25,6 @@ public class Configuration {
       History history,
       Formatter formatter,
       Class<? extends RuntimeException> exception,
-      Checker checker,
       Proxer proxer,
       Namer mockNamer,
       Maker mockMaker,
@@ -36,7 +33,6 @@ public class Configuration {
     this.history = history;
     this.formatter = formatter;
     this.exception = exception;
-    this.checker = checker;
     this.proxer = proxer;
     this.mockNamer = mockNamer;
     this.mockMaker = mockMaker;
@@ -53,7 +49,6 @@ public class Configuration {
         null,
         null,
         null,
-        null,
         null);
   }
 
@@ -63,7 +58,6 @@ public class Configuration {
         history,
         formatter,
         exception,
-        checker,
         proxer,
         mockNamer,
         mockMaker,
@@ -77,7 +71,6 @@ public class Configuration {
         history,
         formatter,
         exception,
-        checker,
         proxer,
         mockNamer,
         mockMaker,
@@ -91,21 +84,6 @@ public class Configuration {
         history,
         formatter,
         exception,
-        checker,
-        proxer,
-        mockNamer,
-        mockMaker,
-        injector,
-        wildcardSupport);
-  }
-
-  public Configuration checker(Checker checker) {
-    check(checker != null);
-    return new Configuration(
-        history,
-        formatter,
-        exception,
-        checker,
         proxer,
         mockNamer,
         mockMaker,
@@ -119,7 +97,6 @@ public class Configuration {
         history,
         formatter,
         exception,
-        checker,
         proxer,
         mockNamer,
         mockMaker,
@@ -133,7 +110,6 @@ public class Configuration {
         history,
         formatter,
         exception,
-        checker,
         proxer,
         mockNamer,
         mockMaker,
@@ -147,7 +123,6 @@ public class Configuration {
         history,
         formatter,
         exception,
-        checker,
         proxer,
         mockNamer,
         mockMaker,
@@ -161,7 +136,6 @@ public class Configuration {
         history,
         formatter,
         exception,
-        checker,
         proxer,
         mockNamer,
         mockMaker,
@@ -175,7 +149,6 @@ public class Configuration {
         history,
         formatter,
         exception,
-        checker,
         proxer,
         mockNamer,
         mockMaker,
