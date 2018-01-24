@@ -21,7 +21,6 @@ import static org.testory.proxy.handler.ReturningDefaultValueHandler.returningDe
 import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.proxy.handler.ThrowingHandler.throwing;
 
-import org.testory.TestoryException;
 import org.testory.common.Closure;
 import org.testory.common.DiagnosticMatcher;
 import org.testory.common.Effect;
@@ -32,6 +31,7 @@ import org.testory.common.Matcher;
 import org.testory.common.Optional;
 import org.testory.common.VoidClosure;
 import org.testory.plumbing.Inspecting;
+import org.testory.plumbing.PlumbingException;
 import org.testory.plumbing.VerifyingInOrder;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.im.wildcard.WildcardException;
@@ -59,7 +59,7 @@ public class ConfigurableFacade implements Facade {
     try {
       configuration.injector.inject(test);
     } catch (RuntimeException e) {
-      throw new TestoryException(e);
+      throw wrap(e);
     }
   }
 
@@ -67,7 +67,7 @@ public class ConfigurableFacade implements Facade {
     try {
       closure.invoke();
     } catch (Throwable e) {
-      throw new TestoryException(e);
+      throw wrap(e);
     }
   }
 
@@ -224,11 +224,11 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void the(boolean value) {
-    throw new TestoryException();
+    throw newException();
   }
 
   public void the(double value) {
-    throw new TestoryException();
+    throw newException();
   }
 
   public InvocationMatcher onInstance(final Object mock) {
@@ -566,7 +566,7 @@ public class ConfigurableFacade implements Facade {
     try {
       return configuration.wildcardSupport.matcherize(invocation);
     } catch (WildcardException e) {
-      throw new TestoryException(e);
+      throw wrap(e);
     }
   }
 
@@ -634,6 +634,22 @@ public class ConfigurableFacade implements Facade {
         return "" + number;
       }
     };
+  }
+
+  private RuntimeException wrap(Throwable throwable) {
+    try {
+      return configuration.exception.getConstructor(Throwable.class).newInstance(throwable);
+    } catch (ReflectiveOperationException e) {
+      throw new PlumbingException(e);
+    }
+  }
+
+  private RuntimeException newException() {
+    try {
+      return configuration.exception.getConstructor().newInstance();
+    } catch (ReflectiveOperationException e) {
+      throw new PlumbingException(e);
+    }
   }
 
   private <T> T proxyWrapping(T wrapped, Handler handler) {
