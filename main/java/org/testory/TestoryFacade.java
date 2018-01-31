@@ -23,6 +23,7 @@ import static org.testory.plumbing.mock.NiceMockMaker.nice;
 import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
 import static org.testory.plumbing.mock.SaneMockMaker.sane;
 import static org.testory.plumbing.mock.UniqueNamer.uniqueNamer;
+import static org.testory.proxy.extra.Overrider.overrider;
 import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
 import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
 import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
@@ -54,7 +55,7 @@ public class TestoryFacade {
         .history(history)
         .formatter(formatter)
         .exception(exception)
-        .proxer(proxer)
+        .overrider(overrider(proxer))
         .mockNamer(uniqueNamer(history))
         .mockMaker(mockMaker)
         .injector(injector(singletonArray(chain(randomPrimitiveMaker(), finalMaker(), mockMaker))))

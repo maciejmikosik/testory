@@ -8,14 +8,14 @@ import org.testory.plumbing.history.History;
 import org.testory.plumbing.im.wildcard.WildcardSupport;
 import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
-import org.testory.proxy.Proxer;
+import org.testory.proxy.extra.Overrider;
 
 @SuppressWarnings("hiding")
 public class Configuration {
   public final History history;
   public final Formatter formatter;
   public final Class<? extends RuntimeException> exception;
-  public final Proxer proxer;
+  public final Overrider overrider;
   public final Namer mockNamer;
   public final Maker mockMaker;
   public final Injector injector;
@@ -25,7 +25,7 @@ public class Configuration {
       History history,
       Formatter formatter,
       Class<? extends RuntimeException> exception,
-      Proxer proxer,
+      Overrider overrider,
       Namer mockNamer,
       Maker mockMaker,
       Injector injector,
@@ -33,7 +33,7 @@ public class Configuration {
     this.history = history;
     this.formatter = formatter;
     this.exception = exception;
-    this.proxer = proxer;
+    this.overrider = overrider;
     this.mockNamer = mockNamer;
     this.mockMaker = mockMaker;
     this.injector = injector;
@@ -58,7 +58,7 @@ public class Configuration {
         history,
         formatter,
         exception,
-        proxer,
+        overrider,
         mockNamer,
         mockMaker,
         injector,
@@ -71,7 +71,7 @@ public class Configuration {
         history,
         formatter,
         exception,
-        proxer,
+        overrider,
         mockNamer,
         mockMaker,
         injector,
@@ -84,20 +84,20 @@ public class Configuration {
         history,
         formatter,
         exception,
-        proxer,
+        overrider,
         mockNamer,
         mockMaker,
         injector,
         wildcardSupport);
   }
 
-  public Configuration proxer(Proxer proxer) {
-    check(proxer != null);
+  public Configuration overrider(Overrider overrider) {
+    check(overrider != null);
     return new Configuration(
         history,
         formatter,
         exception,
-        proxer,
+        overrider,
         mockNamer,
         mockMaker,
         injector,
@@ -110,7 +110,7 @@ public class Configuration {
         history,
         formatter,
         exception,
-        proxer,
+        overrider,
         mockNamer,
         mockMaker,
         injector,
@@ -123,7 +123,7 @@ public class Configuration {
         history,
         formatter,
         exception,
-        proxer,
+        overrider,
         mockNamer,
         mockMaker,
         injector,
@@ -136,7 +136,7 @@ public class Configuration {
         history,
         formatter,
         exception,
-        proxer,
+        overrider,
         mockNamer,
         mockMaker,
         injector,
@@ -149,7 +149,7 @@ public class Configuration {
         history,
         formatter,
         exception,
-        proxer,
+        overrider,
         mockNamer,
         mockMaker,
         injector,
@@ -160,7 +160,7 @@ public class Configuration {
     check(history != null);
     check(formatter != null);
     check(exception != null);
-    check(proxer != null);
+    check(overrider != null);
     check(mockNamer != null);
     check(mockMaker != null);
     check(injector != null);
