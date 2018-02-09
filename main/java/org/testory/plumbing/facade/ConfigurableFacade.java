@@ -2,6 +2,7 @@ package org.testory.plumbing.facade;
 
 import static java.util.Objects.deepEquals;
 import static org.testory.TestoryAssertionError.assertionError;
+import static org.testory.common.Classes.defaultValue;
 import static org.testory.common.Effect.returned;
 import static org.testory.common.Effect.returnedVoid;
 import static org.testory.common.Effect.thrown;
@@ -15,9 +16,6 @@ import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 import static org.testory.proxy.Invocation.invocation;
-import static org.testory.proxy.Typing.subclassing;
-import static org.testory.proxy.handler.DelegatingHandler.delegatingTo;
-import static org.testory.proxy.handler.ReturningDefaultValueHandler.returningDefaultValue;
 import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.proxy.handler.ThrowingHandler.throwing;
 
@@ -84,7 +82,7 @@ public class ConfigurableFacade implements Facade {
   public void given(double primitive) {}
 
   public <T> T givenTry(T object) {
-    Handler handler = new Handler() {
+    return configuration.overrider.override(object, new Handler() {
       public Object handle(Invocation invocation) {
         try {
           return invocation.invoke();
@@ -92,8 +90,7 @@ public class ConfigurableFacade implements Facade {
           return null;
         }
       }
-    };
-    return proxyWrapping(object, handler);
+    });
   }
 
   public void givenTimes(int number, Closure closure) {
@@ -111,15 +108,14 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T givenTimes(final int number, T object) {
-    Handler handler = new Handler() {
+    return configuration.overrider.override(object, new Handler() {
       public Object handle(Invocation invocation) throws Throwable {
         for (int i = 0; i < number; i++) {
           invocation.invoke();
         }
-        return null;
+        return defaultValue(invocation.method.getReturnType());
       }
-    };
-    return proxyWrapping(object, handler);
+    });
   }
 
   public <T> T mock(Class<T> type) {
@@ -135,10 +131,10 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T given(final Handler handler, T mock) {
-    return proxyWrapping(mock, new Handler() {
+    return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
         configuration.history.add(stubbing(matcherize(invocation), handler));
-        return null;
+        return defaultValue(invocation.method.getReturnType());
       }
     });
   }
@@ -277,10 +273,10 @@ public class ConfigurableFacade implements Facade {
   public <T> T when(T object) {
     configuration.history.add(inspecting(returned(object)));
     try {
-      return proxyWrapping(object, new Handler() {
+      return configuration.overrider.override(object, new Handler() {
         public Object handle(Invocation invocation) {
           configuration.history.add(inspecting(effectOf(invocation)));
-          return null;
+          return defaultValue(invocation.method.getReturnType());
         }
       });
     } catch (RuntimeException e) {
@@ -515,13 +511,12 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T thenCalledTimes(final Object numberMatcher, T mock) {
-    Handler handler = new Handler() {
+    return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
         thenCalledTimes(numberMatcher, matcherize(invocation));
-        return null;
+        return defaultValue(invocation.method.getReturnType());
       }
-    };
-    return proxyWrapping(mock, handler);
+    });
   }
 
   public void thenCalledTimes(Object numberMatcher, InvocationMatcher invocationMatcher) {
@@ -541,13 +536,12 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T thenCalledInOrder(T mock) {
-    Handler handler = new Handler() {
+    return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
         thenCalledInOrder(matcherize(invocation));
-        return null;
+        return defaultValue(invocation.method.getReturnType());
       }
-    };
-    return proxyWrapping(mock, handler);
+    });
   }
 
   public void thenCalledInOrder(InvocationMatcher invocationMatcher) {
@@ -650,11 +644,5 @@ public class ConfigurableFacade implements Facade {
     } catch (ReflectiveOperationException e) {
       throw new PlumbingException(e);
     }
-  }
-
-  private <T> T proxyWrapping(T wrapped, Handler handler) {
-    return (T) configuration.proxer.proxy(
-        subclassing(wrapped.getClass()),
-        returningDefaultValue(delegatingTo(wrapped, handler)));
   }
 }
