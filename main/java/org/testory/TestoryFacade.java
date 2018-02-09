@@ -2,6 +2,7 @@ package org.testory;
 
 import static org.testory.plumbing.Checker.checker;
 import static org.testory.plumbing.CheckingProxer.checkingProxer;
+import static org.testory.plumbing.facade.CheckingFacade.checking;
 import static org.testory.plumbing.facade.ConfigurableFacade.configurableFacade;
 import static org.testory.plumbing.facade.Configuration.configuration;
 import static org.testory.plumbing.facade.PurgingFacade.purging;
@@ -53,7 +54,6 @@ public class TestoryFacade {
         .history(history)
         .formatter(formatter)
         .exception(exception)
-        .checker(checker)
         .proxer(proxer)
         .mockNamer(uniqueNamer(history))
         .mockMaker(mockMaker)
@@ -66,6 +66,6 @@ public class TestoryFacade {
             formatter))
         .validate();
 
-    return purging(history, proxer, configurableFacade(configuration));
+    return checking(checker, proxer, purging(history, proxer, configurableFacade(configuration)));
   }
 }

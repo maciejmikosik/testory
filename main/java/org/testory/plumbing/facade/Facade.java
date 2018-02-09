@@ -1,6 +1,8 @@
 package org.testory.plumbing.facade;
 
 import org.testory.common.Closure;
+import org.testory.common.Named;
+import org.testory.common.Nullable;
 import org.testory.common.VoidClosure;
 import org.testory.proxy.Handler;
 import org.testory.proxy.InvocationMatcher;
@@ -12,7 +14,7 @@ public interface Facade {
 
   void given(VoidClosure closure);
 
-  <T> T given(T object);
+  <T> T given(@Nullable T object);
 
   void given(boolean primitive);
 
@@ -30,11 +32,11 @@ public interface Facade {
 
   <T> T spy(T real);
 
-  <T> T given(Handler handler, T mock);
+  <T> T given(Handler handler, @Named("mock") T mock);
 
   void given(Handler handler, InvocationMatcher invocationMatcher);
 
-  Handler willReturn(Object object);
+  Handler willReturn(@Nullable Object object);
 
   Handler willThrow(Throwable throwable);
 
@@ -44,7 +46,7 @@ public interface Facade {
 
   <T> T any(Class<T> type);
 
-  <T> T any(Class<T> type, Object matcher);
+  <T> T any(Class<T> type, @Named("matcher") Object matcher);
 
   <T> T anyInstanceOf(Class<T> type);
 
@@ -72,13 +74,13 @@ public interface Facade {
 
   void the(double value);
 
-  InvocationMatcher onInstance(Object mock);
+  InvocationMatcher onInstance(@Named("mock") Object mock);
 
   InvocationMatcher onReturn(Class<?> type);
 
   InvocationMatcher onRequest(Class<?> type, Object... arguments);
 
-  <T> T when(T object);
+  <T> T when(@Nullable T object);
 
   void when(Closure closure);
 
@@ -100,7 +102,7 @@ public interface Facade {
 
   void when(double value);
 
-  void thenReturned(Object objectOrMatcher);
+  void thenReturned(@Nullable Object objectOrMatcher);
 
   void thenReturned(boolean value);
 
@@ -120,7 +122,7 @@ public interface Facade {
 
   void thenReturned();
 
-  void thenThrown(Object matcher);
+  void thenThrown(@Named("matcher") Object matcher);
 
   void thenThrown(Throwable throwable);
 
@@ -130,28 +132,27 @@ public interface Facade {
 
   void then(boolean condition);
 
-  void then(Object object, Object matcher);
+  void then(@Nullable Object object, @Named("matcher") Object matcher);
 
-  void thenEqual(Object object, Object expected);
+  void thenEqual(@Nullable Object object, @Nullable Object expected);
 
-  <T> T thenCalled(T mock);
+  <T> T thenCalled(@Named("mock") T mock);
 
   void thenCalled(InvocationMatcher invocationMatcher);
 
-  <T> T thenCalledNever(T mock);
+  <T> T thenCalledNever(@Named("mock") T mock);
 
   void thenCalledNever(InvocationMatcher invocationMatcher);
 
-  <T> T thenCalledTimes(int number, T mock);
+  <T> T thenCalledTimes(int number, @Named("mock") T mock);
 
   void thenCalledTimes(int number, InvocationMatcher invocationMatcher);
 
-  <T> T thenCalledTimes(Object numberMatcher, T mock);
+  <T> T thenCalledTimes(@Named("numberMatcher") Object numberMatcher, @Named("mock") T mock);
 
-  void thenCalledTimes(Object numberMatcher, InvocationMatcher invocationMatcher);
+  void thenCalledTimes(@Named("numberMatcher") Object numberMatcher, InvocationMatcher invocationMatcher);
 
-  <T> T thenCalledInOrder(T mock);
+  <T> T thenCalledInOrder(@Named("mock") T mock);
 
   void thenCalledInOrder(InvocationMatcher invocationMatcher);
-
 }
