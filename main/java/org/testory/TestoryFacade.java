@@ -1,5 +1,6 @@
 package org.testory;
 
+import static org.testory.common.PageFormatter.pageFormatter;
 import static org.testory.plumbing.Checker.checker;
 import static org.testory.plumbing.CheckingProxer.checkingProxer;
 import static org.testory.plumbing.facade.CheckingFacade.checking;
@@ -54,6 +55,7 @@ public class TestoryFacade {
     Configuration configuration = configuration()
         .history(history)
         .formatter(formatter)
+        .pageFormatter(pageFormatter(formatter).add("\n"))
         .exception(exception)
         .overrider(overrider(proxer))
         .mockNamer(uniqueNamer(history))
