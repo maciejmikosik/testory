@@ -588,11 +588,8 @@ public class ConfigurableFacade implements Facade {
   private String formatInvocations() {
     StringBuilder builder = new StringBuilder();
 
-    for (Object event : configuration.history.get().reverse()) {
-      if (event instanceof Invocation) {
-        Invocation invocation = (Invocation) event;
-        builder.append("    ").append(configuration.formatter.format(invocation)).append("\n");
-      }
+    for (Invocation invocation : invocationHistory.get().reverse()) {
+      builder.append("    ").append(configuration.formatter.format(invocation)).append("\n");
     }
     if (builder.length() > 0) {
       builder.insert(0, "  actual invocations\n");
