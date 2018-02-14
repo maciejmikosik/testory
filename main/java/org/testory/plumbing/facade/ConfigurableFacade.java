@@ -14,6 +14,8 @@ import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
+import static org.testory.plumbing.format.Body.body;
+import static org.testory.plumbing.format.Header.header;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.handler.ReturningHandler.returning;
@@ -366,10 +368,12 @@ public class ConfigurableFacade implements Facade {
           && effect instanceof ReturnedObject
               ? tryFormatDiagnosis(objectOrMatcher, ((ReturnedObject) effect).object)
               : "";
-      throw assertionError("\n"
-          + formatSection("expected returned", objectOrMatcher)
-          + formatBut(effect)
-          + diagnosis);
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected returned"))
+          .add(body(objectOrMatcher))
+          .add(formatBut(effect))
+          .add(diagnosis)
+          .build());
     }
   }
 
@@ -409,9 +413,11 @@ public class ConfigurableFacade implements Facade {
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Returned;
     if (!expected) {
-      throw assertionError("\n"
-          + formatSection("expected returned", "")
-          + formatBut(effect));
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected returned"))
+          .add(body(""))
+          .add(formatBut(effect))
+          .build());
     }
   }
 
@@ -423,10 +429,12 @@ public class ConfigurableFacade implements Facade {
       String diagnosis = effect instanceof Thrown
           ? tryFormatDiagnosis(matcher, ((Thrown) effect).throwable)
           : "";
-      throw assertionError("\n"
-          + formatSection("expected thrown", matcher)
-          + formatBut(effect)
-          + diagnosis);
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(matcher))
+          .add(formatBut(effect))
+          .add(diagnosis)
+          .build());
     }
   }
 
@@ -435,9 +443,11 @@ public class ConfigurableFacade implements Facade {
     boolean expected = effect instanceof Thrown
         && deepEquals(throwable, ((Thrown) effect).throwable);
     if (!expected) {
-      throw assertionError("\n"
-          + formatSection("expected thrown", throwable)
-          + formatBut(effect));
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(throwable))
+          .add(formatBut(effect))
+          .build());
     }
   }
 
@@ -445,9 +455,11 @@ public class ConfigurableFacade implements Facade {
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown && type.isInstance(((Thrown) effect).throwable);
     if (!expected) {
-      throw assertionError("\n"
-          + formatSection("expected thrown", type.getName())
-          + formatBut(effect));
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(type.getName()))
+          .add(formatBut(effect))
+          .build());
     }
   }
 
@@ -455,34 +467,45 @@ public class ConfigurableFacade implements Facade {
     Effect effect = getLastEffect();
     boolean expected = effect instanceof Thrown;
     if (!expected) {
-      throw assertionError("\n"
-          + formatSection("expected thrown", "")
-          + formatBut(effect));
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(""))
+          .add(formatBut(effect))
+          .build());
     }
   }
 
   public void then(boolean condition) {
     if (!condition) {
-      throw assertionError("\n"
-          + formatSection("expected", "true")
-          + formatSection("but was", "false"));
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected"))
+          .add(body(true))
+          .add(header("but was"))
+          .add(body(false))
+          .build());
     }
   }
 
   public void then(Object object, Object matcher) {
     if (!asMatcher(matcher).matches(object)) {
-      throw assertionError("\n"
-          + formatSection("expected", matcher)
-          + formatSection("but was", object)
-          + tryFormatDiagnosis(matcher, object));
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected"))
+          .add(body(matcher))
+          .add(header("but was"))
+          .add(body(object))
+          .add(tryFormatDiagnosis(matcher, object))
+          .build());
     }
   }
 
   public void thenEqual(Object object, Object expected) {
     if (!deepEquals(object, expected)) {
-      throw assertionError("\n"
-          + formatSection("expected", expected)
-          + formatSection("but was", object));
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected"))
+          .add(body(expected))
+          .add(header("but was"))
+          .add(body(object))
+          .build());
     }
   }
 
@@ -528,10 +551,13 @@ public class ConfigurableFacade implements Facade {
     }
     boolean expected = asMatcher(numberMatcher).matches(numberOfCalls);
     if (!expected) {
-      throw assertionError("\n"
-          + formatSection("expected called times " + numberMatcher, invocationMatcher)
-          + formatSection("but called", "times " + numberOfCalls)
-          + formatInvocations());
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected called times " + numberMatcher))
+          .add(body(invocationMatcher))
+          .add(header("but called"))
+          .add(body("times " + numberOfCalls))
+          .add(formatInvocations())
+          .build());
     }
   }
 
@@ -549,10 +575,12 @@ public class ConfigurableFacade implements Facade {
     if (verified.isPresent()) {
       configuration.history.add(verified.get());
     } else {
-      throw assertionError("\n"
-          + formatSection("expected called in order", invocationMatcher)
-          + "  but not called\n"
-          + formatInvocations());
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected called in order"))
+          .add(body(invocationMatcher))
+          .add(header("but not called"))
+          .add(formatInvocations())
+          .build());
     }
   }
 
