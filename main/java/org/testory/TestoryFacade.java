@@ -54,7 +54,6 @@ public class TestoryFacade {
 
     Configuration configuration = configuration()
         .history(history)
-        .formatter(formatter)
         .pageFormatter(pageFormatter(formatter).add("\n"))
         .exception(exception)
         .overrider(overrider(proxer))
