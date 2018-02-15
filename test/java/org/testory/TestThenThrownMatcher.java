@@ -68,10 +68,10 @@ public class TestThenThrownMatcher {
           + "    " + matcher + "\n"
           + "  but thrown\n"
           + "    " + throwable + "\n"
-          + "\n"
-          + printStackTrace(throwable)
           + "  diagnosis\n"
-          + "    " + diagnosed(throwable) + "\n",
+          + "    " + diagnosed(throwable) + "\n"
+          + "\n"
+          + printStackTrace(throwable),
           e.getMessage());
     }
   }

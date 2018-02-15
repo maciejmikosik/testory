@@ -24,8 +24,8 @@ import static org.testory.proxy.handler.ThrowingHandler.throwing;
 import org.testory.common.Closure;
 import org.testory.common.DiagnosticMatcher;
 import org.testory.common.Effect;
-import org.testory.common.Effect.Returned;
 import org.testory.common.Effect.ReturnedObject;
+import org.testory.common.Effect.ReturnedVoid;
 import org.testory.common.Effect.Thrown;
 import org.testory.common.Matcher;
 import org.testory.common.Optional;
@@ -359,20 +359,49 @@ public class ConfigurableFacade implements Facade {
 
   public void thenReturned(Object objectOrMatcher) {
     Effect effect = getLastEffect();
-    boolean expected = effect instanceof ReturnedObject
-        && (deepEquals(objectOrMatcher, ((ReturnedObject) effect).object) || objectOrMatcher != null
-            && isMatcher(objectOrMatcher)
-            && asMatcher(objectOrMatcher).matches(((ReturnedObject) effect).object));
-    if (!expected) {
-      String diagnosis = objectOrMatcher != null && isMatcher(objectOrMatcher)
-          && effect instanceof ReturnedObject
-              ? tryFormatDiagnosis(objectOrMatcher, ((ReturnedObject) effect).object)
-              : "";
+    if (effect instanceof Thrown) {
+      Thrown thrown = (Thrown) effect;
       throw assertionError(configuration.pageFormatter
           .add(header("expected returned"))
           .add(body(objectOrMatcher))
-          .add(formatBut(effect))
-          .add(diagnosis)
+          .add(header("but thrown"))
+          .add(body(thrown.throwable))
+          .add("\n")
+          .add(printStackTrace(thrown.throwable))
+          .build());
+    } else if (effect instanceof ReturnedVoid) {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected returned"))
+          .add(body(objectOrMatcher))
+          .add(header("but returned"))
+          .add(body("void"))
+          .build());
+    }
+
+    ReturnedObject returned = (ReturnedObject) effect;
+    if (deepEquals(objectOrMatcher, returned.object)) {
+      return;
+    } else if (objectOrMatcher != null
+        && isMatcher(objectOrMatcher)
+        && asMatcher(objectOrMatcher).matches(returned.object)) {
+      return;
+    } else if (objectOrMatcher != null
+        && isMatcher(objectOrMatcher)
+        && asMatcher(objectOrMatcher) instanceof DiagnosticMatcher) {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected returned"))
+          .add(body(objectOrMatcher))
+          .add(header("but returned"))
+          .add(body(returned.object))
+          .add(header("diagnosis"))
+          .add(body(((DiagnosticMatcher) asMatcher(objectOrMatcher)).diagnose(returned.object)))
+          .build());
+    } else {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected returned"))
+          .add(body(objectOrMatcher))
+          .add(header("but returned"))
+          .add(body(returned.object))
           .build());
     }
   }
@@ -411,66 +440,144 @@ public class ConfigurableFacade implements Facade {
 
   public void thenReturned() {
     Effect effect = getLastEffect();
-    boolean expected = effect instanceof Returned;
-    if (!expected) {
+    if (effect instanceof Thrown) {
+      Thrown thrown = (Thrown) effect;
       throw assertionError(configuration.pageFormatter
           .add(header("expected returned"))
           .add(body(""))
-          .add(formatBut(effect))
+          .add(header("but thrown"))
+          .add(body(thrown.throwable))
+          .add("\n")
+          .add(printStackTrace(thrown.throwable))
           .build());
     }
   }
 
   public void thenThrown(Object matcher) {
     Effect effect = getLastEffect();
-    boolean expected = effect instanceof Thrown
-        && asMatcher(matcher).matches(((Thrown) effect).throwable);
-    if (!expected) {
-      String diagnosis = effect instanceof Thrown
-          ? tryFormatDiagnosis(matcher, ((Thrown) effect).throwable)
-          : "";
+    if (effect instanceof ReturnedObject) {
       throw assertionError(configuration.pageFormatter
           .add(header("expected thrown"))
           .add(body(matcher))
-          .add(formatBut(effect))
-          .add(diagnosis)
+          .add(header("but returned"))
+          .add(body(((ReturnedObject) effect).object))
+          .build());
+    } else if (effect instanceof ReturnedVoid) {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(matcher))
+          .add(header("but returned"))
+          .add(body("void"))
+          .build());
+    }
+
+    Thrown thrown = (Thrown) effect;
+    if (asMatcher(matcher).matches(thrown.throwable)) {
+      return;
+    } else if (asMatcher(matcher) instanceof DiagnosticMatcher) {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(matcher))
+          .add(header("but thrown"))
+          .add(body(thrown.throwable))
+          .add(header("diagnosis"))
+          .add(body(((DiagnosticMatcher) asMatcher(matcher)).diagnose(thrown.throwable)))
+          .add("\n")
+          .add(printStackTrace(thrown.throwable))
+          .build());
+    } else {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(matcher))
+          .add(header("but thrown"))
+          .add(body(thrown.throwable))
+          .add("\n")
+          .add(printStackTrace(thrown.throwable))
           .build());
     }
   }
 
   public void thenThrown(Throwable throwable) {
     Effect effect = getLastEffect();
-    boolean expected = effect instanceof Thrown
-        && deepEquals(throwable, ((Thrown) effect).throwable);
-    if (!expected) {
+    if (effect instanceof ReturnedObject) {
       throw assertionError(configuration.pageFormatter
           .add(header("expected thrown"))
           .add(body(throwable))
-          .add(formatBut(effect))
+          .add(header("but returned"))
+          .add(body(((ReturnedObject) effect).object))
+          .build());
+    } else if (effect instanceof ReturnedVoid) {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(throwable))
+          .add(header("but returned"))
+          .add(body("void"))
+          .build());
+    }
+
+    Thrown thrown = (Thrown) effect;
+    if (deepEquals(throwable, thrown.throwable)) {
+      return;
+    } else {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(throwable))
+          .add(header("but thrown"))
+          .add(body(thrown.throwable))
+          .add("\n")
+          .add(printStackTrace(thrown.throwable))
           .build());
     }
   }
 
   public void thenThrown(Class<? extends Throwable> type) {
     Effect effect = getLastEffect();
-    boolean expected = effect instanceof Thrown && type.isInstance(((Thrown) effect).throwable);
-    if (!expected) {
+    if (effect instanceof ReturnedObject) {
       throw assertionError(configuration.pageFormatter
           .add(header("expected thrown"))
           .add(body(type.getName()))
-          .add(formatBut(effect))
+          .add(header("but returned"))
+          .add(body(((ReturnedObject) effect).object))
+          .build());
+    } else if (effect instanceof ReturnedVoid) {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(type.getName()))
+          .add(header("but returned"))
+          .add(body("void"))
+          .build());
+    }
+
+    Thrown thrown = (Thrown) effect;
+    if (type.isInstance(thrown.throwable)) {
+      return;
+    } else {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(type.getName()))
+          .add(header("but thrown"))
+          .add(body(thrown.throwable))
+          .add("\n")
+          .add(printStackTrace(thrown.throwable))
           .build());
     }
   }
 
   public void thenThrown() {
     Effect effect = getLastEffect();
-    boolean expected = effect instanceof Thrown;
-    if (!expected) {
+    if (effect instanceof ReturnedObject) {
       throw assertionError(configuration.pageFormatter
           .add(header("expected thrown"))
           .add(body(""))
-          .add(formatBut(effect))
+          .add(header("but returned"))
+          .add(body(((ReturnedObject) effect).object))
+          .build());
+    } else if (effect instanceof ReturnedVoid) {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected thrown"))
+          .add(body(""))
+          .add(header("but returned"))
+          .add(body("void"))
           .build());
     }
   }
@@ -487,13 +594,23 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void then(Object object, Object matcher) {
-    if (!asMatcher(matcher).matches(object)) {
+    if (asMatcher(matcher).matches(object)) {
+      return;
+    } else if (asMatcher(matcher) instanceof DiagnosticMatcher) {
       throw assertionError(configuration.pageFormatter
           .add(header("expected"))
           .add(body(matcher))
           .add(header("but was"))
           .add(body(object))
-          .add(tryFormatDiagnosis(matcher, object))
+          .add(header("diagnosis"))
+          .add(body(((DiagnosticMatcher) asMatcher(matcher)).diagnose(object)))
+          .build());
+    } else {
+      throw assertionError(configuration.pageFormatter
+          .add(header("expected"))
+          .add(body(matcher))
+          .add(header("but was"))
+          .add(body(object))
           .build());
     }
   }
@@ -596,23 +713,6 @@ public class ConfigurableFacade implements Facade {
     return inspectingHistory.get().get().effect;
   }
 
-  private String formatSection(String caption, Object content) {
-    return ""
-        + "  " + caption + "\n"
-        + "    " + configuration.formatter.format(content) + "\n";
-  }
-
-  private String formatBut(Effect effect) {
-    return effect instanceof Returned
-        ? effect instanceof ReturnedObject
-            ? formatSection("but returned", ((ReturnedObject) effect).object)
-            : formatSection("but returned", "void")
-        : ""
-            + formatSection("but thrown", ((Thrown) effect).throwable)
-            + "\n"
-            + printStackTrace(((Thrown) effect).throwable);
-  }
-
   private String formatInvocations() {
     StringBuilder builder = new StringBuilder();
 
@@ -625,13 +725,6 @@ public class ConfigurableFacade implements Facade {
       builder.insert(0, "  actual invocations\n    none\n");
     }
     return builder.toString();
-  }
-
-  private String tryFormatDiagnosis(Object matcher, Object item) {
-    Matcher asMatcher = asMatcher(matcher);
-    return asMatcher instanceof DiagnosticMatcher
-        ? formatSection("diagnosis", ((DiagnosticMatcher) asMatcher).diagnose(item))
-        : "";
   }
 
   private static Closure asClosure(final VoidClosure closure) {
