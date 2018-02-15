@@ -1,17 +1,20 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.testory.common.Matchers.asDiagnosticMatcher;
 import static org.testory.common.Matchers.asMatcher;
+import static org.testory.common.Matchers.isDiagnosticMatcher;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.testing.Fakes.newObject;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestMatchersAsMatcher {
+public class TestMatchersDynamic {
   private Object matcher, object, otherObject;
   private String string;
 
@@ -32,33 +35,28 @@ public class TestMatchersAsMatcher {
 
       public void describeTo(org.hamcrest.Description description) {}
 
-      public void describeMismatch(Object item, org.hamcrest.Description mismatchDescription) {}
+      public void describeMismatch(Object item, org.hamcrest.Description mismatchDescription) {
+        mismatchDescription.appendText(format("diagnosed(%s)", item.toString()));
+
+      }
 
       @Deprecated
       public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {}
     };
+
     assertTrue(isMatcher(matcher));
     assertTrue(asMatcher(matcher).matches(object));
     assertFalse(asMatcher(matcher).matches(otherObject));
-  }
+    assertEquals(
+        format("diagnosed(%s)", otherObject),
+        ((DiagnosticMatcher) asMatcher(matcher)).diagnose(otherObject));
 
-  @Test
-  public void supports_hamcrest_diagnosis() {
-    matcher = new org.hamcrest.Matcher<Object>() {
-      public boolean matches(Object item) {
-        return false;
-      }
-
-      public void describeTo(org.hamcrest.Description description) {}
-
-      public void describeMismatch(Object item, org.hamcrest.Description mismatchDescription) {
-        mismatchDescription.appendText(string).appendText(item.toString());
-      }
-
-      @Deprecated
-      public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {}
-    };
-    assertEquals(string + object, ((DiagnosticMatcher) asMatcher(matcher)).diagnose(object));
+    assertTrue(isDiagnosticMatcher(matcher));
+    assertTrue(asDiagnosticMatcher(matcher).matches(object));
+    assertFalse(asDiagnosticMatcher(matcher).matches(otherObject));
+    assertEquals(
+        format("diagnosed(%s)", otherObject),
+        asDiagnosticMatcher(matcher).diagnose(otherObject));
   }
 
   @Test

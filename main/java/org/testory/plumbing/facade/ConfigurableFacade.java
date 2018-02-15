@@ -6,7 +6,9 @@ import static org.testory.common.Classes.defaultValue;
 import static org.testory.common.Effect.returned;
 import static org.testory.common.Effect.returnedVoid;
 import static org.testory.common.Effect.thrown;
+import static org.testory.common.Matchers.asDiagnosticMatcher;
 import static org.testory.common.Matchers.asMatcher;
+import static org.testory.common.Matchers.isDiagnosticMatcher;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
@@ -22,7 +24,6 @@ import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.proxy.handler.ThrowingHandler.throwing;
 
 import org.testory.common.Closure;
-import org.testory.common.DiagnosticMatcher;
 import org.testory.common.Effect;
 import org.testory.common.Effect.ReturnedObject;
 import org.testory.common.Effect.ReturnedVoid;
@@ -385,16 +386,14 @@ public class ConfigurableFacade implements Facade {
         && isMatcher(objectOrMatcher)
         && asMatcher(objectOrMatcher).matches(returned.object)) {
       return;
-    } else if (objectOrMatcher != null
-        && isMatcher(objectOrMatcher)
-        && asMatcher(objectOrMatcher) instanceof DiagnosticMatcher) {
+    } else if (objectOrMatcher != null && isDiagnosticMatcher(objectOrMatcher)) {
       throw assertionError(configuration.pageFormatter
           .add(header("expected returned"))
           .add(body(objectOrMatcher))
           .add(header("but returned"))
           .add(body(returned.object))
           .add(header("diagnosis"))
-          .add(body(((DiagnosticMatcher) asMatcher(objectOrMatcher)).diagnose(returned.object)))
+          .add(body(asDiagnosticMatcher(objectOrMatcher).diagnose(returned.object)))
           .build());
     } else {
       throw assertionError(configuration.pageFormatter
@@ -474,14 +473,14 @@ public class ConfigurableFacade implements Facade {
     Thrown thrown = (Thrown) effect;
     if (asMatcher(matcher).matches(thrown.throwable)) {
       return;
-    } else if (asMatcher(matcher) instanceof DiagnosticMatcher) {
+    } else if (isDiagnosticMatcher(matcher)) {
       throw assertionError(configuration.pageFormatter
           .add(header("expected thrown"))
           .add(body(matcher))
           .add(header("but thrown"))
           .add(body(thrown.throwable))
           .add(header("diagnosis"))
-          .add(body(((DiagnosticMatcher) asMatcher(matcher)).diagnose(thrown.throwable)))
+          .add(body(asDiagnosticMatcher(matcher).diagnose(thrown.throwable)))
           .add("\n")
           .add(printStackTrace(thrown.throwable))
           .build());
@@ -596,14 +595,14 @@ public class ConfigurableFacade implements Facade {
   public void then(Object object, Object matcher) {
     if (asMatcher(matcher).matches(object)) {
       return;
-    } else if (asMatcher(matcher) instanceof DiagnosticMatcher) {
+    } else if (isDiagnosticMatcher(matcher)) {
       throw assertionError(configuration.pageFormatter
           .add(header("expected"))
           .add(body(matcher))
           .add(header("but was"))
           .add(body(object))
           .add(header("diagnosis"))
-          .add(body(((DiagnosticMatcher) asMatcher(matcher)).diagnose(object)))
+          .add(body(asDiagnosticMatcher(matcher).diagnose(object)))
           .build());
     } else {
       throw assertionError(configuration.pageFormatter
