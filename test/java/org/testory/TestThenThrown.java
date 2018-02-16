@@ -1,6 +1,6 @@
 package org.testory;
 
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
@@ -9,7 +9,6 @@ import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Closures.voidReturning;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
-import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +35,14 @@ public class TestThenThrown {
     try {
       thenThrown();
       fail();
-    } catch (TestoryAssertionError e) {}
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    \n"
+          + "  but returned\n"
+          + "    " + object + "\n",
+          e.getMessage());
+    }
   }
 
   @Test
@@ -45,19 +51,13 @@ public class TestThenThrown {
     try {
       thenThrown();
       fail();
-    } catch (TestoryAssertionError e) {}
-  }
-
-  @Test
-  public void failure_prints_expectation() {
-    when(returning(object));
-    try {
-      thenThrown();
-      fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
+      assertEquals("\n"
           + "  expected thrown\n"
-          + "    \n"));
+          + "    \n"
+          + "  but returned\n"
+          + "    void\n",
+          e.getMessage());
     }
   }
 }

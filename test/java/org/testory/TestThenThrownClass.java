@@ -1,15 +1,15 @@
 package org.testory;
 
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
+import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Closures.voidReturning;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
-import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +48,16 @@ public class TestThenThrownClass {
     try {
       thenThrown(ExpectedThrowable.class);
       fail();
-    } catch (TestoryAssertionError e) {}
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + ExpectedThrowable.class.getName() + "\n"
+          + "  but thrown\n"
+          + "    " + throwable.getClass().getName() + "\n"
+          + "\n"
+          + printStackTrace(throwable),
+          e.getMessage());
+    }
   }
 
   @Test
@@ -60,7 +69,16 @@ public class TestThenThrownClass {
     try {
       thenThrown(ExpectedThrowable.class);
       fail();
-    } catch (TestoryAssertionError e) {}
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + ExpectedThrowable.class.getName() + "\n"
+          + "  but thrown\n"
+          + "    " + throwable.getClass().getName() + "\n"
+          + "\n"
+          + printStackTrace(throwable),
+          e.getMessage());
+    }
   }
 
   @Test
@@ -70,7 +88,14 @@ public class TestThenThrownClass {
     try {
       thenThrown(ExpectedThrowable.class);
       fail();
-    } catch (TestoryAssertionError e) {}
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + ExpectedThrowable.class.getName() + "\n"
+          + "  but returned\n"
+          + "    " + object + "\n",
+          e.getMessage());
+    }
   }
 
   @Test
@@ -80,22 +105,13 @@ public class TestThenThrownClass {
     try {
       thenThrown(ExpectedThrowable.class);
       fail();
-    } catch (TestoryAssertionError e) {}
-  }
-
-  @Test
-  public void failure_prints_expected_throwable() {
-    class ExpectedThrowable extends Throwable {}
-    class OtherThrowable extends Throwable {}
-    throwable = new OtherThrowable();
-    when(returning(object));
-    try {
-      thenThrown(ExpectedThrowable.class);
-      fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
+      assertEquals("\n"
           + "  expected thrown\n"
-          + "    " + ExpectedThrowable.class.getName() + "\n"));
+          + "    " + ExpectedThrowable.class.getName() + "\n"
+          + "  but returned\n"
+          + "    void\n",
+          e.getMessage());
     }
   }
 

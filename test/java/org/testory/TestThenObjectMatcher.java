@@ -1,13 +1,12 @@
 package org.testory;
 
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.then;
 import static org.testory.testing.DynamicMatchers.same;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.HamcrestMatchers.diagnosed;
 import static org.testory.testing.HamcrestMatchers.hamcrestDiagnosticMatcher;
-import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,34 +33,31 @@ public class TestThenObjectMatcher {
     try {
       then(otherObject, matcher);
       fail();
-    } catch (TestoryAssertionError e) {}
-  }
-
-  @Test
-  public void failure_prints_matcher_and_object() {
-    matcher = same(object);
-    try {
-      then(otherObject, matcher);
-      fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
+      assertEquals("\n"
           + "  expected\n"
           + "    " + matcher + "\n"
           + "  but was\n"
-          + "    " + otherObject + "\n"));
+          + "    " + otherObject + "\n",
+          e.getMessage());
     }
   }
 
   @Test
-  public void failure_diagnoses_mismatch() {
+  public void diagnoses_mismatch() {
     matcher = hamcrestDiagnosticMatcher();
     try {
       then(object, matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
+      assertEquals("\n"
+          + "  expected\n"
+          + "    " + matcher + "\n"
+          + "  but was\n"
+          + "    " + object + "\n"
           + "  diagnosis\n"
-          + "    " + diagnosed(object) + "\n"));
+          + "    " + diagnosed(object) + "\n",
+          e.getMessage());
     }
   }
 

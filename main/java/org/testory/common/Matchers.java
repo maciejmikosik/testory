@@ -110,6 +110,10 @@ public class Matchers {
     return findMatchesMethod(matcher.getClass()).isPresent();
   }
 
+  public static boolean isDiagnosticMatcher(Object matcher) {
+    return findDiagnoseMethod(matcher.getClass()).isPresent();
+  }
+
   public static Matcher asMatcher(Object matcher) {
     Optional<Method> matchesMethod = findMatchesMethod(matcher.getClass());
     checkArgument(matchesMethod.isPresent());
@@ -117,6 +121,14 @@ public class Matchers {
     return diagnoseMethod.isPresent()
         ? newDiagnosticMatcher(matcher, matchesMethod.get(), diagnoseMethod.get())
         : newMatcher(matcher, matchesMethod.get());
+  }
+
+  public static DiagnosticMatcher asDiagnosticMatcher(Object matcher) {
+    Optional<Method> matchesMethod = findMatchesMethod(matcher.getClass());
+    checkArgument(matchesMethod.isPresent());
+    Optional<Method> diagnoseMethod = findDiagnoseMethod(matcher.getClass());
+    checkArgument(diagnoseMethod.isPresent());
+    return newDiagnosticMatcher(matcher, matchesMethod.get(), diagnoseMethod.get());
   }
 
   private static Matcher newMatcher(final Object dynamicMatcher, final Method matchesMethod) {

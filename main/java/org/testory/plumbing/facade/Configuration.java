@@ -2,7 +2,7 @@ package org.testory.plumbing.facade;
 
 import static org.testory.plumbing.PlumbingException.check;
 
-import org.testory.common.Formatter;
+import org.testory.common.PageFormatter;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.history.History;
 import org.testory.plumbing.im.wildcard.WildcardSupport;
@@ -13,7 +13,7 @@ import org.testory.proxy.extra.Overrider;
 @SuppressWarnings("hiding")
 public class Configuration {
   public final History history;
-  public final Formatter formatter;
+  public final PageFormatter pageFormatter;
   public final Class<? extends RuntimeException> exception;
   public final Overrider overrider;
   public final Namer mockNamer;
@@ -23,7 +23,7 @@ public class Configuration {
 
   private Configuration(
       History history,
-      Formatter formatter,
+      PageFormatter pageFormatter,
       Class<? extends RuntimeException> exception,
       Overrider overrider,
       Namer mockNamer,
@@ -31,7 +31,7 @@ public class Configuration {
       Injector injector,
       WildcardSupport wildcardSupport) {
     this.history = history;
-    this.formatter = formatter;
+    this.pageFormatter = pageFormatter;
     this.exception = exception;
     this.overrider = overrider;
     this.mockNamer = mockNamer;
@@ -56,7 +56,7 @@ public class Configuration {
     check(history != null);
     return new Configuration(
         history,
-        formatter,
+        pageFormatter,
         exception,
         overrider,
         mockNamer,
@@ -65,11 +65,11 @@ public class Configuration {
         wildcardSupport);
   }
 
-  public Configuration formatter(Formatter formatter) {
-    check(formatter != null);
+  public Configuration pageFormatter(PageFormatter pageFormatter) {
+    check(pageFormatter != null);
     return new Configuration(
         history,
-        formatter,
+        pageFormatter,
         exception,
         overrider,
         mockNamer,
@@ -82,7 +82,7 @@ public class Configuration {
     check(exception != null);
     return new Configuration(
         history,
-        formatter,
+        pageFormatter,
         exception,
         overrider,
         mockNamer,
@@ -95,7 +95,7 @@ public class Configuration {
     check(overrider != null);
     return new Configuration(
         history,
-        formatter,
+        pageFormatter,
         exception,
         overrider,
         mockNamer,
@@ -108,7 +108,7 @@ public class Configuration {
     check(mockNamer != null);
     return new Configuration(
         history,
-        formatter,
+        pageFormatter,
         exception,
         overrider,
         mockNamer,
@@ -121,7 +121,7 @@ public class Configuration {
     check(mockMaker != null);
     return new Configuration(
         history,
-        formatter,
+        pageFormatter,
         exception,
         overrider,
         mockNamer,
@@ -134,7 +134,7 @@ public class Configuration {
     check(injector != null);
     return new Configuration(
         history,
-        formatter,
+        pageFormatter,
         exception,
         overrider,
         mockNamer,
@@ -147,7 +147,7 @@ public class Configuration {
     check(wildcardSupport != null);
     return new Configuration(
         history,
-        formatter,
+        pageFormatter,
         exception,
         overrider,
         mockNamer,
@@ -158,7 +158,7 @@ public class Configuration {
 
   public Configuration validate() {
     check(history != null);
-    check(formatter != null);
+    check(pageFormatter != null);
     check(exception != null);
     check(overrider != null);
     check(mockNamer != null);

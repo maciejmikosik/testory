@@ -1,10 +1,10 @@
 package org.testory;
 
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
+import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Closures.voidReturning;
@@ -13,7 +13,6 @@ import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
 import static org.testory.testing.HamcrestMatchers.diagnosed;
 import static org.testory.testing.HamcrestMatchers.hamcrestDiagnosticMatcher;
-import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +43,37 @@ public class TestThenThrownMatcher {
     try {
       thenThrown(matcher);
       fail();
-    } catch (TestoryAssertionError e) {}
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + matcher + "\n"
+          + "  but thrown\n"
+          + "    " + otherThrowable + "\n"
+          + "\n"
+          + printStackTrace(otherThrowable),
+          e.getMessage());
+    }
+  }
+
+  @Test
+  public void diagnoses_throwing_mismatching_throwable() {
+    matcher = hamcrestDiagnosticMatcher();
+    when(throwing(throwable));
+    try {
+      thenThrown(matcher);
+      fail();
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + matcher + "\n"
+          + "  but thrown\n"
+          + "    " + throwable + "\n"
+          + "  diagnosis\n"
+          + "    " + diagnosed(throwable) + "\n"
+          + "\n"
+          + printStackTrace(throwable),
+          e.getMessage());
+    }
   }
 
   @Test
@@ -54,7 +83,14 @@ public class TestThenThrownMatcher {
     try {
       thenThrown(matcher);
       fail();
-    } catch (TestoryAssertionError e) {}
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + matcher + "\n"
+          + "  but returned\n"
+          + "    " + object + "\n",
+          e.getMessage());
+    }
   }
 
   @Test
@@ -64,46 +100,13 @@ public class TestThenThrownMatcher {
     try {
       thenThrown(matcher);
       fail();
-    } catch (TestoryAssertionError e) {}
-  }
-
-  @Test
-  public void failure_prints_expected_matcher() {
-    matcher = same(throwable);
-    when(returning(object));
-    try {
-      thenThrown(matcher);
-      fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
+      assertEquals("\n"
           + "  expected thrown\n"
-          + "    " + matcher + "\n"));
-    }
-  }
-
-  @Test
-  public void failure_diagnoses_mismatch() {
-    matcher = hamcrestDiagnosticMatcher();
-    when(throwing(throwable));
-    try {
-      thenThrown(matcher);
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
-          + "  diagnosis\n"
-          + "    " + diagnosed(throwable) + "\n"));
-    }
-  }
-
-  @Test
-  public void failure_skips_diagnosis_if_returned() {
-    matcher = hamcrestDiagnosticMatcher();
-    when(returning(object));
-    try {
-      thenThrown(matcher);
-      fail();
-    } catch (TestoryAssertionError e) {
-      assertThat(e, not(hasMessageContaining("diagnosis\n")));
+          + "    " + matcher + "\n"
+          + "  but returned\n"
+          + "    void\n",
+          e.getMessage());
     }
   }
 

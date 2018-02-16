@@ -1,15 +1,15 @@
 package org.testory;
 
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenThrown;
 import static org.testory.Testory.when;
+import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Closures.voidReturning;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
-import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +37,16 @@ public class TestThenThrownThrowable {
     try {
       thenThrown(throwable);
       fail();
-    } catch (TestoryAssertionError e) {}
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + throwable + "\n"
+          + "  but thrown\n"
+          + "    " + otherThrowable + "\n"
+          + "\n"
+          + printStackTrace(otherThrowable),
+          e.getMessage());
+    }
   }
 
   @Test
@@ -46,7 +55,14 @@ public class TestThenThrownThrowable {
     try {
       thenThrown(throwable);
       fail();
-    } catch (TestoryAssertionError e) {}
+    } catch (TestoryAssertionError e) {
+      assertEquals("\n"
+          + "  expected thrown\n"
+          + "    " + throwable + "\n"
+          + "  but returned\n"
+          + "    " + object + "\n",
+          e.getMessage());
+    }
   }
 
   @Test
@@ -55,19 +71,13 @@ public class TestThenThrownThrowable {
     try {
       thenThrown(throwable);
       fail();
-    } catch (TestoryAssertionError e) {}
-  }
-
-  @Test
-  public void failure_prints_expected_throwable() {
-    when(returning(object));
-    try {
-      thenThrown(throwable);
-      fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
+      assertEquals("\n"
           + "  expected thrown\n"
-          + "    " + throwable + "\n"));
+          + "    " + throwable + "\n"
+          + "  but returned\n"
+          + "    void\n",
+          e.getMessage());
     }
   }
 

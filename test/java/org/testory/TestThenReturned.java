@@ -1,15 +1,15 @@
 package org.testory;
 
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
 import static org.testory.Testory.when;
+import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.testing.Closures.returning;
 import static org.testory.testing.Closures.throwing;
 import static org.testory.testing.Closures.voidReturning;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;
-import static org.testory.testing.HamcrestMatchers.hasMessageContaining;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,19 +48,15 @@ public class TestThenReturned {
     try {
       thenReturned();
       fail();
-    } catch (TestoryAssertionError e) {}
-  }
-
-  @Test
-  public void failure_prints_expected() {
-    when(throwing(throwable));
-    try {
-      thenReturned();
-      fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
+      assertEquals("\n"
           + "  expected returned\n"
-          + "    \n"));
+          + "    \n"
+          + "  but thrown\n"
+          + "    " + throwable + "\n"
+          + "\n"
+          + printStackTrace(throwable),
+          e.getMessage());
     }
   }
 }
