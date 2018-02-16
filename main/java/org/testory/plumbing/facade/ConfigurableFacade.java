@@ -18,6 +18,7 @@ import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
 import static org.testory.plumbing.format.Body.body;
 import static org.testory.plumbing.format.Header.header;
+import static org.testory.plumbing.format.Multiline.multiline;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.handler.ReturningHandler.returning;
@@ -672,7 +673,10 @@ public class ConfigurableFacade implements Facade {
           .add(body(invocationMatcher))
           .add(header("but called"))
           .add(body("times " + numberOfCalls))
-          .add(formatInvocations())
+          .add(header("actual invocations"))
+          .add(invocationHistory.get().size() > 0
+              ? multiline(invocationHistory.get().reverse())
+              : body("none"))
           .build());
     }
   }
@@ -695,7 +699,10 @@ public class ConfigurableFacade implements Facade {
           .add(header("expected called in order"))
           .add(body(invocationMatcher))
           .add(header("but not called"))
-          .add(formatInvocations())
+          .add(header("actual invocations"))
+          .add(invocationHistory.get().size() > 0
+              ? multiline(invocationHistory.get().reverse())
+              : body("none"))
           .build());
     }
   }
@@ -710,20 +717,6 @@ public class ConfigurableFacade implements Facade {
 
   private Effect getLastEffect() {
     return inspectingHistory.get().get().effect;
-  }
-
-  private String formatInvocations() {
-    StringBuilder builder = new StringBuilder();
-
-    for (Invocation invocation : invocationHistory.get().reverse()) {
-      builder.append("    ").append(configuration.formatter.format(invocation)).append("\n");
-    }
-    if (builder.length() > 0) {
-      builder.insert(0, "  actual invocations\n");
-    } else {
-      builder.insert(0, "  actual invocations\n    none\n");
-    }
-    return builder.toString();
   }
 
   private static Closure asClosure(final VoidClosure closure) {

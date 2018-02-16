@@ -1,6 +1,7 @@
 package org.testory.plumbing.format;
 
 import static org.testory.common.SequenceFormatter.sequence;
+import static org.testory.plumbing.format.Body.body;
 
 import org.testory.common.Formatter;
 import org.testory.common.Nullable;
@@ -21,6 +22,8 @@ public class MessageFormatter extends ObjectFormatter {
       return format((Header) object);
     } else if (object instanceof Body) {
       return format((Body) object);
+    } else if (object instanceof Multiline) {
+      return format((Multiline) object);
     } else {
       return super.format(object);
     }
@@ -39,5 +42,13 @@ public class MessageFormatter extends ObjectFormatter {
 
   private String format(Body body) {
     return String.format("    %s\n", format(body.object));
+  }
+
+  private String format(Multiline multiline) {
+    StringBuilder builder = new StringBuilder();
+    for (Object object : multiline.iterable) {
+      builder.append(format(body(object)));
+    }
+    return builder.toString();
   }
 }
