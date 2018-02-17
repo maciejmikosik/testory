@@ -30,7 +30,7 @@ import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
 import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
 import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
 import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
-import static org.testory.proxy.proxer.RepeatableProxy.repeatable;
+import static org.testory.proxy.proxer.RepeatableProxer.repeatable;
 import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
 
 import org.testory.common.PageFormatter;
