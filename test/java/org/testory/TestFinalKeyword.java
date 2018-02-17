@@ -8,6 +8,7 @@ import static org.testory.Testory.mock;
 import static org.testory.Testory.when;
 
 import org.junit.Test;
+import org.testory.proxy.ProxyException;
 
 public class TestFinalKeyword {
   @Test
@@ -25,7 +26,7 @@ public class TestFinalKeyword {
     try {
       mock(FinalClass.class);
       fail();
-    } catch (TestoryException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -34,7 +35,7 @@ public class TestFinalKeyword {
     try {
       givenTry(new FinalClass());
       fail();
-    } catch (TestoryException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -43,7 +44,7 @@ public class TestFinalKeyword {
     try {
       givenTimes(3, new FinalClass());
       fail();
-    } catch (TestoryException e) {}
+    } catch (ProxyException e) {}
   }
 
   @SuppressWarnings("unused")

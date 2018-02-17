@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
+import org.testory.proxy.ProxyException;
 
 public class TestStubbing {
   private Object object, otherObject;
@@ -139,7 +140,7 @@ public class TestStubbing {
     try {
       mock.returnString();
       fail();
-    } catch (TestoryException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -148,7 +149,7 @@ public class TestStubbing {
     try {
       mock.returnInt();
       fail();
-    } catch (TestoryException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -157,7 +158,7 @@ public class TestStubbing {
     try {
       mock.returnVoid();
       fail();
-    } catch (TestoryException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -166,7 +167,7 @@ public class TestStubbing {
     try {
       mock.returnInt();
       fail();
-    } catch (TestoryException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -175,7 +176,7 @@ public class TestStubbing {
     try {
       mock.returnInt();
       fail();
-    } catch (TestoryException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -185,7 +186,7 @@ public class TestStubbing {
     try {
       mock.returnObject();
       fail();
-    } catch (TestoryException t) {}
+    } catch (ProxyException t) {}
   }
 
   @Test
@@ -194,7 +195,7 @@ public class TestStubbing {
     try {
       mock.returnObject();
       fail();
-    } catch (TestoryException e) {}
+    } catch (ProxyException e) {}
   }
 
   @Test
@@ -204,7 +205,7 @@ public class TestStubbing {
     try {
       mock.throwIOException();
       fail();
-    } catch (TestoryException t) {}
+    } catch (ProxyException t) {}
   }
 
   @Test

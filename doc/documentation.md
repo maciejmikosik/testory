@@ -174,9 +174,7 @@ If you need more complex logic to happen on invocation, implement custom `Handle
       }
     }), list).get(0);
 
-If you stub a mock to return object incompatible with method return type,
-or throw throwable incompatible with method signature,
-you will get `TestoryException` upon invocation.
+If you stub a mock to return object incompatible with method return type, or throw throwable incompatible with method signature, you will get `ProxyException` upon invocation.
 
 You can restub already stubbed invocation, because most recent stubbing takes precedence over earlier one.
 Newly created mock is already stubbed for convenience.

@@ -31,7 +31,6 @@ import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
 import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
 import static org.testory.proxy.proxer.RepeatableProxy.repeatable;
 import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
-import static org.testory.proxy.proxer.WrappingProxer.wrapping;
 
 import org.testory.plumbing.Checker;
 import org.testory.plumbing.Maker;
@@ -47,9 +46,7 @@ public class TestoryFacade {
     QuietFormatter formatter = quiet(messageFormatter());
     History history = formatter.quiet(synchronize(newRawHistory()));
     Checker checker = checker(history, exception);
-    Proxer proxer = wrapping(exception,
-        nonFinal(typeSafe(jdkCollections(fixObjectBug(repeatable(
-            wrapping(exception, cglibProxer())))))));
+    Proxer proxer = nonFinal(typeSafe(jdkCollections(fixObjectBug(repeatable(cglibProxer())))));
     Maker mockMaker = sane(history, nice(history, rawMockMaker(history, checkingProxer(checker, proxer))));
 
     Configuration configuration = configuration()
