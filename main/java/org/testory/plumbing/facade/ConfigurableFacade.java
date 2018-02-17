@@ -33,7 +33,6 @@ import org.testory.common.Matcher;
 import org.testory.common.Optional;
 import org.testory.common.VoidClosure;
 import org.testory.plumbing.Inspecting;
-import org.testory.plumbing.PlumbingException;
 import org.testory.plumbing.VerifyingInOrder;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.im.wildcard.WildcardException;
@@ -61,7 +60,7 @@ public class ConfigurableFacade implements Facade {
     try {
       configuration.injector.inject(test);
     } catch (RuntimeException e) {
-      throw wrap(e);
+      throw configuration.checker.wrap(e);
     }
   }
 
@@ -69,7 +68,7 @@ public class ConfigurableFacade implements Facade {
     try {
       closure.invoke();
     } catch (Throwable e) {
-      throw wrap(e);
+      throw configuration.checker.wrap(e);
     }
   }
 
@@ -224,11 +223,11 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void the(boolean value) {
-    throw newException();
+    configuration.checker.fail("unsupported");
   }
 
   public void the(double value) {
-    throw newException();
+    configuration.checker.fail("unsupported");
   }
 
   public InvocationMatcher onInstance(final Object mock) {
@@ -711,7 +710,7 @@ public class ConfigurableFacade implements Facade {
     try {
       return configuration.wildcardSupport.matcherize(invocation);
     } catch (WildcardException e) {
-      throw wrap(e);
+      throw configuration.checker.wrap(e);
     }
   }
 
@@ -738,21 +737,5 @@ public class ConfigurableFacade implements Facade {
         return "" + number;
       }
     };
-  }
-
-  private RuntimeException wrap(Throwable throwable) {
-    try {
-      return configuration.exception.getConstructor(Throwable.class).newInstance(throwable);
-    } catch (ReflectiveOperationException e) {
-      throw new PlumbingException(e);
-    }
-  }
-
-  private RuntimeException newException() {
-    try {
-      return configuration.exception.getConstructor().newInstance();
-    } catch (ReflectiveOperationException e) {
-      throw new PlumbingException(e);
-    }
   }
 }

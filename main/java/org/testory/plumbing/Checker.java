@@ -11,15 +11,18 @@ import org.testory.plumbing.history.History;
 public class Checker {
   private final FilteredHistory<Mocking> mockingHistory;
   private final FilteredHistory<Inspecting> inspectingHistory;
-  private final Constructor<? extends RuntimeException> exceptionConstructor;
+  private final Constructor<? extends RuntimeException> constructorString;
+  private final Constructor<? extends RuntimeException> constructorThrowable;
 
   private Checker(
       FilteredHistory<Mocking> mockingHistory,
       FilteredHistory<Inspecting> inspectingHistory,
-      Constructor<? extends RuntimeException> exceptionConstructor) {
+      Constructor<? extends RuntimeException> constructorString,
+      Constructor<? extends RuntimeException> constructorThrowable) {
     this.mockingHistory = mockingHistory;
     this.inspectingHistory = inspectingHistory;
-    this.exceptionConstructor = exceptionConstructor;
+    this.constructorString = constructorString;
+    this.constructorThrowable = constructorThrowable;
   }
 
   public static Checker checker(History history, Class<? extends RuntimeException> exceptionType) {
@@ -27,7 +30,8 @@ public class Checker {
       return new Checker(
           filter(Mocking.class, history),
           filter(Inspecting.class, history),
-          exceptionType.getConstructor(String.class));
+          exceptionType.getConstructor(String.class),
+          exceptionType.getConstructor(Throwable.class));
     } catch (NoSuchMethodException e) {
       throw new PlumbingException(e);
     }
@@ -68,9 +72,17 @@ public class Checker {
     }
   }
 
-  private void fail(String string) {
+  public void fail(String string) {
     try {
-      throw exceptionConstructor.newInstance(string);
+      throw constructorString.newInstance(string);
+    } catch (ReflectiveOperationException e) {
+      throw new PlumbingException(e);
+    }
+  }
+
+  public RuntimeException wrap(Throwable throwable) {
+    try {
+      return constructorThrowable.newInstance(throwable);
     } catch (ReflectiveOperationException e) {
       throw new PlumbingException(e);
     }
