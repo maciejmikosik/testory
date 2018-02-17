@@ -64,7 +64,7 @@ public class TestoryFacade {
         .wildcardSupport(wildcardSupport(
             history,
             tokenizer(proxer),
-            repairer(),
+            repairer(checker),
             wildcardMatcherizer(formatter),
             formatter))
         .validate();

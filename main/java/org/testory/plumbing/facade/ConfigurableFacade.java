@@ -35,7 +35,6 @@ import org.testory.common.VoidClosure;
 import org.testory.plumbing.Inspecting;
 import org.testory.plumbing.VerifyingInOrder;
 import org.testory.plumbing.history.FilteredHistory;
-import org.testory.plumbing.im.wildcard.WildcardException;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
@@ -136,7 +135,7 @@ public class ConfigurableFacade implements Facade {
   public <T> T given(final Handler handler, T mock) {
     return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
-        configuration.history.add(stubbing(matcherize(invocation), handler));
+        configuration.history.add(stubbing(configuration.wildcardSupport.matcherize(invocation), handler));
         return defaultValue(invocation.method.getReturnType());
       }
     });
@@ -652,7 +651,7 @@ public class ConfigurableFacade implements Facade {
   public <T> T thenCalledTimes(final Object numberMatcher, T mock) {
     return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
-        thenCalledTimes(numberMatcher, matcherize(invocation));
+        thenCalledTimes(numberMatcher, configuration.wildcardSupport.matcherize(invocation));
         return defaultValue(invocation.method.getReturnType());
       }
     });
@@ -683,7 +682,7 @@ public class ConfigurableFacade implements Facade {
   public <T> T thenCalledInOrder(T mock) {
     return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
-        thenCalledInOrder(matcherize(invocation));
+        thenCalledInOrder(configuration.wildcardSupport.matcherize(invocation));
         return defaultValue(invocation.method.getReturnType());
       }
     });
@@ -703,14 +702,6 @@ public class ConfigurableFacade implements Facade {
               ? multiline(invocationHistory.get().reverse())
               : body("none"))
           .build());
-    }
-  }
-
-  private InvocationMatcher matcherize(Invocation invocation) {
-    try {
-      return configuration.wildcardSupport.matcherize(invocation);
-    } catch (WildcardException e) {
-      throw configuration.checker.wrap(e);
     }
   }
 
