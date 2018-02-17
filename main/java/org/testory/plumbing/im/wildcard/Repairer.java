@@ -12,11 +12,18 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Repairer {
-  private Repairer() {}
+import org.testory.plumbing.Checker;
 
-  public static Repairer repairer() {
-    return new Repairer();
+public class Repairer {
+  private final Checker checker;
+
+  private Repairer(Checker checker) {
+    this.checker = checker;
+  }
+
+  public static Repairer repairer(Checker checker) {
+    check(checker != null);
+    return new Repairer(checker);
   }
 
   public WildcardInvocation repair(WildcardInvocation invocation) {
@@ -40,7 +47,7 @@ public class Repairer {
         invocation.wildcards);
   }
 
-  private static List<Object> repair(
+  private List<Object> repair(
       List<Class<?>> parameters,
       List<Object> arguments,
       WildcardInvocation invocation) {
@@ -48,7 +55,7 @@ public class Repairer {
     if (!deepEquals(
         flip(solution),
         trySolveEager(flip(invocation.wildcards), flip(parameters), flip(arguments)))) {
-      throw new WildcardException("found more than one solution");
+      checker.fail("found more than one solution");
     }
     List<Wildcard> wildcards = new ArrayList<>(invocation.wildcards);
     List<Object> repaired = new ArrayList<>();
@@ -60,7 +67,7 @@ public class Repairer {
     return repaired;
   }
 
-  private static List<Boolean> trySolveEager(
+  private List<Boolean> trySolveEager(
       List<Wildcard> wildcards,
       List<Class<?>> parameters,
       List<Object> arguments) {
@@ -81,7 +88,7 @@ public class Repairer {
           continue nextWildcard;
         }
       }
-      throw new WildcardException("cannot find any solution");
+      checker.fail("cannot find any solution");
     }
     return solution;
   }
@@ -119,5 +126,4 @@ public class Repairer {
     Object array = Array.newInstance(Object.class, 0);
     return elements.toArray((Object[]) array);
   }
-
 }

@@ -33,10 +33,8 @@ import org.testory.common.Matcher;
 import org.testory.common.Optional;
 import org.testory.common.VoidClosure;
 import org.testory.plumbing.Inspecting;
-import org.testory.plumbing.PlumbingException;
 import org.testory.plumbing.VerifyingInOrder;
 import org.testory.plumbing.history.FilteredHistory;
-import org.testory.plumbing.im.wildcard.WildcardException;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
@@ -61,7 +59,7 @@ public class ConfigurableFacade implements Facade {
     try {
       configuration.injector.inject(test);
     } catch (RuntimeException e) {
-      throw wrap(e);
+      throw configuration.checker.wrap(e);
     }
   }
 
@@ -69,7 +67,7 @@ public class ConfigurableFacade implements Facade {
     try {
       closure.invoke();
     } catch (Throwable e) {
-      throw wrap(e);
+      throw configuration.checker.wrap(e);
     }
   }
 
@@ -137,7 +135,7 @@ public class ConfigurableFacade implements Facade {
   public <T> T given(final Handler handler, T mock) {
     return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
-        configuration.history.add(stubbing(matcherize(invocation), handler));
+        configuration.history.add(stubbing(configuration.wildcardSupport.matcherize(invocation), handler));
         return defaultValue(invocation.method.getReturnType());
       }
     });
@@ -224,11 +222,11 @@ public class ConfigurableFacade implements Facade {
   }
 
   public void the(boolean value) {
-    throw newException();
+    configuration.checker.fail("unsupported");
   }
 
   public void the(double value) {
-    throw newException();
+    configuration.checker.fail("unsupported");
   }
 
   public InvocationMatcher onInstance(final Object mock) {
@@ -653,7 +651,7 @@ public class ConfigurableFacade implements Facade {
   public <T> T thenCalledTimes(final Object numberMatcher, T mock) {
     return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
-        thenCalledTimes(numberMatcher, matcherize(invocation));
+        thenCalledTimes(numberMatcher, configuration.wildcardSupport.matcherize(invocation));
         return defaultValue(invocation.method.getReturnType());
       }
     });
@@ -684,7 +682,7 @@ public class ConfigurableFacade implements Facade {
   public <T> T thenCalledInOrder(T mock) {
     return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
-        thenCalledInOrder(matcherize(invocation));
+        thenCalledInOrder(configuration.wildcardSupport.matcherize(invocation));
         return defaultValue(invocation.method.getReturnType());
       }
     });
@@ -704,14 +702,6 @@ public class ConfigurableFacade implements Facade {
               ? multiline(invocationHistory.get().reverse())
               : body("none"))
           .build());
-    }
-  }
-
-  private InvocationMatcher matcherize(Invocation invocation) {
-    try {
-      return configuration.wildcardSupport.matcherize(invocation);
-    } catch (WildcardException e) {
-      throw wrap(e);
     }
   }
 
@@ -738,21 +728,5 @@ public class ConfigurableFacade implements Facade {
         return "" + number;
       }
     };
-  }
-
-  private RuntimeException wrap(Throwable throwable) {
-    try {
-      return configuration.exception.getConstructor(Throwable.class).newInstance(throwable);
-    } catch (ReflectiveOperationException e) {
-      throw new PlumbingException(e);
-    }
-  }
-
-  private RuntimeException newException() {
-    try {
-      return configuration.exception.getConstructor().newInstance();
-    } catch (ReflectiveOperationException e) {
-      throw new PlumbingException(e);
-    }
   }
 }
