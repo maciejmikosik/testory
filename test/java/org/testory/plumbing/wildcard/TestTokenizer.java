@@ -1,9 +1,9 @@
-package org.testory.plumbing.im.wildcard;
+package org.testory.plumbing.wildcard;
 
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.testory.plumbing.im.wildcard.Tokenizer.tokenizer;
+import static org.testory.plumbing.wildcard.Tokenizer.tokenizer;
 import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
 
 import java.util.AbstractList;

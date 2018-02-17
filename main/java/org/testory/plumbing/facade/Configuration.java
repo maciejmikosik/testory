@@ -6,9 +6,9 @@ import org.testory.common.PageFormatter;
 import org.testory.plumbing.Checker;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.history.History;
-import org.testory.plumbing.im.wildcard.WildcardSupport;
 import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
+import org.testory.plumbing.wildcard.WildcardSupport;
 import org.testory.proxy.extra.Overrider;
 
 @SuppressWarnings("hiding")

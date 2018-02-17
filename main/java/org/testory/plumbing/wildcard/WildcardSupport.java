@@ -1,4 +1,4 @@
-package org.testory.plumbing.im.wildcard;
+package org.testory.plumbing.wildcard;
 
 import static java.lang.String.format;
 import static org.testory.common.Matchers.asMatcher;
@@ -6,9 +6,9 @@ import static org.testory.common.Matchers.equalDeep;
 import static org.testory.common.Matchers.isMatcher;
 import static org.testory.common.Matchers.same;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.im.wildcard.Wildcard.wildcard;
-import static org.testory.plumbing.im.wildcard.WildcardInvocation.wildcardInvocation;
-import static org.testory.plumbing.im.wildcard.Wildcarded.wildcarded;
+import static org.testory.plumbing.wildcard.Wildcard.wildcard;
+import static org.testory.plumbing.wildcard.WildcardInvocation.wildcardInvocation;
+import static org.testory.plumbing.wildcard.Wildcarded.wildcarded;
 
 import java.util.ArrayList;
 import java.util.List;

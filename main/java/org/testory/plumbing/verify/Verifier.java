@@ -19,7 +19,7 @@ import org.testory.common.PageFormatter;
 import org.testory.plumbing.facade.Facade;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
-import org.testory.plumbing.im.wildcard.WildcardSupport;
+import org.testory.plumbing.wildcard.WildcardSupport;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;

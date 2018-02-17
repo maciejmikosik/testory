@@ -1,4 +1,4 @@
-package org.testory.plumbing.im.wildcard;
+package org.testory.plumbing.wildcard;
 
 public class Wildcarded {
   private Wildcarded() {}

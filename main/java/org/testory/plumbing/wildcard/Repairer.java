@@ -1,4 +1,4 @@
-package org.testory.plumbing.im.wildcard;
+package org.testory.plumbing.wildcard;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.nCopies;
@@ -6,7 +6,7 @@ import static java.util.Objects.deepEquals;
 import static org.testory.common.Collections.flip;
 import static org.testory.common.Collections.last;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.im.wildcard.WildcardInvocation.wildcardInvocation;
+import static org.testory.plumbing.wildcard.WildcardInvocation.wildcardInvocation;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
