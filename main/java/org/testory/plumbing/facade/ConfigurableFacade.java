@@ -15,10 +15,8 @@ import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.Stubbing.stubbing;
-import static org.testory.plumbing.VerifyingInOrder.verifyInOrder;
 import static org.testory.plumbing.format.Body.body;
 import static org.testory.plumbing.format.Header.header;
-import static org.testory.plumbing.format.Multiline.multiline;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.handler.ReturningHandler.returning;
@@ -29,11 +27,8 @@ import org.testory.common.Effect;
 import org.testory.common.Effect.ReturnedObject;
 import org.testory.common.Effect.ReturnedVoid;
 import org.testory.common.Effect.Thrown;
-import org.testory.common.Matcher;
-import org.testory.common.Optional;
 import org.testory.common.VoidClosure;
 import org.testory.plumbing.Inspecting;
-import org.testory.plumbing.VerifyingInOrder;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
@@ -42,12 +37,10 @@ import org.testory.proxy.InvocationMatcher;
 public class ConfigurableFacade implements Facade {
   private final Configuration configuration;
   private final FilteredHistory<Inspecting> inspectingHistory;
-  private final FilteredHistory<Invocation> invocationHistory;
 
   private ConfigurableFacade(Configuration configuration) {
     this.configuration = configuration;
     inspectingHistory = filter(Inspecting.class, configuration.history);
-    invocationHistory = filter(Invocation.class, configuration.history);
   }
 
   public static Facade configurableFacade(Configuration configuration) {
@@ -625,84 +618,43 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T thenCalled(T mock) {
-    return thenCalledTimes(exactly(1), mock);
+    return configuration.verifier.thenCalled(mock);
   }
 
   public void thenCalled(InvocationMatcher invocationMatcher) {
-    thenCalledTimes(exactly(1), invocationMatcher);
+    configuration.verifier.thenCalled(invocationMatcher);
   }
 
   public <T> T thenCalledNever(T mock) {
-    return thenCalledTimes(exactly(0), mock);
+    return configuration.verifier.thenCalledNever(mock);
   }
 
   public void thenCalledNever(InvocationMatcher invocationMatcher) {
-    thenCalledTimes(exactly(0), invocationMatcher);
+    configuration.verifier.thenCalledNever(invocationMatcher);
   }
 
   public <T> T thenCalledTimes(int number, T mock) {
-    return thenCalledTimes(exactly(number), mock);
+    return configuration.verifier.thenCalledTimes(number, mock);
   }
 
   public void thenCalledTimes(int number, InvocationMatcher invocationMatcher) {
-    thenCalledTimes(exactly(number), invocationMatcher);
+    configuration.verifier.thenCalledTimes(number, invocationMatcher);
   }
 
-  public <T> T thenCalledTimes(final Object numberMatcher, T mock) {
-    return configuration.overrider.override(mock, new Handler() {
-      public Object handle(Invocation invocation) {
-        thenCalledTimes(numberMatcher, configuration.wildcardSupport.matcherize(invocation));
-        return defaultValue(invocation.method.getReturnType());
-      }
-    });
+  public <T> T thenCalledTimes(Object numberMatcher, T mock) {
+    return configuration.verifier.thenCalledTimes(numberMatcher, mock);
   }
 
   public void thenCalledTimes(Object numberMatcher, InvocationMatcher invocationMatcher) {
-    int numberOfCalls = 0;
-    for (Invocation invocation : invocationHistory.get()) {
-      if (invocationMatcher.matches(invocation)) {
-        numberOfCalls++;
-      }
-    }
-    boolean expected = asMatcher(numberMatcher).matches(numberOfCalls);
-    if (!expected) {
-      throw assertionError(configuration.pageFormatter
-          .add(header("expected called times " + numberMatcher))
-          .add(body(invocationMatcher))
-          .add(header("but called"))
-          .add(body("times " + numberOfCalls))
-          .add(header("actual invocations"))
-          .add(invocationHistory.get().size() > 0
-              ? multiline(invocationHistory.get().reverse())
-              : body("none"))
-          .build());
-    }
+    configuration.verifier.thenCalledTimes(numberMatcher, invocationMatcher);
   }
 
   public <T> T thenCalledInOrder(T mock) {
-    return configuration.overrider.override(mock, new Handler() {
-      public Object handle(Invocation invocation) {
-        thenCalledInOrder(configuration.wildcardSupport.matcherize(invocation));
-        return defaultValue(invocation.method.getReturnType());
-      }
-    });
+    return configuration.verifier.thenCalledInOrder(mock);
   }
 
   public void thenCalledInOrder(InvocationMatcher invocationMatcher) {
-    Optional<VerifyingInOrder> verified = verifyInOrder(invocationMatcher, configuration.history.get());
-    if (verified.isPresent()) {
-      configuration.history.add(verified.get());
-    } else {
-      throw assertionError(configuration.pageFormatter
-          .add(header("expected called in order"))
-          .add(body(invocationMatcher))
-          .add(header("but not called"))
-          .add(header("actual invocations"))
-          .add(invocationHistory.get().size() > 0
-              ? multiline(invocationHistory.get().reverse())
-              : body("none"))
-          .build());
-    }
+    configuration.verifier.thenCalledInOrder(invocationMatcher);
   }
 
   private Effect getLastEffect() {
@@ -714,18 +666,6 @@ public class ConfigurableFacade implements Facade {
       public Object invoke() throws Throwable {
         closure.invoke();
         return null;
-      }
-    };
-  }
-
-  private static Matcher exactly(final int number) {
-    return new Matcher() {
-      public boolean matches(Object item) {
-        return item.equals(number);
-      }
-
-      public String toString() {
-        return "" + number;
       }
     };
   }
