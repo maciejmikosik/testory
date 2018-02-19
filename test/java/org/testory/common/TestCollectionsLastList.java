@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestCollectionsLast {
+public class TestCollectionsLastList {
   private Object a, b, c;
 
   @Before
@@ -42,7 +42,7 @@ public class TestCollectionsLast {
   @Test
   public void fails_for_null_list() {
     try {
-      last(null);
+      last((List<?>) null);
       fail();
     } catch (NullPointerException e) {}
   }
