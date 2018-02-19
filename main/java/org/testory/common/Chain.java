@@ -36,6 +36,14 @@ public class Chain<E> implements Iterable<E> {
     return new Chain<>(size + 1, requireNonNull(newElement), this);
   }
 
+  public Chain<E> addAll(Iterable<? extends E> newElements) {
+    Chain<E> chain = this;
+    for (E newElement : newElements) {
+      chain = chain.add(newElement);
+    }
+    return chain;
+  }
+
   public Chain<E> remove() {
     checkHasElement();
     return tail;

@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -75,6 +76,30 @@ public class TestChain {
     chain = chain();
     try {
       chain.add(null);
+      fail();
+    } catch (NullPointerException e) {}
+  }
+
+  @Test
+  public void adds_all_elements() {
+    chain = chain().addAll(asList(a, b, c));
+    assertEquals(chain().add(a).add(b).add(c), chain);
+  }
+
+  @Test
+  public void add_all_forbids_null_elements() {
+    chain = chain();
+    try {
+      chain.addAll(asList(a, null, c));
+      fail();
+    } catch (NullPointerException e) {}
+  }
+
+  @Test
+  public void add_all_forbids_null_iterables() {
+    chain = chain();
+    try {
+      chain.addAll(null);
       fail();
     } catch (NullPointerException e) {}
   }

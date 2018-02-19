@@ -36,9 +36,7 @@ public class VerifyingInOrder {
     Chain<Object> unverified = chain();
     for (Object event : history) {
       if (event instanceof VerifyingInOrder) {
-        for (Object oldEvent : ((VerifyingInOrder) event).unverified) {
-          unverified = unverified.add(oldEvent);
-        }
+        unverified = unverified.addAll(((VerifyingInOrder) event).unverified);
         break;
       } else {
         unverified = unverified.add(event);
