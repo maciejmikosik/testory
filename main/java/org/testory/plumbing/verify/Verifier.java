@@ -6,17 +6,16 @@ import static org.testory.common.Classes.defaultValue;
 import static org.testory.common.Collections.last;
 import static org.testory.common.Matchers.asMatcher;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.VerifyingInOrder.verifyingInOrder;
 import static org.testory.plumbing.format.Body.body;
 import static org.testory.plumbing.format.Header.header;
 import static org.testory.plumbing.format.Multiline.multiline;
 import static org.testory.plumbing.history.FilteredHistory.filter;
+import static org.testory.plumbing.verify.Verified.verified;
 import static org.testory.proxy.Typing.implementing;
 
 import org.testory.common.Chain;
 import org.testory.common.Matcher;
 import org.testory.common.PageFormatter;
-import org.testory.plumbing.VerifyingInOrder;
 import org.testory.plumbing.facade.Facade;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
@@ -86,20 +85,20 @@ public class Verifier {
       }
 
       private void thenCalledInOrder(InvocationMatcher invocationMatcher) {
-        Chain<Object> unverifiedOldest = chain();
+        Chain<Object> remainingFlipped = chain();
         for (Object event : history.get()) {
-          if (event instanceof VerifyingInOrder) {
-            unverifiedOldest = unverifiedOldest.addAll(((VerifyingInOrder) event).unverified);
+          if (event instanceof Verified) {
+            remainingFlipped = remainingFlipped.addAll(((Verified) event).remaining);
             break;
           } else {
-            unverifiedOldest = unverifiedOldest.add(event);
+            remainingFlipped = remainingFlipped.add(event);
           }
         }
-        while (unverifiedOldest.size() > 0) {
-          Object event = unverifiedOldest.get();
-          unverifiedOldest = unverifiedOldest.remove();
+        while (remainingFlipped.size() > 0) {
+          Object event = remainingFlipped.get();
+          remainingFlipped = remainingFlipped.remove();
           if (event instanceof Invocation && invocationMatcher.matches((Invocation) event)) {
-            history.add(verifyingInOrder(unverifiedOldest.reverse()));
+            history.add(verified(remainingFlipped.reverse()));
             return;
           }
         }
