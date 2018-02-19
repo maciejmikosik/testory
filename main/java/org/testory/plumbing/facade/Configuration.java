@@ -22,6 +22,7 @@ public class Configuration {
   public final Maker mockMaker;
   public final Injector injector;
   public final WildcardSupport wildcardSupport;
+  public final Facade verifier;
 
   private Configuration(
       History history,
@@ -32,7 +33,8 @@ public class Configuration {
       Namer mockNamer,
       Maker mockMaker,
       Injector injector,
-      WildcardSupport wildcardSupport) {
+      WildcardSupport wildcardSupport,
+      Facade verifier) {
     this.history = history;
     this.checker = checker;
     this.pageFormatter = pageFormatter;
@@ -42,10 +44,12 @@ public class Configuration {
     this.mockMaker = mockMaker;
     this.injector = injector;
     this.wildcardSupport = wildcardSupport;
+    this.verifier = verifier;
   }
 
   public static Configuration configuration() {
     return new Configuration(
+        null,
         null,
         null,
         null,
@@ -68,7 +72,8 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport);
+        wildcardSupport,
+        verifier);
   }
 
   public Configuration checker(Checker checker) {
@@ -82,7 +87,8 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport);
+        wildcardSupport,
+        verifier);
   }
 
   public Configuration pageFormatter(PageFormatter pageFormatter) {
@@ -96,7 +102,8 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport);
+        wildcardSupport,
+        verifier);
   }
 
   public Configuration exception(Class<? extends RuntimeException> exception) {
@@ -110,7 +117,8 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport);
+        wildcardSupport,
+        verifier);
   }
 
   public Configuration overrider(Overrider overrider) {
@@ -124,7 +132,8 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport);
+        wildcardSupport,
+        verifier);
   }
 
   public Configuration mockNamer(Namer mockNamer) {
@@ -138,7 +147,8 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport);
+        wildcardSupport,
+        verifier);
   }
 
   public Configuration mockMaker(Maker mockMaker) {
@@ -152,7 +162,8 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport);
+        wildcardSupport,
+        verifier);
   }
 
   public Configuration injector(Injector injector) {
@@ -166,7 +177,8 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport);
+        wildcardSupport,
+        verifier);
   }
 
   public Configuration wildcardSupport(WildcardSupport wildcardSupport) {
@@ -180,7 +192,23 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport);
+        wildcardSupport,
+        verifier);
+  }
+
+  public Configuration verifier(Facade verifier) {
+    check(verifier != null);
+    return new Configuration(
+        history,
+        checker,
+        pageFormatter,
+        exception,
+        overrider,
+        mockNamer,
+        mockMaker,
+        injector,
+        wildcardSupport,
+        verifier);
   }
 
   public Configuration validate() {
@@ -193,6 +221,7 @@ public class Configuration {
     check(mockMaker != null);
     check(injector != null);
     check(wildcardSupport != null);
+    check(verifier != null);
     return this;
   }
 }

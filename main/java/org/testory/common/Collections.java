@@ -10,6 +10,10 @@ public class Collections {
     return list.get(list.size() - 1);
   }
 
+  public static <E> E last(E[] array) {
+    return array[array.length - 1];
+  }
+
   public static <E> List<E> flip(List<E> list) {
     List<E> newList = new ArrayList<>(list);
     java.util.Collections.reverse(newList);
