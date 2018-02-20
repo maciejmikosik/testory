@@ -128,7 +128,7 @@ public class ConfigurableFacade implements Facade {
   public <T> T given(final Handler handler, T mock) {
     return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
-        configuration.history.add(stubbed(configuration.wildcardSupport.matcherize(invocation), handler));
+        configuration.history.add(stubbed(configuration.wildcarder.matcherize(invocation), handler));
         return defaultValue(invocation.method.getReturnType());
       }
     });
@@ -163,15 +163,15 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T any(Class<T> type) {
-    return (T) configuration.wildcardSupport.any(type);
+    return (T) configuration.wildcarder.any(type);
   }
 
   public <T> T any(Class<T> type, Object matcher) {
-    return (T) configuration.wildcardSupport.any(type, matcher);
+    return (T) configuration.wildcarder.any(type, matcher);
   }
 
   public <T> T anyInstanceOf(Class<T> type) {
-    return (T) configuration.wildcardSupport.anyInstanceOf(type);
+    return (T) configuration.wildcarder.anyInstanceOf(type);
   }
 
   public boolean a(boolean value) {
@@ -207,11 +207,11 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T a(T value) {
-    return (T) configuration.wildcardSupport.a(value);
+    return (T) configuration.wildcarder.a(value);
   }
 
   public <T> T the(T value) {
-    return (T) configuration.wildcardSupport.the(value);
+    return (T) configuration.wildcarder.the(value);
   }
 
   public void the(boolean value) {
