@@ -1,4 +1,4 @@
-package org.testory.plumbing.im.wildcard;
+package org.testory.plumbing.wildcard;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -20,19 +20,18 @@ import org.testory.common.SequenceFormatter;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
 
-public class WildcardMatcherizer {
+public class Matcherizer {
   private final Formatter formatter;
   private final SequenceFormatter sequenceFormatter;
 
-  private WildcardMatcherizer(Formatter formatter) {
+  private Matcherizer(Formatter formatter) {
     this.formatter = formatter;
     this.sequenceFormatter = sequence(", ", formatter);
   }
 
-  public static WildcardMatcherizer wildcardMatcherizer(
-      Formatter formatter) {
+  public static Matcherizer matcherizer(Formatter formatter) {
     check(formatter != null);
-    return new WildcardMatcherizer(formatter);
+    return new Matcherizer(formatter);
   }
 
   public InvocationMatcher matcherize(WildcardInvocation invocation) {

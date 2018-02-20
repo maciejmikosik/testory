@@ -14,10 +14,10 @@ import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.format.Body.body;
 import static org.testory.plumbing.format.Header.header;
 import static org.testory.plumbing.history.FilteredHistory.filter;
+import static org.testory.plumbing.mock.Stubbed.stubbed;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.proxy.handler.ThrowingHandler.throwing;
@@ -128,14 +128,14 @@ public class ConfigurableFacade implements Facade {
   public <T> T given(final Handler handler, T mock) {
     return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
-        configuration.history.add(stubbing(configuration.wildcardSupport.matcherize(invocation), handler));
+        configuration.history.add(stubbed(configuration.wildcarder.matcherize(invocation), handler));
         return defaultValue(invocation.method.getReturnType());
       }
     });
   }
 
   public void given(Handler handler, InvocationMatcher invocationMatcher) {
-    configuration.history.add(stubbing(invocationMatcher, handler));
+    configuration.history.add(stubbed(invocationMatcher, handler));
   }
 
   public Handler willReturn(final Object object) {
@@ -163,15 +163,15 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T any(Class<T> type) {
-    return (T) configuration.wildcardSupport.any(type);
+    return (T) configuration.wildcarder.any(type);
   }
 
   public <T> T any(Class<T> type, Object matcher) {
-    return (T) configuration.wildcardSupport.any(type, matcher);
+    return (T) configuration.wildcarder.any(type, matcher);
   }
 
   public <T> T anyInstanceOf(Class<T> type) {
-    return (T) configuration.wildcardSupport.anyInstanceOf(type);
+    return (T) configuration.wildcarder.anyInstanceOf(type);
   }
 
   public boolean a(boolean value) {
@@ -207,11 +207,11 @@ public class ConfigurableFacade implements Facade {
   }
 
   public <T> T a(T value) {
-    return (T) configuration.wildcardSupport.a(value);
+    return (T) configuration.wildcarder.a(value);
   }
 
   public <T> T the(T value) {
-    return (T) configuration.wildcardSupport.the(value);
+    return (T) configuration.wildcarder.the(value);
   }
 
   public void the(boolean value) {

@@ -6,9 +6,9 @@ import org.testory.common.PageFormatter;
 import org.testory.plumbing.Checker;
 import org.testory.plumbing.Maker;
 import org.testory.plumbing.history.History;
-import org.testory.plumbing.im.wildcard.WildcardSupport;
 import org.testory.plumbing.inject.Injector;
 import org.testory.plumbing.mock.Namer;
+import org.testory.plumbing.wildcard.Wildcarder;
 import org.testory.proxy.extra.Overrider;
 
 @SuppressWarnings("hiding")
@@ -21,7 +21,7 @@ public class Configuration {
   public final Namer mockNamer;
   public final Maker mockMaker;
   public final Injector injector;
-  public final WildcardSupport wildcardSupport;
+  public final Wildcarder wildcarder;
   public final Facade verifier;
 
   private Configuration(
@@ -33,7 +33,7 @@ public class Configuration {
       Namer mockNamer,
       Maker mockMaker,
       Injector injector,
-      WildcardSupport wildcardSupport,
+      Wildcarder wildcarder,
       Facade verifier) {
     this.history = history;
     this.checker = checker;
@@ -43,7 +43,7 @@ public class Configuration {
     this.mockNamer = mockNamer;
     this.mockMaker = mockMaker;
     this.injector = injector;
-    this.wildcardSupport = wildcardSupport;
+    this.wildcarder = wildcarder;
     this.verifier = verifier;
   }
 
@@ -72,7 +72,7 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport,
+        wildcarder,
         verifier);
   }
 
@@ -87,7 +87,7 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport,
+        wildcarder,
         verifier);
   }
 
@@ -102,7 +102,7 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport,
+        wildcarder,
         verifier);
   }
 
@@ -117,7 +117,7 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport,
+        wildcarder,
         verifier);
   }
 
@@ -132,7 +132,7 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport,
+        wildcarder,
         verifier);
   }
 
@@ -147,7 +147,7 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport,
+        wildcarder,
         verifier);
   }
 
@@ -162,7 +162,7 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport,
+        wildcarder,
         verifier);
   }
 
@@ -177,12 +177,12 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport,
+        wildcarder,
         verifier);
   }
 
-  public Configuration wildcardSupport(WildcardSupport wildcardSupport) {
-    check(wildcardSupport != null);
+  public Configuration wildcarder(Wildcarder wildcarder) {
+    check(wildcarder != null);
     return new Configuration(
         history,
         checker,
@@ -192,7 +192,7 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport,
+        wildcarder,
         verifier);
   }
 
@@ -207,7 +207,7 @@ public class Configuration {
         mockNamer,
         mockMaker,
         injector,
-        wildcardSupport,
+        wildcarder,
         verifier);
   }
 
@@ -220,7 +220,7 @@ public class Configuration {
     check(mockNamer != null);
     check(mockMaker != null);
     check(injector != null);
-    check(wildcardSupport != null);
+    check(wildcarder != null);
     check(verifier != null);
     return this;
   }

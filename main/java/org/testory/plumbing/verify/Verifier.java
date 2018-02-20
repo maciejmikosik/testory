@@ -19,7 +19,7 @@ import org.testory.common.PageFormatter;
 import org.testory.plumbing.facade.Facade;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
-import org.testory.plumbing.im.wildcard.WildcardSupport;
+import org.testory.plumbing.wildcard.Wildcarder;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
 import org.testory.proxy.InvocationMatcher;
@@ -31,12 +31,12 @@ public class Verifier {
       Proxer proxer,
       final Overrider overrider,
       final PageFormatter pageFormatter,
-      final WildcardSupport wildcardSupport,
+      final Wildcarder wildcarder,
       final History history) {
     check(proxer != null);
     check(overrider != null);
     check(pageFormatter != null);
-    check(wildcardSupport != null);
+    check(wildcarder != null);
     check(history != null);
     final FilteredHistory<Invocation> invocationHistory = filter(Invocation.class, history);
     return (Facade) proxer.proxy(implementing(Facade.class), new Handler() {
@@ -48,7 +48,7 @@ public class Verifier {
         } else {
           return overrider.override(last(thenCalledInvocation.arguments), new Handler() {
             public Object handle(Invocation invocation) {
-              verify(thenCalledInvocation, wildcardSupport.matcherize(invocation));
+              verify(thenCalledInvocation, wildcarder.matcherize(invocation));
               return defaultValue(invocation.method.getReturnType());
             }
           });

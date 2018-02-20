@@ -13,16 +13,16 @@ import org.testory.proxy.Typing;
 
 import net.sf.cglib.proxy.Factory;
 
-public class RepeatableProxy implements Proxer {
+public class RepeatableProxer implements Proxer {
   private final Proxer proxer;
 
-  private RepeatableProxy(Proxer proxer) {
+  private RepeatableProxer(Proxer proxer) {
     this.proxer = proxer;
   }
 
   public static Proxer repeatable(Proxer proxer) {
     check(proxer != null);
-    return new RepeatableProxy(proxer);
+    return new RepeatableProxer(proxer);
   }
 
   public Object proxy(Typing typing, Handler handler) {

@@ -1,23 +1,23 @@
-package org.testory.plumbing;
+package org.testory.plumbing.mock;
 
 import static org.testory.plumbing.PlumbingException.check;
 
-public class Mocking {
+public class Mocked {
   public final Object mock;
   public final String name;
 
-  private Mocking(Object mock, String name) {
+  private Mocked(Object mock, String name) {
     this.mock = mock;
     this.name = name;
   }
 
-  public static Mocking mocking(Object mock, String name) {
+  public static Mocked mocked(Object mock, String name) {
     check(mock != null);
     check(name != null);
-    return new Mocking(mock, name);
+    return new Mocked(mock, name);
   }
 
   public String toString() {
-    return "mocking(" + mock + ", " + name + ")";
+    return "mocked(" + mock + ", " + name + ")";
   }
 }

@@ -11,10 +11,6 @@ import static org.testory.plumbing.format.MessageFormatter.messageFormatter;
 import static org.testory.plumbing.format.QuietFormatter.quiet;
 import static org.testory.plumbing.history.RawHistory.newRawHistory;
 import static org.testory.plumbing.history.SynchronizedHistory.synchronize;
-import static org.testory.plumbing.im.wildcard.Repairer.repairer;
-import static org.testory.plumbing.im.wildcard.Tokenizer.tokenizer;
-import static org.testory.plumbing.im.wildcard.WildcardMatcherizer.wildcardMatcherizer;
-import static org.testory.plumbing.im.wildcard.WildcardSupport.wildcardSupport;
 import static org.testory.plumbing.inject.ArrayMaker.singletonArray;
 import static org.testory.plumbing.inject.ChainedMaker.chain;
 import static org.testory.plumbing.inject.FinalMaker.finalMaker;
@@ -25,12 +21,16 @@ import static org.testory.plumbing.mock.RawMockMaker.rawMockMaker;
 import static org.testory.plumbing.mock.SaneMockMaker.sane;
 import static org.testory.plumbing.mock.UniqueNamer.uniqueNamer;
 import static org.testory.plumbing.verify.Verifier.verifier;
+import static org.testory.plumbing.wildcard.Matcherizer.matcherizer;
+import static org.testory.plumbing.wildcard.Repairer.repairer;
+import static org.testory.plumbing.wildcard.Tokenizer.tokenizer;
+import static org.testory.plumbing.wildcard.Wildcarder.wildcarder;
 import static org.testory.proxy.extra.Overrider.overrider;
 import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
 import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
 import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
 import static org.testory.proxy.proxer.NonFinalProxer.nonFinal;
-import static org.testory.proxy.proxer.RepeatableProxy.repeatable;
+import static org.testory.proxy.proxer.RepeatableProxer.repeatable;
 import static org.testory.proxy.proxer.TypeSafeProxer.typeSafe;
 
 import org.testory.common.PageFormatter;
@@ -40,7 +40,7 @@ import org.testory.plumbing.facade.Configuration;
 import org.testory.plumbing.facade.Facade;
 import org.testory.plumbing.format.QuietFormatter;
 import org.testory.plumbing.history.History;
-import org.testory.plumbing.im.wildcard.WildcardSupport;
+import org.testory.plumbing.wildcard.Wildcarder;
 import org.testory.proxy.Proxer;
 import org.testory.proxy.extra.Overrider;
 
@@ -54,11 +54,11 @@ public class TestoryFacade {
     Proxer proxer = nonFinal(typeSafe(jdkCollections(fixObjectBug(repeatable(cglibProxer())))));
     Overrider overrider = overrider(proxer);
     Maker mockMaker = sane(history, nice(history, rawMockMaker(history, checkingProxer(checker, proxer))));
-    WildcardSupport wildcardSupport = wildcardSupport(
+    Wildcarder wildcarder = wildcarder(
         history,
         tokenizer(proxer),
         repairer(checker),
-        wildcardMatcherizer(formatter),
+        matcherizer(formatter),
         formatter);
 
     Configuration configuration = configuration()
@@ -70,8 +70,8 @@ public class TestoryFacade {
         .mockNamer(uniqueNamer(history))
         .mockMaker(mockMaker)
         .injector(injector(singletonArray(chain(randomPrimitiveMaker(), finalMaker(), mockMaker))))
-        .wildcardSupport(wildcardSupport)
-        .verifier(verifier(proxer, overrider, pageFormatter, wildcardSupport, history))
+        .wildcarder(wildcarder)
+        .verifier(verifier(proxer, overrider, pageFormatter, wildcarder, history))
         .validate();
 
     return checking(checker, proxer, purging(history, proxer, configurableFacade(configuration)));

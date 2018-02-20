@@ -7,19 +7,20 @@ import java.lang.reflect.Constructor;
 import org.testory.common.Matchers;
 import org.testory.plumbing.history.FilteredHistory;
 import org.testory.plumbing.history.History;
+import org.testory.plumbing.mock.Mocked;
 
 public class Checker {
-  private final FilteredHistory<Mocking> mockingHistory;
+  private final FilteredHistory<Mocked> mockedHistory;
   private final FilteredHistory<Inspecting> inspectingHistory;
   private final Constructor<? extends RuntimeException> constructorString;
   private final Constructor<? extends RuntimeException> constructorThrowable;
 
   private Checker(
-      FilteredHistory<Mocking> mockingHistory,
+      FilteredHistory<Mocked> mockedHistory,
       FilteredHistory<Inspecting> inspectingHistory,
       Constructor<? extends RuntimeException> constructorString,
       Constructor<? extends RuntimeException> constructorThrowable) {
-    this.mockingHistory = mockingHistory;
+    this.mockedHistory = mockedHistory;
     this.inspectingHistory = inspectingHistory;
     this.constructorString = constructorString;
     this.constructorThrowable = constructorThrowable;
@@ -28,7 +29,7 @@ public class Checker {
   public static Checker checker(History history, Class<? extends RuntimeException> exceptionType) {
     try {
       return new Checker(
-          filter(Mocking.class, history),
+          filter(Mocked.class, history),
           filter(Inspecting.class, history),
           exceptionType.getConstructor(String.class),
           exceptionType.getConstructor(Throwable.class));
@@ -52,8 +53,8 @@ public class Checker {
 
   public void mock(Object mock) {
     notNull(mock);
-    for (Mocking mocking : mockingHistory.get()) {
-      if (mocking.mock == mock) {
+    for (Mocked mocked : mockedHistory.get()) {
+      if (mocked.mock == mock) {
         return;
       }
     }

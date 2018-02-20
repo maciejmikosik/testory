@@ -18,7 +18,7 @@ import static org.testory.proxy.handler.ThrowingHandler.throwing;
 import static org.testory.proxy.proxer.CglibProxer.cglibProxer;
 import static org.testory.proxy.proxer.FixObjectBugProxer.fixObjectBug;
 import static org.testory.proxy.proxer.JdkCollectionsProxer.jdkCollections;
-import static org.testory.proxy.proxer.RepeatableProxy.repeatable;
+import static org.testory.proxy.proxer.RepeatableProxer.repeatable;
 import static org.testory.proxy.proxer.Tester.tester;
 import static org.testory.testing.Fakes.newObject;
 import static org.testory.testing.Fakes.newThrowable;

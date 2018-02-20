@@ -1,4 +1,4 @@
-package org.testory.plumbing.im.wildcard;
+package org.testory.plumbing.wildcard;
 
 import static org.testory.plumbing.PlumbingException.check;
 
