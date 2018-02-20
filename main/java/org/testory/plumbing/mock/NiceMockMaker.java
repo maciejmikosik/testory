@@ -2,10 +2,9 @@ package org.testory.plumbing.mock;
 
 import static org.testory.common.Classes.defaultValue;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.Stubbing.stubbing;
+import static org.testory.plumbing.mock.Stubbed.stubbed;
 
 import org.testory.plumbing.Maker;
-import org.testory.plumbing.Stubbing;
 import org.testory.plumbing.history.History;
 import org.testory.proxy.Handler;
 import org.testory.proxy.Invocation;
@@ -30,12 +29,12 @@ public class NiceMockMaker implements Maker {
     check(type != null);
     check(name != null);
     T mock = mockMaker.make(type, name);
-    history.add(stubbingNice(mock));
+    history.add(stubbedNice(mock));
     return mock;
   }
 
-  private static Stubbing stubbingNice(Object mock) {
-    return stubbing(onInstance(mock), new Handler() {
+  private static Stubbed stubbedNice(Object mock) {
+    return stubbed(onInstance(mock), new Handler() {
       public Object handle(Invocation invocation) {
         return defaultValue(invocation.method.getReturnType());
       }

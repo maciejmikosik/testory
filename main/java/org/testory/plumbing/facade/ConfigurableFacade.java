@@ -14,10 +14,10 @@ import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Inspecting.inspecting;
 import static org.testory.plumbing.PlumbingException.check;
-import static org.testory.plumbing.Stubbing.stubbing;
 import static org.testory.plumbing.format.Body.body;
 import static org.testory.plumbing.format.Header.header;
 import static org.testory.plumbing.history.FilteredHistory.filter;
+import static org.testory.plumbing.mock.Stubbed.stubbed;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.proxy.handler.ThrowingHandler.throwing;
@@ -128,14 +128,14 @@ public class ConfigurableFacade implements Facade {
   public <T> T given(final Handler handler, T mock) {
     return configuration.overrider.override(mock, new Handler() {
       public Object handle(Invocation invocation) {
-        configuration.history.add(stubbing(configuration.wildcardSupport.matcherize(invocation), handler));
+        configuration.history.add(stubbed(configuration.wildcardSupport.matcherize(invocation), handler));
         return defaultValue(invocation.method.getReturnType());
       }
     });
   }
 
   public void given(Handler handler, InvocationMatcher invocationMatcher) {
-    configuration.history.add(stubbing(invocationMatcher, handler));
+    configuration.history.add(stubbed(invocationMatcher, handler));
   }
 
   public Handler willReturn(final Object object) {
