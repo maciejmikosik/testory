@@ -4,7 +4,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.deepEquals;
 import static org.testory.common.Checks.checkArgument;
-import static org.testory.common.Checks.checkNotNull;
 import static org.testory.common.Classes.setAccessible;
 import static org.testory.common.ObjectFormatter.objectFormatter;
 import static org.testory.common.SequenceFormatter.sequence;
@@ -55,10 +54,8 @@ public class Matchers {
   }
 
   public static Matcher arrayOf(List<Matcher> elementsMatchers) {
-    for (Matcher matcher : elementsMatchers) {
-      checkNotNull(matcher);
-    }
     final List<Matcher> matchers = new ArrayList<>(elementsMatchers);
+    checkArgument(!matchers.contains(null));
     return new Matcher() {
       public boolean matches(Object item) {
         return item != null && item.getClass().isArray()
@@ -81,10 +78,8 @@ public class Matchers {
   }
 
   public static Matcher listOf(List<Matcher> elementsMatchers) {
-    for (Matcher matcher : elementsMatchers) {
-      checkNotNull(matcher);
-    }
     final List<Matcher> matchers = new ArrayList<>(elementsMatchers);
+    checkArgument(!matchers.contains(null));
     return new Matcher() {
       public boolean matches(Object item) {
         return item instanceof List<?> && matchers.size() == ((List<?>) item).size()

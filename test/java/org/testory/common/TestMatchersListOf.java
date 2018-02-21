@@ -94,7 +94,7 @@ public class TestMatchersListOf {
     try {
       listOf(asList(m, null, m));
       fail();
-    } catch (NullPointerException e) {}
+    } catch (IllegalArgumentException e) {}
   }
 
   @Test

@@ -1,8 +1,8 @@
 package org.testory.common;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.requireNonNull;
 import static org.testory.common.Checks.checkArgument;
-import static org.testory.common.Checks.checkNotNull;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class Classes {
   public static void setAccessible(final AccessibleObject accessible) {
-    checkNotNull(accessible);
+    requireNonNull(accessible);
     AccessController.doPrivileged(new PrivilegedAction<Void>() {
       public Void run() {
         accessible.setAccessible(true);
@@ -25,10 +25,10 @@ public class Classes {
   }
 
   public static boolean hasMethod(String name, Class<?>[] parameters, Class<?> type) {
-    checkNotNull(name);
-    checkNotNull(parameters);
+    requireNonNull(name);
+    requireNonNull(parameters);
     checkArgument(!asList(parameters).contains(null));
-    checkNotNull(type);
+    requireNonNull(type);
     try {
       type.getMethod(name, parameters);
       return true;
@@ -38,7 +38,7 @@ public class Classes {
   }
 
   public static boolean canAssign(@Nullable Object instance, Class<?> type) {
-    checkNotNull(type);
+    requireNonNull(type);
     return type.isPrimitive()
         ? canConvert(instance, type)
         : instance == null || type.isAssignableFrom(instance.getClass());
@@ -74,13 +74,13 @@ public class Classes {
   }
 
   public static boolean canReturn(@Nullable Object object, Method method) {
-    checkNotNull(method);
+    requireNonNull(method);
     return canAssign(object, method.getReturnType());
   }
 
   public static boolean canThrow(Throwable throwable, Method method) {
-    checkNotNull(throwable);
-    checkNotNull(method);
+    requireNonNull(throwable);
+    requireNonNull(method);
     for (Class<?> exceptionType : method.getExceptionTypes()) {
       if (exceptionType.isInstance(throwable)) {
         return true;
@@ -90,8 +90,8 @@ public class Classes {
   }
 
   public static boolean canInvoke(Method method, @Nullable Object instance, Object... arguments) {
-    checkNotNull(method);
-    checkNotNull(arguments);
+    requireNonNull(method);
+    requireNonNull(arguments);
     return correctInstance(instance, method) && correctArguments(arguments, method);
   }
 
@@ -114,7 +114,7 @@ public class Classes {
   }
 
   public static <T> T defaultValue(Class<T> type) {
-    checkNotNull(type);
+    requireNonNull(type);
     return (T) defaultValues.get(type);
   }
 
@@ -134,7 +134,7 @@ public class Classes {
   }
 
   public static Class<?> tryWrap(Class<?> type) {
-    checkNotNull(type);
+    requireNonNull(type);
     return wrapping.containsKey(type)
         ? wrapping.get(type)
         : type;

@@ -100,7 +100,7 @@ public class TestMatchersArrayOf {
     try {
       arrayOf(asList(m, null, m));
       fail();
-    } catch (NullPointerException e) {}
+    } catch (IllegalArgumentException e) {}
   }
 
   @Test

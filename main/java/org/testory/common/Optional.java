@@ -1,6 +1,6 @@
 package org.testory.common;
 
-import static org.testory.common.Checks.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 import java.util.NoSuchElementException;
 
@@ -27,7 +27,6 @@ public class Optional<T> {
   }
 
   public static <T> Optional<T> of(T value) {
-    checkNotNull(value);
-    return new Optional<>(value);
+    return new Optional<>(requireNonNull(value));
   }
 }

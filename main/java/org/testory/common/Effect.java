@@ -1,6 +1,6 @@
 package org.testory.common;
 
-import static org.testory.common.Checks.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 public abstract class Effect {
   private Effect() {}
@@ -51,7 +51,6 @@ public abstract class Effect {
   }
 
   public static Thrown thrown(Throwable throwable) {
-    checkNotNull(throwable);
-    return new Thrown(throwable);
+    return new Thrown(requireNonNull(throwable));
   }
 }
