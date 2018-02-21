@@ -1,6 +1,6 @@
 package org.testory.common;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static org.testory.common.Checks.checkArgument;
 
@@ -9,7 +9,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,19 +21,6 @@ public class Classes {
         return null;
       }
     });
-  }
-
-  public static boolean hasMethod(String name, Class<?>[] parameters, Class<?> type) {
-    requireNonNull(name);
-    requireNonNull(parameters);
-    checkArgument(!asList(parameters).contains(null));
-    requireNonNull(type);
-    try {
-      type.getMethod(name, parameters);
-      return true;
-    } catch (NoSuchMethodException e) {
-      return false;
-    }
   }
 
   public static boolean canAssign(@Nullable Object instance, Class<?> type) {
@@ -130,7 +116,7 @@ public class Classes {
     map.put(long.class, 0L);
     map.put(float.class, 0f);
     map.put(double.class, 0.0);
-    return Collections.unmodifiableMap(map);
+    return unmodifiableMap(map);
   }
 
   public static Class<?> tryWrap(Class<?> type) {
@@ -153,6 +139,6 @@ public class Classes {
     map.put(long.class, Long.class);
     map.put(float.class, Float.class);
     map.put(double.class, Double.class);
-    return Collections.unmodifiableMap(map);
+    return unmodifiableMap(map);
   }
 }

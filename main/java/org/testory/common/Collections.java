@@ -27,10 +27,4 @@ public class Collections {
   public static <E> Set<E> immutable(Set<? extends E> set) {
     return java.util.Collections.unmodifiableSet(new HashSet<>(set));
   }
-
-  public static <T> List<T> reverse(List<T> list) {
-    ArrayList<T> result = new ArrayList<>(list);
-    java.util.Collections.reverse(result);
-    return result;
-  }
 }
