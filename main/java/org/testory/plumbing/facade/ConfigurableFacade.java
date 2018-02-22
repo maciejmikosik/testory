@@ -145,7 +145,7 @@ public class ConfigurableFacade implements Facade {
     configuration.history.add(stubbed(invocationMatcher, handler));
   }
 
-  public Handler willReturn(final Object object) {
+  public Handler willReturn(Object object) {
     return returning(object);
   }
 
@@ -157,7 +157,7 @@ public class ConfigurableFacade implements Facade {
     };
   }
 
-  public Handler willRethrow(final Throwable throwable) {
+  public Handler willRethrow(Throwable throwable) {
     return throwing(throwable);
   }
 
