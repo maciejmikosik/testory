@@ -2,6 +2,7 @@ package org.testory.proxy;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Objects.hash;
 import static org.testory.common.Collections.immutable;
 import static org.testory.proxy.ProxyException.check;
 
@@ -81,7 +82,7 @@ public class Typing {
   }
 
   public int hashCode() {
-    return ((0xFFFF + superclass.hashCode()) * 0xFFFF + interfaces.hashCode()) * 0xFFFF;
+    return hash(superclass, interfaces);
   }
 
   public String toString() {
