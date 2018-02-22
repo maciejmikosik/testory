@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -56,6 +57,6 @@ public class TestMatchersSame {
 
   @Test
   public void prints() {
-    assertEquals("same(" + object + ")", same(object).toString());
+    assertEquals(format("same(%s)", object), same(object).toString());
   }
 }

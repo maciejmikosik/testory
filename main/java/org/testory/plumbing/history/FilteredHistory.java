@@ -47,16 +47,7 @@ public class FilteredHistory<T> {
     if (processing.size() == 0) {
       filtered = filtering.reverse();
     } else {
-      filtered = link(filtered, filtering);
+      filtered = filtered.addAll(filtering);
     }
-  }
-
-  /** TODO create Chain.link */
-  private static <T> Chain<T> link(Chain<? extends T> first, Chain<? extends T> second) {
-    Chain<T> linking = (Chain<T>) first;
-    for (T element : second) {
-      linking = linking.add(element);
-    }
-    return linking;
   }
 }

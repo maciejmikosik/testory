@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
@@ -49,13 +50,15 @@ public class TestThenReturned {
       thenReturned();
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
+      assertEquals(format("\n"
           + "  expected returned\n"
           + "    \n"
           + "  but thrown\n"
-          + "    " + throwable + "\n"
+          + "    %s\n"
           + "\n"
-          + printStackTrace(throwable),
+          + "%s",
+          throwable,
+          printStackTrace(throwable)),
           e.getMessage());
     }
   }

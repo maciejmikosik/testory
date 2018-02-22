@@ -1,6 +1,7 @@
 package org.testory.common;
 
-import static org.testory.common.Checks.checkNotNull;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 public abstract class Effect {
   private Effect() {}
@@ -18,7 +19,7 @@ public abstract class Effect {
     }
 
     public String toString() {
-      return "returned(" + object + ")";
+      return format("returned(%s)", object);
     }
   }
 
@@ -38,7 +39,7 @@ public abstract class Effect {
     }
 
     public String toString() {
-      return "thrown(" + throwable + ")";
+      return format("thrown(%s)", throwable);
     }
   }
 
@@ -51,7 +52,6 @@ public abstract class Effect {
   }
 
   public static Thrown thrown(Throwable throwable) {
-    checkNotNull(throwable);
-    return new Thrown(throwable);
+    return new Thrown(requireNonNull(throwable));
   }
 }

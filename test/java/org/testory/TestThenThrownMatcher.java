@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenThrown;
@@ -44,13 +45,17 @@ public class TestThenThrownMatcher {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected thrown\n"
-          + "    " + matcher + "\n"
-          + "  but thrown\n"
-          + "    " + otherThrowable + "\n"
-          + "\n"
-          + printStackTrace(otherThrowable),
+      assertEquals(
+          format("\n"
+              + "  expected thrown\n"
+              + "    %s\n"
+              + "  but thrown\n"
+              + "    %s\n"
+              + "\n"
+              + "%s",
+              matcher,
+              otherThrowable,
+              printStackTrace(otherThrowable)),
           e.getMessage());
     }
   }
@@ -63,15 +68,20 @@ public class TestThenThrownMatcher {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected thrown\n"
-          + "    " + matcher + "\n"
-          + "  but thrown\n"
-          + "    " + throwable + "\n"
-          + "  diagnosis\n"
-          + "    " + diagnosed(throwable) + "\n"
-          + "\n"
-          + printStackTrace(throwable),
+      assertEquals(
+          format("\n"
+              + "  expected thrown\n"
+              + "    %s\n"
+              + "  but thrown\n"
+              + "    %s\n"
+              + "  diagnosis\n"
+              + "    %s\n"
+              + "\n"
+              + "%s",
+              matcher,
+              throwable,
+              diagnosed(throwable),
+              printStackTrace(throwable)),
           e.getMessage());
     }
   }
@@ -84,11 +94,14 @@ public class TestThenThrownMatcher {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected thrown\n"
-          + "    " + matcher + "\n"
-          + "  but returned\n"
-          + "    " + object + "\n",
+      assertEquals(
+          format("\n"
+              + "  expected thrown\n"
+              + "    %s\n"
+              + "  but returned\n"
+              + "    %s\n",
+              matcher,
+              object),
           e.getMessage());
     }
   }
@@ -101,11 +114,13 @@ public class TestThenThrownMatcher {
       thenThrown(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected thrown\n"
-          + "    " + matcher + "\n"
-          + "  but returned\n"
-          + "    void\n",
+      assertEquals(
+          format("\n"
+              + "  expected thrown\n"
+              + "    %s\n"
+              + "  but returned\n"
+              + "    void\n",
+              matcher),
           e.getMessage());
     }
   }

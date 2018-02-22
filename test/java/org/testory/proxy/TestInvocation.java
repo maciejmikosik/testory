@@ -1,5 +1,6 @@
 package org.testory.proxy;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -239,7 +240,8 @@ public class TestInvocation {
   @Test
   public void implements_to_string() {
     invocation = invocation(method, instance, arguments);
-    assertEquals("invocation(" + method + ", " + instance + ", " + arguments + ")",
+    assertEquals(
+        format("invocation(%s, %s, %s)", method, instance, arguments),
         invocation.toString());
   }
 

@@ -1,5 +1,6 @@
 package org.testory.proxy.proxer;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertTrue;
 import static org.testory.proxy.Typing.subclassing;
 import static org.testory.proxy.handler.ReturningHandler.returning;
@@ -37,7 +38,7 @@ public class Tester {
   }
 
   public Tester canProxy(Typing incoming, Typing outgoing) {
-    String message = incoming + " " + outgoing;
+    String message = format("%s %s", incoming, outgoing);
     Object proxy = proxer.proxy(incoming, returning(null));
     assertTrue(message, outgoing.superclass.isInstance(proxy));
     for (Class<?> type : outgoing.interfaces) {

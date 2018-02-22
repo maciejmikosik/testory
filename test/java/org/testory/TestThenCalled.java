@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
@@ -117,7 +118,7 @@ public class TestThenCalled {
       }
 
       public String toString() {
-        return "onInstance(" + mock + ")";
+        return format("onInstance(%s)", mock);
       }
     };
   }

@@ -1,6 +1,6 @@
 package org.testory.common;
 
-import static org.testory.common.Checks.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -8,13 +8,13 @@ import java.io.StringWriter;
 public class Throwables {
   /**
    * usage
-   * 
+   *
    * <pre>
    * throw gently(anyThrowable);
    * </pre>
    */
   public static RuntimeException gently(Throwable throwable) {
-    checkNotNull(throwable);
+    requireNonNull(throwable);
     if (throwable instanceof RuntimeException) {
       throw (RuntimeException) throwable;
     } else if (throwable instanceof Error) {

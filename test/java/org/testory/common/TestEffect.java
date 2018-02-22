@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -65,13 +66,13 @@ public class TestEffect {
   @Test
   public void prints_returned_object() {
     effect = returned(object);
-    assertEquals("returned(" + object + ")", effect.toString());
+    assertEquals(format("returned(%s)", object), effect.toString());
   }
 
   @Test
   public void prints_returned_null() {
     effect = returned(null);
-    assertEquals("returned(" + null + ")", effect.toString());
+    assertEquals("returned(null)", effect.toString());
   }
 
   @Test
@@ -83,6 +84,6 @@ public class TestEffect {
   @Test
   public void prints_thrown_throwable() {
     effect = thrown(throwable);
-    assertEquals("thrown(" + throwable + ")", effect.toString());
+    assertEquals(format("thrown(%s)", throwable), effect.toString());
   }
 }

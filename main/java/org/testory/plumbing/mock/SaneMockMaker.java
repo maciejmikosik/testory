@@ -34,7 +34,7 @@ public class SaneMockMaker implements Maker {
     check(type != null);
     check(name != null);
     T mock = mockMaker.make(type, name);
-    history.add(stubbedEquals(mock, name));
+    history.add(stubbedEquals(mock));
     history.add(stubbedHashCode(mock, name));
     history.add(stubbedToString(mock, name));
     if (Throwable.class.isAssignableFrom(type)) {
@@ -46,7 +46,7 @@ public class SaneMockMaker implements Maker {
     return mock;
   }
 
-  private static Stubbed stubbedEquals(final Object mock, String name) {
+  private static Stubbed stubbedEquals(final Object mock) {
     return stubbed(onInvocation(mock, "equals", Object.class), new Handler() {
       public Object handle(Invocation invocation) {
         return mock == invocation.arguments.get(0);

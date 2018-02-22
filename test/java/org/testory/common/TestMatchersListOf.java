@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -77,7 +78,9 @@ public class TestMatchersListOf {
   @Test
   public void prints_matchers() {
     matcher = listOf(asList(ma, mb, mc));
-    assertEquals("listOf(" + ma + ", " + mb + ", " + mc + ")", matcher.toString());
+    assertEquals(
+        format("listOf(%s, %s, %s)", ma, mb, mc),
+        matcher.toString());
   }
 
   @Test
@@ -94,7 +97,7 @@ public class TestMatchersListOf {
     try {
       listOf(asList(m, null, m));
       fail();
-    } catch (NullPointerException e) {}
+    } catch (IllegalArgumentException e) {}
   }
 
   @Test
@@ -112,7 +115,7 @@ public class TestMatchersListOf {
       }
 
       public String toString() {
-        return "same(" + instance + ")";
+        return format("same(%s)", instance);
       }
     };
   }

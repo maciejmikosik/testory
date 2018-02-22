@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -49,6 +50,6 @@ public class TestMatchersEqualDeep {
 
   @Test
   public void prints() {
-    assertEquals("equalDeep(" + object + ")", equalDeep(object).toString());
+    assertEquals(format("equalDeep(%s)", object), equalDeep(object).toString());
   }
 }

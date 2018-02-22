@@ -1,5 +1,6 @@
 package org.testory.plumbing.mock;
 
+import static java.lang.String.format;
 import static org.testory.common.Classes.defaultValue;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.mock.Stubbed.stubbed;
@@ -48,7 +49,7 @@ public class NiceMockMaker implements Maker {
       }
 
       public String toString() {
-        return "onInstance(" + mock + ")";
+        return format("onInstance(%s)", mock);
       }
     };
   }

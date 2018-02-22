@@ -160,7 +160,7 @@ public class Testory {
     return getFacade().onReturn(type);
   }
 
-  public static InvocationMatcher onRequest(Class<?> type, final Object... arguments) {
+  public static InvocationMatcher onRequest(Class<?> type, Object... arguments) {
     return getFacade().onRequest(type, arguments);
   }
 

@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -74,11 +75,11 @@ public class TestInvocationMatchers {
 
   @Test
   public void invocation_matchers_are_printable() {
-    assertEquals("onInstance(" + mock + ")", onInstance(mock).toString());
-    assertEquals("onReturn(" + type.getName() + ")", onReturn(type).toString());
-    assertEquals("onRequest(" + type.getName() + ", " + argument + ")",
+    assertEquals(format("onInstance(%s)", mock), onInstance(mock).toString());
+    assertEquals(format("onReturn(%s)", type.getName()), onReturn(type).toString());
+    assertEquals(format("onRequest(%s, %s)", type.getName(), argument),
         onRequest(type, argument).toString());
-    assertEquals("onRequest(" + type.getName() + ")", onRequest(type).toString());
+    assertEquals(format("onRequest(%s)", type.getName()), onRequest(type).toString());
   }
 
   @Test

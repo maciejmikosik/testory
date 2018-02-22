@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenThrown;
@@ -38,13 +39,17 @@ public class TestThenThrownThrowable {
       thenThrown(throwable);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected thrown\n"
-          + "    " + throwable + "\n"
-          + "  but thrown\n"
-          + "    " + otherThrowable + "\n"
-          + "\n"
-          + printStackTrace(otherThrowable),
+      assertEquals(
+          format("\n"
+              + "  expected thrown\n"
+              + "    %s\n"
+              + "  but thrown\n"
+              + "    %s\n"
+              + "\n"
+              + "%s",
+              throwable,
+              otherThrowable,
+              printStackTrace(otherThrowable)),
           e.getMessage());
     }
   }
@@ -56,11 +61,14 @@ public class TestThenThrownThrowable {
       thenThrown(throwable);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected thrown\n"
-          + "    " + throwable + "\n"
-          + "  but returned\n"
-          + "    " + object + "\n",
+      assertEquals(
+          format("\n"
+              + "  expected thrown\n"
+              + "    %s\n"
+              + "  but returned\n"
+              + "    %s\n",
+              throwable,
+              object),
           e.getMessage());
     }
   }
@@ -72,11 +80,13 @@ public class TestThenThrownThrowable {
       thenThrown(throwable);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected thrown\n"
-          + "    " + throwable + "\n"
-          + "  but returned\n"
-          + "    void\n",
+      assertEquals(
+          format("\n"
+              + "  expected thrown\n"
+              + "    %s\n"
+              + "  but returned\n"
+              + "    void\n",
+              throwable),
           e.getMessage());
     }
   }

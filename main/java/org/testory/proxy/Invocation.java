@@ -1,6 +1,8 @@
 package org.testory.proxy;
 
+import static java.lang.String.format;
 import static java.util.Objects.deepEquals;
+import static java.util.Objects.hash;
 import static org.testory.common.Classes.canInvoke;
 import static org.testory.common.Classes.setAccessible;
 import static org.testory.common.Collections.immutable;
@@ -60,10 +62,10 @@ public class Invocation {
   }
 
   public int hashCode() {
-    return (method.hashCode() * 0xFFFF + instance.hashCode()) * 0xFFFF + arguments.hashCode();
+    return hash(method, instance, arguments);
   }
 
   public String toString() {
-    return "invocation(" + method + ", " + instance + ", " + arguments + ")";
+    return format("invocation(%s, %s, %s)", method, instance, arguments);
   }
 }

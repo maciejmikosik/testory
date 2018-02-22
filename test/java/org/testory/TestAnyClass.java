@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNotSame;
@@ -105,7 +106,7 @@ public class TestAnyClass {
       fail();
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(
-          mock + ".returnObject(any(" + Object.class.getName() + ", " + matcher + "))"));
+          format("%s.returnObject(any(%s, %s))", mock, Object.class.getName(), matcher)));
     }
   }
 
@@ -116,7 +117,7 @@ public class TestAnyClass {
       fail();
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(
-          mock + ".returnObject(any(" + Object.class.getName() + "))"));
+          format("%s.returnObject(any(%s))", mock, Object.class.getName())));
     }
   }
 
@@ -127,7 +128,7 @@ public class TestAnyClass {
       fail();
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(
-          mock + ".varargs(" + object + ", [any(" + Object.class.getName() + ")])"));
+          format("%s.varargs(%s, [any(%s)])", mock, object, Object.class.getName())));
     }
   }
 

@@ -23,7 +23,7 @@ public class ObjectFormatter implements Formatter {
   }
 
   private String formatArray(Object array) {
-    return "[" + sequence(", ", this).format(arrayAsIterable(array)) + "]";
+    return String.format("[%s]", sequence(", ", this).format(arrayAsIterable(array)));
   }
 
   private Iterable<Object> arrayAsIterable(final Object array) {

@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
@@ -44,11 +45,14 @@ public class TestThenReturnedMatcher {
       thenReturned(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected returned\n"
-          + "    " + matcher + "\n"
-          + "  but returned\n"
-          + "    " + otherObject + "\n",
+      assertEquals(
+          format("\n"
+              + "  expected returned\n"
+              + "    %s\n"
+              + "  but returned\n"
+              + "    %s\n",
+              matcher,
+              otherObject),
           e.getMessage());
     }
   }
@@ -61,13 +65,17 @@ public class TestThenReturnedMatcher {
       thenReturned(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected returned\n"
-          + "    " + matcher + "\n"
-          + "  but returned\n"
-          + "    " + object + "\n"
-          + "  diagnosis\n"
-          + "    " + diagnosed(object) + "\n",
+      assertEquals(
+          format("\n"
+              + "  expected returned\n"
+              + "    %s\n"
+              + "  but returned\n"
+              + "    %s\n"
+              + "  diagnosis\n"
+              + "    %s\n",
+              matcher,
+              object,
+              diagnosed(object)),
           e.getMessage());
     }
   }
@@ -87,11 +95,13 @@ public class TestThenReturnedMatcher {
       thenReturned(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected returned\n"
-          + "    " + matcher + "\n"
-          + "  but returned\n"
-          + "    void\n",
+      assertEquals(
+          format("\n"
+              + "  expected returned\n"
+              + "    %s\n"
+              + "  but returned\n"
+              + "    void\n",
+              matcher),
           e.getMessage());
     }
   }
@@ -104,13 +114,17 @@ public class TestThenReturnedMatcher {
       thenReturned(matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected returned\n"
-          + "    " + matcher + "\n"
-          + "  but thrown\n"
-          + "    " + throwable + "\n"
-          + "\n"
-          + printStackTrace(throwable),
+      assertEquals(
+          format("\n"
+              + "  expected returned\n"
+              + "    %s\n"
+              + "  but thrown\n"
+              + "    %s\n"
+              + "\n"
+              + "%s",
+              matcher,
+              throwable,
+              printStackTrace(throwable)),
           e.getMessage());
     }
   }

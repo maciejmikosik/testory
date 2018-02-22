@@ -17,7 +17,7 @@ public class HamcrestMatchers {
       }
 
       public void describeTo(Description description) {
-        description.appendText("hasMessageContaining(" + message + ")");
+        description.appendText(format("hasMessageContaining(%s)", message));
       }
     };
   }
@@ -29,7 +29,7 @@ public class HamcrestMatchers {
       }
 
       public void describeTo(Description description) {
-        description.appendText("hasMessageContaining(" + substring + ")");
+        description.appendText(format("hasMessageContaining(%s)", substring));
       }
     };
   }
@@ -41,7 +41,7 @@ public class HamcrestMatchers {
       }
 
       public void describeTo(Description description) {
-        description.appendText("hasMessageMatching(" + regex + ")");
+        description.appendText(format("hasMessageMatching(%s)", regex));
       }
     };
   }

@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
@@ -182,28 +183,28 @@ public class TestMatchingInvocations {
       fail();
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(
-          mock + ".invoke()"));
+          format("%s.invoke()", mock)));
     }
     try {
       thenCalled(mock).returnObject(object);
       fail();
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(
-          mock + ".returnObject(" + object + ")"));
+          format("%s.returnObject(%s)", mock, object)));
     }
     try {
       thenCalled(mock).acceptObjects(object, otherObject);
       fail();
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(
-          mock + ".acceptObjects(" + object + ", " + otherObject + ")"));
+          format("%s.acceptObjects(%s, %s)", mock, object, otherObject)));
     }
     try {
       thenCalled(mock).varargs(object, otherObject);
       fail();
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(
-          mock + ".varargs(" + object + ", [" + otherObject + "])"));
+          format("%s.varargs(%s, [%s])", mock, object, otherObject)));
     }
   }
 
