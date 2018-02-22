@@ -46,7 +46,7 @@ public class TestSequenceFormatter {
   public void formats_elements() {
     sequenceFormatter = sequence(separator, formatter);
     assertEquals(
-        formatter.format(a) + separator + formatter.format(b) + separator + formatter.format(c),
+        format("%s%s%s%s%s", formatter.format(a), separator, formatter.format(b), separator, formatter.format(c)),
         sequenceFormatter.format(asIterable(asList(a, b, c))));
   }
 

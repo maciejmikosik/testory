@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.testory.common.ObjectFormatter.objectFormatter;
 import static org.testory.testing.Fakes.newObject;
@@ -37,35 +38,35 @@ public class TestObjectFormatter {
   @Test
   public void formats_single_object_array() {
     assertEquals(
-        "[" + a + "]",
+        format("[%s]", a),
         formatter.format(new Object[] { a }));
   }
 
   @Test
   public void formats_primitive() {
     assertEquals(
-        "[" + 1 + "]",
+        format("[%s]", 1),
         formatter.format(new int[] { 1 }));
   }
 
   @Test
   public void formats_object_array() {
     assertEquals(
-        "[" + a + ", " + b + "]",
+        format("[%s, %s]", a, b),
         formatter.format(new Object[] { a, b }));
   }
 
   @Test
   public void formats_deep_array() {
     assertEquals(
-        "[[" + a + ", " + b + "], [" + c + ", " + d + "]]",
+        format("[[%s, %s], [%s, %s]]", a, b, c, d),
         formatter.format(new Object[] { new Object[] { a, b }, new Object[] { c, d } }));
   }
 
   @Test
   public void formats_primitive_array() {
     assertEquals(
-        "[[" + 1 + ", " + 2 + "], [" + 3 + ", " + 4 + "]]",
+        format("[[%s, %s], [%s, %s]]", 1, 2, 3, 4),
         formatter.format(new int[][] { { 1, 2 }, { 3, 4 } }));
   }
 

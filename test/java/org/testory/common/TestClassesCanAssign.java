@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -169,6 +170,6 @@ public class TestClassesCanAssign {
   }
 
   private static String formatMessage(Object value, Class<?> type) {
-    return "can assign " + value.getClass().getName() + " to type " + type.getName();
+    return format("can assign %s to type %s", value.getClass().getName(), type.getName());
   }
 }

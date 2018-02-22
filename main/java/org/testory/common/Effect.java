@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 public abstract class Effect {
@@ -18,7 +19,7 @@ public abstract class Effect {
     }
 
     public String toString() {
-      return "returned(" + object + ")";
+      return format("returned(%s)", object);
     }
   }
 
@@ -38,7 +39,7 @@ public abstract class Effect {
     }
 
     public String toString() {
-      return "thrown(" + throwable + ")";
+      return format("thrown(%s)", throwable);
     }
   }
 

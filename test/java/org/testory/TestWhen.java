@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -51,9 +52,10 @@ public class TestWhen {
       thenThrown();
       fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
+      assertThat(e, hasMessageContaining(format(""
           + "  but returned\n"
-          + "    " + object + "\n"));
+          + "    %s\n",
+          object)));
     }
   }
 
@@ -66,7 +68,7 @@ public class TestWhen {
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(""
           + "  but returned\n"
-          + "    " + null + "\n"));
+          + "    null\n"));
     }
   }
 
@@ -79,7 +81,7 @@ public class TestWhen {
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(""
           + "  but returned\n"
-          + "    " + 1234 + "\n"));
+          + "    1234\n"));
     }
   }
 

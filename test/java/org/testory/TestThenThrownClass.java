@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenThrown;
@@ -49,13 +50,17 @@ public class TestThenThrownClass {
       thenThrown(ExpectedThrowable.class);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected thrown\n"
-          + "    " + ExpectedThrowable.class.getName() + "\n"
-          + "  but thrown\n"
-          + "    " + throwable.getClass().getName() + "\n"
-          + "\n"
-          + printStackTrace(throwable),
+      assertEquals(
+          format("\n"
+              + "  expected thrown\n"
+              + "    %s\n"
+              + "  but thrown\n"
+              + "    %s\n"
+              + "\n"
+              + "%s",
+              ExpectedThrowable.class.getName(),
+              throwable.getClass().getName(),
+              printStackTrace(throwable)),
           e.getMessage());
     }
   }
@@ -70,13 +75,17 @@ public class TestThenThrownClass {
       thenThrown(ExpectedThrowable.class);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected thrown\n"
-          + "    " + ExpectedThrowable.class.getName() + "\n"
-          + "  but thrown\n"
-          + "    " + throwable.getClass().getName() + "\n"
-          + "\n"
-          + printStackTrace(throwable),
+      assertEquals(
+          format("\n"
+              + "  expected thrown\n"
+              + "    %s\n"
+              + "  but thrown\n"
+              + "    %s\n"
+              + "\n"
+              + "%s",
+              ExpectedThrowable.class.getName(),
+              throwable.getClass().getName(),
+              printStackTrace(throwable)),
           e.getMessage());
     }
   }
@@ -89,11 +98,14 @@ public class TestThenThrownClass {
       thenThrown(ExpectedThrowable.class);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected thrown\n"
-          + "    " + ExpectedThrowable.class.getName() + "\n"
-          + "  but returned\n"
-          + "    " + object + "\n",
+      assertEquals(
+          format("\n"
+              + "  expected thrown\n"
+              + "    %s\n"
+              + "  but returned\n"
+              + "    %s\n",
+              ExpectedThrowable.class.getName(),
+              object),
           e.getMessage());
     }
   }
@@ -106,11 +118,13 @@ public class TestThenThrownClass {
       thenThrown(ExpectedThrowable.class);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected thrown\n"
-          + "    " + ExpectedThrowable.class.getName() + "\n"
-          + "  but returned\n"
-          + "    void\n",
+      assertEquals(
+          format("\n"
+              + "  expected thrown\n"
+              + "    %s\n"
+              + "  but returned\n"
+              + "    void\n",
+              ExpectedThrowable.class.getName()),
           e.getMessage());
     }
   }

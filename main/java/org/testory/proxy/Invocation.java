@@ -1,5 +1,6 @@
 package org.testory.proxy;
 
+import static java.lang.String.format;
 import static java.util.Objects.deepEquals;
 import static org.testory.common.Classes.canInvoke;
 import static org.testory.common.Classes.setAccessible;
@@ -64,6 +65,6 @@ public class Invocation {
   }
 
   public String toString() {
-    return "invocation(" + method + ", " + instance + ", " + arguments + ")";
+    return format("invocation(%s, %s, %s)", method, instance, arguments);
   }
 }

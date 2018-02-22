@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -92,6 +93,6 @@ public class TestClassesCanReturn {
   }
 
   private static String formatMessage(Method method, Object object) {
-    return "can return " + object + " from " + method.getName();
+    return format("can return %s from %s", object, method.getName());
   }
 }

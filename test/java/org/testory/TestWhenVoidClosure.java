@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenReturned;
@@ -59,11 +60,13 @@ public class TestWhenVoidClosure {
       thenReturned();
       fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
-          + "  but thrown\n"
-          + "    " + throwable + "\n"));
       assertThat(e, hasMessageContaining(
-          "\n" + printStackTrace(throwable) + "\n"));
+          format(""
+              + "  but thrown\n"
+              + "    %s\n",
+              throwable)));
+      assertThat(e, hasMessageContaining(
+          format("\n%s\n", printStackTrace(throwable))));
     }
   }
 

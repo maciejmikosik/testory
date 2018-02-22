@@ -1,5 +1,6 @@
 package org.testory.plumbing.mock;
 
+import static java.lang.String.format;
 import static org.testory.plumbing.PlumbingException.check;
 
 import org.testory.proxy.Handler;
@@ -21,6 +22,6 @@ public class Stubbed {
   }
 
   public String toString() {
-    return "stubbed(" + invocationMatcher + ", " + handler + ")";
+    return format("stubbed(%s, %s)", invocationMatcher, handler);
   }
 }

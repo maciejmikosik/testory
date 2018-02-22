@@ -1,5 +1,6 @@
 package org.testory.proxy;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.testory.common.Collections.immutable;
 import static org.testory.proxy.ProxyException.check;
@@ -84,6 +85,6 @@ public class Typing {
   }
 
   public String toString() {
-    return "typing(" + superclass + ", " + interfaces + ")";
+    return format("typing(%s, %s)", superclass, interfaces);
   }
 }

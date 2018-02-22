@@ -1,5 +1,7 @@
 package org.testory.plumbing.facade;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Objects.deepEquals;
 import static org.testory.TestoryAssertionError.assertionError;
 import static org.testory.common.Classes.defaultValue;
@@ -10,6 +12,8 @@ import static org.testory.common.Matchers.asDiagnosticMatcher;
 import static org.testory.common.Matchers.asMatcher;
 import static org.testory.common.Matchers.isDiagnosticMatcher;
 import static org.testory.common.Matchers.isMatcher;
+import static org.testory.common.ObjectFormatter.objectFormatter;
+import static org.testory.common.SequenceFormatter.sequence;
 import static org.testory.common.Throwables.gently;
 import static org.testory.common.Throwables.printStackTrace;
 import static org.testory.plumbing.Inspecting.inspecting;
@@ -21,6 +25,9 @@ import static org.testory.plumbing.mock.Stubbed.stubbed;
 import static org.testory.proxy.Invocation.invocation;
 import static org.testory.proxy.handler.ReturningHandler.returning;
 import static org.testory.proxy.handler.ThrowingHandler.throwing;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.testory.common.Closure;
 import org.testory.common.Effect;
@@ -229,7 +236,7 @@ public class ConfigurableFacade implements Facade {
       }
 
       public String toString() {
-        return "onInstance(" + mock + ")";
+        return format("onInstance(%s)", mock);
       }
     };
   }
@@ -241,7 +248,7 @@ public class ConfigurableFacade implements Facade {
       }
 
       public String toString() {
-        return "onReturn(" + type.getName() + ")";
+        return format("onReturn(%s)", type.getName());
       }
     };
   }
@@ -254,13 +261,10 @@ public class ConfigurableFacade implements Facade {
       }
 
       public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("onRequest(").append(type.getName());
-        for (Object argument : arguments) {
-          builder.append(", ").append(argument);
-        }
-        builder.append(")");
-        return builder.toString();
+        List<Object> elements = new ArrayList<>();
+        elements.add(type.getName());
+        elements.addAll(asList(arguments));
+        return format("onRequest(%s)", sequence(", ", objectFormatter()).format(elements));
       }
     };
   }

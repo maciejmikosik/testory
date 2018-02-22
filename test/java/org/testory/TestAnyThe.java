@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -94,13 +95,13 @@ public class TestAnyThe {
       thenCalled(mock).invoke(the(object));
       fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(".invoke(the(" + object + "))"));
+      assertThat(e, hasMessageContaining(format(".invoke(the(%s))", object)));
     }
     try {
       thenCalled(mock).invoke(the(new Object[] { object }));
       fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(".invoke(the([" + object + "]))"));
+      assertThat(e, hasMessageContaining(format(".invoke(the([%s]))", object)));
     }
   }
 

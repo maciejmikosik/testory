@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -102,7 +103,7 @@ public class TestClassesCanInvoke {
   }
 
   private static void assertCorrectness(Method method, Object instance, Object... arguments) {
-    String message = "canInvoke(" + method + ", " + instance + ", " + asList(arguments) + ")";
+    String message = format("canInvoke(%s, %s, %s)", method, instance, asList(arguments));
     boolean expected = canJavaInvoke(method, instance, arguments);
     boolean actual = canInvoke(method, instance, arguments);
     assertEquals(message, expected, actual);

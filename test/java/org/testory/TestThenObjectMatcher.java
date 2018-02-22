@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.then;
@@ -34,11 +35,14 @@ public class TestThenObjectMatcher {
       then(otherObject, matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected\n"
-          + "    " + matcher + "\n"
-          + "  but was\n"
-          + "    " + otherObject + "\n",
+      assertEquals(
+          format("\n"
+              + "  expected\n"
+              + "    %s\n"
+              + "  but was\n"
+              + "    %s\n",
+              matcher,
+              otherObject),
           e.getMessage());
     }
   }
@@ -50,13 +54,17 @@ public class TestThenObjectMatcher {
       then(object, matcher);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected\n"
-          + "    " + matcher + "\n"
-          + "  but was\n"
-          + "    " + object + "\n"
-          + "  diagnosis\n"
-          + "    " + diagnosed(object) + "\n",
+      assertEquals(
+          format("\n"
+              + "  expected\n"
+              + "    %s\n"
+              + "  but was\n"
+              + "    %s\n"
+              + "  diagnosis\n"
+              + "    %s\n",
+              matcher,
+              object,
+              diagnosed(object)),
           e.getMessage());
     }
   }

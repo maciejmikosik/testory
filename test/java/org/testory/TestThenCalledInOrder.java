@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
@@ -112,10 +113,12 @@ public class TestThenCalledInOrder {
       thenCalledInOrder(onInstance(first));
       fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
-          + "  expected called in order\n"
-          + "    " + onInstance(first) + "\n"
-          + "  but not called\n"));
+      assertThat(e, hasMessageContaining(
+          format(""
+              + "  expected called in order\n"
+              + "    %s\n"
+              + "  but not called\n",
+              onInstance(first))));
     }
   }
 

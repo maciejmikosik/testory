@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertFalse;
@@ -94,7 +95,7 @@ public class TestAnyInstanceOf {
       fail();
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(
-          mock + ".invoke(anyInstanceOf(" + Object.class.getName() + "))"));
+          format("%s.invoke(anyInstanceOf(%s))", mock, Object.class.getName())));
     }
   }
 

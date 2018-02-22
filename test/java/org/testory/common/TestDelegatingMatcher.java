@@ -1,5 +1,6 @@
 package org.testory.common;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -58,7 +59,7 @@ public class TestDelegatingMatcher {
       }
 
       public String toString() {
-        return "same(" + instance + ")";
+        return format("same(%s)", instance);
       }
     };
   }

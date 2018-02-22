@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.mock;
@@ -62,8 +63,7 @@ public class TestThenCalledTimesInteger {
       thenCalledTimes(3, onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
-          + "expected called times " + 3 + "\n"));
+      assertThat(e, hasMessageContaining("expected called times 3\n"));
     }
   }
 
@@ -112,7 +112,7 @@ public class TestThenCalledTimesInteger {
       }
 
       public String toString() {
-        return "onInstance(" + mock + ")";
+        return format("onInstance(%s)", mock);
       }
     };
   }

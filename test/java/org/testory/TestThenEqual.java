@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.testory.Testory.thenEqual;
@@ -39,11 +40,14 @@ public class TestThenEqual {
       thenEqual(otherObject, object);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected\n"
-          + "    " + object + "\n"
-          + "  but was\n"
-          + "    " + otherObject + "\n",
+      assertEquals(
+          format("\n"
+              + "  expected\n"
+              + "    %s\n"
+              + "  but was\n"
+              + "    %s\n",
+              object,
+              otherObject),
           e.getMessage());
     }
   }
@@ -54,11 +58,13 @@ public class TestThenEqual {
       thenEqual(object, null);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected\n"
-          + "    " + null + "\n"
-          + "  but was\n"
-          + "    " + object + "\n",
+      assertEquals(
+          format("\n"
+              + "  expected\n"
+              + "    null\n"
+              + "  but was\n"
+              + "    %s\n",
+              object),
           e.getMessage());
     }
   }
@@ -69,11 +75,13 @@ public class TestThenEqual {
       thenEqual(null, object);
       fail();
     } catch (TestoryAssertionError e) {
-      assertEquals("\n"
-          + "  expected\n"
-          + "    " + object + "\n"
-          + "  but was\n"
-          + "    " + null + "\n",
+      assertEquals(
+          format("\n"
+              + "  expected\n"
+              + "    %s\n"
+              + "  but was\n"
+              + "    null\n",
+              object),
           e.getMessage());
     }
   }

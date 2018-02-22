@@ -1,5 +1,6 @@
 package org.testory.plumbing.mock;
 
+import static java.lang.String.format;
 import static org.testory.plumbing.PlumbingException.check;
 import static org.testory.plumbing.history.FilteredHistory.filter;
 
@@ -25,7 +26,7 @@ public class UniqueNamer implements Namer {
     check(type != null);
     List<String> usedNames = usedNames();
     for (int i = 0;; i++) {
-      String name = "mock" + type.getSimpleName() + i;
+      String name = format("mock%s%s", type.getSimpleName(), i);
       if (!usedNames.contains(name)) {
         return name;
       }

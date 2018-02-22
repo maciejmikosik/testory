@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -64,9 +65,10 @@ public class TestWhenChained {
       thenThrown();
       fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
+      assertThat(e, hasMessageContaining(format(""
           + "  but returned\n"
-          + "    " + object + "\n"));
+          + "    %s\n",
+          object)));
     }
   }
 
@@ -90,10 +92,13 @@ public class TestWhenChained {
       thenReturned();
       fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
-          + "  but thrown\n"
-          + "    " + throwable + "\n"));
-      assertThat(e, hasMessageContaining("\n" + printStackTrace(throwable) + "\n"));
+      assertThat(e, hasMessageContaining(
+          format(""
+              + "  but thrown\n"
+              + "    %s\n",
+              throwable)));
+      assertThat(e, hasMessageContaining(
+          format("\n%s\n", printStackTrace(throwable))));
     }
   }
 

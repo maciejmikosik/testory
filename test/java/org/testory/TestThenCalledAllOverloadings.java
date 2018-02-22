@@ -1,5 +1,6 @@
 package org.testory;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -100,8 +101,8 @@ public class TestThenCalledAllOverloadings {
       fail();
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(""
-          + "  but called" + "\n"
-          + "    times " + 3 + "\n"));
+          + "  but called\n"
+          + "    times 3\n"));
     }
   }
 
@@ -115,10 +116,10 @@ public class TestThenCalledAllOverloadings {
       fail();
     } catch (TestoryAssertionError e) {
       assertThat(e, hasMessageContaining(""
-          + "  actual invocations\n"
-          + "    " + mock + ".invoke()\n"
-          + "    " + mock + ".acceptObject(" + object + ")\n"
-          + "    " + mock + ".acceptObjects(" + object + ", " + object + ")\n"));
+          + format("  actual invocations\n")
+          + format("    %s.invoke()\n", mock)
+          + format("    %s.acceptObject(%s)\n", mock, object)
+          + format("    %s.acceptObjects(%s, %s)\n", mock, object, object)));
     }
   }
 
@@ -130,8 +131,8 @@ public class TestThenCalledAllOverloadings {
       thenCalled(onInstance(mock));
       fail();
     } catch (TestoryAssertionError e) {
-      assertThat(e, hasMessageContaining(""
-          + "    " + mock + ".acceptObject([[" + object + "]])\n"));
+      assertThat(e, hasMessageContaining(
+          format("    %s.acceptObject([[%s]])\n", mock, object)));
     }
   }
 
@@ -170,7 +171,7 @@ public class TestThenCalledAllOverloadings {
       }
 
       public String toString() {
-        return "onInstance(" + mock + ")";
+        return format("onInstance(%s)", mock);
       }
     };
   }

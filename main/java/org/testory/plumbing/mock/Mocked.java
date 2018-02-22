@@ -1,5 +1,6 @@
 package org.testory.plumbing.mock;
 
+import static java.lang.String.format;
 import static org.testory.plumbing.PlumbingException.check;
 
 public class Mocked {
@@ -18,6 +19,6 @@ public class Mocked {
   }
 
   public String toString() {
-    return "mocked(" + mock + ", " + name + ")";
+    return format("mocked(%s, %s)", mock, name);
   }
 }
