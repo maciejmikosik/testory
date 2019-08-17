@@ -1,0 +1,47 @@
+
+
+
+
+Typing - factory methods, builder pattern
+Instantiation - unique and CglibProxer
+gather Handlers, delegatingTo=willSpy
+String.format instead of +
+Object printable -> interface Printable
+exception - simplify stack hackery
+
+
+----- desktop -----
+
+
+printStackTrace -> format(StackTrace)
+
+
+build deterministic test
+
+BUILD
+	replace jarjar by proguard
+	replace cglib by bytebuddy
+
+
+TODO
+ - replace `Inspecting` by `Effect`
+ - `willSpy` - extract `DelegatingHandler` and `InvokingHandler`
+ - `SaneMockMaker.onInvocation`
+ - `onInstance` -> testingg
+ - test spawn 2 threads
+ - `checkNotNull` for all exceptions
+
+
+
+---- keep ---
+
+
+
+	
+	givenTest - NaN, infinity?
+	givenTest for empty enum
+	finals -  Any of the following throws TestoryException. Really? Test it!
+	purged stubbing is no longer in effect. so what happens
+	calling it causes TestoryException -> calling any of its methods
+
+
