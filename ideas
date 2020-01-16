@@ -45,3 +45,10 @@ TODO
 	calling it causes TestoryException -> calling any of its methods
 
 
+
+java 8
+ - test for stubbing default methods
+
+logbuddy uses peeling for anonymous classes but testory doesn't
+turn TestCglibProxer to learning test
+explicit dependency to ObjenesisStd
