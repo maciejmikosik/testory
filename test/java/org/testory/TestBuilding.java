@@ -1,13 +1,13 @@
 package org.testory;
 
 import static java.util.Arrays.asList;
-import static javax.xml.bind.DatatypeConverter.printHexBinary;
 import static org.junit.Assert.assertEquals;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -53,6 +53,10 @@ public class TestBuilding {
     } catch (IOException | NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private static String printHexBinary(byte[] bytes) {
+    return new BigInteger(1, bytes).toString(16);
   }
 
   private static void drainAllBytes(DigestInputStream input) throws IOException {
