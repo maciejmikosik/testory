@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="main/java"/>
 	<classpathentry kind="lib" path="main/jar/cglib-nodep-3.3.0.jar" sourcepath="main/jar/cglib-RELEASE_3_3_0.zip"/>
+	<classpathentry kind="lib" path="main/jar/byte-buddy-1.12.21.jar" sourcepath="main/jar/byte-buddy-1.12.21-sources.jar"/>
 	<classpathentry kind="lib" path="main/jar/objenesis-3.3.jar" sourcepath="main/jar/objenesis-3.3-sources.jar"/>
 	<classpathentry kind="src" path="test/java"/>
 	<classpathentry kind="lib" path="test/jar/assertj-core-1.7.0.jar" sourcepath="test/jar/assertj-core-1.7.0-sources.jar"/>
