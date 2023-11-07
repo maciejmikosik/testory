@@ -9,7 +9,6 @@ import java.util.AbstractList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class learn_Objenesis {
@@ -65,7 +64,7 @@ public class learn_Objenesis {
     try {
       objenesis.newInstance(List.class);
       fail();
-    } catch (ObjenesisException e) {}
+    } catch (InstantiationError e) {}
   }
 
   @Test
@@ -73,7 +72,7 @@ public class learn_Objenesis {
     try {
       objenesis.newInstance(AbstractList.class);
       fail();
-    } catch (ObjenesisException e) {}
+    } catch (InstantiationError e) {}
   }
 
   @Test
@@ -81,7 +80,7 @@ public class learn_Objenesis {
     try {
       objenesis.newInstance(SuppressWarnings.class);
       fail();
-    } catch (ObjenesisException e) {}
+    } catch (InstantiationError e) {}
   }
 
   @Test
@@ -89,7 +88,7 @@ public class learn_Objenesis {
     try {
       objenesis.newInstance(Object[].class);
       fail();
-    } catch (ObjenesisException e) {}
+    } catch (InstantiationError e) {}
   }
 
   @Test
@@ -97,18 +96,14 @@ public class learn_Objenesis {
     try {
       objenesis.newInstance(int[].class);
       fail();
-    } catch (ObjenesisException e) {}
+    } catch (InstantiationError e) {}
   }
 
-  /**
-   * crashes jvm
-   */
-  @Ignore
   @Test
   public void cannot_create_primitive() {
     try {
       objenesis.newInstance(int.class);
       fail();
-    } catch (ObjenesisException e) {}
+    } catch (IllegalArgumentException e) {}
   }
 }

@@ -7,20 +7,13 @@ import static org.testory.common.Checks.checkArgument;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Classes {
   public static void setAccessible(final AccessibleObject accessible) {
     requireNonNull(accessible);
-    AccessController.doPrivileged(new PrivilegedAction<Void>() {
-      public Void run() {
-        accessible.setAccessible(true);
-        return null;
-      }
-    });
+    accessible.setAccessible(true);
   }
 
   public static boolean canAssign(@Nullable Object instance, Class<?> type) {

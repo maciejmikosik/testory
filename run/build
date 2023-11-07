@@ -11,6 +11,8 @@ PROJECT=`pwd`
 		JAVA="${MAIN}/java"
 		JAR="${MAIN}/jar"
 
+	JMODS="/usr/lib/jvm/default/jmods"
+
 ########## CLEANUP ##########
 rm \
   --recursive \
@@ -27,10 +29,10 @@ mkdir \
 
 ########## COMPILE SOURCES ##########
 javac \
-  -classpath "${JAR}/cglib-nodep-2.2.3.jar:${JAR}/objenesis-2.0.jar" \
+  -classpath "${JAR}/cglib-nodep-3.3.0.jar:${JAR}/objenesis-3.3.jar" \
   -sourcepath "${JAVA}" \
-  -source 1.7 \
-  -target 1.7 \
+  -source 1.8 \
+  -target 1.8 \
   -d "${UNPACKED}" \
   "${JAVA}/org/testory/Build.java"
 
@@ -43,12 +45,12 @@ cp \
 ########## COPY DEPENDENCIES ##########
 unzip \
   -q \
-  "${JAR}/cglib-nodep-2.2.3.jar" \
+  "${JAR}/cglib-nodep-3.3.0.jar" \
   -d "${UNPACKED}" \
   net/*
 unzip \
   -q \
-  "${JAR}/objenesis-2.0.jar" \
+  "${JAR}/objenesis-3.3.jar" \
   -d "${UNPACKED}" \
   org/*
 
@@ -70,27 +72,68 @@ cd ${UNPACKED}
 zip \
   --quiet \
   --recurse-paths \
-  ./testory.jar \
+  ${BUILDING}/testory.jar \
   ./*
 cd "${PROJECT}"
+rm -rf ${UNPACKED}
 
-########## INLINE DEPENDENCIES ##########
+########## SHADE DEPENDENCIES ##########
+jar tf ${BUILDING}/testory.jar \
+  | grep "\.class$" \
+  | grep -v "$org/testory/" \
+  | sed 's/\.class$//g' \
+  | sed  's/\//\./g' \
+  | xargs -I{} echo {} -\> org.testory.shaded.{} : \
+  > "${BUILDING}/shading_map.txt"
+
+
 java \
-  -jar "${RUN}/jarjar-1.4.jar" \
-  process "${RUN}/jarjar-rules.txt" \
-  "${UNPACKED}/testory.jar" \
-  "${UNPACKED}/testory.jar"
+  -cp "${RUN}/proguard-7.4.0.jar" \
+  proguard.ProGuard \
+  -injars "${BUILDING}/testory.jar" \
+  -outjars "${BUILDING}/testory-shaded.jar" \
+  -libraryjars "${JMODS}/java.base.jmod(!**.jar;!module-info.class)" \
+  -libraryjars "${JMODS}/java.desktop.jmod" \
+  -libraryjars "${JMODS}/jdk.unsupported.jmod" \
+  -dontnote org.objenesis.** \
+  -dontwarn net.sf.cglib.** \
+  -dontnote net.sf.cglib.** \
+  -dontshrink \
+  -dontoptimize \
+  -keepattributes \* \
+  -keepparameternames \
+  -keepclassmembers class \* { \
+   \*\*\* \*\; \
+   \*\*\* \*\(...\)\; \
+  } \
+  -keep class org.testory.** \
+  -applymapping "${BUILDING}/shading_map.txt"
 
-########## COPY PRODUCED JAR ##########
-cp \
-  "${UNPACKED}/testory.jar" \
-  "${BUILDING}"
+mv "${BUILDING}/testory-shaded.jar" "${BUILDING}/testory.jar"
 
-########## CLEANUP ##########
+rm "${BUILDING}/shading_map.txt"
+
+########## RESET TIMESTAMPS IN JAR ##########
+mkdir "${UNPACKED}"
+unzip \
+  -q \
+  -d "${UNPACKED}" \
+  "${BUILDING}/testory.jar"
+find "${UNPACKED}" | xargs touch --date=@0
+cd "${UNPACKED}"
+zip \
+  --quiet \
+  -X \
+  --recurse-paths \
+  "${BUILDING}/testory.jar" \
+  ./*
+cd "${PROJECT}"
 rm \
   --recursive \
   --force \
   "${UNPACKED}"
+
+########## REPORT ##########
 
 echo ""
 echo "BUILD SUCCESSFUL"
