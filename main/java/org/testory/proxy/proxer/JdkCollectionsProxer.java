@@ -42,13 +42,14 @@ public class JdkCollectionsProxer implements Proxer {
   }
 
   private static boolean isFromJdk(Class<?> type) {
-    return type.getPackage() == Package.getPackage("java.util");
+    return true;
   }
 
   private static boolean isContainer(Class<?> type) {
     return Collection.class.isAssignableFrom(type)
         || Map.class.isAssignableFrom(type)
         || Iterator.class.isAssignableFrom(type)
-        || (type != null && isContainer(type.getDeclaringClass()));
+        || (type.getDeclaringClass() != null
+            && isContainer(type.getDeclaringClass()));
   }
 }
