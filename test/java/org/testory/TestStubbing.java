@@ -64,6 +64,12 @@ public class TestStubbing {
   }
 
   @Test
+  public void stubbing_returns_narrower_primitive() {
+    given(willReturn(3), onAlways);
+    assertEquals(3f, mock.returnFloat(), 0f);
+  }
+
+  @Test
   public void mock_returns_null() {
     given(willReturn(null), onAlways);
     assertEquals(null, mock.returnObject());
@@ -265,6 +271,8 @@ public class TestStubbing {
     abstract String returnString();
 
     abstract int returnInt();
+
+    abstract float returnFloat();
 
     abstract void returnVoid();
 
